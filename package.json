@@ -1,0 +1,38 @@
+{
+  "name": "cinema-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@dgshahr/dg-theme-tailwind-plugin": "^1.1.0",
+    "@dgshahr/ui-kit": "^1.9.8",
+    "@tanstack/react-query": "^5.101.0",
+    "axios": "^1.18.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.574.0",
+    "next": "16.1.6",
+    "qs": "^6.15.2",
+    "react": "19.2.3",
+    "react-device-detect": "^2.2.3",
+    "react-dom": "19.2.3",
+    "react-toastify": "^11.0.5",
+    "swiper": "^12.1.1",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/qs": "^6.15.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

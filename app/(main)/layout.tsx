@@ -1,0 +1,31 @@
+"use client";
+
+import { MobileBottomNav } from "@/components/site/MobileBottomNav";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import LoginDrawer from "@/components/login/LoginDrawer";
+import "../globals.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMemo } from "react";
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const queryClient = useMemo(() => new QueryClient(), []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="flex min-h-dvh flex-col bg-zinc-950 text-zinc-100 antialiased">
+        <SiteHeader />
+        <main className="flex-1 overflow-hidden mt-10 pb-24 lg:pb-0">
+          {children}
+        </main>
+        <SiteFooter />
+        <MobileBottomNav />
+        <LoginDrawer />
+      </div>
+    </QueryClientProvider>
+  );
+}
