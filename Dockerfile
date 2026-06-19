@@ -2,7 +2,7 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json ./
 RUN yarn config set registry https://package-mirror.liara.ir/repository/npm/
 RUN yarn install --frozen-lockfile
 
