@@ -34,7 +34,7 @@ export type LoginResponse = {
 
 export interface ParamsArtistList {
   count: number;
-  p: number;
+  page: number;
   search: string | null;
   status__in: string[];
   categoryId__in: number[];
@@ -63,6 +63,7 @@ export enum EArtistRequestStatus {
   PENDING_PAYMENT = "PENDING_PAYMENT",
   APPROVED = "APPROVED",
   REJECTED = "REJECTED",
+  NEED_TO_REVISION = "NEED_TO_REVISION",
 }
 
 export enum EArtistGender {
@@ -95,6 +96,7 @@ export interface IArtistItem {
   categories: IArtistCategory[];
   createdAt: string | null;
   updatedAt: string | null;
+  trackingCode: string | null;
   id: number;
   portfolios: IArtistPortfolios[];
   status: EArtistRequestStatus;
@@ -138,7 +140,7 @@ export enum ESupportStatus {
 
 export interface ParamsSupportList {
   count: number;
-  p: number;
+  page: number;
   search: string | null;
   status__in: string[];
   categoryId__in: number[];
@@ -167,7 +169,7 @@ export interface ISupportItem {
 
 export interface ParamsCategoryList {
   count: number;
-  p: number;
+  page: number;
   search: string | null;
   isActive?: boolean | null;
   categoryId__in: number[];
@@ -187,6 +189,88 @@ export interface IUpdateCategoryRequest {
   config: ICategoryConfig;
 }
 
+export interface IFaqItem {
+  answer: string;
+  createdAt: string | null;
+  deletedAt: string | null;
+  id: number;
+  isActive: boolean;
+  question: string;
+  updatedAt: string | null;
+}
+
+export interface IAdminAboutUs {
+  createdAt: string | null;
+  deletedAt: string | null;
+  id: number;
+  isActive: boolean;
+  text: string;
+  updatedAt: string;
+}
+
+export interface IAboutUsResponse {
+  message: string | null;
+  result: IAdminAboutUs[];
+}
+
+export interface IUserRetrive {
+  message: string | null;
+  result: IArtistItem[];
+}
+
+export interface IAdminFaqUpdateItem {
+  id: number;
+  question: string;
+  answer: string;
+}
+
+export interface IUsersItem {
+  aboutMe: string | null;
+  address: string | null;
+  avatar: string | null;
+  birthDate: string | null;
+  city: string | null;
+  code: string | null;
+  createdAt: string | null;
+  deletedAt: string | null;
+  dialect: string | null;
+  education: string | null;
+  email: string | null;
+  firstName: string | null;
+  gender: string | null;
+  height: number | null;
+  id: number;
+  isActive: boolean;
+  language: string | null;
+  lastLogin: string | null;
+  lastName: string | null;
+  major: string | null;
+  phone_number: string | null;
+  postalCode: string | null;
+  province: string | null;
+  skinColor: string | null;
+  updatedAt: string | null;
+  weight: number | null;
+  [key: string]: unknown;
+}
+
+export interface ParamsUsersList {
+  count: number;
+  page: number;
+  search: string | null;
+  categoryId__in: number[];
+  province__in: number[] | null;
+  createdAt__gte: Date | null;
+  createdAt__lte: Date | null;
+  updateAt__gte: Date | null;
+  updateAt__lte: Date | null;
+}
+
+export interface IArtistStatusUpdateRequest {
+  status: EArtistRequestStatus;
+  rejected_reason?: string;
+}
+
 export type IArtistListResponse = IBasePaginateResponse<IArtistItem>;
 export type IArtistRetriveResponse = IRetriveResponse<IArtistItem>;
 
@@ -197,3 +281,7 @@ export type ISupportListResponse = IBasePaginateResponse<ISupportItem>;
 export type ISupportRetriveResponse = IRetriveResponse<ISupportItem>;
 
 export type IProvinceListResponse = IBasePaginateResponse<IProvinceItem>;
+
+export type IFaqListResponse = IBasePaginateResponse<IFaqItem>;
+
+export type IUsersListResponse = IBasePaginateResponse<IUsersItem>;

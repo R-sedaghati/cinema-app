@@ -56,8 +56,6 @@ const ExtendedUiDatePicker: FC<ExtendedUiDatePickerProps> = ({
     }));
   };
 
-  console.log(params[startKey]);
-
   useEffect(() => {
     if (applyOnChange) setParamsFromLocal();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -14,7 +14,7 @@ interface Props {
 const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
   const [search, setSearch] = useState<string>("");
   const showCleanFilters = ObjectUtils.hasMeaningfulValues(params, [
-    "p",
+    "page",
     "count",
   ]);
 
@@ -23,7 +23,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
     setParams({
       ...params,
       search: search,
-      p: 1,
+      page: 1,
     });
   };
 

@@ -9,9 +9,13 @@ export const ARTSIT_STATUS: Record<
     label: "تایید شده",
     color: "success",
   },
+  [EArtistRequestStatus.NEED_TO_REVISION]: {
+    label: "نیاز به اصلاح",
+    color: "gray",
+  },
   [EArtistRequestStatus.PENDING]: {
     label: "در انتظار بررسی",
-    color: "gray",
+    color: "warning",
   },
   [EArtistRequestStatus.PENDING_PAYMENT]: {
     label: "در انتظار پرداخت",
@@ -19,6 +23,6 @@ export const ARTSIT_STATUS: Record<
   },
   [EArtistRequestStatus.REJECTED]: {
     label: "رد شده",
-    color: "warning",
+    color: "error",
   },
 };

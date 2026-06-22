@@ -3,12 +3,12 @@ import { hasValidParams } from "@/lib/utils/hasValidParams";
 import { ParamsArtistList } from "@/lib/services/admin/type";
 
 interface Pagination {
-  p: number;
+  page: number;
   count: number;
 }
 
 const initialParams: Partial<ParamsArtistList> = {
-  p: 1,
+  page: 1,
   count: 10,
   search: null,
   province__in: [],
@@ -23,7 +23,10 @@ const initialParams: Partial<ParamsArtistList> = {
 export default function useArtistListParams() {
   const [params, setParams] =
     useState<Partial<ParamsArtistList>>(initialParams);
-  const [pagination, setPagination] = useState<Pagination>({ count: 10, p: 1 });
+  const [pagination, setPagination] = useState<Pagination>({
+    count: 10,
+    page: 1,
+  });
 
   const finalParams = {
     ...params,

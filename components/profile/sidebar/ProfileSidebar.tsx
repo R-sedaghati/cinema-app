@@ -66,7 +66,7 @@ export default function ProfileSidebar({
     <aside className="relative flex-2 z-10 w-full space-y-2 text-right">
       <div
         className={clsx(
-          "flex flex-wrap justify-between gap-2 overflow-hidden items-center bg-gray-100/60 rounded-xl border-2 border-zinc-700/60 p-5 shadow-[0_10px_60px_rgba(0,0,0,0.8)] backdrop-blur-sm",
+          "flex justify-between gap-2 overflow-hidden items-center bg-gray-100/60 rounded-xl border-2 border-zinc-700/60 p-5 shadow-[0_10px_60px_rgba(0,0,0,0.8)] backdrop-blur-sm",
         )}
       >
         <div className="flex items-center justify-start gap-2">
@@ -74,13 +74,13 @@ export default function ProfileSidebar({
             <UserRound className="h-6 w-6 text-zinc-300" />
           </div>
           <div className="flex flex-col gap-2 items-start">
-            <h2 className="text-base text-zinc-100">نام و نام خانوادگی</h2>
+            <h2 className="text-base text-zinc-100">{`${data?.firstName} ${data?.lastName}`}</h2>
 
             <span dir="ltr" className="text-sm text-zinc-400">
               {data?.phone_number ?? ""}
             </span>
 
-            <p className="text-sm text-zinc-400 truncate">Nimauxii@gmail.com</p>
+            <p className="text-sm text-zinc-400 truncate">{data?.email}</p>
           </div>
         </div>
 
@@ -94,10 +94,7 @@ export default function ProfileSidebar({
         </Button>
       </div>
 
-      {/* Menu Sections 1 */}
       <MenuSection sections={sections1} active={active} setActive={setActive} />
-
-      {/* Menu Sections 2 */}
       <MenuSection sections={sections2} active={active} setActive={setActive} />
     </aside>
   );

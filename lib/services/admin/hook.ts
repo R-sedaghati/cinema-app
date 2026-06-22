@@ -1,29 +1,44 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  EArtistRequestStatus,
+  IAboutUsResponse,
+  IAdminFaqUpdateItem,
   IArtistListResponse,
   IArtistRetriveResponse,
+  IArtistStatusUpdateRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
+  IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
   IUpdateCategoryRequest,
+  IUserRetrive,
+  IUsersListResponse,
   LoginRequest,
   LoginResponse,
   ParamsArtistList,
   ParamsCategoryList,
+  ParamsUsersList,
 } from "./type";
 import {
+  adminAboutUs,
+  adminAboutUsUpdate,
   adminArtistList,
   adminArtistRetrieve,
+  adminArtistStatusUpdate,
   adminCategoryList,
   adminCategoryRetrieve,
   adminCategoryUpdate,
+  adminFaqList,
+  adminFaqUpdate,
   adminLogin,
   adminProvinceList,
   adminSupportList,
   adminSupportRetrieve,
+  adminUserRequest,
+  adminUsersList,
 } from "./api";
 import { AxiosError } from "axios";
 import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
@@ -131,5 +146,83 @@ export const useAdminCategoryUpdate = () => {
   return useMutation({
     mutationFn: (data: { id: number; payload: IUpdateCategoryRequest }) =>
       adminCategoryUpdate(data.id, data.payload, accessToken),
+  });
+};
+
+export const useAdminFaqList = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IFaqListResponse>({
+    queryKey: ["adminFaqList"],
+    queryFn: () => adminFaqList(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminAboutUs = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IAboutUsResponse>({
+    queryKey: ["adminAboutUs"],
+    queryFn: () => adminAboutUs(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminAboutUsUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: ({ text }: { text: string }) =>
+      adminAboutUsUpdate(text, accessToken),
+  });
+};
+
+export const useAdminFaqUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (faqs: IAdminFaqUpdateItem[]) =>
+      adminFaqUpdate(faqs, accessToken),
+  });
+};
+
+export const useAdminUserRequest = (id: number | undefined) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IUserRetrive>({
+    queryKey: ["adminUserRequest", id],
+    queryFn: () => adminUserRequest(id, accessToken),
+    refetchInterval: 30 * 1000,
+    enabled: Boolean(id),
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminUsersList = (
+  params?: Partial<ParamsUsersList> | undefined,
+) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IUsersListResponse>({
+    queryKey: ["adminUsersList", params],
+    queryFn: () => adminUsersList(params, accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminArtistStatusUpdate = (id: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (body: IArtistStatusUpdateRequest) =>
+      adminArtistStatusUpdate(id, body, accessToken),
   });
 };

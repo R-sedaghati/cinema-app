@@ -6,7 +6,7 @@ import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
-import Header from "../artists/Header";
+import Header from "../users/Header";
 import RequestDetailModal from "./RequestDetailModal";
 import { useState } from "react";
 import { useAdminSupportList } from "@/lib/services/admin/hook";
@@ -33,7 +33,7 @@ function RequestTable() {
   );
 
   return (
-    <div className="ss02">
+    <div className="ss02 mb-5">
       <FilterBar
         setParams={setParams}
         params={params}
@@ -58,9 +58,10 @@ function RequestTable() {
         {...(data?.count && {
           pagination: {
             pageSize: pagination.count,
-            defaultCurrent: pagination.p,
+            defaultCurrent: pagination.page,
             totalCount: data?.count ?? 0,
-            onPageChange: (p) => setPagination((state) => ({ ...state, p: p })),
+            onPageChange: (p) =>
+              setPagination((state) => ({ ...state, page: p })),
           },
         })}
         emptyContent={

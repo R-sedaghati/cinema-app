@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import qs from "qs";
 import { toast } from "react-toastify";
+import useAuthStore from "../stores/useAuthStore";
 
 type ErrorResponse = {
   data: null;
@@ -22,6 +23,12 @@ const landingApi = axios.create({
 
 landingApi.interceptors.request.use(
   (config) => {
+    const token = useAuthStore.getState().accessToken;
+
+    if (token) {
+      config.headers.Authorization = token;
+    }
+
     return config;
   },
   (error) => Promise.reject(error),

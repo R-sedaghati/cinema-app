@@ -47,25 +47,27 @@ function CategoryDetail() {
   });
 
   useEffect(() => {
-    if (!data?.config) return;
+    if (!data) return;
 
     setFaName(data.faName);
     setIsActive(data.isActive);
 
-    setFormFields({
-      fullName: data.config.fullName,
-      profileImage: data.config.profileImage,
-      email: data.config.email,
-      province: data.config.province,
-      city: data.config.city,
-      address: data.config.address,
-      postalCode: data.config.postalCode,
-      education: data.config.education,
-      educationField: data.config.educationField,
-      aboutMe: data.config.aboutMe,
-      portfolioImage: data.config.portfolioImage,
-      portfolioVideo: data.config.portfolioVideo,
-    });
+    if (data.config) {
+      setFormFields({
+        fullName: data.config.fullName,
+        profileImage: data.config.profileImage,
+        email: data.config.email,
+        province: data.config.province,
+        city: data.config.city,
+        address: data.config.address,
+        postalCode: data.config.postalCode,
+        education: data.config.education,
+        educationField: data.config.educationField,
+        aboutMe: data.config.aboutMe,
+        portfolioImage: data.config.portfolioImage,
+        portfolioVideo: data.config.portfolioVideo,
+      });
+    }
   }, [data]);
 
   const handleCheckboxChange =

@@ -14,7 +14,7 @@ export function ProfileClient() {
     useResponsiveSidebar(setActive);
 
   return (
-    <div className="relative grid gap-5 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,2.1fr)]">
+    <div className="relative grid gap-9 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,2.1fr)]">
       {(isMobile === null || !isMobile || showSidebar) && (
         <ProfileSidebar active={active} setActive={handleSelect} />
       )}

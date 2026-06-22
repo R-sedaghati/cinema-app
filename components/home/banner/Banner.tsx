@@ -1,9 +1,14 @@
+"use client";
+
 import Button from "@/components/common/Button";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Banner = () => {
+  const router = useRouter();
+
   return (
     <div className="w-full relative ">
       <div className="bg-secondary-black flex-col md:flex-row min-h-52 relative rounded-4xl border border-error-500/30 shadow-card w-full p-9 flex justify-between items-center">
@@ -20,8 +25,9 @@ const Banner = () => {
             leftIcon={<ChevronLeft />}
             size="small"
             className="bg-error-500 rounded-full!"
+            onClick={() => router.push("/artist-registration")}
           >
-            ثبت‌نام کارجو
+            ثبت‌ نام هنرمند
           </Button>
         </div>
         <div className="h-42 md:h-auto">

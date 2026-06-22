@@ -3,16 +3,25 @@
 import React from "react";
 import ContentCard from "./ContentCard";
 import Button from "../common/Button";
+import useAuthStore from "@/lib/stores/useAuthStore";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function LogoutCard() {
+  const router = useRouter();
+  const { logout } = useAuthStore();
+
   return (
     <ContentCard title="خروج از حساب">
-      <p className="text-sm leading-8 text-zinc-300">
-        این دکمه در نسخه نهایی به سیستم احراز هویت متصل می‌شود. در حال حاضر، فقط
-        برای کامل شدن نمای ظاهری صفحه قرار داده شده است.
-      </p>
-
-      <Button> خروج از حساب</Button>
+      <Button
+        onClick={() => {
+          logout();
+          toast.success("با موفقیت خارج شدید");
+          router.push("/");
+        }}
+      >
+        خروج از حساب
+      </Button>
     </ContentCard>
   );
 }

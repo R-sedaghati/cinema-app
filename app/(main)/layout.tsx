@@ -19,7 +19,7 @@ export default function RootLayout({
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-dvh flex-col bg-zinc-950 text-zinc-100 antialiased">
         <SiteHeader />
-        <main className="flex-1 overflow-hidden mt-10 pb-24 lg:pb-0">
+        <main className="flex-1 overflow-hidden md:mt-10 pb-24 lg:pb-8">
           {children}
         </main>
         <SiteFooter />

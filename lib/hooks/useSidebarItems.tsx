@@ -2,10 +2,11 @@ import { FirstLevelSidebarItem } from "@dgshahr/ui-kit/Sidebar";
 import { usePathname } from "next/navigation";
 import {
   User,
-  Settings,
   ChartColumnIncreasing,
   CircleDollarSign,
   Handshake,
+  TableOfContents,
+  ClipboardList,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -25,22 +26,9 @@ type SidebarParent = {
 
 export const useSidebarItems = (): {
   mainMenuItems: FirstLevelSidebarItem;
-  secondaryMenuItems: FirstLevelSidebarItem;
   firstAllowedRoute: string | undefined;
 } => {
   const pathname = usePathname() || "";
-
-  const filterAndMapChildren = (
-    items: SidebarChild[],
-    pathname: string,
-  ): Omit<SidebarChild, "permitted">[] =>
-    items
-      .filter(({ permitted }) => permitted === undefined || permitted)
-      .map(({ title, link }) => ({
-        title,
-        link,
-        active: pathname?.startsWith(link),
-      }));
 
   const mainMenuItems: FirstLevelSidebarItem = {
     title: "منوی اصلی",
@@ -48,8 +36,14 @@ export const useSidebarItems = (): {
       {
         icon: <User />,
         title: "لیست هنرمندان",
-        link: "/admin/artists",
-        active: pathname.startsWith("/admin/artists"),
+        link: "/admin/users",
+        active: pathname.startsWith("/admin/users"),
+      },
+      {
+        icon: <ClipboardList />,
+        title: "لیست فرم‌های ثبت‌نامی",
+        link: "/admin/artist-registration",
+        active: pathname.startsWith("/admin/artist-registration"),
       },
       {
         icon: <ChartColumnIncreasing />,
@@ -69,25 +63,11 @@ export const useSidebarItems = (): {
         link: "/admin/transactions",
         active: pathname.startsWith("/admin/transactions"),
       },
-    ],
-  };
-
-  const secondaryMenuItems: FirstLevelSidebarItem = {
-    title: "",
-    children: [
       {
-        icon: <Settings />,
-        title: "تنظیمات",
-        // children: filterAndMapChildren(
-        //   [
-        //     { title: "قرارداد‌ها", link: "/panel/admin/contracts" },
-        //     {
-        //       title: "مدل‌های اعتباری",
-        //       link: "/panel/admin/credits",
-        //     },
-        //   ],
-        //   pathname,
-        // ),
+        icon: <TableOfContents />,
+        title: "مدیریت محتوای لندینگ",
+        link: "/admin/content-management",
+        active: pathname.startsWith("/admin/content-management"),
       },
     ],
   };
@@ -109,7 +89,6 @@ export const useSidebarItems = (): {
 
   return {
     mainMenuItems,
-    secondaryMenuItems,
     firstAllowedRoute,
   };
 };

@@ -1,9 +1,9 @@
-import { adminSupportRetrieve } from "@/lib/services/admin/api";
 import { useAdminSupportRetrieve } from "@/lib/services/admin/hook";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
 import { Badge, Button, Drawer, Input } from "@dgshahr/ui-kit";
 import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface IRequestDetailProps {
   open: boolean;
@@ -16,8 +16,9 @@ const RequestDetailModal = ({
   onClose,
   selectedArtistId,
 }: IRequestDetailProps) => {
-  const { data: retriveData, isPending } =
-    useAdminSupportRetrieve(selectedArtistId);
+  const router = useRouter();
+
+  const { data: retriveData } = useAdminSupportRetrieve(selectedArtistId);
   const data = retriveData?.result;
 
   return (
@@ -66,7 +67,12 @@ const RequestDetailModal = ({
                 <p className="font-p1-regular text-gray-500">هنرمند:</p>
                 <p className="font-p1-regular text-gray-800">{`${data?.firstName} ${data?.lastName}`}</p>
               </div>
-              <Button variant="text" leftIcon={<ChevronLeft />} color="error">
+              <Button
+                onClick={() => router.push(`/admin/users/${data?.id}`)}
+                variant="text"
+                leftIcon={<ChevronLeft />}
+                color="error"
+              >
                 مشاهده پروفایل
               </Button>
             </div>
