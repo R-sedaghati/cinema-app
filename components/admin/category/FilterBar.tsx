@@ -17,7 +17,7 @@ interface Props {
 const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
   const [search, setSearch] = useState<string>("");
   const showCleanFilters = ObjectUtils.hasMeaningfulValues(params, [
-    "p",
+    "page",
     "count",
   ]);
 
@@ -26,7 +26,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
     setParams({
       ...params,
       search: search,
-      p: 1,
+      page: 1,
     });
   };
 
@@ -88,7 +88,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
             setParams((prev) => ({
               ...prev,
               isActive: value,
-              p: 1,
+              page: 1,
             }));
           }}
           optionCellClassName="!bg-transparent hover:!bg-primary-50"

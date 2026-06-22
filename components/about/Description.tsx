@@ -1,51 +1,16 @@
+"use client";
+
+import { useUserAboutUs } from "@/lib/services/landing/hook";
+
 export default function Description() {
+  const { data } = useUserAboutUs();
+
   return (
     <div className="relative w-full text-right flex flex-col justify-center items-center">
       <h3 className="text-4xl font-h1-regular mb-10">درباره آرشیو هنر</h3>
 
-      <div className="relative backdrop-blur-sm border-2 border-error-500/30 shadow-card text-xl rounded-4xl p-20 bg-zinc-900/40 w-full">
-        <p className="mb-8">
-          آرشیو هنر یک پلتفرم جامع و تخصصی برای هنرمندان است که با هدف تقویت
-          استعدادهای هنری و ایجاد فرصت‌های واقعی حرفه‌ای برای فعالان هنر در
-          ایران طراحی شده است.
-        </p>
-
-        <p className="mb-8">
-          ما تیمی از هنرمندان هستیم — افرادی که در مسیر هنر نفس کشیده‌اند،
-          چالش‌ها را تجربه کرده‌اند و یاد گرفته‌اند مسیر حرفه‌ای بودن در هنر
-          باید سالم، هوشمندانه و همراه با فرصت‌های واقعی باشد. این تجربه‌ی زیسته
-          ما را بر آن داشت تا بستری ایجاد کنیم که نه فقط یک اپ یا سایت باشد،
-          بلکه خانه دوم هنرمندان برای رشد، ارتباط‌سازی و دیده‌شدن باشد.
-        </p>
-
-        <div className="mb-8 text-right max-w-4xl mx-auto">
-          <p className="mb-4 font-semibold text-white">در آرشیو هنر:</p>
-          <ul className="space-y-3 list-disc list-inside">
-            <li>شما می‌توانید یک صفحه شخصی حرفه‌ای بسازید،</li>
-            <li>مهارت‌ها و نمونه‌کارهایتان را بارگذاری کنید،</li>
-            <li>ویدیوهای معرفی استعدادتان را منتشر کنید،</li>
-            <li>و بخشی از یک جامعه‌ی بزرگ و فعال هنری شوید.</li>
-          </ul>
-        </div>
-
-        <p className="mb-8">
-          پس از عضویت، تیم ما به کمک شبکه‌ی گسترده‌ی خود با تهیه‌کنندگان،
-          کارگردانان، سرمایه‌گذاران و تصمیم‌گیرندگان صنعت هنر، شما را به
-          پروژه‌ها و فرصت‌های شغلی واقعی معرفی می‌کند — به‌دور از فراخوان‌های
-          غیرحرفه‌ای یا مسیرهای سنتی که اغلب فقط وقت و انرژی هنرمندان را تلف
-          می‌کنند.
-        </p>
-
-        <p className="mb-8 font-semibold text-white">
-          باور ما این است که استعداد و توانمندی هر هنرمند باید در فضایی سالم،
-          عادلانه و بدون مانع رشد کند — دور از پارتی‌بازی، محدودیت‌های مالی یا
-          ارتباطات غیرمنصفانه.
-        </p>
-
-        <p>
-          هدف ما این است که همراه با شما از این دنیای شگفت‌انگیز هنر لذت ببریم و
-          در مسیر پیشرفت حرفه‌ای‌تان همراهتان باشیم.
-        </p>
+      <div className="relative backdrop-blur-sm border-2 border-error-500/30 shadow-card text-xl rounded-4xl p-5 md:p-20 bg-zinc-900/40 w-full">
+        <p className="mb-8">{data?.result?.at(0)?.text}</p>
       </div>
     </div>
   );

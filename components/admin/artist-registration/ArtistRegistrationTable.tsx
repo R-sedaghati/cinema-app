@@ -4,15 +4,19 @@ import { Table } from "@dgshahr/ui-kit";
 import TableEmptyState from "@/components/common/TableEmptyState";
 import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
 import FilterBar from "./FilterBar";
-import Header from "./Header";
 import { generateColumns } from "./columns";
 import { useAdminArtistList } from "@/lib/services/admin/hook";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import Header from "../users/Header";
+import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
+import { useEffect } from "react";
 
-function ArtistTable() {
+function ArtistRegistrationTable() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("categoryId");
 
   const {
     params,
@@ -28,12 +32,22 @@ function ArtistTable() {
     isValidParams ? finalParams : undefined,
   );
 
+  useEffect(() => {
+    if (!categoryId) return;
+
+    setParams((prev) => ({
+      ...prev,
+      categoryId__in: [Number(categoryId)],
+      page: 1,
+    }));
+  }, [categoryId, setParams]);
+
   const columns = generateColumns((id) => {
-    router.push(`/admin/artists/${id}`);
+    router.push(`/admin/artist-registration/${id}`);
   });
 
   return (
-    <div className="ss02">
+    <div className="ss02 mb-5">
       <FilterBar
         setParams={setParams}
         params={params}
@@ -55,9 +69,10 @@ function ArtistTable() {
         {...(data?.count && {
           pagination: {
             pageSize: pagination.count,
-            defaultCurrent: pagination.p,
+            defaultCurrent: pagination.page,
             totalCount: data?.count ?? 0,
-            onPageChange: (p) => setPagination((state) => ({ ...state, p: p })),
+            onPageChange: (p) =>
+              setPagination((state) => ({ ...state, page: p })),
           },
         })}
         emptyContent={
@@ -73,4 +88,4 @@ function ArtistTable() {
   );
 }
 
-export default withNoSSR(ArtistTable);
+export default withNoSSR(ArtistRegistrationTable);

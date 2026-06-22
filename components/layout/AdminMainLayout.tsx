@@ -21,7 +21,7 @@ const AdminMainLayout = (props: Props) => {
 
   const hideSidebar = /\/document\/[^/]+\/?$/.test(pathname);
 
-  const { mainMenuItems, secondaryMenuItems } = useSidebarItems();
+  const { mainMenuItems } = useSidebarItems();
 
   if (usePathname() === "/home")
     return <React.Fragment>{props.children}</React.Fragment>;
@@ -31,11 +31,11 @@ const AdminMainLayout = (props: Props) => {
       {!hideSidebar && (
         <Sidebar
           logo={{
-            close: "/assets/svg/logo-compact.svg",
+            close: "/assets/images/logo.svg",
             loading: "eager",
-            open: "/assets/svg/logo.svg",
+            open: "/assets/images/logo.svg",
           }}
-          items={[mainMenuItems, secondaryMenuItems]}
+          items={[mainMenuItems]}
           setIsOpen={setIsSidebarOpen}
           isOpen={isSidebarOpen}
           searchInput={false}

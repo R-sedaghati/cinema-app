@@ -3,7 +3,7 @@ import { faqMock } from "@/lib/mock/faq";
 
 export const Faq = () => {
   return (
-    <div className="flex relative flex-col justify-center items-center gap-10 pb-28">
+    <div className="flex relative flex-col justify-center items-center gap-10 md:pb-28">
       <h3 className="font-h1-bold">سوالات متداول</h3>
       <AccordionGroup className="gap-4" defaultActiveKey={"f1"}>
         {faqMock.map((item) => (

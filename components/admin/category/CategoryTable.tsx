@@ -7,7 +7,7 @@ import withNoSSR from "@/lib/utils/withNoSSR";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
 import { useAdminCategoryList } from "@/lib/services/admin/hook";
-import Header from "../artists/Header";
+import Header from "../users/Header";
 import { useRouter } from "next/navigation";
 import useCategoryListParams from "@/lib/hooks/tables/useCategoryListParams";
 
@@ -28,12 +28,17 @@ function CategoryTable() {
     isValidParams ? finalParams : undefined,
   );
 
-  const columns = generateColumns((id) => {
-    router.push(`/admin/categories/${id}`);
-  });
+  const columns = generateColumns(
+    (id) => {
+      router.push(`/admin/categories/${id}`);
+    },
+    (id) => {
+      router.push(`/admin/artist-registration?categoryId=${id}`);
+    },
+  );
 
   return (
-    <div className="ss02">
+    <div className="ss02 mb-5">
       <FilterBar
         setParams={setParams}
         params={params}
@@ -55,9 +60,10 @@ function CategoryTable() {
         {...(data?.count && {
           pagination: {
             pageSize: pagination.count,
-            defaultCurrent: pagination.p,
+            defaultCurrent: pagination.page,
             totalCount: data?.count ?? 0,
-            onPageChange: (p) => setPagination((state) => ({ ...state, p: p })),
+            onPageChange: (p) =>
+              setPagination((state) => ({ ...state, page: p })),
           },
         })}
         emptyContent={

@@ -29,7 +29,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
 
   const [search, setSearch] = useState<string>("");
   const showCleanFilters = ObjectUtils.hasMeaningfulValues(params, [
-    "p",
+    "page",
     "count",
   ]);
 
@@ -38,7 +38,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
     setParams({
       ...params,
       search: search,
-      p: 1,
+      page: 1,
     });
   };
 
@@ -107,20 +107,20 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
             setParams((prev) => ({
               ...prev,
               status__in: value,
-              p: 1,
+              page: 1,
             }));
           }}
           optionCellClassName="!bg-transparent hover:!bg-primary-50"
           beforeOptions={
             <SelectBeforeOption
               onSelectNone={() =>
-                setParams({ ...params, status__in: [], p: 1 })
+                setParams({ ...params, status__in: [], page: 1 })
               }
               onSelectAll={() =>
                 setParams({
                   ...params,
                   status__in: status?.map((st) => st.value),
-                  p: 1,
+                  page: 1,
                 })
               }
             />
@@ -150,20 +150,20 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
             setParams((prev) => ({
               ...prev,
               categoryId__in: value,
-              p: 1,
+              page: 1,
             }));
           }}
           optionCellClassName="!bg-transparent hover:!bg-primary-50"
           beforeOptions={
             <SelectBeforeOption
               onSelectNone={() =>
-                setParams({ ...params, categoryId__in: [], p: 1 })
+                setParams({ ...params, categoryId__in: [], page: 1 })
               }
               onSelectAll={() =>
                 setParams({
                   ...params,
                   categoryId__in: data?.result?.map((st) => st.id),
-                  p: 1,
+                  page: 1,
                 })
               }
             />
@@ -193,20 +193,20 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
             setParams((prev) => ({
               ...prev,
               province__in: value,
-              p: 1,
+              page: 1,
             }));
           }}
           optionCellClassName="!bg-transparent hover:!bg-primary-50"
           beforeOptions={
             <SelectBeforeOption
               onSelectNone={() =>
-                setParams({ ...params, province__in: [], p: 1 })
+                setParams({ ...params, province__in: [], page: 1 })
               }
               onSelectAll={() =>
                 setParams({
                   ...params,
                   province__in: provinceData?.result?.map((st) => st.id),
-                  p: 1,
+                  page: 1,
                 })
               }
             />

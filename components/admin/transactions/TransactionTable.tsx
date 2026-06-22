@@ -7,7 +7,7 @@ import withNoSSR from "@/lib/utils/withNoSSR";
 import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
-import Header from "../artists/Header";
+import Header from "../users/Header";
 
 function TransactionTable() {
   const {

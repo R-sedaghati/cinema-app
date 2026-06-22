@@ -9,7 +9,7 @@ interface BenefitItem {
 export const benefitItems: BenefitItem[] = [
   {
     title: "ماموریت ما",
-    image: "./reasons-profile.svg",
+    image: "/assets/images/goal.svg",
     desc: (
       <div className="text-right">
         <p>ایجاد یک بستر مطمئن، کاربردی و حرفه‌ای برای هنرمندان تا بتوانند:</p>
@@ -26,7 +26,7 @@ export const benefitItems: BenefitItem[] = [
   },
   {
     title: "چشم‌انداز ما",
-    image: "./reasons-search.svg",
+    image: "/assets/images/overview.svg",
     desc: (
       <div className="text-right">
         <p>
@@ -48,7 +48,7 @@ export const benefitItems: BenefitItem[] = [
   },
   {
     title: "مسئولیت ما",
-    image: "./reasons-relation.svg",
+    image: "/assets/images/mission.svg",
     desc: (
       <div className="text-right">
         <p>

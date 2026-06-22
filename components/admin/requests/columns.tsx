@@ -85,7 +85,7 @@ export const generateColumns = (
       dataIndex: "status",
       title: "وضعیت",
       className: "align-middle",
-      render: (data) => <RequestStatus status={data.status} />,
+      render: (data) => <RequestStatus status={data.status} isSolid={false} />,
     },
     {
       align: "center",

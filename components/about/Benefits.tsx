@@ -3,11 +3,11 @@ import Image from "next/image";
 
 const Benefits = () => {
   return (
-    <section className="w-full flex flex-wrap justify-center gap-8 items-center">
+    <section className="w-full flex flex-col md:flex-row justify-center gap-8 items-center">
       {benefitItems.map((item) => (
         <div
           key={item.title}
-          className="w-73 min-h-[560px] flex flex-col items-center gap-8 
+          className="w-full md:w-73! min-h-[560px] flex flex-col items-center gap-8 
              bg-secondary-black 
              border border-error-500/30 
              shadow-card 

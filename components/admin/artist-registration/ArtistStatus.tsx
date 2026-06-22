@@ -7,13 +7,20 @@ import { EArtistRequestStatus } from "@/lib/services/admin/type";
 
 interface RolesProps {
   status: EArtistRequestStatus;
+  isSolid: boolean;
 }
-const ArtistStatus: React.FC<RolesProps> = ({ status }) => {
+const ArtistStatus: React.FC<RolesProps> = ({ status, isSolid }) => {
   const key = status;
 
   const item = ARTSIT_STATUS[key] ?? { label: status, color: "gray" };
 
-  return <Badge value={item.label} color={item.color} type="twoTone" />;
+  return (
+    <Badge
+      value={item.label}
+      color={item.color}
+      type={isSolid ? "solid" : "twoTone"}
+    />
+  );
 };
 
 export default ArtistStatus;

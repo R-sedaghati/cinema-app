@@ -5,6 +5,7 @@ import { ChevronLeft, Pencil } from "lucide-react";
 
 export const generateColumns = (
   onProfileClick: (id: number) => void,
+  onRequestClick: (id: number) => void,
 ): ColumnsType<ICategoryItem>[] => {
   return [
     {
@@ -62,7 +63,12 @@ export const generateColumns = (
           >
             ویرایش
           </Button>
-          <Button variant="text" leftIcon={<ChevronLeft />} color="error">
+          <Button
+            onClick={() => onRequestClick(data.id)}
+            variant="text"
+            leftIcon={<ChevronLeft />}
+            color="error"
+          >
             مشاهده درخواست‌ها
           </Button>
         </div>

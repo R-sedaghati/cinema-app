@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import useAuthStore from "@/lib/stores/useAuthStore";
+import Image from "next/image";
+import { isMobile } from "react-device-detect";
 
 const navItems = [
   { href: "/", label: "خانه" },
@@ -59,18 +61,43 @@ export function SiteHeader() {
     <>
       <header className="sticky top-0 z-50 bg-zinc-950/70 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          <div className="flex min-w-0 flex-1 items-center justify-start">
-            <Menu
-              onClick={() => setSidebarOpen(true)}
-              size={24}
-              className="lg:hidden text-zinc-300"
-              aria-label="منو"
-            />
-          </div>
+          {isMobile ? (
+            <div className="flex min-w-0 flex-1 items-center justify-start">
+              <Menu
+                onClick={() => setSidebarOpen(true)}
+                size={24}
+                className="text-zinc-300"
+                aria-label="منو"
+              />
+            </div>
+          ) : (
+            <div className="flex gap-2 items-center">
+              <Image
+                src="/assets/images/logo.svg"
+                alt="logo"
+                width={60}
+                height={60}
+              />
+              <span className="text-xl font-semibold text-error-500 text-nowrap">
+                آرشیو هنر
+              </span>
+            </div>
+          )}
+
           <nav className="flex min-w-0 flex-1 items-center justify-center lg:justify-center">
-            <span className="text-xl font-semibold text-error-500 lg:hidden">
-              آرشیو هنر
-            </span>
+            {isMobile && (
+              <div className="flex gap-1 items-center">
+                <Image
+                  src="/assets/images/logo.svg"
+                  alt="logo"
+                  width={60}
+                  height={60}
+                />
+                <span className="text-xl font-semibold text-error-500 text-nowrap">
+                  آرشیو هنر
+                </span>
+              </div>
+            )}
             <div className="hidden lg:flex items-center justify-center gap-2 rounded-full bg-zinc-800/80 p-2 border border-zinc-800 backdrop-blur-xs">
               {navItems.map((item) => {
                 const active = isActive(pathname, item.href);

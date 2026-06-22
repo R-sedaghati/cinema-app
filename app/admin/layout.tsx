@@ -11,7 +11,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
   const router = useRouter();
 
   const { isLoggedIn } = useAdminAuthStore();
-  console.log(isLoggedIn);
 
   const excludedPaths = ["/admin/login"];
   const isLoginPage = excludedPaths.includes(pathname);

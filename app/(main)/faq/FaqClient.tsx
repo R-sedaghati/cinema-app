@@ -1,17 +1,19 @@
 "use client";
 
-import { faqMock } from "@/lib/mock/faq";
+import { useUserFaqList } from "@/lib/services/landing/hook";
 import { AccordionGroup, AccordionItem } from "@dgshahr/ui-kit";
 
 export function FaqClient() {
+  const { data } = useUserFaqList();
+
   return (
-    <div className="flex relative flex-col justify-center items-center gap-10 pb-28">
+    <div className="flex relative flex-col justify-center items-center gap-10 md:pb-28">
       <h3 className="font-h1-regular text-4xl">سوالات متداول</h3>
       <AccordionGroup className="gap-4" defaultActiveKey={"f1"}>
-        {faqMock.map((item) => (
+        {data?.result?.map((item) => (
           <AccordionItem
             key={item.id}
-            accordionKey={item.id}
+            accordionKey={String(item.id)}
             className="bg-secondary-black! rounded-lg border border-zinc-700 [&>div:nth-child(3)]:bg-transparent"
             titleClassName="text-error-500! text-right!"
             contentClassName="text-zinc-100!"
