@@ -4,6 +4,7 @@ import { MobileBottomNav } from "@/components/site/MobileBottomNav";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import LoginDrawer from "@/components/login/LoginDrawer";
+import ProfileCompletionChecker from "@/components/login/ProfileCompletionChecker";
 import "../globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -25,6 +26,7 @@ export default function RootLayout({
         <SiteFooter />
         <MobileBottomNav />
         <LoginDrawer />
+        <ProfileCompletionChecker />
       </div>
     </QueryClientProvider>
   );
