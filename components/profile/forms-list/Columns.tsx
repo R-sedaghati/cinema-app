@@ -1,11 +1,13 @@
 import ArtistStatus from "@/components/admin/artist-registration/ArtistStatus";
 import Button from "@/components/common/Button";
-import { IArtistItem } from "@/lib/services/admin/type";
+import { EArtistRequestStatus, IArtistItem } from "@/lib/services/admin/type";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
 
-export const columns: ColumnsType<IArtistItem>[] = [
+export const generateColumns = (
+  onView: (item: IArtistItem) => void,
+): ColumnsType<IArtistItem>[] => [
   {
     align: "start",
     key: "title",
@@ -45,9 +47,15 @@ export const columns: ColumnsType<IArtistItem>[] = [
     dataIndex: "actions",
     title: "عملیات",
     className: "align-middle",
-    render: () => (
-      <Button variant="text" leftIcon={<ChevronLeft />}>
-        مشاهده پروفایل
+    render: (data) => (
+      <Button
+        variant="text"
+        leftIcon={<ChevronLeft />}
+        onClick={() => onView(data)}
+      >
+        {data.status === EArtistRequestStatus.NEED_TO_REVISION
+          ? "ویرایش فرم"
+          : "مشاهده فرم"}
       </Button>
     ),
   },

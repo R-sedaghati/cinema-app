@@ -12,6 +12,9 @@ interface ArtistRegistrationState {
   // Stepper
   step: number;
 
+  // Edit mode — non-null means editing an existing request
+  editId: number | null;
+
   // Form
   categoryId: number[];
   firstName: string;
@@ -31,6 +34,7 @@ interface ArtistRegistrationState {
   major: string;
   portfolios: Portfolio[];
   avatar: string;
+  aboutMe: string;
 
   // Step Actions
   handleNext: () => void;
@@ -51,6 +55,7 @@ interface ArtistRegistrationState {
 
 const initialState = {
   step: 0,
+  editId: null as number | null,
 
   categoryId: [],
 
@@ -71,6 +76,7 @@ const initialState = {
   major: "",
   portfolios: [] as Portfolio[],
   avatar: "",
+  aboutMe: "",
 };
 
 export const useArtistRegistrationStore = create<ArtistRegistrationState>(

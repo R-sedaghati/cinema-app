@@ -3,6 +3,7 @@
 import {
   useAdminAboutUs,
   useAdminAboutUsUpdate,
+  useAdminCreateFaq,
   useAdminFaqList,
   useAdminFaqUpdate,
 } from "@/lib/services/admin/hook";
@@ -10,6 +11,7 @@ import withNoSSR from "@/lib/utils/withNoSSR";
 import { Button, Card, Divider, Input, Textarea } from "@dgshahr/ui-kit";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface FaqItem {
   id: number;
@@ -18,6 +20,7 @@ interface FaqItem {
 }
 
 function ContentManagement() {
+  const queryClient = useQueryClient();
   const { data: faqData } = useAdminFaqList();
   const { data: aboutData } = useAdminAboutUs();
 
@@ -25,6 +28,7 @@ function ContentManagement() {
     useAdminAboutUsUpdate();
 
   const { mutate: updateFaq, isPending: isFaqPending } = useAdminFaqUpdate();
+  const { mutate: createFaq, isPending: isCreatePending } = useAdminCreateFaq();
 
   const [aboutText, setAboutText] = useState("");
   const [faqs, setFaqs] = useState<FaqItem[]>([]);
@@ -54,21 +58,14 @@ function ContentManagement() {
   ) => {
     setFaqs((prev) =>
       prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              [field]: value,
-            }
-          : item,
+        i === index ? { ...item, [field]: value } : item,
       ),
     );
   };
 
   const handleAboutSubmit = () => {
     updateAbout(
-      {
-        text: aboutText,
-      },
+      { text: aboutText },
       {
         onSuccess: () => {
           toast.success("با موفقیت تغییر کرد");
@@ -78,11 +75,31 @@ function ContentManagement() {
   };
 
   const handleFaqSubmit = () => {
-    updateFaq(faqs, {
-      onSuccess: () => {
+    const existing = faqs.filter((f) => f.id > 0);
+    const newItems = faqs.filter((f) => f.id === 0);
+
+    const existingUpdate = existing.length
+      ? new Promise<void>((resolve, reject) =>
+          updateFaq(existing, { onSuccess: () => resolve(), onError: reject }),
+        )
+      : Promise.resolve();
+
+    const createAll = newItems.map(
+      (f) =>
+        new Promise<void>((resolve, reject) =>
+          createFaq(
+            { question: f.question, answer: f.answer },
+            { onSuccess: () => resolve(), onError: reject },
+          ),
+        ),
+    );
+
+    Promise.all([existingUpdate, ...createAll])
+      .then(() => {
         toast.success("با موفقیت تغییر کرد");
-      },
-    });
+        queryClient.invalidateQueries({ queryKey: ["adminFaqList"] });
+      })
+      .catch(() => toast.error("خطا در ذخیره‌سازی"));
   };
 
   return (
@@ -96,12 +113,27 @@ function ContentManagement() {
       <div className="flex flex-col gap-8 bg-gray-100 px-4 pt-5">
         <Card>
           <div className="flex flex-col gap-4">
-            <p className="font-h3-bold text-error-500">سوالات متداول</p>
+            <div className="flex justify-between items-center">
+              <p className="font-h3-bold text-error-500">سوالات متداول</p>
+              <Button
+                variant="outline"
+                color="error"
+                size="small"
+                onClick={() =>
+                  setFaqs((prev) => [
+                    ...prev,
+                    { id: 0, question: "", answer: "" },
+                  ])
+                }
+              >
+                افزودن سوال جدید
+              </Button>
+            </div>
 
             <Divider color="gray" size="thin" type="horizontal" />
 
             {faqs.map((faq, index) => (
-              <div key={faq.id} className="flex justify-between gap-3">
+              <div key={faq.id === 0 ? `new-${index}` : faq.id} className="flex justify-between gap-3">
                 <Input
                   labelContent={`سوال ${index + 1}`}
                   placeholder={`سوال ${index + 1} را وارد کنید`}
@@ -125,14 +157,28 @@ function ContentManagement() {
             ))}
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline" color="error">
+              <Button
+                variant="outline"
+                color="error"
+                onClick={() => {
+                  if (faqData?.result?.length) {
+                    setFaqs(
+                      faqData.result.map((item) => ({
+                        id: item.id,
+                        question: item.question ?? "",
+                        answer: item.answer ?? "",
+                      })),
+                    );
+                  }
+                }}
+              >
                 انصراف
               </Button>
 
               <Button
                 color="error"
-                isLoading={isFaqPending}
-                disabled={isFaqPending}
+                isLoading={isFaqPending || isCreatePending}
+                disabled={isFaqPending || isCreatePending}
                 onClick={handleFaqSubmit}
               >
                 ثبت تغییرات
@@ -156,7 +202,15 @@ function ContentManagement() {
             />
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline" color="error">
+              <Button
+                variant="outline"
+                color="error"
+                onClick={() => {
+                  if (aboutData?.result?.length) {
+                    setAboutText(aboutData.result[0].text ?? "");
+                  }
+                }}
+              >
                 انصراف
               </Button>
 

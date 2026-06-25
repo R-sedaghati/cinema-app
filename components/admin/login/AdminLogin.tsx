@@ -28,7 +28,7 @@ const AdminLogin = () => {
           const data = response.result;
           setUserName(data.username);
           loginStore(data.accessToken);
-          router.push("/admin/artists/");
+          router.push("/admin/users/");
           if (data?.accessToken) {
             toast.success("خوش آمدید");
           } else {

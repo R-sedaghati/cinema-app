@@ -4,8 +4,9 @@ import { useRef, useState } from "react";
 
 export type WorksSliderItem = {
   id: string;
-  title: string;
+  title?: string;
   year?: number;
+  url?: string | null;
 };
 
 interface WorksSliderProps {
@@ -65,24 +66,32 @@ export function WorksSlider({
           >
             <div
               className={[
-                "mb-4 grid aspect-video place-items-center overflow-hidden rounded-xl",
+                "mb-4 aspect-video overflow-hidden rounded-xl",
                 variant === "photo"
                   ? "bg-linear-to-br from-zinc-900 to-zinc-950"
                   : "bg-linear-to-br from-red-600/25 to-zinc-950",
               ].join(" ")}
             >
-              <div className="text-xs font-semibold text-zinc-200">
-                {variant === "photo" ? "نمونه تصویری" : "نمونه ویدیویی"}
+              {item.url && variant === "photo" ? (
+                <img src={item.url} alt={item.title ?? ""} className="h-full w-full object-cover" />
+              ) : item.url && variant === "video" ? (
+                <video src={item.url} controls className="h-full w-full object-cover" />
+              ) : (
+                <div className="grid h-full place-items-center text-xs font-semibold text-zinc-200">
+                  {variant === "photo" ? "نمونه تصویری" : "نمونه ویدیویی"}
+                </div>
+              )}
+            </div>
+
+            {item.title && (
+              <div className="text-sm font-semibold text-zinc-100 hover:text-red-300">
+                {item.title}
               </div>
-            </div>
+            )}
 
-            <div className="text-sm font-semibold text-zinc-100 hover:text-red-300">
-              {item.title}
-            </div>
-
-            <div className="mt-2 text-xs text-zinc-500">
-              {item.year ? `سال ${item.year}` : "بدون تاریخ"}
-            </div>
+            {item.year && (
+              <div className="mt-2 text-xs text-zinc-500">{`سال ${item.year}`}</div>
+            )}
           </div>
         ))}
       </div>

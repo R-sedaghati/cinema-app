@@ -1,6 +1,10 @@
+"use client";
+
 import { Asterisk, ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "../common/Button";
 import { Card, FileUploader, RadioButton, Textarea } from "@dgshahr/ui-kit";
+import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
+import { useUserUploadAvatar, useUserUploadVideo } from "@/lib/services/landing/hook";
 
 interface Props {
   onNext: () => void;
@@ -8,6 +12,24 @@ interface Props {
 }
 
 const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
+  const store = useArtistRegistrationStore();
+  const uploadImage = useUserUploadAvatar();
+  const uploadVideo = useUserUploadVideo();
+
+  const handleImageUpload = (files: File[]) => {
+    if (!files[0]) return;
+    uploadImage.mutate(files[0], {
+      onSuccess: (res) => store.addPortfolio({ path: res.path, type: "IMAGE" }),
+    });
+  };
+
+  const handleVideoUpload = (files: File[]) => {
+    if (!files[0]) return;
+    uploadVideo.mutate(files[0], {
+      onSuccess: (res) => store.addPortfolio({ path: res.path, type: "VIDEO" }),
+    });
+  };
+
   return (
     <Card wrapperClassName="w-3/4">
       <div className="flex flex-col gap-5">
@@ -15,6 +37,8 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           labelContent="درباره من"
           placeholder="درباره خود بنویسید . . ."
           required
+          value={store.aboutMe}
+          onChange={(e) => store.setField("aboutMe", e.target.value)}
         />
         <div className="flex flex-col gap-2">
           <div className="flex gap-1">
@@ -36,7 +60,7 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
                 description: "فرمت‌های قابل قبول JPG , PNG\nحداکثر حجم تا 5Mb",
                 title: "بارگذاری نمونه کار (عکس)",
               }}
-              onChange={function Xs() {}}
+              onChange={handleImageUpload}
               mode="single"
               previewProps={{
                 exteraButton: {
@@ -55,7 +79,7 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
                 description: "فرمت‌های قابل قبول JPG , PNG\nحداکثر حجم تا 5Mb",
                 title: "بارگذاری نمونه کار (ویدیو)",
               }}
-              onChange={function Xs() {}}
+              onChange={handleVideoUpload}
               mode="single"
               previewProps={{
                 exteraButton: {
