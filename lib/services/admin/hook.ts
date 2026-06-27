@@ -8,6 +8,7 @@ import {
   IArtistStatusUpdateRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
+  IFaqItem,
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -31,12 +32,14 @@ import {
   adminCategoryList,
   adminCategoryRetrieve,
   adminCategoryUpdate,
+  adminCreateFaq,
   adminFaqList,
   adminFaqUpdate,
   adminLogin,
   adminProvinceList,
   adminSupportList,
   adminSupportRetrieve,
+  adminSupportUpdate,
   adminUserRequest,
   adminUsersList,
 } from "./api";
@@ -224,5 +227,22 @@ export const useAdminArtistStatusUpdate = (id: number) => {
   return useMutation({
     mutationFn: (body: IArtistStatusUpdateRequest) =>
       adminArtistStatusUpdate(id, body, accessToken),
+  });
+};
+
+export const useAdminSupportUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      adminSupportUpdate(id, status, accessToken),
+  });
+};
+
+export const useAdminCreateFaq = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation<IRetriveResponse<IFaqItem>, Error, { question: string; answer: string }>({
+    mutationFn: (payload) => adminCreateFaq(payload, accessToken),
   });
 };

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   IAboutUsResponse,
+  IArtistRetriveResponse,
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -11,20 +12,27 @@ import {
 } from "../admin/type";
 import { AxiosError } from "axios";
 import {
+  ArtistRequestResult,
+  ICityListResponse,
   IPagination,
   IUserArtistListResponse,
   IUserCategoryListResponse,
   IUserProfile,
   IUserSupportListResponse,
+  UserCreateArtistRequest,
   UserCreateSupport,
   UserLoginRequest,
   UserUpdateProfile,
 } from "./type";
 import {
+  getUserArtistDetail,
+  updateUserArtistRequest,
   userAboutUs,
   userArtistRequests,
   userArtsitList,
   userCategoryList,
+  userCityList,
+  userCreateArtistRequest,
   userCreateSupport,
   userFaqList,
   userLogin,
@@ -32,6 +40,8 @@ import {
   userProvinceList,
   userSupport,
   userUpdatePofile,
+  userUploadAvatar,
+  userUploadVideo,
 } from "./api";
 import useAuthStore from "@/lib/stores/useAuthStore";
 
@@ -144,5 +154,48 @@ export const useUserAboutUs = () => {
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserCityList = (provinceId: number) => {
+  return useQuery<ICityListResponse>({
+    queryKey: ["userCityList", provinceId],
+    queryFn: () => userCityList(provinceId),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+    enabled: provinceId > 0,
+  });
+};
+
+export const useUserUploadAvatar = () =>
+  useMutation<{ path: string }, AxiosError, File>({
+    mutationFn: userUploadAvatar,
+  });
+
+export const useUserUploadVideo = () =>
+  useMutation<{ path: string; filename: string }, AxiosError, File>({
+    mutationFn: userUploadVideo,
+  });
+
+export const useUserCreateArtistRequest = () =>
+  useMutation<{ result: ArtistRequestResult }, AxiosError, UserCreateArtistRequest>({
+    mutationFn: userCreateArtistRequest,
+  });
+
+export const useUserArtistDetail = (id?: number) =>
+  useQuery<IArtistRetriveResponse>({
+    queryKey: ["userArtistDetail", id],
+    queryFn: () => getUserArtistDetail(id!),
+    enabled: !!id,
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+export const useUpdateUserArtistRequest = () => {
+  const { accessToken } = useAuthStore();
+  return useMutation({
+    mutationFn: ({ id, ...payload }: { id: number } & Partial<UserCreateArtistRequest>) =>
+      updateUserArtistRequest(id, payload, accessToken),
   });
 };

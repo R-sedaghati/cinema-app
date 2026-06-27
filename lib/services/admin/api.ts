@@ -7,6 +7,7 @@ import {
   IArtistStatusUpdateRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
+  IFaqItem,
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -235,5 +236,30 @@ export const adminArtistStatusUpdate = async (
     },
   });
 
+  return data;
+};
+
+export const adminSupportUpdate = async (
+  id: number,
+  status: string,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<ISupportRetriveResponse>(
+    `/admin/supports/${id}/`,
+    { status },
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminCreateFaq = async (
+  payload: { question: string; answer: string },
+  accessToken: string,
+) => {
+  const { data } = await api.post<IRetriveResponse<IFaqItem>>(
+    "/admin/faqs/",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
   return data;
 };

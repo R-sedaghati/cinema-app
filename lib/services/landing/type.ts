@@ -76,3 +76,45 @@ export type IUserArtistListResponse = IBasePaginateResponse<IArtistItem>;
 export type IUserSupportListResponse = IBasePaginateResponse<ISupportItem>;
 export type IUserCategoryListResponse =
   IBasePaginateResponse<IUserCategoryResponse>;
+
+export interface ICityItem {
+  id: number;
+  name: string;
+}
+export type ICityListResponse = IBaseResponse<ICityItem>;
+
+export type ArtistRequestStatus =
+  | "PENDING_PAYMENT"
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED";
+
+export type PortfolioType = "IMAGE" | "VIDEO";
+
+export type UserCreateArtistRequest = {
+  categoryIds: number[];
+  firstName?: string;
+  lastName?: string;
+  height?: number;
+  weight?: number;
+  language?: string;
+  dialect?: string;
+  email?: string;
+  address?: string;
+  province?: string;
+  city?: string;
+  postalCode?: string;
+  education?: string;
+  major?: string;
+  avatar?: string;
+  birthDate?: string;
+  gender?: "MAN" | "WOMAN";
+  aboutMe?: string;
+  portfolios?: { path: string; type: PortfolioType }[];
+};
+
+export type ArtistRequestResult = {
+  artistRequestId: number;
+  status: ArtistRequestStatus;
+  portfolios: { id: number; filePath: string; type: PortfolioType }[];
+};

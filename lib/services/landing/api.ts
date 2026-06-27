@@ -1,5 +1,6 @@
 import {
   IAboutUsResponse,
+  IArtistRetriveResponse,
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -10,11 +11,14 @@ import {
 } from "../admin/type";
 import landingApi from "../landingAxiosInstance";
 import {
+  ArtistRequestResult,
+  ICityListResponse,
   IPagination,
   IUserArtistListResponse,
   IUserCategoryListResponse,
   IUserProfile,
   IUserSupportListResponse,
+  UserCreateArtistRequest,
   UserCreateSupport,
   UserLoginRequest,
   UserUpdateProfile,
@@ -128,5 +132,59 @@ export const userFaqList = async () => {
 export const userAboutUs = async () => {
   const { data } = await landingApi.get<IAboutUsResponse>("/about-us");
 
+  return data;
+};
+
+export const userCityList = async (provinceId: number) => {
+  const { data } = await landingApi.get<ICityListResponse>(
+    `/provinces/${provinceId}/cities`,
+  );
+  return data;
+};
+
+export const userUploadAvatar = async (file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await landingApi.post<{ path: string }>("/user/avatar", form);
+  return data;
+};
+
+export const userUploadVideo = async (file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await landingApi.post<{ path: string; filename: string }>(
+    "/user/upload/video",
+    form,
+  );
+  return data;
+};
+
+export const userCreateArtistRequest = async (
+  payload: UserCreateArtistRequest,
+) => {
+  const { data } = await landingApi.post<{ result: ArtistRequestResult }>(
+    "/user/artist-requests",
+    payload,
+  );
+  return data;
+};
+
+export const getUserArtistDetail = async (id: number) => {
+  const { data } = await landingApi.get<IArtistRetriveResponse>(
+    `/artists-requests/${id}/`,
+  );
+  return data;
+};
+
+export const updateUserArtistRequest = async (
+  id: number,
+  payload: Partial<UserCreateArtistRequest>,
+  accessToken: string,
+) => {
+  const { data } = await landingApi.patch<{ result: ArtistRequestResult }>(
+    `/user/artist-requests/${id}/`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
   return data;
 };

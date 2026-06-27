@@ -1,6 +1,7 @@
 "use client";
 
 import { IUserCaategoryItem } from "@/lib/services/landing/type";
+import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { Card, Checkbox } from "@dgshahr/ui-kit";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import Button from "../common/Button";
@@ -16,6 +17,19 @@ const FirstStepFlow: React.FC<Props> = ({
   onNext,
   onPrevious,
 }) => {
+  const { categoryId, setField } = useArtistRegistrationStore();
+
+  const toggleCategory = (id: number) => {
+    if (categoryId.includes(id)) {
+      setField(
+        "categoryId",
+        categoryId.filter((c) => c !== id),
+      );
+    } else {
+      setField("categoryId", [...categoryId, id]);
+    }
+  };
+
   return (
     <Card wrapperClassName="w-3/4">
       <div className="flex flex-col gap-4">
@@ -26,8 +40,8 @@ const FirstStepFlow: React.FC<Props> = ({
             <Checkbox
               key={child.id}
               label={child?.faName ?? ""}
-              checked={false}
-              onChange={() => {}}
+              checked={categoryId.includes(child.id)}
+              onChange={() => toggleCategory(child.id)}
             />
           ))}
         </div>

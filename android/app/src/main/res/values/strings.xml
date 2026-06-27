@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ArchiveHonar</string>
+    <string name="title_activity_main">ArchiveHonar</string>
+    <string name="package_name">com.archive.cinema</string>
+    <string name="custom_url_scheme">com.archive.cinema</string>
+</resources>
