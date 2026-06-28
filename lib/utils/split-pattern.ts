@@ -14,3 +14,13 @@ export function splitPattern(items: CategoryItem[]) {
 
   return result;
 }
+
+export function mobileSplitPattern(items: CategoryItem[]) {
+  const result: CategoryItem[][] = [];
+
+  for (let i = 0; i < items.length; i += 4) {
+    result.push(items.slice(i, i + 4));
+  }
+
+  return result;
+}

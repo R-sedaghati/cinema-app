@@ -23,10 +23,10 @@ const landingApi = axios.create({
 
 landingApi.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().accessToken;
+    const { accessToken } = useAuthStore.getState();
 
-    if (token) {
-      config.headers.Authorization = token;
+    if (accessToken) {
+      config.headers.Authorization = accessToken;
     }
 
     return config;
@@ -35,12 +35,25 @@ landingApi.interceptors.request.use(
 );
 
 function handleError(error: AxiosError) {
+  const { logout } = useAuthStore.getState();
+  const status = error.response?.status;
+
+  if (status === 401) {
+    logout();
+
+    window.location.href = "/";
+
+    return Promise.reject(error);
+  }
+
   const data = error.response?.data as ErrorResponse | undefined;
 
   const message =
     data?.error || data?.message || "خطایی در ارتباط با سرور رخ داده است.";
 
-  toast.error(message, { toastId: message });
+  toast.error(message, {
+    toastId: message,
+  });
 
   return Promise.reject(error);
 }

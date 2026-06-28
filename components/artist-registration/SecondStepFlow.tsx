@@ -3,7 +3,6 @@
 import {
   Card,
   Datepicker,
-  FileUploader,
   Input,
   RadioButton,
   Select,
@@ -18,6 +17,9 @@ import {
   useUserUploadAvatar,
 } from "@/lib/services/landing/hook";
 import { useState } from "react";
+import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
+import { isDesktop, isMobile } from "react-device-detect";
+import clsx from "clsx";
 
 interface Props {
   onNext: () => void;
@@ -37,27 +39,61 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
   const store = useArtistRegistrationStore();
   const [selectedProvinceId, setSelectedProvinceId] = useState(0);
 
-  const { data: provincesData } = useUserProvinceList(undefined);
+  const [avatarFile, setAvatarFile] = useState<FileType | null>(null);
+
+  const { data: provincesData } = useUserProvinceList();
   const { data: citiesData } = useUserCityList(selectedProvinceId);
   const uploadAvatar = useUserUploadAvatar();
 
   const provinceOptions =
-    provincesData?.result?.map((p) => ({ label: p.name, value: p.name })) ??
-    [];
+    provincesData?.result?.map((p) => ({ label: p.name, value: p.name })) ?? [];
   const cityOptions =
     citiesData?.result?.map((c) => ({ label: c.name, value: c.name })) ?? [];
 
-  const handleAvatarChange = (files: File[]) => {
-    if (!files[0]) return;
-    uploadAvatar.mutate(files[0], {
-      onSuccess: (res) => store.setField("avatar", res.path),
+  const handleAvatarChange = (file: File | undefined) => {
+    if (!file) return;
+
+    const localFile: FileType = {
+      file,
+      src: URL.createObjectURL(file),
+      loading: true,
+      status: "default",
+    };
+
+    setAvatarFile(localFile);
+
+    uploadAvatar.mutate(file, {
+      onSuccess: (res) => {
+        setAvatarFile((prev) =>
+          prev
+            ? {
+                ...prev,
+                src: res.path,
+                loading: false,
+              }
+            : null,
+        );
+
+        store.setField("avatar", res.path);
+      },
+      onError: () => {
+        setAvatarFile((prev) =>
+          prev
+            ? {
+                ...prev,
+                loading: false,
+                status: "error",
+              }
+            : null,
+        );
+      },
     });
   };
 
   return (
-    <Card wrapperClassName="w-3/4">
+    <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}>
       <div className="flex flex-col gap-5">
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-col md:flex-row gap-3 items-center">
           <Input
             labelContent="نام"
             placeholder="نام خود را وارد کنید."
@@ -77,21 +113,24 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
         </div>
         <FileUploader
           fileInputProps={{
-            className: "dgsuikit:ss02",
-            description: "فرمت‌های قابل قبول JPG , PNG\nحداکثر حجم تا 5Mb",
+            className: "dgsuikit:ss02 w-full md:w-1/3",
             title: "بارگذاری تصویر پروفایل",
           }}
-          onChange={handleAvatarChange}
           mode="single"
+          files={avatarFile ?? undefined}
+          onChange={handleAvatarChange}
           previewProps={{
-            exteraButton: {
-              children: "عنوان",
-              size: "small",
-              variant: "secondary",
+            leftButton: {
+              onClick: () => {
+                setAvatarFile(null);
+                store.setField("avatar", "");
+              },
             },
+            rightButton: false,
+            wrapperClassName: "w-fit",
           }}
         />
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-col md:flex-row gap-3 md:items-center">
           <Datepicker
             inputProps={{
               labelContent: "تاریخ تولد",
@@ -109,7 +148,7 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
                 haveCloseIcon: true,
               },
             }}
-            wrapperClassName="w-1/2"
+            wrapperClassName="w-full md:w-1/2"
             value={store.birthDate ? new Date(store.birthDate) : null}
             onChange={(dt) =>
               store.setField("birthDate", dt ? dt.toISOString() : "")
@@ -136,11 +175,11 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <Input
             labelContent="قد"
             placeholder="قد خود را وارد کنید."
-            postfix="سانتی متر"
+            postfix={isMobile ? "cm" : "سانتی متر"}
             wrapperClassName="w-full"
             required
             value={store.height ?? ""}
@@ -154,7 +193,7 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           <Input
             labelContent="وزن"
             placeholder="وزن خود را وارد کنید."
-            postfix="کیلوگرم"
+            postfix={isMobile ? "kg" : "کیلوگرم"}
             wrapperClassName="w-full"
             required
             value={store.weight ?? ""}
@@ -170,7 +209,7 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           labelContent="زبان و گویش"
           placeholder="زبان و گویش خود را وارد کنید."
           required
-          wrapperClassName="w-1/2"
+          wrapperClassName="w-full md:w-1/2"
           value={store.language}
           onChange={(e) => store.setField("language", e.target.value)}
         />
@@ -178,26 +217,25 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           labelContent="ایمیل"
           placeholder="ایمیل خود را وارد کنید."
           required
-          wrapperClassName="w-1/2"
+          wrapperClassName="w-full md:w-1/2"
           value={store.email}
           onChange={(e) => store.setField("email", e.target.value)}
         />
-        <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <Select
             inputProps={{
               labelContent: "استان",
               placeholder: "استان خود را انتخاب کنید",
               required: true,
             }}
-            value={store.province ? { label: store.province, value: store.province } : null}
+            value={store.province || null}
             options={provinceOptions}
             wrapperClassName="w-full"
-            onChange={(opt) => {
-              const selected = opt as { label: string; value: string } | null;
-              store.setField("province", selected?.value ?? "");
+            onChange={(selected) => {
+              store.setField("province", selected ?? "");
               store.setField("city", "");
               const found = provincesData?.result?.find(
-                (p) => p.name === selected?.value,
+                (p) => p.name === selected,
               );
               setSelectedProvinceId(found?.id ?? 0);
             }}
@@ -209,12 +247,11 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
               placeholder: "شهر خود را انتخاب کنید",
               required: true,
             }}
-            value={store.city ? { label: store.city, value: store.city } : null}
+            value={store.city || null}
             options={cityOptions}
             wrapperClassName="w-full"
-            onChange={(opt) => {
-              const selected = opt as { label: string; value: string } | null;
-              store.setField("city", selected?.value ?? "");
+            onChange={(selected) => {
+              store.setField("city", selected ?? "");
             }}
             mode="single"
           />
@@ -229,27 +266,22 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           labelContent="کد پستی"
           placeholder="کد پستی خود را وارد کنید."
           required
-          wrapperClassName="w-1/2"
+          wrapperClassName="w-full md:w-1/2"
           value={store.postalCode}
           onChange={(e) => store.setField("postalCode", e.target.value)}
         />
-        <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <Select
             inputProps={{
               labelContent: "تحصیلات",
               placeholder: "تحصیلات خود را انتخاب کنید",
               required: true,
             }}
-            value={
-              store.education
-                ? { label: store.education, value: store.education }
-                : null
-            }
+            value={store.education || null}
             wrapperClassName="w-full"
             options={EDUCATION_OPTIONS}
-            onChange={(opt) => {
-              const selected = opt as { label: string; value: string } | null;
-              store.setField("education", selected?.value ?? "");
+            onChange={(selected) => {
+              store.setField("education", selected ?? "");
             }}
             mode="single"
           />
@@ -266,16 +298,20 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           <Button
             variant="outline"
             rightIcon={<ChevronRight />}
-            className="rounded-full! px-10"
+            className={clsx("rounded-full!", isDesktop && "px-10")}
             onClick={onPrevious}
+            isFullWidth={isMobile}
+            size={isMobile ? "small" : "medium"}
           >
             مرحله قبل
           </Button>
 
           <Button
             leftIcon={<ChevronLeft />}
-            className="rounded-full! px-10"
+            className={clsx("rounded-full!", isDesktop && "px-10")}
             onClick={onNext}
+            isFullWidth={isMobile}
+            size={isMobile ? "small" : "medium"}
           >
             مرحله بعد
           </Button>

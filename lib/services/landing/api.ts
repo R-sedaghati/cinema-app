@@ -145,7 +145,10 @@ export const userCityList = async (provinceId: number) => {
 export const userUploadAvatar = async (file: File) => {
   const form = new FormData();
   form.append("file", file);
-  const { data } = await landingApi.post<{ path: string }>("/user/avatar", form);
+  const { data } = await landingApi.post<{ path: string }>(
+    "/user/avatar",
+    form,
+  );
   return data;
 };
 
@@ -154,6 +157,16 @@ export const userUploadVideo = async (file: File) => {
   form.append("file", file);
   const { data } = await landingApi.post<{ path: string; filename: string }>(
     "/user/upload/video",
+    form,
+  );
+  return data;
+};
+
+export const userUploadImage = async (file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await landingApi.post<{ path: string; filename: string }>(
+    "/user/upload/image",
     form,
   );
   return data;

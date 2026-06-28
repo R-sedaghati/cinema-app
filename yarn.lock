@@ -146,6 +146,11 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.28.5"
 
+"@capacitor/android@^8.4.1":
+  version "8.4.1"
+  resolved "https://package-mirror.liara.ir/repository/npm/@capacitor/android/-/android-8.4.1.tgz#d2a42c051c3a8127510bae62875aaf4237c33719"
+  integrity sha512-igtDCJ7QQn0P2qHFD9p4KXaa6V1b2PRNt+MxjVwtjTm/BJvqmiazOJq6rPjwFSZnfHm6iFoZk8TfzHd44pyBGw==
+
 "@capacitor/cli@^8.4.1":
   version "8.4.1"
   resolved "https://package-mirror.liara.ir/repository/npm/@capacitor/cli/-/cli-8.4.1.tgz#2e340118cb6d380a6484e5375a9fe99a39a25021"

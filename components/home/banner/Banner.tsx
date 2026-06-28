@@ -1,6 +1,8 @@
 "use client";
 
 import Button from "@/components/common/Button";
+import useAuthStore from "@/lib/stores/useAuthStore";
+import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -8,6 +10,8 @@ import React from "react";
 
 const Banner = () => {
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore();
+  const { open } = useLoginDrawerStore();
 
   return (
     <div className="w-full relative ">
@@ -25,7 +29,9 @@ const Banner = () => {
             leftIcon={<ChevronLeft />}
             size="small"
             className="bg-error-500 rounded-full!"
-            onClick={() => router.push("/artist-registration")}
+            onClick={
+              isLoggedIn ? () => router.push("/artist-registration") : open
+            }
           >
             ثبت‌ نام هنرمند
           </Button>

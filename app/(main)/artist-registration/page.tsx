@@ -1,23 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Card } from "@dgshahr/ui-kit";
 import { MoveLeft } from "lucide-react";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
 import { artistCategories } from "@/lib/mock/artists";
-import { splitPattern } from "@/lib/utils/split-pattern";
+import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import { Gender, useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { useUserArtistDetail } from "@/lib/services/landing/hook";
+import clsx from "clsx";
+import { isDesktop, isMobile } from "react-device-detect";
 
 export interface SelectedCategory {
   id: number;
   title: string;
 }
 
-export default function ArtistRegistrationPage() {
-  const rows = splitPattern(artistCategories);
+function ArtistRegistrationPageContent() {
+  const rows = isMobile
+    ? mobileSplitPattern(artistCategories)
+    : splitPattern(artistCategories);
   const searchParams = useSearchParams();
   const editIdParam = searchParams.get("editId");
   const editId = editIdParam ? Number(editIdParam) : null;
@@ -36,7 +40,10 @@ export default function ArtistRegistrationPage() {
 
     reset();
     setField("editId", editId);
-    setField("categoryId", r.categories.map((c) => c.id));
+    setField(
+      "categoryId",
+      r.categories.map((c) => c.id),
+    );
     setField("firstName", r.user.firstName ?? "");
     setField("lastName", r.user.lastName ?? "");
     setField("height", r.user.height);
@@ -89,9 +96,12 @@ export default function ArtistRegistrationPage() {
   return (
     <>
       {step === 0 && !editId && (
-        <Card wrapperClassName="w-4/5 mx-auto">
+        <Card
+          wrapperClassName={clsx("w-[90%] mx-auto", isDesktop && "w-4/5")}
+          className={clsx("p-4", isDesktop && "p-6!")}
+        >
           <div className="flex flex-col gap-3 items-center">
-            <p className="font-h3-bold">
+            <p className={clsx("font-h4-bold", isDesktop && "font-h3-bold")}>
               لطفاً زمینه فعالیت خود را مشخص نمایید:
             </p>
 
@@ -105,7 +115,7 @@ export default function ArtistRegistrationPage() {
                     <button
                       key={item.id}
                       onClick={() => handleSelectCategory(item.id, item.title)}
-                      className="md:w-60 overflow-hidden w-36 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
+                      className="md:w-60 overflow-hidden w-32.5 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
                     >
                       <p className="text-nowrap text-sm md:text-base z-10">
                         {item.title}
@@ -138,5 +148,13 @@ export default function ArtistRegistrationPage() {
         />
       )}
     </>
+  );
+}
+
+export default function ArtistRegistrationPage() {
+  return (
+    <Suspense fallback={null}>
+      <ArtistRegistrationPageContent />
+    </Suspense>
   );
 }

@@ -41,6 +41,7 @@ import {
   userSupport,
   userUpdatePofile,
   userUploadAvatar,
+  userUploadImage,
   userUploadVideo,
 } from "./api";
 import useAuthStore from "@/lib/stores/useAuthStore";
@@ -178,8 +179,17 @@ export const useUserUploadVideo = () =>
     mutationFn: userUploadVideo,
   });
 
+export const useUserUploadImage = () =>
+  useMutation<{ path: string; filename: string }, AxiosError, File>({
+    mutationFn: userUploadImage,
+  });
+
 export const useUserCreateArtistRequest = () =>
-  useMutation<{ result: ArtistRequestResult }, AxiosError, UserCreateArtistRequest>({
+  useMutation<
+    { result: ArtistRequestResult },
+    AxiosError,
+    UserCreateArtistRequest
+  >({
     mutationFn: userCreateArtistRequest,
   });
 
@@ -195,7 +205,10 @@ export const useUserArtistDetail = (id?: number) =>
 export const useUpdateUserArtistRequest = () => {
   const { accessToken } = useAuthStore();
   return useMutation({
-    mutationFn: ({ id, ...payload }: { id: number } & Partial<UserCreateArtistRequest>) =>
+    mutationFn: ({
+      id,
+      ...payload
+    }: { id: number } & Partial<UserCreateArtistRequest>) =>
       updateUserArtistRequest(id, payload, accessToken),
   });
 };

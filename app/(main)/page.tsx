@@ -1,10 +1,8 @@
-// import Link from "next/link";
-// import { faqMock } from "@/lib/mock/faq";
 import Banner from "@/components/home/banner/Banner";
-import { Faq } from "@/components/home/faq/Faq";
 import MainHeader from "@/components/home/main-header/MainHeader";
 import Reasons from "@/components/home/reasons/Reasons";
 import Statistics from "@/components/home/statistics/Statistics";
+import { FaqClient } from "./faq/FaqClient";
 
 export default function Home() {
   return (
@@ -13,7 +11,7 @@ export default function Home() {
       <Statistics />
       <Banner />
       <Reasons />
-      <Faq />
+      <FaqClient />
     </div>
   );
 }

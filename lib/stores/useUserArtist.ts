@@ -48,7 +48,7 @@ interface ArtistRegistrationState {
   ) => void;
 
   addPortfolio: (portfolio: Portfolio) => void;
-  removePortfolio: (index: number) => void;
+  removePortfolio: (path: string) => void;
 
   reset: () => void;
 }
@@ -114,9 +114,9 @@ export const useArtistRegistrationStore = create<ArtistRegistrationState>(
         portfolios: [...state.portfolios, portfolio],
       })),
 
-    removePortfolio: (index) =>
+    removePortfolio: (path) =>
       set((state) => ({
-        portfolios: state.portfolios.filter((_, i) => i !== index),
+        portfolios: state.portfolios.filter((item) => item.path !== path),
       })),
 
     reset: () =>

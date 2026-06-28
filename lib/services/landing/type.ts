@@ -81,6 +81,18 @@ export interface ICityItem {
   id: number;
   name: string;
 }
+
+export type FileTyp = {
+  file?: File;
+  src?: string;
+  loading?: boolean | number;
+  status?: "warning" | "error" | "default";
+  title?: string;
+  errorMessage?: string;
+  hintMessage?: string;
+  className?: string;
+};
+
 export type ICityListResponse = IBaseResponse<ICityItem>;
 
 export type ArtistRequestStatus =

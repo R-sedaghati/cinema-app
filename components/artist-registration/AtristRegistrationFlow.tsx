@@ -8,6 +8,8 @@ import FirstStepFlow from "./FIrstStepFlow";
 import SecondStepFlow from "./SecondStepFlow";
 import ThirdStepFlow from "./ThirdStepFlow";
 import FourthStepFlow from "./FourthStepFlow";
+import { isDesktop, isMobile } from "react-device-detect";
+import clsx from "clsx";
 
 interface ArtistProps {
   category: SelectedCategory | null;
@@ -61,14 +63,17 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
   return (
     <div className="flex flex-col gap-3 items-center">
-      <p className="font-h2-bold">{`فرم حوزه ${category?.title}`}</p>
+      <p className="font-h2-bold md:mb-7">{`فرم حوزه ${category?.title}`}</p>
 
-      <Card wrapperClassName="w-3/4" className="py-4">
+      <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"} className="py-4">
         <HorizontalStepper
           activeStep={flowStep}
           size="medium"
           stepOrientation="horizontal"
-          classname="w-3/4 mx-auto"
+          classname={clsx(
+            "w-[85%] mx-auto scrollbar-hidden",
+            isDesktop && "w-3/4",
+          )}
         >
           <HorizontalStep
             activeIcon={<LayoutGrid />}

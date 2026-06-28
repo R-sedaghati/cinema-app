@@ -11,6 +11,8 @@ import {
 } from "@/lib/services/landing/hook";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { isDesktop, isMobile } from "react-device-detect";
+import clsx from "clsx";
 
 const PAYMENT_AMOUNT = 200000;
 
@@ -22,8 +24,10 @@ interface Props {
 const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
   const store = useArtistRegistrationStore();
   const router = useRouter();
-  const { mutate: create, isPending: isCreating } = useUserCreateArtistRequest();
-  const { mutate: update, isPending: isUpdating } = useUpdateUserArtistRequest();
+  const { mutate: create, isPending: isCreating } =
+    useUserCreateArtistRequest();
+  const { mutate: update, isPending: isUpdating } =
+    useUpdateUserArtistRequest();
   const isPending = isCreating || isUpdating;
 
   const formPayload = {
@@ -71,10 +75,13 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
   };
 
   return (
-    <Card wrapperClassName="w-3/4" className="pt-16">
+    <Card
+      wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}
+      className={clsx("pt-16 px-4", isDesktop && "px-6")}
+    >
       <div className="flex flex-col gap-10">
         {!store.editId && (
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center">
             <div className="flex flex-col gap-3">
               <div className="flex gap-2 items-center">
                 <div className="w-1 h-6 bg-error-500" />
@@ -86,7 +93,7 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
                 هزینه یکبار برای همیشه در این دسته بندی میباشد
               </p>
             </div>
-            <Card wrapperClassName="w-1/3">
+            <Card wrapperClassName="w-full md:w-1/3">
               <div className="flex justify-between items-center">
                 <p className="font-p2-medium">مبلغ قابل پرداخت</p>
                 <div className="flex gap-1">
@@ -111,18 +118,21 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
           <Button
             variant="outline"
             rightIcon={<ChevronRight />}
-            className="rounded-full! px-10"
+            className={clsx("rounded-full!", isDesktop && "px-10")}
             onClick={onPrevious}
-            disabled={isPending}
+            isFullWidth={isMobile}
+            size={isMobile ? "small" : "medium"}
           >
             مرحله قبل
           </Button>
 
           <Button
             leftIcon={<ChevronLeft />}
-            className="rounded-full! px-10"
+            className={clsx("rounded-full!", isDesktop && "px-10")}
             onClick={handleSubmit}
             isLoading={isPending}
+            isFullWidth={isMobile}
+            size={isMobile ? "small" : "medium"}
             disabled={isPending}
           >
             {store.editId ? "ثبت تغییرات" : "پرداخت و ثبت‌نام نهایی"}

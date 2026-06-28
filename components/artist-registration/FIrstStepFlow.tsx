@@ -5,6 +5,8 @@ import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { Card, Checkbox } from "@dgshahr/ui-kit";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import Button from "../common/Button";
+import clsx from "clsx";
+import { isDesktop, isMobile } from "react-device-detect";
 
 interface Props {
   childrenList: IUserCaategoryItem[];
@@ -31,8 +33,8 @@ const FirstStepFlow: React.FC<Props> = ({
   };
 
   return (
-    <Card wrapperClassName="w-3/4">
-      <div className="flex flex-col gap-4">
+    <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}>
+      <div className={clsx("flex flex-col gap-6", isDesktop && "gap-4!")}>
         <p className="font-p2-medium">لطفاً زمینه فعالیت خود را مشخص نمایید:</p>
 
         <div className="flex flex-col gap-2">
@@ -50,16 +52,20 @@ const FirstStepFlow: React.FC<Props> = ({
           <Button
             variant="outline"
             rightIcon={<ChevronRight />}
-            className="rounded-full! px-10"
+            className={clsx("rounded-full!", isDesktop && "px-10")}
             onClick={onPrevious}
+            isFullWidth={isMobile}
+            size={isMobile ? "small" : "medium"}
           >
             مرحله قبل
           </Button>
 
           <Button
             leftIcon={<ChevronLeft />}
-            className="rounded-full! px-10"
+            className={clsx("rounded-full!", isDesktop && "px-10")}
             onClick={onNext}
+            isFullWidth={isMobile}
+            size={isMobile ? "small" : "medium"}
           >
             مرحله بعد
           </Button>
