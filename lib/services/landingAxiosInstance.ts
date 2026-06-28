@@ -11,7 +11,7 @@ type ErrorResponse = {
 };
 
 const landingApi = axios.create({
-  baseURL: "http://api.archivehonar.ir/api",
+  baseURL: "https://api.archivehonar.ir/api",
   paramsSerializer: {
     serialize: (params) =>
       qs.stringify(params, {

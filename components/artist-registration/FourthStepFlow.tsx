@@ -68,7 +68,7 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
     } else {
       create(formPayload, {
         onSuccess: (res) => {
-          window.location.href = `http://api.archivehonar.ir/api/user/purchase/?amount=${PAYMENT_AMOUNT}&requestId=${res.result.artistRequestId}`;
+          window.location.href = `https://api.archivehonar.ir/api/user/purchase/?amount=${PAYMENT_AMOUNT}&requestId=${res.result.artistRequestId}`;
         },
       });
     }
