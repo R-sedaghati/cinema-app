@@ -63,7 +63,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
   return (
     <div className="flex flex-col gap-3 items-center">
-      <p className="font-h2-bold md:mb-7">{`فرم حوزه ${category?.title}`}</p>
+      <p className="font-h2-bold mt-5 mb-1 md:mb-7 md:mt-0">{`فرم حوزه ${category?.title}`}</p>
 
       <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"} className="py-4">
         <HorizontalStepper

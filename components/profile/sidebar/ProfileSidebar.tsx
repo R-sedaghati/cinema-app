@@ -66,7 +66,7 @@ export default function ProfileSidebar({
     <aside className="relative flex-2 z-10 w-full space-y-2 text-right">
       <div
         className={clsx(
-          "flex justify-between gap-2 overflow-hidden items-center bg-gray-100/60 rounded-xl border-2 border-zinc-700/60 p-5 shadow-[0_10px_60px_rgba(0,0,0,0.8)] backdrop-blur-sm",
+          "flex justify-between gap-2 overflow-hidden items-center bg-gray-100/60 rounded-xl border-2 border-zinc-700/60 p-5 backdrop-blur-sm",
         )}
       >
         <div className="flex items-center justify-start gap-2">

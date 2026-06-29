@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { useRef, useState } from "react";
 
 export type WorksSliderItem = {
@@ -13,12 +14,14 @@ interface WorksSliderProps {
   title: string;
   items: WorksSliderItem[];
   variant: "photo" | "video";
+  className?: string;
 }
 
 export function WorksSlider({
   title,
   items,
   variant,
+  className,
 }: Readonly<WorksSliderProps>) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -62,20 +65,31 @@ export function WorksSlider({
         {items.map((item) => (
           <div
             key={item.id}
-            className="min-w-[80%] sm:min-w-[45%] lg:min-w-[30%] shrink-0 rounded-2xl border border-zinc-800 bg-zinc-950/40 p-4"
+            className={clsx(
+              "w-1/2 shrink-0 rounded-2xl border border-zinc-800 bg-zinc-950/40 p-1",
+              className,
+            )}
           >
             <div
               className={[
-                "mb-4 aspect-video overflow-hidden rounded-xl",
+                "aspect-video overflow-hidden rounded-xl",
                 variant === "photo"
                   ? "bg-linear-to-br from-zinc-900 to-zinc-950"
                   : "bg-linear-to-br from-red-600/25 to-zinc-950",
               ].join(" ")}
             >
               {item.url && variant === "photo" ? (
-                <img src={item.url} alt={item.title ?? ""} className="h-full w-full object-cover" />
+                <img
+                  src={item.url}
+                  alt={item.title ?? ""}
+                  className="h-full w-full object-cover"
+                />
               ) : item.url && variant === "video" ? (
-                <video src={item.url} controls className="h-full w-full object-cover" />
+                <video
+                  src={item.url}
+                  controls
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <div className="grid h-full place-items-center text-xs font-semibold text-zinc-200">
                   {variant === "photo" ? "نمونه تصویری" : "نمونه ویدیویی"}

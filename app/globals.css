@@ -3,20 +3,20 @@
 
 :root {
   --background: #23353d;
-  --foreground: #F8F3EA;
-  --accent: #D89A2B;
-  --accent-foreground: #FFFFFF;
+  --foreground: #f8f3ea;
+  --accent: #d89a2b;
+  --accent-foreground: #ffffff;
   --secondary-black: #344851;
 
-  --primary-50: #FFF8EB;
-  --primary-100: #FDEBC5;
-  --primary-200: #F8D98F;
-  --primary-300: #F1C45E;
-  --primary-400: #E7AE38;
-  --primary-500: #D89A2B;
-  --primary-600: #BF831C;
-  --primary-700: #9B6712;
-  --primary-800: #744A0A;
+  --primary-50: #fff8eb;
+  --primary-100: #fdebc5;
+  --primary-200: #f8d98f;
+  --primary-300: #f1c45e;
+  --primary-400: #e7ae38;
+  --primary-500: #d89a2b;
+  --primary-600: #bf831c;
+  --primary-700: #9b6712;
+  --primary-800: #744a0a;
 
   --dgs-color-primary-50: 45 35 15;
   --dgs-color-primary-100: 65 49 20;
@@ -62,29 +62,31 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-secondary-black: #344851;
   --font-sans: var(--font-meem);
-  --shadow-card: 0 10px 30px rgb(0 0 0 / 0.18), 0 0 24px rgb(var(--dgs-color-primary-500) / 0.08);
+  --shadow-card:
+    0 10px 30px rgb(0 0 0 / 0.18),
+    0 0 24px rgb(var(--dgs-color-primary-500) / 0.08);
 
   /* remap built-in red/rose to amber so hardcoded text-red-* / text-rose-* in components render gold */
-  --color-red-50: #FFF8EB;
-  --color-red-100: #FDEBC5;
-  --color-red-200: #F8D98F;
-  --color-red-300: #F1C45E;
-  --color-red-400: #E7AE38;
-  --color-red-500: #D89A2B;
-  --color-red-600: #BF831C;
-  --color-red-700: #9B6712;
-  --color-red-800: #744A0A;
-  --color-red-900: #4A2E06;
-  --color-rose-50: #FFF8EB;
-  --color-rose-100: #FDEBC5;
-  --color-rose-200: #F8D98F;
-  --color-rose-300: #F1C45E;
-  --color-rose-400: #E7AE38;
-  --color-rose-500: #D89A2B;
-  --color-rose-600: #BF831C;
-  --color-rose-700: #9B6712;
-  --color-rose-800: #744A0A;
-  --color-rose-900: #4A2E06;
+  --color-red-50: #fff8eb;
+  --color-red-100: #fdebc5;
+  --color-red-200: #f8d98f;
+  --color-red-300: #f1c45e;
+  --color-red-400: #e7ae38;
+  --color-red-500: #d89a2b;
+  --color-red-600: #bf831c;
+  --color-red-700: #9b6712;
+  --color-red-800: #744a0a;
+  --color-red-900: #4a2e06;
+  --color-rose-50: #fff8eb;
+  --color-rose-100: #fdebc5;
+  --color-rose-200: #f8d98f;
+  --color-rose-300: #f1c45e;
+  --color-rose-400: #e7ae38;
+  --color-rose-500: #d89a2b;
+  --color-rose-600: #bf831c;
+  --color-rose-700: #9b6712;
+  --color-rose-800: #744a0a;
+  --color-rose-900: #4a2e06;
 }
 
 @utility bg-radial-primary {
@@ -100,7 +102,7 @@
     @apply hover:border-primary-500! hover:ring-primary-500/20! has-focus:ring-primary-500/30!;
   }
   input {
-    @apply text-zinc-50! bg-[#455861]!;
+    @apply text-zinc-50!;
   }
   input::placeholder {
     @apply text-zinc-400;
@@ -110,7 +112,7 @@
     @apply hover:border-primary-500! hover:ring-primary-500/20! has-focus:ring-primary-500/30!;
   }
   textarea {
-    @apply text-zinc-50! bg-[#455861]!;
+    @apply text-zinc-50!;
   }
   textarea::placeholder {
     @apply text-zinc-400;
@@ -118,7 +120,7 @@
 }
 
 body {
-  background: linear-gradient(180deg, #263840 0%, #22353D 100%);
+  background: linear-gradient(180deg, #263840 0%, #22353d 100%);
   background-attachment: fixed;
   color: var(--foreground);
 }
@@ -137,7 +139,7 @@ a {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #8B6D2D transparent;
+  scrollbar-color: #8b6d2d transparent;
 }
 
 .scrollbar-hidden {

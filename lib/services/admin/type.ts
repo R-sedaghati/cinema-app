@@ -90,6 +90,7 @@ interface IArtistUser {
   province: string | null;
   weight: number | null;
   gender: EArtistGender;
+  code: string;
 }
 
 export interface IArtistItem {

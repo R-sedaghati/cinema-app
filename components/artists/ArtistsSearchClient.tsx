@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { artistCategories, type Gender } from "@/lib/mock/artists";
+import { artistCategories } from "@/lib/mock/artists";
 import { ChevronDown, MoveLeft, Search, X } from "lucide-react";
-import { splitPattern } from "@/lib/utils/split-pattern";
+import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import Image from "next/image";
 import ArtistCard from "./Card";
 import NotFoundSearch from "../common/NotFoundSearch";
@@ -14,13 +14,14 @@ import {
   useUserProvinceList,
 } from "@/lib/services/landing/hook";
 import useDebounce from "@/lib/hooks/useDebounce";
+import { isMobile } from "react-device-detect";
+import { EArtistGender } from "@/lib/services/admin/type";
 
 type Filters = {
   categoryId__in: number[];
-  gender: Gender | "همه";
+  gender: EArtistGender | null;
   city__in: number[];
 };
-const genders: Array<Filters["gender"]> = ["همه", "زن", "مرد"];
 
 export function ArtistsSearchClient() {
   const [query, setQuery] = useState("");
@@ -28,29 +29,31 @@ export function ArtistsSearchClient() {
 
   const [filters, setFilters] = useState<Filters>({
     categoryId__in: [],
-    gender: "همه",
+    gender: null,
     city__in: [],
   });
 
-  const { data, isPending } = useUserArtsitList({
+  const { data } = useUserArtsitList({
     search: debouncedSearch,
     categoryId__in: filters.categoryId__in.length
       ? filters.categoryId__in
       : undefined,
-    gender: filters.gender == "همه" ? undefined : filters.gender,
+    gender: filters.gender ?? undefined,
     city__in: filters.city__in.length ? filters.city__in : undefined,
   });
 
   const { data: provinceData } = useUserProvinceList();
 
   const results = data?.result ?? [];
-  const rows = splitPattern(artistCategories);
+  const rows = isMobile
+    ? mobileSplitPattern(artistCategories)
+    : splitPattern(artistCategories);
 
   return (
     <div className="space-y-12 relative">
       <div className="flex flex-col items-center justify-center gap-5">
-        <h1 className="text-[32px] text-zinc-50 w-full text-center">
-          هنرمند رو سرچ کن یا انتخاب کن
+        <h1 className="text-[24px] ma:text-[32px] text-zinc-50 w-full text-center">
+          دسته بندی رو سرچ کن یا انتخاب کن
         </h1>
 
         <div className="relative md:w-131.5 w-full">
@@ -106,14 +109,24 @@ export function ArtistsSearchClient() {
                   gender: value,
                 }))
               }
-              options={genders.map((o) => ({
-                value: o,
-                label: o,
-              }))}
+              options={[
+                {
+                  label: "همه",
+                  value: null,
+                },
+                {
+                  label: "مرد",
+                  value: EArtistGender.MAN,
+                },
+                {
+                  label: "زن",
+                  value: EArtistGender.WOMAN,
+                },
+              ]}
               customInput={(isOpen) => (
                 <Chip
-                  label={filters.gender === "همه" ? "جنسیت" : filters.gender}
-                  filled={isOpen || filters.gender !== "همه"}
+                  label={filters.gender ?? "جنسیت"}
+                  filled={isOpen || filters.gender !== null}
                   leftIcon={<ChevronDown className={chevronCn(isOpen)} />}
                 />
               )}

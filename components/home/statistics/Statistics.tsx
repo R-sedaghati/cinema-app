@@ -1,5 +1,8 @@
+"use client";
+
 import Button from "@/components/common/Button";
 import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const statisticsItems = [
   {
@@ -41,6 +44,7 @@ const statisticsItems = [
 ];
 
 const StatisticsSection = () => {
+  const router = useRouter();
   return (
     <div className="flex relative flex-col md:flex-row gap-10 justify-between items-center">
       <div className="flex flex-1 flex-col gap-8 text-zinc-100">
@@ -52,6 +56,7 @@ const StatisticsSection = () => {
           برای انتخاب بهتر و سریع‌تر آماده است.
         </h6>
         <Button
+          onClick={() => router.push("/artists")}
           leftIcon={<ChevronLeft />}
           size="small"
           className="bg-error-500 rounded-full!"
