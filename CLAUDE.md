@@ -5,9 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-yarn dev        # start dev server (http://localhost:3000)
-yarn build      # production build
-yarn lint       # run ESLint
+pnpm dev        # start dev server (http://localhost:3000)
+pnpm build      # production build
+pnpm lint       # run ESLint
+pnpm cap:sync   # sync web assets to Android
+pnpm cap:android  # open Android Studio
 ```
 
 No test suite configured.
@@ -68,3 +70,19 @@ All responses wrap data in `ApiResponse<T>` envelope (`message`, `result`, optio
 ### Query defaults
 
 All `useQuery` hooks use `refetchInterval: 30_000`, `refetchOnWindowFocus: false`. Queries gated on auth use `enabled: Boolean(accessToken)`.
+
+### Shared types
+
+`lib/services/admin/type.ts` is the canonical type file — landing services import shared types from it (e.g. `IRetriveResponse`, `IArtistRetriveResponse`). Landing-specific types live in `lib/services/landing/type.ts`.
+
+### Utilities (`lib/utils/`)
+
+Persian/Gregorian number and date converters, phone formatter, Shamsi date converter. Use these — don't re-implement Persian formatting.
+
+### Custom hooks (`lib/hooks/`)
+
+`useDebounce`, `useTimer`, `useWebOtp` (Web OTP API for auto-fill), `useSidebarItems` (admin nav), `lib/hooks/tables/` (table state helpers).
+
+### Capacitor / mobile
+
+`capacitor.config.ts` points the Android WebView at `https://archivehonar.ir` (live server), not localhost. `webDir: 'public'` — run `pnpm cap:sync` after `pnpm build` to push web assets.

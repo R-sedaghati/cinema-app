@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#0E0E0E] text-white">
+    <footer className="bg-zinc-950/40 text-white">
       <div className="mx-auto max-w-7xl px-6 py-16 flex flex-col gap-14">
         {/* top */}
         <div className="flex flex-col md:flex-row gap-5 justify-between items-center">

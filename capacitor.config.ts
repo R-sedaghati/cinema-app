@@ -1,12 +1,12 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.archive.cinema',
-  appName: 'ArchiveHonar',
-  webDir: 'public',
+  appId: "com.archive.cinema",
+  appName: "ArchiveHonar",
+  webDir: "public",
   server: {
-    url: 'https://archivehonar.ir',
-    androidScheme: 'https',
+    url: "https://ui.archivehonar.ir",
+    androidScheme: "https",
   },
 };
 

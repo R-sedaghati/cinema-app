@@ -59,7 +59,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-zinc-950/70 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
+      <header className="sticky top-0 z-50 bg-zinc-950/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center">
           {isMobile ? (
             <div className="flex min-w-0 flex-1 items-center justify-start">
@@ -198,9 +198,6 @@ export function SiteHeader() {
                       {item.label}
                     </div>
                     <div className="flex items-center gap-3">
-                      {/* <span className="flex size-8 items-center justify-center rounded-full bg-zinc-700/80 text-zinc-400">
-                        <Icon size={16} />
-                      </span> */}
                       <ChevronLeft size={20} className="text-zinc-200" />
                     </div>
                   </Link>
