@@ -198,9 +198,6 @@ export function SiteHeader() {
                       {item.label}
                     </div>
                     <div className="flex items-center gap-3">
-                      {/* <span className="flex size-8 items-center justify-center rounded-full bg-zinc-700/80 text-zinc-400">
-                        <Icon size={16} />
-                      </span> */}
                       <ChevronLeft size={20} className="text-zinc-200" />
                     </div>
                   </Link>
