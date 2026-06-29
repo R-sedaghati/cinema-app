@@ -165,9 +165,17 @@ export function SiteHeader() {
         >
           <div className="flex flex-col h-full p-4">
             <div className="flex items-center justify-between mb-6">
-              <span className="text-lg font-semibold text-error-500">
-                آرشیو هنر
-              </span>
+              <div className="flex gap-1 items-center">
+                <Image
+                  src="/assets/images/logo.svg"
+                  alt="logo"
+                  width={40}
+                  height={40}
+                />
+                <span className="text-xl font-semibold text-error-500 text-nowrap">
+                  آرشیو هنر
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={handleClose}

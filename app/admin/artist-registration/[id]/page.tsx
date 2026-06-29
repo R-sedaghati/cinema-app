@@ -2,6 +2,7 @@
 
 import ArtistRevisionDrawer from "@/components/admin/artist-registration/ArtistRevisionDrawer";
 import ArtistStatus from "@/components/admin/artist-registration/ArtistStatus";
+import { WorksSlider } from "@/components/media/WorksSlider";
 import {
   useAdminArtistRetrieve,
   useAdminArtistStatusUpdate,
@@ -35,13 +36,16 @@ function ArtistDetail() {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const imagePortfolios = data?.portfolios?.filter(
-    (item) => item.type === "IMAGE",
-  );
+  const photoWorks =
+    data?.portfolios
+      .filter((p) => p.type === "IMAGE")
+      .map((p) => ({ id: String(p.id), url: p.url })) ?? [];
 
-  const videoPortfolios = data?.portfolios?.filter(
-    (item) => item.type === "VIDEO",
-  );
+  const videoWorks =
+    data?.portfolios
+      .filter((p) => p.type === "VIDEO")
+      .map((p) => ({ id: String(p.id), url: p.url })) ?? [];
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between">
@@ -257,47 +261,16 @@ function ArtistDetail() {
             />
             <div className="flex flex-col gap-4">
               <p className="font-h5-bold">نمونه کارهای تصویری</p>
-              <div className="flex gap-3 flex-wrap">
-                {imagePortfolios?.map((item) => (
-                  <FileUploader
-                    key={item.id}
-                    mode="single"
-                    fileInputProps={{
-                      className: "w-40!",
-                      title: "عنوان",
-                    }}
-                    onChange={() => {}}
-                    previewProps={{
-                      leftButton: false,
-                    }}
-                    files={{
-                      src: item.url ?? "",
-                    }}
-                  />
-                ))}
-              </div>
+              <WorksSlider
+                title=""
+                items={photoWorks}
+                variant="photo"
+                className="w-1/4"
+              />
             </div>
             <div className="flex flex-col gap-4">
               <p className="font-h5-bold">نمونه کارهای ویدئویی</p>
-              <div className="flex gap-3 flex-wrap">
-                {videoPortfolios?.map((item) => (
-                  <FileUploader
-                    key={item.id}
-                    mode="single"
-                    fileInputProps={{
-                      className: "w-40!",
-                      title: "عنوان",
-                    }}
-                    onChange={() => {}}
-                    previewProps={{
-                      leftButton: false,
-                    }}
-                    files={{
-                      src: item.url ?? "",
-                    }}
-                  />
-                ))}
-              </div>
+              <WorksSlider title="" items={videoWorks} variant="video" />
             </div>
           </div>
         </Card>

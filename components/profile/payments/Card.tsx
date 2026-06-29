@@ -9,7 +9,7 @@ const Card = () => {
           <p className="text-zinc-400"> شنبه - ۱۴۰۲/۴/۲ - ۱۰:۳۰</p>
           <Badge value="پرداخت شده" color="success" />
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row items-start justify-between md:items-center">
           <p className="line-clamp-1">
             مشاهده اطلاعات تماس پروفایل: نیما بنیادی
           </p>

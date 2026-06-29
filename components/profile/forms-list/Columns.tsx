@@ -24,7 +24,7 @@ export const generateColumns = (
     key: "createAt",
     dataIndex: "titcreateAtle",
     title: "تاریخ ارسال",
-    className: "align-middle",
+    className: "align-middle min-w-32",
     render: (data) => {
       return (
         <p className="font-p1-regular">
@@ -38,7 +38,7 @@ export const generateColumns = (
     key: "status",
     dataIndex: "status",
     title: "وضعیت",
-    className: "align-middle",
+    className: "align-middle min-w-32",
     render: (data) => <ArtistStatus status={data.status} isSolid />,
   },
   {

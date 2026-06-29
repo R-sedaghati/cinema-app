@@ -65,7 +65,7 @@ export default function Overview() {
     <ContentCard title="ویرایش پروفایل">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-8 rounded-xl border-2 border-zinc-700/60 bg-gray-100/60 p-4 shadow-[0_10px_60px_rgba(0,0,0,0.8)] backdrop-blur-sm"
+        className="flex flex-col gap-8 rounded-xl border-2 border-zinc-700/60 bg-gray-100/60 p-4 backdrop-blur-sm"
       >
         <div className="grid w-full gap-4 md:grid-cols-2">
           <Input

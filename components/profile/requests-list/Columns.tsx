@@ -10,7 +10,7 @@ export const columns: ColumnsType<ISupportItem>[] = [
     key: "title",
     dataIndex: "title",
     title: "درخواست",
-    className: "align-middle",
+    className: "align-middle min-w-60",
     render: (data) =>
       data.id && (
         <p className="font-p1-regular">{`${data.firstName}  ${data.lastName}`}</p>
@@ -21,7 +21,7 @@ export const columns: ColumnsType<ISupportItem>[] = [
     key: "status",
     dataIndex: "status",
     title: "وضعیت",
-    className: "align-middle",
+    className: "align-middle min-w-32",
     render: (data) => <RequestStatus status={data.status} isSolid />,
   },
   {
@@ -29,7 +29,7 @@ export const columns: ColumnsType<ISupportItem>[] = [
     key: "actions",
     dataIndex: "actions",
     title: "عملیات",
-    className: "align-middle max-w-28",
+    className: "align-middle max-w-52",
     render: () => (
       <Button variant="text" leftIcon={<ChevronLeft />}>
         مشاهده پروفایل هنرمند

@@ -96,7 +96,7 @@ const ContactUsForm = () => {
         onSubmit={handleSubmit}
         className="flex flex-col mt-6 gap-7 border border-error-500/30 shadow-card rounded-4xl p-6 bg-zinc-900/40 w-full"
       >
-        <div className="flex flex-wrap gap-2 w-full">
+        <div className="flex flex-wrap gap-7 md:gap-2 w-full">
           <Input
             labelContent="نام"
             required
@@ -116,7 +116,7 @@ const ContactUsForm = () => {
           />
         </div>
 
-        <div className="flex flex-wrap gap-2 w-full">
+        <div className="flex flex-wrap gap-7 md:gap-2 w-full">
           <Input
             labelContent="ایمیل"
             required
@@ -137,7 +137,7 @@ const ContactUsForm = () => {
           />
         </div>
 
-        <div className="flex gap-2 w-full">
+        <div className="flex flex-col md:flex-row gap-7 md:gap-2 w-full">
           <Select
             inputProps={{
               labelContent: "دسته بندی اصلی",
