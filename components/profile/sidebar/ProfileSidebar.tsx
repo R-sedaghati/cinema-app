@@ -14,6 +14,7 @@ import { SectionId } from "../types";
 import Button from "../../common/Button";
 import MenuSection from "./MenuSection";
 import { useUserProfile } from "@/lib/services/landing/hook";
+import clsx from "clsx";
 
 export interface SideBarSections {
   id: SectionId;
@@ -60,8 +61,6 @@ export default function ProfileSidebar({
   setActive: (s: SectionId | null) => void;
 }>) {
   const { data } = useUserProfile();
-
-  const fullName = `${data?.firstName ?? ""} ${data?.lastName ?? ""}`.trim();
 
   return (
     <aside className="relative flex-2 z-10 w-full space-y-2 text-right">
