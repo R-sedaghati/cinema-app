@@ -26,7 +26,7 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 lg:hidden"
+      className="fixed bottom-safe-6 left-1/2 z-40 -translate-x-1/2 lg:hidden"
       aria-label="ناوبری اصلی"
     >
       <div className="flex items-center gap-1 rounded-full bg-zinc-900/95 px-2 py-2 shadow-lg ring-1 ring-zinc-800 backdrop-blur-sm">

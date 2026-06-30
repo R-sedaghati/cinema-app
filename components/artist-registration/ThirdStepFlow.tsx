@@ -52,10 +52,10 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           prev.map((item) =>
             item.file === file
               ? {
-                  ...item,
-                  src: res.path,
-                  loading: false,
-                }
+                ...item,
+                src: res.path,
+                loading: false,
+              }
               : item,
           ),
         );
@@ -73,10 +73,10 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           prev.map((item) =>
             item.file === file
               ? {
-                  ...item,
-                  loading: false,
-                  status: "error",
-                }
+                ...item,
+                loading: false,
+                status: "error",
+              }
               : item,
           ),
         );
@@ -85,7 +85,7 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
   };
 
   return (
-    <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}>
+    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
       <div className="flex flex-col gap-5">
         <Textarea
           labelContent="درباره من"

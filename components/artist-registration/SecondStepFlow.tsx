@@ -67,10 +67,10 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
         setAvatarFile((prev) =>
           prev
             ? {
-                ...prev,
-                src: res.path,
-                loading: false,
-              }
+              ...prev,
+              src: res.path,
+              loading: false,
+            }
             : null,
         );
 
@@ -80,10 +80,10 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
         setAvatarFile((prev) =>
           prev
             ? {
-                ...prev,
-                loading: false,
-                status: "error",
-              }
+              ...prev,
+              loading: false,
+              status: "error",
+            }
             : null,
         );
       },
@@ -91,7 +91,7 @@ const SecondStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
   };
 
   return (
-    <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}>
+    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
       <div className="flex flex-col gap-5">
         <div className="flex flex-col md:flex-row gap-3 items-center">
           <Input

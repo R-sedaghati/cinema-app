@@ -33,7 +33,7 @@ const FirstStepFlow: React.FC<Props> = ({
   };
 
   return (
-    <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}>
+    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
       <div className={clsx("flex flex-col gap-6", isDesktop && "gap-4!")}>
         <p className="font-p2-medium">لطفاً زمینه فعالیت خود را مشخص نمایید:</p>
 

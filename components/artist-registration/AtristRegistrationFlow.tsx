@@ -1,8 +1,8 @@
 import { useUserCategoryList } from "@/lib/services/landing/hook";
 import { IUserCategoryResponse } from "@/lib/services/landing/type";
 import { Card, HorizontalStep, HorizontalStepper } from "@dgshahr/ui-kit";
-import { LayoutGrid, UserRound, List, CreditCard } from "lucide-react";
-import { useMemo } from "react";
+import { LayoutGrid, UserRound, List, CreditCard, Loader2 } from "lucide-react";
+import { useEffect, useMemo } from "react";
 import { SelectedCategory } from "@/app/(main)/artist-registration/page";
 import FirstStepFlow from "./FIrstStepFlow";
 import SecondStepFlow from "./SecondStepFlow";
@@ -24,7 +24,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   onNext,
   onPrevious,
 }) => {
-  const { data } = useUserCategoryList({ page: 1, count: 16 });
+  const { data, isLoading } = useUserCategoryList({ page: 1, count: 16 });
 
   const selectedCategory = useMemo(() => {
     if (!data?.result || !category?.id) return null;
@@ -35,17 +35,34 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   }, [data, category]);
 
   const children = selectedCategory?.children || [];
+  const hasChildren = children.length > 0;
+
+  useEffect(() => {
+    if (data && !hasChildren && flowStep === 0) {
+      onNext();
+    }
+  }, [data, hasChildren, flowStep]);
+
+  const stepperActiveStep = hasChildren ? flowStep : flowStep - 1;
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-24">
+        <Loader2 className="animate-spin text-error-500" size={40} />
+      </div>
+    );
+  }
 
   const renderStep = () => {
     switch (flowStep) {
       case 0:
-        return (
+        return hasChildren ? (
           <FirstStepFlow
             childrenList={children}
             onNext={onNext}
             onPrevious={onPrevious}
           />
-        );
+        ) : null;
 
       case 1:
         return <SecondStepFlow onNext={onNext} onPrevious={onPrevious} />;
@@ -65,32 +82,34 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     <div className="flex flex-col gap-3 items-center">
       <p className="font-h2-bold mt-5 mb-1 md:mb-7 md:mt-0">{`فرم حوزه ${category?.title}`}</p>
 
-      <Card wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"} className="py-4">
+      <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} className="py-4">
         <HorizontalStepper
-          activeStep={flowStep}
+          activeStep={stepperActiveStep}
           size="medium"
           stepOrientation="horizontal"
           classname={clsx(
-            "w-[85%] mx-auto scrollbar-hidden",
+            "w-[95%] mx-auto scrollbar-hidden",
             isDesktop && "w-3/4",
           )}
         >
-          <HorizontalStep
-            activeIcon={<LayoutGrid />}
-            icon={<LayoutGrid />}
-            subTitle="مرحله ۱ از ۴"
-            title="زمینه فعالیت"
-          />
+          {hasChildren && (
+            <HorizontalStep
+              activeIcon={<LayoutGrid />}
+              icon={<LayoutGrid />}
+              subTitle={`مرحله ۱ از ۴`}
+              title="زمینه فعالیت"
+            />
+          )}
           <HorizontalStep
             activeIcon={<UserRound />}
             icon={<UserRound />}
-            subTitle="مرحله ۲ از ۴"
+            subTitle={hasChildren ? "مرحله ۲ از ۴" : "مرحله ۱ از ۳"}
             title="اطلاعات هویتی"
           />
           <HorizontalStep
             activeIcon={<List />}
             icon={<List />}
-            subTitle="مرحله ۳ از ۴"
+            subTitle={hasChildren ? "مرحله ۳ از ۴" : "مرحله ۲ از ۳"}
             title="سوابق کاری و پروژه‌ها"
           />
           <HorizontalStep

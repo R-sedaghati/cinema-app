@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type PortfolioType = "IMAGE" | "VIDEO";
 export type Gender = "MAN" | "WOMAN";
@@ -14,6 +15,10 @@ interface ArtistRegistrationState {
 
   // Edit mode — non-null means editing an existing request
   editId: number | null;
+
+  // Selected category (for display)
+  selectedCategoryId: number | null;
+  selectedCategoryTitle: string;
 
   // Form
   categoryId: number[];
@@ -40,6 +45,7 @@ interface ArtistRegistrationState {
   handleNext: () => void;
   handlePrevious: () => void;
   setStep: (step: number) => void;
+  setSelectedCategory: (id: number, title: string) => void;
 
   // Form Actions
   setField: <K extends keyof ArtistRegistrationState>(
@@ -56,6 +62,9 @@ interface ArtistRegistrationState {
 const initialState = {
   step: 0,
   editId: null as number | null,
+
+  selectedCategoryId: null as number | null,
+  selectedCategoryTitle: "",
 
   categoryId: [],
 
@@ -79,49 +88,57 @@ const initialState = {
   aboutMe: "",
 };
 
-export const useArtistRegistrationStore = create<ArtistRegistrationState>(
-  (set) => ({
-    ...initialState,
+export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
+  persist(
+    (set) => ({
+      ...initialState,
 
-    setStep: (step) => set({ step }),
+      setStep: (step) => set({ step }),
 
-    handleNext: () =>
-      set((state) => ({
-        step: state.step + 1,
-      })),
+      setSelectedCategory: (id, title) =>
+        set({ selectedCategoryId: id, selectedCategoryTitle: title }),
 
-    handlePrevious: () =>
-      set((state) => {
-        if (state.step === 1) {
+      handleNext: () =>
+        set((state) => ({
+          step: state.step + 1,
+        })),
+
+      handlePrevious: () =>
+        set((state) => {
+          if (state.step === 1) {
+            return {
+              step: 0,
+              categoryId: [],
+              selectedCategoryId: null,
+              selectedCategoryTitle: "",
+            };
+          }
+
           return {
-            step: 0,
-            categoryId: [],
+            step: Math.max(state.step - 1, 0),
           };
-        }
+        }),
 
-        return {
-          step: Math.max(state.step - 1, 0),
-        };
-      }),
+      setField: (field, value) =>
+        set({
+          [field]: value,
+        } as Pick<ArtistRegistrationState, typeof field>),
 
-    setField: (field, value) =>
-      set({
-        [field]: value,
-      } as Pick<ArtistRegistrationState, typeof field>),
+      addPortfolio: (portfolio) =>
+        set((state) => ({
+          portfolios: [...state.portfolios, portfolio],
+        })),
 
-    addPortfolio: (portfolio) =>
-      set((state) => ({
-        portfolios: [...state.portfolios, portfolio],
-      })),
+      removePortfolio: (path) =>
+        set((state) => ({
+          portfolios: state.portfolios.filter((item) => item.path !== path),
+        })),
 
-    removePortfolio: (path) =>
-      set((state) => ({
-        portfolios: state.portfolios.filter((item) => item.path !== path),
-      })),
-
-    reset: () =>
-      set({
-        ...initialState,
-      }),
-  }),
+      reset: () =>
+        set({
+          ...initialState,
+        }),
+    }),
+    { name: "artist-registration-storage" },
+  ),
 );

@@ -26,11 +26,11 @@ export default function MenuSection({
             type="button"
             onClick={() => setActive(s.id)}
             className={clsx(
-              "relative flex w-full items-center justify-between px-5 py-4 transition min-h-16",
-              !isLast && "border-b border-zinc-800/70",
+              "relative flex w-full items-center justify-between px-5 py-3.5 md:py-4 transition min-h-13.5 md:min-h-16",
+              !isLast && "border-b border-zinc-800/60",
               activeItem
-                ? "bg-zinc-600/50 text-zinc-100"
-                : "text-zinc-300 hover:bg-zinc-600/20",
+                ? "md:bg-zinc-600/50 text-zinc-100"
+                : "text-zinc-300 active:bg-zinc-700/20 md:hover:bg-zinc-600/20",
             )}
           >
             <div className="flex items-center gap-3">
@@ -42,7 +42,7 @@ export default function MenuSection({
             <ChevronLeft className="text-zinc-500" size={20} />
             <div
               className={clsx(
-                "h-1/2 bg-error-500 absolute left-0 top-1/2 rounded-r-2xl -translate-y-1/2 transition-all",
+                "h-1/2 bg-error-500 absolute left-0 top-1/2 rounded-r-2xl -translate-y-1/2 transition-all hidden md:block",
                 activeItem ? "w-0.75" : "w-0",
               )}
             />

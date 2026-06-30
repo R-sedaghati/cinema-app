@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Card } from "@dgshahr/ui-kit";
-import { MoveLeft } from "lucide-react";
+import { MoveLeft, Loader2 } from "lucide-react";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
 import { artistCategories } from "@/lib/mock/artists";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
@@ -26,13 +26,23 @@ function ArtistRegistrationPageContent() {
   const editIdParam = searchParams.get("editId");
   const editId = editIdParam ? Number(editIdParam) : null;
 
-  const [step, setStep] = useState(0);
-  const [selectedCategory, setSelectedCategory] =
-    useState<SelectedCategory | null>(null);
+  const {
+    step,
+    setStep,
+    selectedCategoryId,
+    selectedCategoryTitle,
+    setSelectedCategory,
+    handleNext,
+    setField,
+    reset,
+  } = useArtistRegistrationStore();
 
-  const { setField, reset } = useArtistRegistrationStore();
+  const selectedCategory: SelectedCategory | null =
+    selectedCategoryId === null
+      ? null
+      : { id: selectedCategoryId, title: selectedCategoryTitle };
 
-  const { data: editData } = useUserArtistDetail(editId ?? undefined);
+  const { data: editData, isLoading: editLoading } = useUserArtistDetail(editId ?? undefined);
 
   useEffect(() => {
     if (!editId || !editData?.result) return;
@@ -67,7 +77,7 @@ function ArtistRegistrationPageContent() {
 
     const cat = r.categories[0];
     if (cat) {
-      setSelectedCategory({ id: cat.id, title: cat.faName });
+      setSelectedCategory(cat.id, cat.faName);
       setStep(1);
     }
   }, [editData, editId]);
@@ -75,26 +85,28 @@ function ArtistRegistrationPageContent() {
   const handleSelectCategory = (id: number, title: string) => {
     reset();
     setField("categoryId", [id]);
-    setSelectedCategory({ id, title });
+    setSelectedCategory(id, title);
     setStep(1);
-  };
-
-  const handleNext = () => {
-    setStep((prev) => prev + 1);
   };
 
   const handlePrevious = () => {
     if (step === 1 && !editId) {
-      setStep(0);
-      setSelectedCategory(null);
       reset();
     } else {
-      setStep((prev) => prev - 1);
+      setStep(step - 1);
     }
   };
 
+  if (editId && editLoading) {
+    return (
+      <div className="flex justify-center items-center py-24">
+        <Loader2 className="animate-spin text-error-500" size={40} />
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className='mt-4'>
       {step === 0 && !editId && (
         <Card
           wrapperClassName={clsx(
@@ -109,9 +121,9 @@ function ArtistRegistrationPageContent() {
             </p>
 
             <div className="flex flex-col gap-4">
-              {rows.map((row, rowIndex) => (
+              {rows.map((row) => (
                 <div
-                  key={rowIndex}
+                  key={row.map((r) => r.id).join("-")}
                   className="flex flex-wrap justify-center gap-4"
                 >
                   {row.map((item) => (
@@ -150,7 +162,7 @@ function ArtistRegistrationPageContent() {
           onPrevious={handlePrevious}
         />
       )}
-    </>
+    </div>
   );
 }
 
