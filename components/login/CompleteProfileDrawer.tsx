@@ -72,6 +72,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
           isLoading={isPending}
           disabled={isPending}
           className="w-full rounded-full!"
+          isFullWidth
         >
           ذخیره
         </Button>

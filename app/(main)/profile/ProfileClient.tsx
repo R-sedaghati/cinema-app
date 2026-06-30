@@ -7,11 +7,25 @@ import ProfileSidebar from "../../../components/profile/sidebar/ProfileSidebar";
 import ProfileContent from "../../../components/profile/ProfileContent";
 import useResponsiveSidebar from "../../../components/profile/useResponsiveSidebar";
 
+const sectionLabels: Record<SectionId, string> = {
+  overview: "ویرایش پروفایل",
+  forms: "لیست فرم‌ها",
+  requests: "درخواست‌های ارتباط",
+  payments: "تاریخچه پرداخت‌ها",
+  support: "پشتیبانی",
+  logout: "خروج از حساب",
+};
+
 export function ProfileClient() {
   const [active, setActive] = useState<SectionId | null>("forms");
 
   const { isMobile, showSidebar, setShowSidebar, handleSelect } =
     useResponsiveSidebar(setActive);
+
+  const goBack = () => {
+    setShowSidebar(true);
+    setActive(null);
+  };
 
   return (
     <div className="relative grid gap-9 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,2.1fr)]">
@@ -19,17 +33,24 @@ export function ProfileClient() {
         <ProfileSidebar active={active} setActive={handleSelect} />
       )}
       {isMobile !== null && (!isMobile || !showSidebar) && (
-        <div className="relative z-10 flex-4 overflow-x-scroll">
+        <div className="relative z-10 flex-4">
           {isMobile && (
-            <ArrowRight
-              onClick={() => {
-                setShowSidebar(true);
-                setActive(null);
-              }}
-              className="absolute top-4 right-4 text-zinc-400"
-            />
+            <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-800/60">
+              <button
+                type="button"
+                onClick={goBack}
+                className="flex items-center justify-center rounded-full p-1.5 text-zinc-400 active:bg-zinc-800 transition"
+              >
+                <ArrowRight size={22} />
+              </button>
+              <span className="text-base font-semibold text-zinc-100">
+                {active ? sectionLabels[active] : ""}
+              </span>
+            </div>
           )}
-          <ProfileContent active={active} />
+          <div className="overflow-x-auto">
+            <ProfileContent active={active} />
+          </div>
         </div>
       )}
 

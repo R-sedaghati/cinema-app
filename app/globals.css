@@ -89,6 +89,15 @@
   --color-rose-900: #4a2e06;
 }
 
+/* Swiper pagination dots — amber brand color */
+.application-banner .swiper-pagination-bullet-active {
+  background: #d89a2b;
+}
+.application-banner .swiper-pagination-bullet {
+  background: rgba(216, 154, 43, 0.4);
+  opacity: 1;
+}
+
 @utility bg-radial-primary {
   background-image: radial-gradient(
     circle,
@@ -123,10 +132,27 @@ body {
   background: linear-gradient(180deg, #263840 0%, #22353d 100%);
   background-attachment: fixed;
   color: var(--foreground);
+  overscroll-behavior: none;
 }
 
 a {
   color: inherit;
+}
+
+/* native app feel — no blue flash on tap, no 300ms delay */
+* {
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: #8b6d2d transparent;
+}
+
+button, a, [role="button"], label {
+  touch-action: manipulation;
+}
+
+/* prevent long-press callout on images */
+img {
+  -webkit-touch-callout: none;
 }
 
 ::-webkit-scrollbar {
@@ -137,11 +163,18 @@ a {
   border-radius: 999px;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #8b6d2d transparent;
-}
-
 .scrollbar-hidden {
   scrollbar-width: none;
+}
+
+@utility pb-safe-24 {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6rem);
+}
+
+@utility pb-safe-32 {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8rem);
+}
+
+@utility bottom-safe-6 {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
 }

@@ -32,7 +32,7 @@ export default function ArtistDetailsPage() {
     .map((p) => ({ id: String(p.id), url: p.url }));
 
   return (
-    <div className="relative min-h-screen px-6 py-16">
+    <div className="relative min-h-screen px-3 sm:px-6 py-16">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="w-170 h-170 rounded-full absolute opacity-20 -bottom-44 -right-96 -z-1
@@ -45,22 +45,24 @@ export default function ArtistDetailsPage() {
       </div>
 
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-4 lg:grid-cols-3">
-        <Aside artist={artist} />
-        <div className="space-y-4 lg:col-span-2">
-          <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-xl font-h1-regular text-error-500">درباره من</h2>
-            <p className="mt-6 space-y-2 text-sm leading-8 text-zinc-300">
+        <div className="mt-16 lg:mt-0">
+          <Aside artist={artist} />
+        </div>
+        <div className="space-y-3 sm:space-y-4 lg:col-span-2">
+          <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">درباره من</h2>
+            <p className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
               {artist.user.aboutMe ?? "—"}
             </p>
           </section>
 
-          <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-xl font-h1-regular text-error-500">نمونه کارهای تصویری</h2>
+          <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">نمونه کارهای تصویری</h2>
             <WorksSlider title="" items={photoWorks} variant="photo" />
           </section>
 
-          <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-xl font-h1-regular text-error-500">نمونه کارهای ویدیویی</h2>
+          <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">نمونه کارهای ویدیویی</h2>
             <WorksSlider title="" items={videoWorks} variant="video" />
           </section>
         </div>

@@ -76,7 +76,7 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
 
   return (
     <Card
-      wrapperClassName={isMobile ? "w-[85%]" : "w-3/4"}
+      wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}
       className={clsx("pt-16 px-4", isDesktop && "px-6")}
     >
       <div className="flex flex-col gap-10">

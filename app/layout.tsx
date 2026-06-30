@@ -1,11 +1,19 @@
 import { ToastContainer } from "react-toastify";
 import localFont from "next/font/local";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import "./admin.css";
 
 export const metadata: Metadata = {
   title: "آرشیو هنرمندان سینما",
   description: "آرشیو هنرمندان حوزه سینما (نسخه توسعه با داده‌های ساختگی)",
+};
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 const meemFont = localFont({

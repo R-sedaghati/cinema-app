@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { SectionId } from "../types";
 import Button from "../../common/Button";
-import clsx from "clsx";
 import MenuSection from "./MenuSection";
 import { useUserProfile } from "@/lib/services/landing/hook";
+import clsx from "clsx";
 
 export interface SideBarSections {
   id: SectionId;
@@ -75,15 +75,12 @@ export default function ProfileSidebar({
           </div>
           <div className="flex flex-col gap-2 items-start">
             <h2 className="text-base text-zinc-100">{`${data?.firstName} ${data?.lastName}`}</h2>
-
             <span dir="ltr" className="text-sm text-zinc-400">
               {data?.phone_number ?? ""}
             </span>
-
             <p className="text-sm text-zinc-400 truncate">{data?.email}</p>
           </div>
         </div>
-
         <Button
           variant="text"
           leftIcon={<ChevronLeft className="text-zinc-500" size={20} />}
