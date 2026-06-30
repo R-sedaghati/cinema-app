@@ -2,7 +2,7 @@
 
 import { artistCategories, type Gender } from "@/lib/mock/artists";
 import { ChevronDown, MoveLeft, Search, X } from "lucide-react";
-import { splitPattern } from "@/lib/utils/split-pattern";
+import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import Image from "next/image";
 import ArtistCard from "./Card";
 import NotFoundSearch from "../common/NotFoundSearch";
@@ -25,7 +25,7 @@ export function ArtistsSearchClient() {
   const [genderDrawerOpen, setGenderDrawerOpen] = useState(false);
   const [cityDrawerOpen, setCityDrawerOpen] = useState(false);
 
-  const { data, isPending } = useUserArtsitList({
+  const { data } = useUserArtsitList({
     search: debouncedSearch,
     categoryId__in: filters.categoryId__in.length
       ? filters.categoryId__in
@@ -37,13 +37,15 @@ export function ArtistsSearchClient() {
   const { data: provinceData } = useUserProvinceList();
 
   const results = data?.result ?? [];
-  const rows = splitPattern(artistCategories);
+  const rows = isMobile
+    ? mobileSplitPattern(artistCategories)
+    : splitPattern(artistCategories);
 
   return (
     <div className="space-y-12 relative">
       <div className="flex flex-col items-center justify-center gap-5">
-        <h1 className="text-[32px] text-zinc-50 w-full text-center">
-          هنرمند رو سرچ کن یا انتخاب کن
+        <h1 className="text-[24px] ma:text-[32px] text-zinc-50 w-full text-center">
+          دسته بندی رو سرچ کن یا انتخاب کن
         </h1>
 
         <div className="relative md:w-131.5 w-full">

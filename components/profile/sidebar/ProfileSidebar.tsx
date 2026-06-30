@@ -64,34 +64,12 @@ export default function ProfileSidebar({
   const fullName = `${data?.firstName ?? ""} ${data?.lastName ?? ""}`.trim();
 
   return (
-    <aside className="relative flex-2 z-10 w-full space-y-3 text-right">
-      {/* Mobile: centered avatar layout */}
-      <div className="flex md:hidden flex-col items-center gap-3 pt-6 pb-4">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800 ring-2 ring-zinc-700/80">
-          <UserRound className="h-9 w-9 text-zinc-300" />
-        </div>
-        <div className="flex flex-col items-center gap-1">
-          <h2 className="text-lg font-semibold text-zinc-100">
-            {fullName || "کاربر"}
-          </h2>
-          <span dir="ltr" className="text-sm text-zinc-400">
-            {data?.phone_number ?? ""}
-          </span>
-          {data?.email && (
-            <p className="text-xs text-zinc-500">{data.email}</p>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={() => setActive("overview")}
-          className="rounded-full border border-zinc-700 px-5 py-1.5 text-sm text-zinc-300 transition active:bg-zinc-800"
-        >
-          ویرایش پروفایل
-        </button>
-      </div>
-
-      {/* Desktop: card layout */}
-      <div className="hidden md:flex justify-between gap-2 overflow-hidden items-center bg-gray-100/60 rounded-xl border-2 border-zinc-700/60 p-5 shadow-[0_10px_60px_rgba(0,0,0,0.8)] backdrop-blur-sm">
+    <aside className="relative flex-2 z-10 w-full space-y-2 text-right">
+      <div
+        className={clsx(
+          "flex justify-between gap-2 overflow-hidden items-center bg-gray-100/60 rounded-xl border-2 border-zinc-700/60 p-5 backdrop-blur-sm",
+        )}
+      >
         <div className="flex items-center justify-start gap-2">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-800/80 ring-1 ring-zinc-700">
             <UserRound className="h-6 w-6 text-zinc-300" />

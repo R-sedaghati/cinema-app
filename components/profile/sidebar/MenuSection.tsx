@@ -15,7 +15,7 @@ export default function MenuSection({
   setActive,
 }: Readonly<MenuSectionProps>) {
   return (
-    <div className="overflow-hidden rounded-2xl md:rounded-xl md:border-2 md:border-zinc-700/60 bg-zinc-900/70 md:bg-gray-100/60 md:shadow-[0_10px_40px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+    <div className="overflow-hidden rounded-xl border-2 border-zinc-700/60 bg-gray-100/60 backdrop-blur-xl">
       {sections.map((s, index) => {
         const activeItem = s.id === active;
         const isLast = index === sections.length - 1;

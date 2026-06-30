@@ -109,7 +109,10 @@ function ArtistRegistrationPageContent() {
     <div className='mt-4'>
       {step === 0 && !editId && (
         <Card
-          wrapperClassName={clsx("w-[90%]  mx-auto", isDesktop && "w-4/5")}
+          wrapperClassName={clsx(
+            "w-[90%] mx-auto mt-4",
+            isDesktop && "w-4/5 mt-0",
+          )}
           className={clsx("p-4", isDesktop && "p-6!")}
         >
           <div className="flex flex-col gap-3 items-center">

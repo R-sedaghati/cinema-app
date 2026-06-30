@@ -22,7 +22,7 @@ export default function RootLayout({
       <PageProgressBar />
       <div className="flex min-h-dvh flex-col  text-zinc-100 antialiased">
         <SiteHeader />
-        <main className="flex-1 md:mt-10 pb-safe-24 lg:pb-8">{children}</main>
+        <main className="flex-1 md:mt-10 pb-safe-24 lg:pb-8 overflow-hidden">{children}</main>
         <div className="hidden lg:block"><SiteFooter /></div>
         <MobileBottomNav />
         <LoginDrawer />
