@@ -12,6 +12,7 @@ import { useState } from "react";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
+import { ESampleType } from "@/lib/services/landing/type";
 
 interface Props {
   onNext: () => void;
@@ -52,10 +53,10 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           prev.map((item) =>
             item.file === file
               ? {
-                ...item,
-                src: res.path,
-                loading: false,
-              }
+                  ...item,
+                  src: res.path,
+                  loading: false,
+                }
               : item,
           ),
         );
@@ -73,10 +74,10 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           prev.map((item) =>
             item.file === file
               ? {
-                ...item,
-                loading: false,
-                status: "error",
-              }
+                  ...item,
+                  loading: false,
+                  status: "error",
+                }
               : item,
           ),
         );
@@ -102,9 +103,32 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
           </div>
 
           <div className="flex flex-col md:flex-row gap-5">
-            <RadioButton label="دارم" name="sample" />
-            <RadioButton label="ندارم" name="sample" />
-            <RadioButton label="تمایل به ضبط نمونه کار دارم" name="sample" />
+            <RadioButton
+              label="دارم"
+              name="sample"
+              checked={store.sampleType === ESampleType.HAS_SAMPLE}
+              onChange={() =>
+                store.setField("sampleType", ESampleType.HAS_SAMPLE)
+              }
+            />
+
+            <RadioButton
+              label="ندارم"
+              name="sample"
+              checked={store.sampleType === ESampleType.NO_SAMPLE}
+              onChange={() =>
+                store.setField("sampleType", ESampleType.NO_SAMPLE)
+              }
+            />
+
+            <RadioButton
+              label="تمایل به ضبط نمونه کار دارم"
+              name="sample"
+              checked={store.sampleType === ESampleType.WANTS_RECORDING}
+              onChange={() =>
+                store.setField("sampleType", ESampleType.WANTS_RECORDING)
+              }
+            />
           </div>
         </div>
 

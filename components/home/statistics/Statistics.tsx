@@ -12,7 +12,7 @@ const statisticsItems = [
         <span className="text-error-500">%</span>۹۰
       </p>
     ),
-    title: "رضایت کارجوها",
+    title: "رضایت هنرجوها",
   },
   {
     id: 2,
@@ -30,7 +30,7 @@ const statisticsItems = [
         <span className="text-error-500">%</span>۳۵
       </p>
     ),
-    title: "کاریابی کارجوها",
+    title: "کاریابی هنرجوها",
   },
   {
     id: 4,

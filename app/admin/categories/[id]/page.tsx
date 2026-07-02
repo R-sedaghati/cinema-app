@@ -30,7 +30,9 @@ function CategoryDetail() {
   const { mutate, isPending } = useAdminCategoryUpdate();
 
   const [faName, setFaName] = useState("");
+  const [priority, setPriority] = useState<number | null>(null);
   const [isActive, setIsActive] = useState(false);
+
   const [formFields, setFormFields] = useState<ICategoryConfig>({
     fullName: false,
     profileImage: false,
@@ -51,6 +53,7 @@ function CategoryDetail() {
 
     setFaName(data.faName);
     setIsActive(data.isActive);
+    setPriority(data.priority);
 
     if (data.config) {
       setFormFields({
@@ -141,7 +144,7 @@ function CategoryDetail() {
               size="thin"
               type="horizontal"
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <Input
                 labelContent="نام دسته ‌بندی"
                 placeholder="نام دسته ‌بندی"
@@ -149,6 +152,20 @@ function CategoryDetail() {
                 value={faName}
                 onChange={(e) => setFaName(e.target.value)}
               />
+              {data?.parent && (
+                <Input
+                  labelContent="اولویت"
+                  placeholder="اولویت"
+                  wrapperClassName="w-full"
+                  value={priority ?? ""}
+                  type="number"
+                  onChange={(e) =>
+                    setPriority(
+                      e.target.value === "" ? null : Number(e.target.value),
+                    )
+                  }
+                />
+              )}
               <div className="flex flex-col gap-3">
                 <p className="font-p1-regular text-gray-500">
                   تعداد درخواست‌‌ها

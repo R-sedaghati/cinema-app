@@ -25,7 +25,7 @@ const MainHeader = () => {
           size="small"
           className="rounded-full!"
         >
-          ورود / ثبت نام کارجو
+          ورود / ثبت نام هنرجو
         </Button>
         <Button
           onClick={() => router.push("/artists")}

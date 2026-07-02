@@ -1,3 +1,5 @@
+import { ESampleType } from "../landing/type";
+
 export interface IRetriveResponse<T> {
   errors: string | null;
   message: string | null;
@@ -102,6 +104,7 @@ export interface IArtistItem {
   portfolios: IArtistPortfolios[];
   status: EArtistRequestStatus;
   user: IArtistUser;
+  sampleType: ESampleType;
   [key: string]: unknown;
 }
 
@@ -130,6 +133,8 @@ export interface ICategoryItem {
   id: number;
   isActive: boolean;
   updatedAt: string | null;
+  priority: number | null;
+  parent: number | null;
   [key: string]: unknown;
 }
 
