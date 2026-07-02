@@ -152,7 +152,7 @@ function CategoryDetail() {
                 value={faName}
                 onChange={(e) => setFaName(e.target.value)}
               />
-              {data?.parent && (
+              {!data?.parent && (
                 <Input
                   labelContent="اولویت"
                   placeholder="اولویت"
