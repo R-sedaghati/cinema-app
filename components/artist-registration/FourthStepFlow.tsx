@@ -50,6 +50,7 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
     gender: store.gender || undefined,
     aboutMe: store.aboutMe || undefined,
     portfolios: store.portfolios.length ? store.portfolios : undefined,
+    sampleType: store.sampleType,
   };
 
   const handleSubmit = () => {

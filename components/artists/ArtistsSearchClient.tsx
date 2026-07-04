@@ -15,6 +15,7 @@ import {
 import useDebounce from "@/lib/hooks/useDebounce";
 import { useArtistFilterStore } from "@/lib/stores/useArtistFilter";
 import { useState } from "react";
+import { isMobile } from "react-device-detect";
 
 const genders: Array<Gender | "همه"> = ["همه", "زن", "مرد"];
 

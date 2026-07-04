@@ -24,7 +24,7 @@ export function MobileBottomNav() {
   const { open } = useLoginDrawerStore();
 
   const bottomNavItems = [
-    { href: "/", label: "خانه", icon: Home },
+    { href: "/application", label: "خانه", icon: Home },
     { href: "/artists", label: "جستجو", icon: Search },
     isLoggedIn
       ? { href: "/profile", label: "پروفایل", icon: User }

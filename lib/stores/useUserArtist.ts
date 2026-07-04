@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { ESampleType } from "../services/landing/type";
 
 export type PortfolioType = "IMAGE" | "VIDEO";
 export type Gender = "MAN" | "WOMAN";
@@ -12,6 +13,8 @@ export interface Portfolio {
 interface ArtistRegistrationState {
   // Stepper
   step: number;
+
+  sampleType: ESampleType;
 
   // Edit mode — non-null means editing an existing request
   editId: number | null;
@@ -67,6 +70,7 @@ const initialState = {
   selectedCategoryTitle: "",
 
   categoryId: [],
+  sampleType: ESampleType.HAS_SAMPLE,
 
   firstName: "",
   lastName: "",

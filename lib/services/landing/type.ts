@@ -126,6 +126,7 @@ export type UserCreateArtistRequest = {
   birthDate?: string;
   gender?: "MAN" | "WOMAN";
   aboutMe?: string;
+  sampleType: ESampleType;
   portfolios?: { path: string; type: PortfolioType }[];
 };
 
@@ -134,3 +135,9 @@ export type ArtistRequestResult = {
   status: ArtistRequestStatus;
   portfolios: { id: number; filePath: string; type: PortfolioType }[];
 };
+
+export enum ESampleType {
+  HAS_SAMPLE = "HAS_SAMPLE",
+  NO_SAMPLE = "NO_SAMPLE",
+  WANTS_RECORDING = "WANTS_RECORDING",
+}

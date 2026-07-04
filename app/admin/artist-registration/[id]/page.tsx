@@ -8,6 +8,7 @@ import {
   useAdminArtistStatusUpdate,
 } from "@/lib/services/admin/hook";
 import { EArtistRequestStatus } from "@/lib/services/admin/type";
+import { ESampleType } from "@/lib/services/landing/type";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import {
   Badge,
@@ -246,11 +247,22 @@ function ArtistDetail() {
                 <Asterisk size={12} className="text-error-500" />
               </div>
               <div className="flex gap-5">
-                <RadioButton label="دارم" name="gender" />
-                <RadioButton label="ندارم" name="gender" />
+                <RadioButton
+                  label="دارم"
+                  name="sample"
+                  checked={data?.sampleType === ESampleType.HAS_SAMPLE}
+                />
+
+                <RadioButton
+                  label="ندارم"
+                  name="sample"
+                  checked={data?.sampleType === ESampleType.NO_SAMPLE}
+                />
+
                 <RadioButton
                   label="تمایل به ضبط نمونه کار دارم"
-                  name="gender"
+                  name="sample"
+                  checked={data?.sampleType === ESampleType.WANTS_RECORDING}
                 />
               </div>
             </div>
