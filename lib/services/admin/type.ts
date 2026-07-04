@@ -193,6 +193,7 @@ export interface IUpdateCategoryRequest {
   faName: string;
   isActive: boolean;
   config: ICategoryConfig;
+  priority: number | null;
 }
 
 export interface IFaqItem {

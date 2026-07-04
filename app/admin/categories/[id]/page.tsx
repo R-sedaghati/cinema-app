@@ -107,6 +107,7 @@ function CategoryDetail() {
         payload: {
           faName,
           isActive,
+          priority,
           config: formFields,
         },
       },
