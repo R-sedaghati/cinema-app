@@ -133,7 +133,6 @@ export interface ICategoryItem {
   faName: string;
   id: number;
   isActive: boolean;
-  priority: number;
   updatedAt: string | null;
   priority: number | null;
   parent: number | null;
