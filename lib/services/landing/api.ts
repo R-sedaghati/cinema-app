@@ -1,10 +1,12 @@
 import {
   IAboutUsResponse,
   IArtistRetriveResponse,
+  IBannerListResponse,
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
   ISupportItem,
+  ITutorialListResponse,
   LoginResponse,
   ParamsArtistList,
   ParamsCategoryList,
@@ -125,6 +127,18 @@ export const userCategoryList = async (params: IPagination) => {
 
 export const userFaqList = async () => {
   const { data } = await landingApi.get<IFaqListResponse>("/faqs");
+
+  return data;
+};
+
+export const userBannerList = async () => {
+  const { data } = await landingApi.get<IBannerListResponse>("/banners");
+
+  return data;
+};
+
+export const userTutorialList = async () => {
+  const { data } = await landingApi.get<ITutorialListResponse>("/tutorials");
 
   return data;
 };

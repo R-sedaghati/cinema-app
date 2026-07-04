@@ -1,0 +1,2 @@
+after creating a new db
+create a sequence: CREATE SEQUENCE user_code_seq START 1000;

@@ -7,6 +7,8 @@ import {
   Handshake,
   TableOfContents,
   ClipboardList,
+  GalleryHorizontal,
+  Video,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -68,6 +70,18 @@ export const useSidebarItems = (): {
         title: "مدیریت محتوای لندینگ",
         link: "/admin/content-management",
         active: pathname.startsWith("/admin/content-management"),
+      },
+      {
+        icon: <GalleryHorizontal />,
+        title: "مدیریت اسلایدرهای صفحه اصلی",
+        link: "/admin/sliders",
+        active: pathname.startsWith("/admin/sliders"),
+      },
+      {
+        icon: <Video />,
+        title: "مدیریت آموزش‌ها",
+        link: "/admin/tutorials",
+        active: pathname.startsWith("/admin/tutorials"),
       },
     ],
   };

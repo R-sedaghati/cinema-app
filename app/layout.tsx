@@ -16,63 +16,13 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-const meemFont = localFont({
-  variable: "--font-meem",
+const danaFont = localFont({
+  variable: "--font-dana",
   display: "swap",
   src: [
     {
-      path: "../public/assets/fonts/Meem-UltraLight.ttf",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-ExtraLight.ttf",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-Light.ttf",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-Medium.ttf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-DemiBold.ttf",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-SemiBold.ttf",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-ExtraBold.ttf",
-      weight: "800",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-UltraBold.ttf",
-      weight: "900",
-      style: "normal",
-    },
-    {
-      path: "../public/assets/fonts/Meem-Black.ttf",
-      weight: "900",
+      path: "../public/assets/fonts/DanaVF.woff",
+      weight: "100 900",
       style: "normal",
     },
   ],
@@ -85,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <body className={`${meemFont.variable} font-sans min-h-dvh`}>
+      <body className={`${danaFont.variable} font-sans min-h-dvh`}>
         <ToastContainer
           position="top-center"
           autoClose={5000}

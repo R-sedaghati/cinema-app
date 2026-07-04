@@ -2,10 +2,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   IAboutUsResponse,
   IArtistRetriveResponse,
+  IBannerListResponse,
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
   ISupportItem,
+  ITutorialListResponse,
   LoginResponse,
   ParamsArtistList,
   ParamsCategoryList,
@@ -30,12 +32,14 @@ import {
   userAboutUs,
   userArtistRequests,
   userArtsitList,
+  userBannerList,
   userCategoryList,
   userCityList,
   userCreateArtistRequest,
   userCreateSupport,
   userFaqList,
   userLogin,
+  userTutorialList,
   userProfile,
   userProvinceList,
   userSupport,
@@ -142,6 +146,26 @@ export const useUserFaqList = () => {
   return useQuery<IFaqListResponse>({
     queryKey: ["userFaqList"],
     queryFn: () => userFaqList(),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserBannerList = () => {
+  return useQuery<IBannerListResponse>({
+    queryKey: ["userBannerList"],
+    queryFn: () => userBannerList(),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserTutorialList = () => {
+  return useQuery<ITutorialListResponse>({
+    queryKey: ["userTutorialList"],
+    queryFn: () => userTutorialList(),
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,

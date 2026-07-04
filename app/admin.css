@@ -1,2 +1,66 @@
 @import "tailwindcss";
 @plugin "@dgshahr/dg-theme-tailwind-plugin";
+
+:root {
+  --primary-50: #fff8eb;
+  --primary-100: #fdebc5;
+  --primary-200: #f8d98f;
+  --primary-300: #f1c45e;
+  --primary-400: #e7ae38;
+  --primary-500: #d89a2b;
+  --primary-600: #bf831c;
+  --primary-700: #9b6712;
+  --primary-800: #744a0a;
+
+  --dgs-color-primary-50: 45 35 15;
+  --dgs-color-primary-100: 65 49 20;
+  --dgs-color-primary-200: 95 69 24;
+  --dgs-color-primary-300: 130 92 30;
+  --dgs-color-primary-400: 170 118 36;
+  --dgs-color-primary-500: 216 154 43;
+  --dgs-color-primary-600: 231 180 80;
+  --dgs-color-primary-700: 241 200 120;
+  --dgs-color-primary-800: 248 220 170;
+  --dgs-color-primary-900: 255 236 205;
+
+  /* ponytail: error palette overridden to amber — app uses error-* as brand color throughout components */
+  --dgs-color-error-50: 45 35 15;
+  --dgs-color-error-100: 65 49 20;
+  --dgs-color-error-200: 95 69 24;
+  --dgs-color-error-300: 130 92 30;
+  --dgs-color-error-400: 170 118 36;
+  --dgs-color-error-500: 216 154 43;
+  --dgs-color-error-600: 231 180 80;
+  --dgs-color-error-700: 241 200 120;
+  --dgs-color-error-800: 248 220 170;
+  --dgs-color-error-900: 255 236 205;
+}
+
+@theme inline {
+  --font-sans: var(--font-dana);
+  --shadow-card:
+    0 10px 30px rgb(0 0 0 / 0.18),
+    0 0 24px rgb(var(--dgs-color-primary-500) / 0.08);
+
+  /* remap built-in red/rose to amber so hardcoded text-red-* / text-rose-* in components render gold */
+  --color-red-50: #fff8eb;
+  --color-red-100: #fdebc5;
+  --color-red-200: #f8d98f;
+  --color-red-300: #f1c45e;
+  --color-red-400: #e7ae38;
+  --color-red-500: #d89a2b;
+  --color-red-600: #bf831c;
+  --color-red-700: #9b6712;
+  --color-red-800: #744a0a;
+  --color-red-900: #4a2e06;
+  --color-rose-50: #fff8eb;
+  --color-rose-100: #fdebc5;
+  --color-rose-200: #f8d98f;
+  --color-rose-300: #f1c45e;
+  --color-rose-400: #e7ae38;
+  --color-rose-500: #d89a2b;
+  --color-rose-600: #bf831c;
+  --color-rose-700: #9b6712;
+  --color-rose-800: #744a0a;
+  --color-rose-900: #4a2e06;
+}

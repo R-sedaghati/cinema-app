@@ -26,6 +26,18 @@ export const generateColumns = (
     },
     {
       align: "center",
+      key: "description",
+      dataIndex: "description",
+      title: "توضیحات",
+      className: "align-middle",
+      render: (data) => (
+        <p className="font-p1-regular truncate max-w-60">
+          {data.description || "-"}
+        </p>
+      ),
+    },
+    {
+      align: "center",
       key: "requestCount",
       dataIndex: "requestCount",
       title: "تعداد درخواست‌ها",

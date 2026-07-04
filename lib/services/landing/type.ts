@@ -53,10 +53,12 @@ export interface IUserCaategoryItem {
   config: ICategoryConfig | null;
   createdAt: string | null;
   deletedAt: string | null;
+  description: string | null;
   enName: string | null;
   faName: string;
   id: number;
   isActive: boolean;
+  priority: number;
   updatedAt: string | null;
 }
 
@@ -65,10 +67,12 @@ export interface IUserCategoryResponse {
   config: ICategoryConfig | null;
   createdAt: string | null;
   deletedAt: string | null;
+  description: string | null;
   enName: string | null;
   faName: string;
   id: number;
   isActive: boolean;
+  priority: number;
   updatedAt: string | null;
 }
 
