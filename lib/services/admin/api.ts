@@ -5,6 +5,9 @@ import {
   IArtistListResponse,
   IArtistRetriveResponse,
   IArtistStatusUpdateRequest,
+  IBannerListResponse,
+  IBannerRetrieveResponse,
+  IBannerUpsertRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
   IFaqItem,
@@ -13,13 +16,18 @@ import {
   IRetriveResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
+  ITutorialListResponse,
+  ITutorialRetrieveResponse,
+  ITutorialUpsertRequest,
   IUpdateCategoryRequest,
   IUserRetrive,
   IUsersListResponse,
   LoginRequest,
   LoginResponse,
   ParamsArtistList,
+  ParamsBannerList,
   ParamsCategoryList,
+  ParamsTutorialList,
   ParamsUsersList,
 } from "./type";
 
@@ -261,5 +269,161 @@ export const adminCreateFaq = async (
     payload,
     { headers: { Authorization: accessToken } },
   );
+  return data;
+};
+
+export const adminBannerList = async (
+  params: Partial<ParamsBannerList> | undefined,
+  accessToken: string,
+) => {
+  const { data } = await api.get<IBannerListResponse>("/admin/banners", {
+    params: params,
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+
+  return data;
+};
+
+export const adminBannerRetrieve = async (id: number, accessToken: string) => {
+  const { data } = await api.get<IBannerRetrieveResponse>(
+    `/admin/banners/${id}`,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const adminBannerCreate = async (
+  payload: IBannerUpsertRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IBannerRetrieveResponse>(
+    "/admin/banners",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminBannerUpdate = async (
+  id: number,
+  payload: IBannerUpsertRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IBannerRetrieveResponse>(
+    `/admin/banners/${id}`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminBannerDelete = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<null>>(
+    `/admin/banners/${id}`,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminUploadBannerImage = async (
+  file: File,
+  accessToken: string,
+) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post<{ path: string }>(
+    "/admin/upload/image",
+    form,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminTutorialList = async (
+  params: Partial<ParamsTutorialList> | undefined,
+  accessToken: string,
+) => {
+  const { data } = await api.get<ITutorialListResponse>("/admin/tutorials", {
+    params: params,
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+
+  return data;
+};
+
+export const adminTutorialRetrieve = async (id: number, accessToken: string) => {
+  const { data } = await api.get<ITutorialRetrieveResponse>(
+    `/admin/tutorials/${id}`,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const adminTutorialCreate = async (
+  payload: ITutorialUpsertRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<ITutorialRetrieveResponse>(
+    "/admin/tutorials",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminTutorialUpdate = async (
+  id: number,
+  payload: ITutorialUpsertRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<ITutorialRetrieveResponse>(
+    `/admin/tutorials/${id}`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminTutorialDelete = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<null>>(
+    `/admin/tutorials/${id}`,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminUploadTutorialThumbnail = async (
+  file: File,
+  accessToken: string,
+) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post<{ path: string }>(
+    "/admin/upload/image",
+    form,
+    { headers: { Authorization: accessToken } },
+  );
+
   return data;
 };

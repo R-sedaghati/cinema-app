@@ -163,6 +163,34 @@ interface Payment {
   paymentId: string;
   status: PaymentStatus;
 }
+
+interface Banner {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string; // full public URL on read; storage path on write (see POST /admin/upload/image)
+  ctaLabel: string;
+  ctaLink: string;
+  priority: number; // ascending sort key
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+interface Tutorial {
+  id: number;
+  title: string;
+  content: string;
+  videoUrl: string; // Aparat embed URL, e.g. https://www.aparat.com/video/video/embed/videohash/{hash}/vt/frame
+  thumbnail: string | null; // full public URL on read; storage path on write (see POST /admin/upload/image)
+  priority: number; // ascending sort key
+  isActive: boolean;
+  isMain: boolean; // if true, rendered as the featured video on the homepage; at most one tutorial can be main
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
 ```
 
 ---
@@ -242,6 +270,20 @@ List FAQs.
 Get about-us content.
 
 **Response:** `ApiResponse<AboutUs>`
+
+---
+
+### `GET /banners/`
+List active banners for the homepage hero slider. Only returns rows where `isActive = true`, sorted by `priority` ascending.
+
+**Response:** `ApiResponse<Banner[]>`
+
+---
+
+### `GET /tutorials/`
+List active tutorials. Only returns rows where `isActive = true`, sorted by `priority` ascending.
+
+**Response:** `ApiResponse<Tutorial[]>`
 
 ---
 
@@ -617,3 +659,125 @@ Update about-us text.
 ```
 
 **Response:** `ApiResponse<AboutUs>`
+
+---
+
+### `GET /admin/banners/`
+List all banners (active and inactive), sorted by `priority` ascending.
+
+**Query params:** `page`, `count`, `search` (matches `title`), `isActive` (boolean filter)
+
+**Response:** `ApiResponse<Banner[]>` (paginated)
+
+---
+
+### `GET /admin/banners/:id/`
+Get a banner by id.
+
+**Response:** `ApiResponse<Banner>`
+
+---
+
+### `POST /admin/banners/`
+Create a banner slide.
+
+**Body:**
+```json
+{
+  "title": "string",
+  "subtitle": "string",
+  "image": "banners/{uuid}.{ext}",
+  "ctaLabel": "string",
+  "ctaLink": "string",
+  "priority": 0,
+  "isActive": true
+}
+```
+
+**Response:** `ApiResponse<Banner>`
+
+---
+
+### `PATCH /admin/banners/:id/`
+Update a banner slide. Full replace of the same body shape as create.
+
+**Body:** same shape as `POST /admin/banners/`
+
+**Response:** `ApiResponse<Banner>`
+
+---
+
+### `DELETE /admin/banners/:id/`
+Soft-delete a banner slide. Excluded from both list endpoints thereafter.
+
+**Response:** `ApiResponse<null>`
+
+---
+
+### `POST /admin/upload/image`
+Upload a banner image. **Auth required.** `multipart/form-data`
+
+**Form field:** `file` (image)
+
+**Response:**
+```json
+{ "path": "banners/{uuid}.{ext}" }
+```
+
+The returned `path` is sent back in the `image` field of `POST`/`PATCH /admin/banners/`; it's resolved to a full URL when the banner is read via `GET /banners/` or `GET /admin/banners/:id/`.
+
+---
+
+### `GET /admin/tutorials/`
+List all tutorials (active and inactive), sorted by `priority` ascending.
+
+**Query params:** `page`, `count`, `search` (matches `title`), `isActive` (boolean filter)
+
+**Response:** `ApiResponse<Tutorial[]>` (paginated)
+
+---
+
+### `GET /admin/tutorials/:id/`
+Get a tutorial by id.
+
+**Response:** `ApiResponse<Tutorial>`
+
+---
+
+### `POST /admin/tutorials/`
+Create a tutorial.
+
+**Body:**
+```json
+{
+  "title": "string",
+  "content": "string",
+  "videoUrl": "https://www.aparat.com/video/video/embed/videohash/{hash}/vt/frame",
+  "thumbnail": "banners/{uuid}.{ext}",
+  "priority": 0,
+  "isActive": true,
+  "isMain": false
+}
+```
+
+**Response:** `ApiResponse<Tutorial>`
+
+---
+
+### `PATCH /admin/tutorials/:id/`
+Update a tutorial. Full replace of the same body shape as create.
+
+**Body:** same shape as `POST /admin/tutorials/`
+
+**Response:** `ApiResponse<Tutorial>`
+
+---
+
+### `DELETE /admin/tutorials/:id/`
+Soft-delete a tutorial. Excluded from both list endpoints thereafter.
+
+**Response:** `ApiResponse<null>`
+
+Note: tutorial thumbnails reuse the existing `POST /admin/upload/image` endpoint (no dedicated upload route) — the returned `path` is sent back in the `thumbnail` field of `POST`/`PATCH /admin/tutorials/`.
+
+Note: `isMain` is optional and defaults to `false`. Setting it to `true` on one tutorial automatically unsets it on all others — at most one tutorial can be main at a time. If no tutorial has `isMain: true`, the homepage simply omits the featured video section.

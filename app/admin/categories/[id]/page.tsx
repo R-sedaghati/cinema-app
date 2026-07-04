@@ -30,6 +30,7 @@ function CategoryDetail() {
   const { mutate, isPending } = useAdminCategoryUpdate();
 
   const [faName, setFaName] = useState("");
+  const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<number | null>(null);
   const [isActive, setIsActive] = useState(false);
 
@@ -52,6 +53,7 @@ function CategoryDetail() {
     if (!data) return;
 
     setFaName(data.faName);
+    setDescription(data.description ?? "");
     setIsActive(data.isActive);
     setPriority(data.priority);
 
@@ -107,6 +109,7 @@ function CategoryDetail() {
         payload: {
           faName,
           isActive,
+          description,
           priority,
           config: formFields,
         },
@@ -179,6 +182,13 @@ function CategoryDetail() {
                 label="وضعیت"
                 checked={isActive}
                 onChange={(checked) => setIsActive(checked)}
+              />
+              <Input
+                labelContent="توضیحات"
+                placeholder="توضیحات"
+                wrapperClassName="w-full md:col-span-3"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           </div>

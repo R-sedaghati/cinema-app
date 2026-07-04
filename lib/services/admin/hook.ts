@@ -6,6 +6,9 @@ import {
   IArtistListResponse,
   IArtistRetriveResponse,
   IArtistStatusUpdateRequest,
+  IBannerListResponse,
+  IBannerRetrieveResponse,
+  IBannerUpsertRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
   IFaqItem,
@@ -14,13 +17,18 @@ import {
   IRetriveResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
+  ITutorialListResponse,
+  ITutorialRetrieveResponse,
+  ITutorialUpsertRequest,
   IUpdateCategoryRequest,
   IUserRetrive,
   IUsersListResponse,
   LoginRequest,
   LoginResponse,
   ParamsArtistList,
+  ParamsBannerList,
   ParamsCategoryList,
+  ParamsTutorialList,
   ParamsUsersList,
 } from "./type";
 import {
@@ -29,6 +37,11 @@ import {
   adminArtistList,
   adminArtistRetrieve,
   adminArtistStatusUpdate,
+  adminBannerCreate,
+  adminBannerDelete,
+  adminBannerList,
+  adminBannerRetrieve,
+  adminBannerUpdate,
   adminCategoryList,
   adminCategoryRetrieve,
   adminCategoryUpdate,
@@ -40,6 +53,13 @@ import {
   adminSupportList,
   adminSupportRetrieve,
   adminSupportUpdate,
+  adminTutorialCreate,
+  adminTutorialDelete,
+  adminTutorialList,
+  adminTutorialRetrieve,
+  adminTutorialUpdate,
+  adminUploadBannerImage,
+  adminUploadTutorialThumbnail,
   adminUserRequest,
   adminUsersList,
 } from "./api";
@@ -244,5 +264,125 @@ export const useAdminCreateFaq = () => {
 
   return useMutation<IRetriveResponse<IFaqItem>, Error, { question: string; answer: string }>({
     mutationFn: (payload) => adminCreateFaq(payload, accessToken),
+  });
+};
+
+export const useAdminBannerList = (
+  params?: Partial<ParamsBannerList> | undefined,
+) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IBannerListResponse>({
+    queryKey: ["bannerList", params],
+    queryFn: () => adminBannerList(params, accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminBannerRetrieve = (id?: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IBannerRetrieveResponse>({
+    queryKey: ["bannerRetrieve", id],
+    queryFn: () => adminBannerRetrieve(id!, accessToken),
+    enabled: Boolean(id),
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminBannerCreate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: IBannerUpsertRequest) =>
+      adminBannerCreate(payload, accessToken),
+  });
+};
+
+export const useAdminBannerUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { id: number; payload: IBannerUpsertRequest }) =>
+      adminBannerUpdate(data.id, data.payload, accessToken),
+  });
+};
+
+export const useAdminBannerDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => adminBannerDelete(id, accessToken),
+  });
+};
+
+export const useAdminUploadBannerImage = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (file: File) => adminUploadBannerImage(file, accessToken),
+  });
+};
+
+export const useAdminTutorialList = (
+  params?: Partial<ParamsTutorialList> | undefined,
+) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<ITutorialListResponse>({
+    queryKey: ["tutorialList", params],
+    queryFn: () => adminTutorialList(params, accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminTutorialRetrieve = (id?: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<ITutorialRetrieveResponse>({
+    queryKey: ["tutorialRetrieve", id],
+    queryFn: () => adminTutorialRetrieve(id!, accessToken),
+    enabled: Boolean(id),
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminTutorialCreate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: ITutorialUpsertRequest) =>
+      adminTutorialCreate(payload, accessToken),
+  });
+};
+
+export const useAdminTutorialUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { id: number; payload: ITutorialUpsertRequest }) =>
+      adminTutorialUpdate(data.id, data.payload, accessToken),
+  });
+};
+
+export const useAdminTutorialDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => adminTutorialDelete(id, accessToken),
+  });
+};
+
+export const useAdminUploadTutorialThumbnail = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (file: File) => adminUploadTutorialThumbnail(file, accessToken),
   });
 };

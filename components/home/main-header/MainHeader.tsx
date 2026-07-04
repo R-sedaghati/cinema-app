@@ -19,13 +19,8 @@ const MainHeader = () => {
         <span className="text-error-400">سینما آرشیو</span>
       </p>
       <div className="flex gap-2">
-        <Button
-          onClick={open}
-          variant="outline"
-          size="small"
-          className="rounded-full!"
-        >
-          ورود / ثبت نام هنرجو
+        <Button variant="outline" size="small" className="rounded-full!">
+          ورود / ثبت نام هنرمند
         </Button>
         <Button
           onClick={() => router.push("/artists")}

@@ -61,7 +61,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-secondary-black: #344851;
-  --font-sans: var(--font-meem);
+  --font-sans: var(--font-dana);
   --shadow-card:
     0 10px 30px rgb(0 0 0 / 0.18),
     0 0 24px rgb(var(--dgs-color-primary-500) / 0.08);

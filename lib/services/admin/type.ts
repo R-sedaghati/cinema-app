@@ -128,10 +128,12 @@ export interface ICategoryItem {
   config: ICategoryConfig | null;
   createdAt: string | null;
   deletedAt: string | null;
+  description: string | null;
   enName: string;
   faName: string;
   id: number;
   isActive: boolean;
+  priority: number;
   updatedAt: string | null;
   priority: number | null;
   parent: number | null;
@@ -192,6 +194,7 @@ interface IProvinceItem {
 export interface IUpdateCategoryRequest {
   faName: string;
   isActive: boolean;
+  description: string;
   config: ICategoryConfig;
   priority: number | null;
 }
@@ -292,3 +295,73 @@ export type IProvinceListResponse = IBasePaginateResponse<IProvinceItem>;
 export type IFaqListResponse = IBasePaginateResponse<IFaqItem>;
 
 export type IUsersListResponse = IBasePaginateResponse<IUsersItem>;
+
+export interface IBannerItem {
+  createdAt: string | null;
+  ctaLabel: string;
+  ctaLink: string;
+  deletedAt: string | null;
+  id: number;
+  image: string;
+  isActive: boolean;
+  priority: number;
+  subtitle: string;
+  title: string;
+  updatedAt: string | null;
+  [key: string]: unknown;
+}
+
+export interface IBannerUpsertRequest {
+  title: string;
+  subtitle: string;
+  image: string;
+  ctaLabel: string;
+  ctaLink: string;
+  priority: number;
+  isActive: boolean;
+}
+
+export interface ParamsBannerList {
+  count: number;
+  page: number;
+  search: string | null;
+  isActive?: boolean | null;
+}
+
+export type IBannerListResponse = IBasePaginateResponse<IBannerItem>;
+export type IBannerRetrieveResponse = IRetriveResponse<IBannerItem>;
+
+export interface ITutorialItem {
+  createdAt: string | null;
+  content: string;
+  deletedAt: string | null;
+  id: number;
+  thumbnail: string | null;
+  isActive: boolean;
+  isMain: boolean;
+  priority: number;
+  title: string;
+  videoUrl: string;
+  updatedAt: string | null;
+  [key: string]: unknown;
+}
+
+export interface ITutorialUpsertRequest {
+  title: string;
+  content: string;
+  videoUrl: string;
+  thumbnail?: string | null;
+  priority: number;
+  isActive: boolean;
+  isMain: boolean;
+}
+
+export interface ParamsTutorialList {
+  count: number;
+  page: number;
+  search: string | null;
+  isActive?: boolean | null;
+}
+
+export type ITutorialListResponse = IBasePaginateResponse<ITutorialItem>;
+export type ITutorialRetrieveResponse = IRetriveResponse<ITutorialItem>;

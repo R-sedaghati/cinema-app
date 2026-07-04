@@ -2,9 +2,16 @@
 
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
-import { Home, LogIn, Search, User } from "lucide-react";
+import { Home, LogIn, PenLine, Search, User, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+const bottomNavItems = [
+  { href: "/", label: "خانه", icon: Home },
+  { href: "/artist-registration", label: "فرم‌ها", icon: PenLine },
+  { href: "/artists", label: "هنرمندان", icon: Users },
+  { href: "/profile", label: "پروفایل", icon: User },
+];
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
