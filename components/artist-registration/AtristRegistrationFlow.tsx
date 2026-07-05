@@ -24,7 +24,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   onNext,
   onPrevious,
 }) => {
-  const { data, isLoading } = useUserCategoryList({ page: 1, count: 16 });
+  const { data, isLoading } = useUserCategoryList({ page: 1, count: 30 });
 
   const selectedCategory = useMemo(() => {
     if (!data?.result || !category?.id) return null;

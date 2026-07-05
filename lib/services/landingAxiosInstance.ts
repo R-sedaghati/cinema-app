@@ -41,7 +41,7 @@ function handleError(error: AxiosError) {
   if (status === 401) {
     logout();
 
-    window.location.href = "/";
+    globalThis.location.href = "/";
 
     return Promise.reject(error);
   }

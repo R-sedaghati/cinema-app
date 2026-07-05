@@ -46,7 +46,7 @@ export const adminCategoryList = async (
   accessToken: string,
 ) => {
   const { data } = await api.get<ICatrgotyListResponse>("/admin/categories", {
-    params: params,
+    params: { count: 30, ...params },
     headers: {
       Authorization: accessToken,
     },
@@ -92,7 +92,7 @@ export const adminArtistList = async (
   const { data } = await api.get<IArtistListResponse>(
     "/admin/artist-requests",
     {
-      params: params,
+      params: { count: 30, ...params },
       headers: {
         Authorization: accessToken,
       },
@@ -120,7 +120,7 @@ export const adminSupportList = async (
   accessToken: string,
 ) => {
   const { data } = await api.get<ISupportListResponse>("/admin/supports", {
-    params: params,
+    params: { count: 30, ...params },
     headers: {
       Authorization: accessToken,
     },
@@ -147,7 +147,7 @@ export const adminProvinceList = async (
   accessToken: string,
 ) => {
   const { data } = await api.get<IProvinceListResponse>("/provinces", {
-    params: params,
+    params: { count: 30, ...params },
     headers: {
       Authorization: accessToken,
     },
@@ -224,7 +224,7 @@ export const adminUsersList = async (
   accessToken: string,
 ) => {
   const { data } = await api.get<IUsersListResponse>("/admin/users", {
-    params: params,
+    params: { count: 30, ...params },
     headers: {
       Authorization: accessToken,
     },
@@ -277,7 +277,7 @@ export const adminBannerList = async (
   accessToken: string,
 ) => {
   const { data } = await api.get<IBannerListResponse>("/admin/banners", {
-    params: params,
+    params: { count: 30, ...params },
     headers: {
       Authorization: accessToken,
     },
@@ -355,7 +355,7 @@ export const adminTutorialList = async (
   accessToken: string,
 ) => {
   const { data } = await api.get<ITutorialListResponse>("/admin/tutorials", {
-    params: params,
+    params: { count: 30, ...params },
     headers: {
       Authorization: accessToken,
     },
