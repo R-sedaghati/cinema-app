@@ -58,16 +58,12 @@ export const useUserLogin = () =>
 export const useUserArtsitList = (
   params?: Partial<ParamsCategoryList> | undefined,
 ) => {
-  const hasSearch = Boolean(params?.search);
-  const hasCategory = Boolean(params?.categoryId__in);
-
   return useQuery<IUserArtistListResponse>({
     queryKey: ["userArtsitList", params],
     queryFn: () => userArtsitList(params),
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
-    enabled: hasSearch || hasCategory,
   });
 };
 
