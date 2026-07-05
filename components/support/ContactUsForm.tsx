@@ -34,7 +34,7 @@ const initialState: UserCreateSupport = {
 
 const ContactUsForm = () => {
   const { mutate, isPending } = useCreateUserSupport();
-  const { data } = useUserCategoryList({ page: 1, count: 16 });
+  const { data } = useUserCategoryList({ page: 1, count: 30 });
 
   const [form, setForm] = useState<UserCreateSupport>(initialState);
 

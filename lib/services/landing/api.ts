@@ -42,7 +42,7 @@ export const userArtsitList = async (
   const { data } = await landingApi.get<IUserArtistListResponse>(
     "/artists-requests",
     {
-      params: params,
+      params: { ...params },
     },
   );
 
@@ -53,7 +53,7 @@ export const userProvinceList = async (
   params: Partial<ParamsArtistList> | undefined,
 ) => {
   const { data } = await landingApi.get<IProvinceListResponse>("/provinces", {
-    params: params,
+    params: { ...params },
   });
 
   return data;
@@ -73,7 +73,7 @@ export const userSupport = async (params: IPagination, accessToken: string) => {
   const { data } = await landingApi.get<IUserSupportListResponse>(
     "/user/supports",
     {
-      params: params,
+      params: { ...params },
       headers: {
         Authorization: accessToken,
       },
@@ -90,7 +90,7 @@ export const userArtistRequests = async (
   const { data } = await landingApi.get<IUserArtistListResponse>(
     "/user/artist-requests",
     {
-      params: params,
+      params: { ...params },
       headers: {
         Authorization: accessToken,
       },
@@ -118,7 +118,7 @@ export const userCategoryList = async (params: IPagination) => {
   const { data } = await landingApi.get<IUserCategoryListResponse>(
     "/categories",
     {
-      params: params,
+      params: { ...params },
     },
   );
 

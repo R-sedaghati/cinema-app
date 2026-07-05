@@ -48,7 +48,7 @@ export default function ApplicationPage() {
 
   const { data: categoryData } = useQuery({
     queryKey: ["applicationCategories"],
-    queryFn: () => userCategoryList({ page: 1, count: 20 }),
+    queryFn: () => userCategoryList({ page: 1, count: 30 }),
     refetchInterval: 30_000,
     refetchOnWindowFocus: false,
   });
