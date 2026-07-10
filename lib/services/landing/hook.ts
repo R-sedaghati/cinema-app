@@ -6,6 +6,7 @@ import {
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
+  ISiteContentResponse,
   ISupportItem,
   ITutorialListResponse,
   LoginResponse,
@@ -16,6 +17,7 @@ import { AxiosError } from "axios";
 import {
   ArtistRequestResult,
   ICityListResponse,
+  IFormSchemaResponse,
   IPagination,
   IUserArtistListResponse,
   IUserCategoryListResponse,
@@ -39,6 +41,7 @@ import {
   userCreateSupport,
   userFaqList,
   userLogin,
+  userSiteContent,
   userTutorialList,
   userProfile,
   userProvinceList,
@@ -47,6 +50,7 @@ import {
   userUploadAvatar,
   userUploadImage,
   userUploadVideo,
+  userGetCategoryFormSchema,
 } from "./api";
 import useAuthStore from "@/lib/stores/useAuthStore";
 
@@ -178,6 +182,16 @@ export const useUserAboutUs = () => {
   });
 };
 
+export const useUserSiteContent = () => {
+  return useQuery<ISiteContentResponse>({
+    queryKey: ["userSiteContent"],
+    queryFn: () => userSiteContent(),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useUserCityList = (provinceId: number) => {
   return useQuery<ICityListResponse>({
     queryKey: ["userCityList", provinceId],
@@ -202,6 +216,15 @@ export const useUserUploadVideo = () =>
 export const useUserUploadImage = () =>
   useMutation<{ path: string; filename: string }, AxiosError, File>({
     mutationFn: userUploadImage,
+  });
+
+export const useUserCategoryFormSchema = (categoryId?: number | null) =>
+  useQuery<IFormSchemaResponse>({
+    queryKey: ["userCategoryFormSchema", categoryId],
+    queryFn: () => userGetCategoryFormSchema(categoryId!),
+    enabled: !!categoryId,
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
   });
 
 export const useUserCreateArtistRequest = () =>

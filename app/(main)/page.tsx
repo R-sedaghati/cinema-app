@@ -209,7 +209,7 @@ export default function ApplicationPage() {
                     className="relative overflow-hidden w-32 h-20 md:w-auto md:h-28 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-error-500/50 transition-colors flex flex-col justify-end p-3 md:p-4 active:scale-[.98] shrink-0 md:shrink"
                   >
                     <Image
-                      src={`/cat-${cat.id}.svg`}
+                      src={cat.image}
                       alt={cat.title}
                       width={64}
                       height={64}
@@ -390,8 +390,8 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
             {artist.categories[0].faName}
           </span>
         )}
-        {artist.user.city && (
-          <span className="text-xs md:text-sm text-zinc-600">{artist.user.city}</span>
+        {typeof artist.answers?.city === "string" && artist.answers.city && (
+          <span className="text-xs md:text-sm text-zinc-600">{artist.answers.city as string}</span>
         )}
       </div>
     </Link>

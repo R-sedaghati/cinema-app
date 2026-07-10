@@ -2,7 +2,7 @@
 
 import { Asterisk, ChevronLeft, ChevronRight } from "lucide-react";
 import Button from "../common/Button";
-import { Card, RadioButton, Textarea } from "@dgshahr/ui-kit";
+import { Card, RadioButton } from "@dgshahr/ui-kit";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import {
   useUserUploadImage,
@@ -88,14 +88,6 @@ const ThirdStepFlow: React.FC<Props> = ({ onNext, onPrevious }) => {
   return (
     <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
       <div className="flex flex-col gap-5">
-        <Textarea
-          labelContent="درباره من"
-          placeholder="درباره خود بنویسید . . ."
-          required
-          value={store.aboutMe}
-          onChange={(e) => store.setField("aboutMe", e.target.value)}
-        />
-
         <div className="flex flex-col gap-2">
           <div className="flex gap-1">
             <p className="font-p2-medium">نمونه کار</p>

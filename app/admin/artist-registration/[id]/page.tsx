@@ -7,8 +7,9 @@ import {
   useAdminArtistRetrieve,
   useAdminArtistStatusUpdate,
 } from "@/lib/services/admin/hook";
-import { EArtistRequestStatus } from "@/lib/services/admin/type";
+import { EArtistRequestStatus, EFormFieldType } from "@/lib/services/admin/type";
 import { ESampleType } from "@/lib/services/landing/type";
+import { useUserCategoryFormSchema } from "@/lib/services/landing/hook";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import {
   Badge,
@@ -18,7 +19,6 @@ import {
   FileUploader,
   Input,
   RadioButton,
-  Textarea,
 } from "@dgshahr/ui-kit";
 import { Asterisk, ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -32,6 +32,9 @@ function ArtistDetail() {
 
   const { data: artistDetail } = useAdminArtistRetrieve(id);
   const data = artistDetail?.result;
+
+  const { data: schemaData } = useUserCategoryFormSchema(data?.categories?.[0]?.id);
+  const steps = [...(schemaData?.result?.steps ?? [])].sort((a, b) => a.order - b.order);
 
   const { mutate, isPending } = useAdminArtistStatusUpdate(id);
 
@@ -153,51 +156,24 @@ function ArtistDetail() {
                 labelContent="ایمیل"
                 value={data?.user?.email ?? ""}
               />
-              <Input
-                placeholder="قد"
-                labelContent="قد"
-                value={data?.user?.height ?? ""}
-              />
-              <Input
-                placeholder="وزن"
-                labelContent="وزن"
-                value={data?.user?.weight ?? ""}
-              />
-              <Input
-                placeholder="زبان و گویش"
-                labelContent="زبان و گویش"
-                value={data?.user?.dialect ?? ""}
-              />
-              <Input
-                placeholder="استان"
-                labelContent="استان"
-                value={data?.user?.province ?? ""}
-              />
-              <Input
-                placeholder="شهر"
-                labelContent="شهر"
-                value={data?.user?.city ?? ""}
-              />
-              <Input
-                placeholder="آدرس"
-                labelContent="آدرس"
-                value={data?.user?.address ?? ""}
-              />
-              <Input
-                placeholder="کد پستی"
-                labelContent="کد پستی"
-                value={data?.user?.postalCode ?? ""}
-              />
-              <Input
-                placeholder="تحصیلات"
-                labelContent="تحصیلات"
-                value={data?.user?.education ?? ""}
-              />
-              <Input
-                placeholder="رشته تحصیلی"
-                labelContent="رشته تحصیلی"
-                value={data?.user?.major ?? ""}
-              />
+              {steps.map((step) =>
+                [...step.fields]
+                  .sort((a, b) => a.order - b.order)
+                  .filter((field) => field.type !== EFormFieldType.IMAGE && field.type !== EFormFieldType.VIDEO)
+                  .map((field) => {
+                    const value = data?.answers?.[field.key];
+                    const display = Array.isArray(value) ? value.join("، ") : (value as string | number | undefined);
+
+                    return (
+                      <Input
+                        key={field.id}
+                        placeholder={field.label}
+                        labelContent={field.label}
+                        value={display ?? ""}
+                      />
+                    );
+                  }),
+              )}
             </div>
           </div>
         </Card>
@@ -266,11 +242,6 @@ function ArtistDetail() {
                 />
               </div>
             </div>
-            <Textarea
-              labelContent="درباره من"
-              placeholder="درباره من"
-              value={data?.user?.aboutMe ?? ""}
-            />
             <div className="flex flex-col gap-4">
               <p className="font-h5-bold">نمونه کارهای تصویری</p>
               <WorksSlider

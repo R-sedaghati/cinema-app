@@ -30,11 +30,6 @@ enum AdminRole {
   ADMIN = "ADMIN",
 }
 
-enum Gender {
-  MAN = "MAN",
-  WOMAN = "WOMAN",
-}
-
 enum PortfolioType {
   IMAGE = "IMAGE",
   VIDEO = "VIDEO",
@@ -61,11 +56,16 @@ enum SupportStatus {
   REJECTED = "REJECTED",
 }
 
-enum SkinColor {
-  FAIR = "FAIR",
-  WHEAT = "WHEAT",
-  OLIVE = "OLIVE",
-  DARKOLIVE = "DARKOLIVE",
+enum FormFieldType {
+  TEXT = "TEXT",
+  TEXTAREA = "TEXTAREA",
+  NUMBER = "NUMBER",
+  SELECT = "SELECT",
+  RADIO = "RADIO",
+  CHECKBOX = "CHECKBOX",
+  DATE = "DATE",
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
 }
 ```
 
@@ -81,20 +81,6 @@ interface User {
   lastName?: string;
   email?: string;
   avatar?: string | null;    // presigned URL
-  gender?: Gender;
-  birthDate?: string;        // ISO date
-  height?: number;
-  weight?: number;
-  language?: string;
-  dialect?: string;
-  address?: string;
-  province?: string;
-  city?: string;
-  postalCode?: string;
-  education?: string;
-  major?: string;
-  aboutMe?: string;
-  skinColor?: SkinColor;
   code?: string;             // auto-generated sequential code
   lastLogin?: string;        // ISO datetime
 }
@@ -105,7 +91,26 @@ interface Category {
   enName: string;
   parent?: Category | null;
   children?: Category[];
-  config?: Record<string, any>;
+}
+
+interface FormField {
+  id: number;
+  key: string;               // storage key inside ArtistRequest.answers
+  label: string;
+  type: FormFieldType;
+  placeholder?: string | null;
+  required: boolean;
+  order: number;
+  options?: { label: string; value: string }[] | null;
+  validation?: { min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+}
+
+interface FormStep {
+  id: number;
+  title: string;
+  order: number;
+  icon?: string | null;
+  fields: FormField[];
 }
 
 interface Portfolio {
@@ -130,6 +135,7 @@ interface ArtistRequest {
   categories: Pick<Category, "id" | "faName" | "enName">[];
   portfolios: Portfolio[];
   user: User;
+  answers: Record<string, unknown>;    // dynamic fields, keyed by FormField.key
   rejectedReasons?: RejectedReason[];  // admin view only
 }
 
@@ -273,6 +279,25 @@ Get about-us content.
 
 ---
 
+### `GET /site-content/`
+Get site-wide editable copy (about-page benefit cards, support-page copy, terms/privacy page). Single row, no auth.
+
+**Response:** `ApiResponse<SiteContent>` where:
+```ts
+interface SiteContent {
+  id: 1;
+  benefits: { items: { title: string; desc: string }[] }; // exactly 3, fixed order (mission, vision, responsibility)
+  support: {
+    title: string;
+    description: string;
+    items: { title: string; detail: string; footerText: string; buttonValue: string }[]; // exactly 3, fixed order (phone, email, telegram)
+  };
+  terms: { title: string; content: string };
+}
+```
+
+---
+
 ### `GET /banners/`
 List active banners for the homepage hero slider. Only returns rows where `isActive = true`, sorted by `priority` ascending.
 
@@ -364,30 +389,19 @@ Upload a video. **Auth required.** `multipart/form-data`
 ---
 
 ### `POST /user/artist-requests`
-Create an artist request. **Auth required.** `multipart/form-data`
+Create an artist request. **Auth required.**
+
+Fields are dynamic — driven by the `FormStep`/`FormField` schema defined per top-level
+category in the admin panel. Fetch the schema first via `GET /categories/:id/form-schema/`
+to know which keys/types/required-ness apply to the selected category.
 
 **Body:**
 ```ts
 {
-  categoryIds: number[];        // required
-  firstName?: string;
-  lastName?: string;
-  height?: number;
-  weight?: number;
-  language?: string;
-  dialect?: string;
-  email?: string;
-  address?: string;
-  province?: string;
-  city?: string;
-  postalCode?: string;
-  education?: string;
-  major?: string;
-  avatar?: string;              // minio path from upload endpoint
-  birthDate?: string;           // ISO date
-  gender?: Gender;
-  skinColor?: SkinColor;
-  portfolios?: { path: string; type: PortfolioType }[];  // form field: portfolios
+  categoryIds: number[];                 // required
+  answers: Record<string, unknown>;      // keyed by FormField.key
+  portfolios?: { path: string; type: PortfolioType }[];
+  sampleType?: ESampleType;
 }
 ```
 
@@ -414,7 +428,36 @@ List own artist requests. **Auth required.**
 ### `PATCH /user/artist-requests/:id/`
 Update own artist request. **Auth required.**
 
-**Body:** same fields as create (all optional). `portfolios` array replaces existing if provided.
+**Body:** same shape as create (all optional). `answers` overwrites wholesale if provided. `portfolios` array replaces existing if provided.
+
+---
+
+### `GET /categories/:id/form-schema/`
+Fetch the dynamic step/field schema for a category. No auth. Resolves child categories to
+their top-level parent's schema (only top-level categories own a schema).
+
+**Response:**
+```ts
+ApiResponse<{
+  steps: {
+    id: number;
+    title: string;
+    order: number;
+    icon: string | null;
+    fields: {
+      id: number;
+      key: string;
+      label: string;
+      type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "RADIO" | "CHECKBOX" | "DATE" | "IMAGE" | "VIDEO";
+      placeholder: string | null;
+      required: boolean;
+      order: number;
+      options: { label: string; value: string }[] | null;
+      validation: { min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+    }[];
+  }[];
+}>
+```
 
 **Response (200):**
 ```ts
@@ -500,11 +543,11 @@ List all artist requests with full detail.
 | categoryId | number | Filter by category ID |
 | categoryName | string | Filter by category name |
 | status | ArtistRequestStatus | Filter by status |
-| city | string | Filter by user city |
-| skinColor | SkinColor | Filter by skin color |
-| height | number | Filter by height |
-| weight | number | Filter by weight |
-| dialect | string | Filter by dialect |
+| city | string | Filter by `answers.city` (convention key, category-dependent) |
+| skinColor | string | Filter by `answers.skinColor` (convention key, category-dependent) |
+| height | number | Filter by `answers.height` (convention key, category-dependent) |
+| weight | number | Filter by `answers.weight` (convention key, category-dependent) |
+| dialect | string | Filter by `answers.dialect` (convention key, category-dependent) |
 | search | string | Search by name or phone |
 | sort | string | Sort by `category` |
 | createdAt | string | Filter by created date |
@@ -553,9 +596,63 @@ Get category by ID.
 ### `PATCH /admin/categories/:id/`
 Update category.
 
-**Body:** partial `Category` fields
+**Body:** partial `Category` fields (`config` is no longer supported — use the form-builder endpoints below)
 
 **Response:** `ApiResponse<Category>`
+
+---
+
+### `GET /admin/categories/:id/form-schema/`
+Get the step/field schema for a top-level category. 400 if `:id` has a parent.
+
+**Response:** same shape as the public `GET /categories/:id/form-schema/`.
+
+---
+
+### `POST /admin/categories/:id/form-steps/`
+Create a step for a top-level category.
+
+**Body:** `{ title: string; order?: number; icon?: string }`
+
+---
+
+### `PATCH /admin/form-steps/:stepId/`
+Update a step. **Body:** `{ title?: string; order?: number; icon?: string }`
+
+---
+
+### `DELETE /admin/form-steps/:stepId/`
+Delete a step (cascades to its fields).
+
+---
+
+### `POST /admin/form-steps/:stepId/fields/`
+Create a field on a step.
+
+**Body:**
+```ts
+{
+  key: string;             // unique within the top-level category
+  label: string;
+  type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "RADIO" | "CHECKBOX" | "DATE" | "IMAGE" | "VIDEO";
+  placeholder?: string;
+  required?: boolean;
+  order?: number;
+  options?: { label: string; value: string }[];   // SELECT/RADIO/CHECKBOX
+  validation?: { min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string };
+  syncToUserField?: "firstName" | "lastName" | "avatar" | "email";
+}
+```
+
+---
+
+### `PATCH /admin/form-fields/:fieldId/`
+Update a field. **Body:** same shape as create, all optional.
+
+---
+
+### `DELETE /admin/form-fields/:fieldId/`
+Delete a field.
 
 ---
 
@@ -643,6 +740,13 @@ Bulk update FAQs.
 
 ---
 
+### `DELETE /admin/faqs/:id/`
+Delete FAQ.
+
+**Response:** `ApiResponse<null>`
+
+---
+
 ### `GET /admin/about-us/`
 Get about-us content.
 
@@ -659,6 +763,22 @@ Update about-us text.
 ```
 
 **Response:** `ApiResponse<AboutUs>`
+
+---
+
+### `GET /admin/site-content/`
+Get site-content (see `GET /site-content/` above for shape). Admin auth.
+
+**Response:** `ApiResponse<SiteContent>`
+
+---
+
+### `PATCH /admin/site-content/:id/`
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`) may be sent independently; unspecified keys are left unchanged.
+
+**Body:** `Partial<Omit<SiteContent, "id">>`
+
+**Response:** `ApiResponse<SiteContent>`
 
 ---
 

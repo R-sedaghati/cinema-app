@@ -10,16 +10,25 @@ import {
   IBannerUpsertRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
+  ICreateFormFieldRequest,
+  ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
+  IFormFieldRetrieveResponse,
+  IFormSchemaRetrieveResponse,
+  IFormStepRetrieveResponse,
   IProvinceListResponse,
   IRetriveResponse,
+  ISiteContent,
+  ISiteContentResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
   ITutorialListResponse,
   ITutorialRetrieveResponse,
   ITutorialUpsertRequest,
   IUpdateCategoryRequest,
+  IUpdateFormFieldRequest,
+  IUpdateFormStepRequest,
   IUserRetrive,
   IUsersListResponse,
   LoginRequest,
@@ -82,6 +91,82 @@ export const adminCategoryRetrieve = async (
     },
   );
 
+  return data;
+};
+
+export const adminGetFormSchema = async (categoryId: number, accessToken: string) => {
+  const { data } = await api.get<IFormSchemaRetrieveResponse>(
+    `/admin/categories/${categoryId}/form-schema/`,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminCreateFormStep = async (
+  categoryId: number,
+  payload: ICreateFormStepRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IFormStepRetrieveResponse>(
+    `/admin/categories/${categoryId}/form-steps/`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminUpdateFormStep = async (
+  stepId: number,
+  payload: IUpdateFormStepRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IFormStepRetrieveResponse>(
+    `/admin/form-steps/${stepId}/`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminDeleteFormStep = async (stepId: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<{ id: number }>>(
+    `/admin/form-steps/${stepId}/`,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminCreateFormField = async (
+  stepId: number,
+  payload: ICreateFormFieldRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IFormFieldRetrieveResponse>(
+    `/admin/form-steps/${stepId}/fields/`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminUpdateFormField = async (
+  fieldId: number,
+  payload: IUpdateFormFieldRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IFormFieldRetrieveResponse>(
+    `/admin/form-fields/${fieldId}/`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminDeleteFormField = async (fieldId: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<{ id: number }>>(
+    `/admin/form-fields/${fieldId}/`,
+    { headers: { Authorization: accessToken } },
+  );
   return data;
 };
 
@@ -199,6 +284,38 @@ export const adminFaqUpdate = async (
       Authorization: accessToken,
     },
   });
+
+  return data;
+};
+
+export const adminFaqDelete = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<null>>(
+    `/admin/faqs/${id}`,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminSiteContent = async (accessToken: string) => {
+  const { data } = await api.get<ISiteContentResponse>("/admin/site-content", {
+    headers: {
+      Authorization: accessToken,
+    },
+  });
+
+  return data;
+};
+
+export const adminSiteContentUpdate = async (
+  payload: Partial<Omit<ISiteContent, "id">>,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<ISiteContentResponse>(
+    "/admin/site-content/1",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
 
   return data;
 };

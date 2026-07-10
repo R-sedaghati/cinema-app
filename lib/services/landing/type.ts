@@ -1,7 +1,8 @@
 import {
   IArtistItem,
   IBasePaginateResponse,
-  ICategoryConfig,
+  IFormStep,
+  IRetriveResponse,
   ISupportItem,
 } from "../admin/type";
 
@@ -50,7 +51,6 @@ export interface IUserProfile {
 }
 
 export interface IUserCaategoryItem {
-  config: ICategoryConfig | null;
   createdAt: string | null;
   deletedAt: string | null;
   description: string | null;
@@ -64,7 +64,6 @@ export interface IUserCaategoryItem {
 
 export interface IUserCategoryResponse {
   children: IUserCaategoryItem[];
-  config: ICategoryConfig | null;
   createdAt: string | null;
   deletedAt: string | null;
   description: string | null;
@@ -75,6 +74,8 @@ export interface IUserCategoryResponse {
   priority: number;
   updatedAt: string | null;
 }
+
+export type IFormSchemaResponse = IRetriveResponse<{ steps: IFormStep[] }>;
 
 export type IUserArtistListResponse = IBasePaginateResponse<IArtistItem>;
 export type IUserSupportListResponse = IBasePaginateResponse<ISupportItem>;
@@ -109,23 +110,7 @@ export type PortfolioType = "IMAGE" | "VIDEO";
 
 export type UserCreateArtistRequest = {
   categoryIds: number[];
-  firstName?: string;
-  lastName?: string;
-  height?: number;
-  weight?: number;
-  language?: string;
-  dialect?: string;
-  email?: string;
-  address?: string;
-  province?: string;
-  city?: string;
-  postalCode?: string;
-  education?: string;
-  major?: string;
-  avatar?: string;
-  birthDate?: string;
-  gender?: "MAN" | "WOMAN";
-  aboutMe?: string;
+  answers: Record<string, unknown>;
   sampleType: ESampleType;
   portfolios?: { path: string; type: PortfolioType }[];
 };

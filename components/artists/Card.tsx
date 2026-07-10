@@ -32,14 +32,14 @@ export default function ArtistCard({
           {artist?.categories?.at(0)?.faName ?? ""}
         </span>
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-          {artist?.user?.gender === EArtistGender.MAN ? "مرد" : "زن"}
+          {artist?.answers?.gender === EArtistGender.MAN ? "مرد" : "زن"}
         </span>
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-          {artist?.user?.city ?? ""}
+          {(artist?.answers?.city as string | undefined) ?? ""}
         </span>
       </div>
       <p className="mt-4 mb-3 line-clamp-2 text-sm leading-7 text-zinc-400">
-        {artist?.user?.aboutMe}
+        {artist?.answers?.aboutMe as string | undefined}
       </p>
       <div className="flex items-center justify-end">
         <p className="text-error-500 font-p2-medium">مشاهده پروفایل</p>
