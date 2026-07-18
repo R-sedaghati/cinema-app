@@ -9,6 +9,7 @@ import {
   useUpdateUserArtistRequest,
   useUserCreateArtistRequest,
 } from "@/lib/services/landing/hook";
+import { IFormStep } from "@/lib/services/admin/type";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
@@ -17,11 +18,12 @@ import clsx from "clsx";
 const PAYMENT_AMOUNT = 200000;
 
 interface Props {
+  steps: IFormStep[];
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
+const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
   const store = useArtistRegistrationStore();
   const router = useRouter();
   const { mutate: create, isPending: isCreating } =
@@ -32,23 +34,7 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
 
   const formPayload = {
     categoryIds: store.categoryId,
-    firstName: store.firstName || undefined,
-    lastName: store.lastName || undefined,
-    height: store.height ?? undefined,
-    weight: store.weight ?? undefined,
-    language: store.language || undefined,
-    dialect: store.dialect || undefined,
-    email: store.email || undefined,
-    address: store.address || undefined,
-    province: store.province || undefined,
-    city: store.city || undefined,
-    postalCode: store.postalCode || undefined,
-    education: store.education || undefined,
-    major: store.major || undefined,
-    avatar: store.avatar || undefined,
-    birthDate: store.birthDate || undefined,
-    gender: store.gender || undefined,
-    aboutMe: store.aboutMe || undefined,
+    answers: store.answers,
     portfolios: store.portfolios.length ? store.portfolios : undefined,
     sampleType: store.sampleType,
   };
@@ -81,6 +67,31 @@ const FourthStepFlow: React.FC<Props> = ({ onPrevious }) => {
       className={clsx("pt-16 px-4", isDesktop && "px-6")}
     >
       <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-4">
+          {steps.map((step) => (
+            <div key={step.id} className="flex flex-col gap-2">
+              <p className="font-h6-bold">{step.title}</p>
+              <div className="grid md:grid-cols-2 gap-2">
+                {[...step.fields]
+                  .sort((a, b) => a.order - b.order)
+                  .map((field) => {
+                    const value = store.answers[field.key];
+                    const display = Array.isArray(value)
+                      ? value.join("، ")
+                      : (value as string | number | undefined) ?? "-";
+
+                    return (
+                      <div key={field.id} className="flex gap-1">
+                        <p className="font-p2-medium text-gray-500">{field.label}:</p>
+                        <p className="font-p2-regular">{String(display)}</p>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          ))}
+        </div>
+
         {!store.editId && (
           <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center">
             <div className="flex flex-col gap-3">

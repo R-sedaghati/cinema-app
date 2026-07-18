@@ -1,7 +1,5 @@
-import { CategoryItem } from "../mock/artists";
-
-export function splitPattern(items: CategoryItem[]) {
-  const result = [];
+export function splitPattern<T>(items: T[]) {
+  const result: T[][] = [];
   let i = 0;
   let toggle = true;
 
@@ -15,8 +13,8 @@ export function splitPattern(items: CategoryItem[]) {
   return result;
 }
 
-export function mobileSplitPattern(items: CategoryItem[]) {
-  const result: CategoryItem[][] = [];
+export function mobileSplitPattern<T>(items: T[]) {
+  const result: T[][] = [];
 
   for (let i = 0; i < items.length; i += 4) {
     result.push(items.slice(i, i + 4));

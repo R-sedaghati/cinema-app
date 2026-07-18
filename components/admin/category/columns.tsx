@@ -1,11 +1,13 @@
 import { ICategoryItem } from "@/lib/services/admin/type";
 import { Badge, Button } from "@dgshahr/ui-kit";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { ChevronLeft, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
 
 export const generateColumns = (
   onProfileClick: (id: number) => void,
   onRequestClick: (id: number) => void,
+  onDeleteClick: (id: number) => void,
 ): ColumnsType<ICategoryItem>[] => {
   return [
     {
@@ -15,6 +17,25 @@ export const generateColumns = (
       title: "ردیف",
       className: "align-middle",
       render: (data) => data.id && <p className="font-p1-regular">{data.id}</p>,
+    },
+    {
+      align: "center",
+      key: "image",
+      dataIndex: "image",
+      title: "تصویر",
+      className: "align-middle",
+      render: (data) =>
+        data.image ? (
+          <Image
+            src={data.image}
+            alt={data.faName}
+            width={40}
+            height={40}
+            className="rounded-md object-cover w-10 h-10"
+          />
+        ) : (
+          <p className="font-p1-regular text-gray-400">-</p>
+        ),
     },
     {
       align: "center",
@@ -66,12 +87,12 @@ export const generateColumns = (
       title: "عملیات",
       className: "align-middle max-w-36",
       render: (data) => (
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-col gap-1 items-start">
           <Button
             onClick={() => onProfileClick(data.id)}
-            variant="outline"
+            variant="text"
+            leftIcon={<Pencil />}
             color="error"
-            rightIcon={<Pencil />}
           >
             ویرایش
           </Button>
@@ -82,6 +103,14 @@ export const generateColumns = (
             color="error"
           >
             مشاهده درخواست‌ها
+          </Button>
+          <Button
+            onClick={() => onDeleteClick(data.id)}
+            variant="text"
+            leftIcon={<Trash2 />}
+            color="error"
+          >
+            حذف
           </Button>
         </div>
       ),

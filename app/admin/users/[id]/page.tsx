@@ -71,47 +71,47 @@ function ArtistDetail() {
               <Input
                 placeholder="قد"
                 labelContent="قد"
-                value={data?.user?.height ?? ""}
+                value={(data?.answers?.height as string | number | undefined) ?? ""}
               />
               <Input
                 placeholder="وزن"
                 labelContent="وزن"
-                value={data?.user?.weight ?? ""}
+                value={(data?.answers?.weight as string | number | undefined) ?? ""}
               />
               <Input
                 placeholder="زبان و گویش"
                 labelContent="زبان و گویش"
-                value={data?.user?.dialect ?? ""}
+                value={(data?.answers?.dialect as string | undefined) ?? ""}
               />
               <Input
                 placeholder="استان"
                 labelContent="استان"
-                value={data?.user?.province ?? ""}
+                value={(data?.answers?.province as string | undefined) ?? ""}
               />
               <Input
                 placeholder="شهر"
                 labelContent="شهر"
-                value={data?.user?.city ?? ""}
+                value={(data?.answers?.city as string | undefined) ?? ""}
               />
               <Input
                 placeholder="آدرس"
                 labelContent="آدرس"
-                value={data?.user?.address ?? ""}
+                value={(data?.answers?.address as string | undefined) ?? ""}
               />
               <Input
                 placeholder="کد پستی"
                 labelContent="کد پستی"
-                value={data?.user?.postalCode ?? ""}
+                value={(data?.answers?.postalCode as string | undefined) ?? ""}
               />
               <Input
                 placeholder="تحصیلات"
                 labelContent="تحصیلات"
-                value={data?.user?.education ?? ""}
+                value={(data?.answers?.education as string | undefined) ?? ""}
               />
               <Input
                 placeholder="رشته تحصیلی"
                 labelContent="رشته تحصیلی"
-                value={data?.user?.major ?? ""}
+                value={(data?.answers?.major as string | undefined) ?? ""}
               />
             </div>
           </div>

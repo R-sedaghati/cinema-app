@@ -3,7 +3,6 @@ import { persist } from "zustand/middleware";
 import { ESampleType } from "../services/landing/type";
 
 export type PortfolioType = "IMAGE" | "VIDEO";
-export type Gender = "MAN" | "WOMAN";
 
 export interface Portfolio {
   path: string;
@@ -25,24 +24,8 @@ interface ArtistRegistrationState {
 
   // Form
   categoryId: number[];
-  firstName: string;
-  lastName: string;
-  height: number | null;
-  weight: number | null;
-  language: string;
-  gender: Gender | "";
-  birthDate: string;
-  dialect: string;
-  email: string;
-  address: string;
-  province: string;
-  city: string;
-  postalCode: string;
-  education: string;
-  major: string;
+  answers: Record<string, unknown>;
   portfolios: Portfolio[];
-  avatar: string;
-  aboutMe: string;
 
   // Step Actions
   handleNext: () => void;
@@ -55,6 +38,9 @@ interface ArtistRegistrationState {
     field: K,
     value: ArtistRegistrationState[K],
   ) => void;
+
+  setAnswer: (key: string, value: unknown) => void;
+  setAnswers: (answers: Record<string, unknown>) => void;
 
   addPortfolio: (portfolio: Portfolio) => void;
   removePortfolio: (path: string) => void;
@@ -72,24 +58,8 @@ const initialState = {
   categoryId: [],
   sampleType: ESampleType.HAS_SAMPLE,
 
-  firstName: "",
-  lastName: "",
-  height: null,
-  weight: null,
-  language: "",
-  gender: "" as Gender | "",
-  birthDate: "",
-  dialect: "",
-  email: "",
-  address: "",
-  province: "",
-  city: "",
-  postalCode: "",
-  education: "",
-  major: "",
+  answers: {} as Record<string, unknown>,
   portfolios: [] as Portfolio[],
-  avatar: "",
-  aboutMe: "",
 };
 
 export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
@@ -127,6 +97,13 @@ export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
         set({
           [field]: value,
         } as Pick<ArtistRegistrationState, typeof field>),
+
+      setAnswer: (key, value) =>
+        set((state) => ({
+          answers: { ...state.answers, [key]: value },
+        })),
+
+      setAnswers: (answers) => set({ answers }),
 
       addPortfolio: (portfolio) =>
         set((state) => ({

@@ -45,6 +45,9 @@ export function SiteFooter() {
           <Link href="/support" className="hover:text-white transition-colors">
             پشتیبانی
           </Link>
+          <Link href="/terms" className="hover:text-white transition-colors">
+            قوانین و حریم خصوصی
+          </Link>
         </nav>
         {/* bottom */}
         <div className="flex flex-col md:flex-row justify-between gap-5 items-center">

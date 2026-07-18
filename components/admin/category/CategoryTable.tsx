@@ -6,13 +6,16 @@ import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
-import { useAdminCategoryList } from "@/lib/services/admin/hook";
-import Header from "../users/Header";
+import { useAdminCategoryDelete, useAdminCategoryList } from "@/lib/services/admin/hook";
+import Header from "./Header";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import useCategoryListParams from "@/lib/hooks/tables/useCategoryListParams";
 
 function CategoryTable() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const {
     params,
@@ -27,6 +30,7 @@ function CategoryTable() {
   const { data, isPending } = useAdminCategoryList(
     isValidParams ? finalParams : undefined,
   );
+  const { mutate: deleteCategory } = useAdminCategoryDelete();
 
   const columns = generateColumns(
     (id) => {
@@ -34,6 +38,17 @@ function CategoryTable() {
     },
     (id) => {
       router.push(`/admin/artist-registration?categoryId=${id}`);
+    },
+    (id) => {
+      if (!window.confirm("آیا از حذف این دسته‌بندی مطمئن هستید؟")) return;
+
+      deleteCategory(id, {
+        onSuccess: () => {
+          toast.success("با موفقیت حذف شد");
+          queryClient.invalidateQueries({ queryKey: ["categoryList"] });
+        },
+        onError: () => toast.error("خطا در حذف دسته‌بندی"),
+      });
     },
   );
 

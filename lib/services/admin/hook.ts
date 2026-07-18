@@ -11,16 +11,24 @@ import {
   IBannerUpsertRequest,
   ICategoryRetriveResponse,
   ICatrgotyListResponse,
+  ICreateCategoryRequest,
+  ICreateFormFieldRequest,
+  ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
+  IFormSchemaRetrieveResponse,
   IProvinceListResponse,
   IRetriveResponse,
+  ISiteContent,
+  ISiteContentResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
   ITutorialListResponse,
   ITutorialRetrieveResponse,
   ITutorialUpsertRequest,
   IUpdateCategoryRequest,
+  IUpdateFormFieldRequest,
+  IUpdateFormStepRequest,
   IUserRetrive,
   IUsersListResponse,
   LoginRequest,
@@ -42,14 +50,24 @@ import {
   adminBannerList,
   adminBannerRetrieve,
   adminBannerUpdate,
+  adminCategoryCreate,
+  adminCategoryDelete,
   adminCategoryList,
   adminCategoryRetrieve,
   adminCategoryUpdate,
   adminCreateFaq,
+  adminCreateFormField,
+  adminCreateFormStep,
+  adminDeleteFormField,
+  adminDeleteFormStep,
+  adminFaqDelete,
   adminFaqList,
   adminFaqUpdate,
+  adminGetFormSchema,
   adminLogin,
   adminProvinceList,
+  adminSiteContent,
+  adminSiteContentUpdate,
   adminSupportList,
   adminSupportRetrieve,
   adminSupportUpdate,
@@ -58,6 +76,8 @@ import {
   adminTutorialList,
   adminTutorialRetrieve,
   adminTutorialUpdate,
+  adminUpdateFormField,
+  adminUpdateFormStep,
   adminUploadBannerImage,
   adminUploadTutorialThumbnail,
   adminUserRequest,
@@ -94,6 +114,70 @@ export const useAdminCategoryRetrieve = (id?: number) => {
     enabled: Boolean(id),
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminFormSchema = (categoryId?: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IFormSchemaRetrieveResponse>({
+    queryKey: ["adminFormSchema", categoryId],
+    queryFn: () => adminGetFormSchema(categoryId!, accessToken),
+    enabled: Boolean(categoryId),
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminCreateFormStep = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { categoryId: number; payload: ICreateFormStepRequest }) =>
+      adminCreateFormStep(data.categoryId, data.payload, accessToken),
+  });
+};
+
+export const useAdminUpdateFormStep = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { stepId: number; payload: IUpdateFormStepRequest }) =>
+      adminUpdateFormStep(data.stepId, data.payload, accessToken),
+  });
+};
+
+export const useAdminDeleteFormStep = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (stepId: number) => adminDeleteFormStep(stepId, accessToken),
+  });
+};
+
+export const useAdminCreateFormField = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { stepId: number; payload: ICreateFormFieldRequest }) =>
+      adminCreateFormField(data.stepId, data.payload, accessToken),
+  });
+};
+
+export const useAdminUpdateFormField = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { fieldId: number; payload: IUpdateFormFieldRequest }) =>
+      adminUpdateFormField(data.fieldId, data.payload, accessToken),
+  });
+};
+
+export const useAdminDeleteFormField = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (fieldId: number) => adminDeleteFormField(fieldId, accessToken),
   });
 };
 
@@ -172,6 +256,23 @@ export const useAdminCategoryUpdate = () => {
   });
 };
 
+export const useAdminCategoryCreate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: ICreateCategoryRequest) =>
+      adminCategoryCreate(payload, accessToken),
+  });
+};
+
+export const useAdminCategoryDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => adminCategoryDelete(id, accessToken),
+  });
+};
+
 export const useAdminFaqList = () => {
   const { accessToken } = useAdminAuthStore();
 
@@ -211,6 +312,35 @@ export const useAdminFaqUpdate = () => {
   return useMutation({
     mutationFn: (faqs: IAdminFaqUpdateItem[]) =>
       adminFaqUpdate(faqs, accessToken),
+  });
+};
+
+export const useAdminFaqDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => adminFaqDelete(id, accessToken),
+  });
+};
+
+export const useAdminSiteContent = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<ISiteContentResponse>({
+    queryKey: ["adminSiteContent"],
+    queryFn: () => adminSiteContent(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminSiteContentUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: Partial<Omit<ISiteContent, "id">>) =>
+      adminSiteContentUpdate(payload, accessToken),
   });
 };
 

@@ -53,7 +53,7 @@ export const generateColumns = (
       dataIndex: "city",
       title: "شهر",
       className: "align-middle",
-      render: (data) => <p className="font-p1-regular">{data?.user?.city}</p>,
+      render: (data) => <p className="font-p1-regular">{data?.answers?.city as string | undefined}</p>,
     },
     {
       align: "center",

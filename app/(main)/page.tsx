@@ -84,18 +84,16 @@ export default function ApplicationPage() {
     <div className="min-h-screen pb-safe-32">
       {/* Banner Slider */}
       {bannersLoading ? (
-        <div className="md:mx-auto md:max-w-6xl md:px-4 md:pt-5">
-          <div className="h-52 md:h-96 md:rounded-3xl bg-zinc-900 animate-pulse" />
-        </div>
+        <div className="h-52 md:h-96 bg-zinc-900 animate-pulse" />
       ) : (
         banners.length > 0 && (
-          <div className="md:mx-auto md:max-w-6xl md:px-4 md:pt-5">
+          <div>
             <Swiper
               modules={[Autoplay, Pagination]}
               autoplay={{ delay: 3500, disableOnInteraction: false }}
               pagination={{ clickable: true }}
               loop
-              className="application-banner h-52 md:h-96 md:rounded-3xl overflow-hidden"
+              className="application-banner h-52 md:h-96 overflow-hidden"
             >
               {banners.map((slide, index) => (
                 <SwiperSlide key={slide.id}>
@@ -190,9 +188,9 @@ export default function ApplicationPage() {
         )}
 
         <div className="mt-5 md:mt-8 space-y-8 md:space-y-12">
-          {/* Artist Registration — horizontal scroll */}
-          <section>
-            <div className="flex items-center justify-between mb-3 md:mb-4">
+          {/* Artist Registration — full width blog-card slider */}
+          <section className="-mx-4">
+            <div className="flex items-center justify-between mb-3 md:mb-4 px-4">
               <h2 className="text-sm md:text-lg font-semibold text-zinc-100">
                 ثبت‌نام هنرمند
               </h2>
@@ -200,28 +198,30 @@ export default function ApplicationPage() {
                 شروع
               </Link>
             </div>
-            <div className="overflow-x-auto md:overflow-visible scrollbar-hidden">
-              <div className="flex gap-3 w-max md:w-auto md:grid md:grid-cols-4 md:gap-4 pb-1">
+            <div className="overflow-x-auto scrollbar-hidden">
+              <div className="flex gap-3 md:gap-4 w-max px-4 pb-1">
                 {artistCategories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => handleCategoryShortcut(cat.id, cat.title)}
-                    className="relative overflow-hidden w-32 h-20 md:w-auto md:h-28 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-error-500/50 transition-colors flex flex-col justify-end p-3 md:p-4 active:scale-[.98] shrink-0 md:shrink"
+                    className="relative overflow-hidden w-40 h-52 md:w-56 md:h-72 shrink-0 rounded-2xl group active:scale-[.98] transition-transform"
                   >
                     <Image
-                      src={`/cat-${cat.id}.svg`}
+                      src={cat.image}
                       alt={cat.title}
-                      width={64}
-                      height={64}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 opacity-30 w-16 h-16 md:w-24 md:h-24"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <p className="text-xs md:text-sm font-medium text-zinc-100 z-10 relative leading-tight">
-                      {cat.title}
-                    </p>
-                    <ArrowLeft
-                      className="text-error-500 mt-1 z-10 relative"
-                      size={12}
-                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-right">
+                      <p className="text-sm md:text-lg font-semibold text-white leading-tight">
+                        {cat.title}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
+                        شروع
+                        <ArrowLeft size={12} />
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -390,8 +390,8 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
             {artist.categories[0].faName}
           </span>
         )}
-        {artist.user.city && (
-          <span className="text-xs md:text-sm text-zinc-600">{artist.user.city}</span>
+        {typeof artist.answers?.city === "string" && artist.answers.city && (
+          <span className="text-xs md:text-sm text-zinc-600">{artist.answers.city as string}</span>
         )}
       </div>
     </Link>
