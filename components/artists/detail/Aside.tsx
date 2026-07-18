@@ -38,7 +38,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
         <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:text-base text-zinc-300 lg:grid-cols-1 lg:gap-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
             <span className="text-zinc-500">استان</span>
-            <span>{artist.user.province ?? "—"}</span>
+            <span>{(artist.answers?.province as string | undefined) ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
@@ -48,13 +48,13 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
             <span className="text-zinc-500">جنسیت</span>
-            <span>{genderMap[artist.user.gender] ?? "—"}</span>
+            <span>{genderMap[artist.answers?.gender as string] ?? "—"}</span>
           </div>
 
-          {artist.user.dialect && (
+          {typeof artist.answers?.dialect === "string" && artist.answers.dialect && (
             <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
               <span className="text-zinc-500">لهجه</span>
-              <span>{artist.user.dialect}</span>
+              <span>{artist.answers.dialect as string}</span>
             </div>
           )}
         </div>

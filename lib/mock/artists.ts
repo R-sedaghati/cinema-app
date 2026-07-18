@@ -40,22 +40,22 @@ export interface CategoryItem {
 }
 
 export const artistCategories: CategoryItem[] = [
-  { title: "خوانندگی", image: "./cat-8.svg", id: 1 },
-  { title: "بازیگری", image: "./cat-13.svg", id: 2 },
-  { title: "کارگردانی", image: "./cat-4.svg", id: 3 },
-  { title: "تصویربرداری", image: "./cat-11.svg", id: 4 },
-  { title: "صدابرداری", image: "./cat-5.svg", id: 5 },
-  { title: "گریم", image: "./cat-3.svg", id: 6 },
-  { title: "مجری‌گری", image: "./cat-2.svg", id: 7 },
-  { title: "دوبلوری", image: "./cat-7.svg", id: 8 },
-  { title: "صحنه و لباس", image: "./cat-6.svg", id: 9 },
-  { title: "پشتیبانی", image: "./cat-12.svg", id: 10 },
-  { title: "تهیه‌کنندگی", image: "./cat-10.svg", id: 11 },
-  { title: "خبرنگاری", image: "./cat-9.svg", id: 12 },
-  { title: "اجاره لوکیشن", image: "./cat-1.svg", id: 13 },
-  { title: "تجهیزات و ملزومات", image: "./cat-1.svg", id: 14 },
-  { title: "اجاره خودرو", image: "./cat-1.svg", id: 15 },
-  { title: "مدلینگ", image: "./cat-1.svg", id: 109 },
+  { title: "خوانندگی", image: "/cat-8.svg", id: 1 },
+  { title: "بازیگری", image: "/cat-13.svg", id: 2 },
+  { title: "کارگردانی", image: "/cat-4.svg", id: 3 },
+  { title: "تصویربرداری", image: "/cat-11.svg", id: 4 },
+  { title: "صدابرداری", image: "/cat-5.svg", id: 5 },
+  { title: "گریم", image: "/cat-3.svg", id: 6 },
+  { title: "مجری‌گری", image: "/cat-2.svg", id: 7 },
+  { title: "دوبلوری", image: "/cat-7.svg", id: 8 },
+  { title: "صحنه و لباس", image: "/cat-6.svg", id: 9 },
+  { title: "پشتیبانی", image: "/cat-12.svg", id: 10 },
+  { title: "تهیه‌کنندگی", image: "/cat-10.svg", id: 11 },
+  { title: "خبرنگاری", image: "/cat-9.svg", id: 12 },
+  { title: "اجاره لوکیشن", image: "/cat-1.svg", id: 13 },
+  { title: "تجهیزات و ملزومات", image: "/cat-1.svg", id: 14 },
+  { title: "اجاره خودرو", image: "/cat-1.svg", id: 15 },
+  { title: "مدلینگ", image: "/cat-1.svg", id: 109 },
 ];
 
 export const artistsMock: Artist[] = [

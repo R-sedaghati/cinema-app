@@ -5,6 +5,7 @@ import {
   IFaqListResponse,
   IProvinceListResponse,
   IRetriveResponse,
+  ISiteContentResponse,
   ISupportItem,
   ITutorialListResponse,
   LoginResponse,
@@ -15,6 +16,7 @@ import landingApi from "../landingAxiosInstance";
 import {
   ArtistRequestResult,
   ICityListResponse,
+  IFormSchemaResponse,
   IPagination,
   IUserArtistListResponse,
   IUserCategoryListResponse,
@@ -149,6 +151,14 @@ export const userAboutUs = async () => {
   return data;
 };
 
+export const userSiteContent = async () => {
+  const { data } = await landingApi.get<ISiteContentResponse>(
+    "/site-content",
+  );
+
+  return data;
+};
+
 export const userCityList = async (provinceId: number) => {
   const { data } = await landingApi.get<ICityListResponse>(
     `/provinces/${provinceId}/cities`,
@@ -182,6 +192,13 @@ export const userUploadImage = async (file: File) => {
   const { data } = await landingApi.post<{ path: string; filename: string }>(
     "/user/upload/image",
     form,
+  );
+  return data;
+};
+
+export const userGetCategoryFormSchema = async (categoryId: number) => {
+  const { data } = await landingApi.get<IFormSchemaResponse>(
+    `/categories/${categoryId}/form-schema/`,
   );
   return data;
 };

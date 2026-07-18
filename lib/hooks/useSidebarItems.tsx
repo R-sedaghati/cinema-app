@@ -9,6 +9,7 @@ import {
   ClipboardList,
   GalleryHorizontal,
   Video,
+  Plus,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -51,7 +52,15 @@ export const useSidebarItems = (): {
         icon: <ChartColumnIncreasing />,
         title: "مدیریت دسته‌بندی و فرم‌ها",
         link: "/admin/categories",
-        active: pathname.startsWith("/admin/categories"),
+        active:
+          pathname.startsWith("/admin/categories") &&
+          pathname !== "/admin/categories/new",
+      },
+      {
+        icon: <Plus />,
+        title: "افزودن دسته‌بندی",
+        link: "/admin/categories/new",
+        active: pathname === "/admin/categories/new",
       },
       {
         icon: <Handshake />,

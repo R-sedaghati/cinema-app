@@ -52,7 +52,7 @@ export default function ArtistDetailsPage() {
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
             <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">درباره من</h2>
             <p className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
-              {artist.user.aboutMe ?? "—"}
+              {(artist.answers?.aboutMe as string | undefined) ?? "—"}
             </p>
           </section>
 

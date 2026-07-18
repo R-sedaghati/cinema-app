@@ -1,53 +1,35 @@
 "use client";
 
 import {
-  useAdminCategoryRetrieve,
-  useAdminCategoryUpdate,
+  useAdminCategoryCreate,
+  useAdminCategoryList,
   useAdminUploadBannerImage,
 } from "@/lib/services/admin/hook";
-import withNoSSR from "@/lib/utils/withNoSSR";
-import {
-  Button,
-  Card,
-  Divider,
-  Input,
-  Switch,
-} from "@dgshahr/ui-kit";
+import { Button, Card, Divider, Input, Select, Switch } from "@dgshahr/ui-kit";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
-import { ChevronRight } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
-function CategoryDetail() {
-  const params = useParams();
-  const id = Number(params.id);
+function CategoryForm() {
   const router = useRouter();
 
-  const { data: retriveDate } = useAdminCategoryRetrieve(id);
-  const data = retriveDate?.result;
-
-  const { mutate, isPending } = useAdminCategoryUpdate();
-
   const [faName, setFaName] = useState("");
+  const [enName, setEnName] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<number | null>(null);
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+  const [parentId, setParentId] = useState<number | null>(null);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
 
+  const { data: parentOptionsData } = useAdminCategoryList({ count: 100 });
+  const parentOptions = (parentOptionsData?.result ?? [])
+    .filter((category) => category.parent === null)
+    .map((category) => ({ label: category.faName, value: category.id }));
+
+  const { mutate: createCategory, isPending } = useAdminCategoryCreate();
   const uploadImage = useAdminUploadBannerImage();
-
-  useEffect(() => {
-    if (!data) return;
-
-    setFaName(data.faName);
-    setDescription(data.description ?? "");
-    setIsActive(data.isActive);
-    setPriority(data.priority);
-    setImagePath(data.image ?? "");
-    setImageFile(data.image ? { src: data.image } : null);
-  }, [data]);
 
   const handleImageChange = (file: File | undefined) => {
     if (!file) return;
@@ -72,22 +54,22 @@ function CategoryDetail() {
   };
 
   const handleSubmit = () => {
-    mutate(
+    createCategory(
       {
-        id,
-        payload: {
-          faName,
-          isActive,
-          description,
-          priority,
-          image: imagePath || null,
-        },
+        faName,
+        enName,
+        parentId,
+        description,
+        priority: parentId === null ? priority : null,
+        isActive,
+        image: imagePath || null,
       },
       {
         onSuccess: () => {
           toast.success("با موفقیت انجام شد");
           router.push("/admin/categories");
         },
+        onError: () => toast.error("خطا در ذخیره‌سازی"),
       },
     );
   };
@@ -98,25 +80,18 @@ function CategoryDetail() {
         <Button
           onClick={() => router.push("/admin/categories")}
           variant="text"
-          rightIcon={<ChevronRight />}
           color="gray"
         >
-          {`دسته‌بندی ${data?.faName}`}
+          افزودن دسته‌بندی
         </Button>
       </div>
       <Divider className="mb-5" color="gray" size="thin" type="horizontal" />
       <div className="flex flex-col gap-5 pt-6 px-4 h-full bg-gray-100">
         <Card>
           <div className="flex flex-col gap-4">
-            <p className="font-h3-bold text-error-500">
-              اطلاعات دسته‌بندی صحنه و لباس
-            </p>
-            <Divider
-              className="mb-5"
-              color="gray"
-              size="thin"
-              type="horizontal"
-            />
+            <p className="font-h3-bold text-error-500">اطلاعات دسته‌بندی</p>
+            <Divider className="mb-5" color="gray" size="thin" type="horizontal" />
+
             <FileUploader
               fileInputProps={{
                 className: "w-full md:w-1/3",
@@ -137,15 +112,34 @@ function CategoryDetail() {
                 wrapperClassName: "w-fit",
               }}
             />
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <Input
-                labelContent="نام دسته ‌بندی"
-                placeholder="نام دسته ‌بندی"
+                labelContent="نام دسته‌ بندی (فارسی)"
+                placeholder="نام دسته‌ بندی"
                 wrapperClassName="w-full"
                 value={faName}
                 onChange={(e) => setFaName(e.target.value)}
               />
-              {!data?.parent && (
+              <Input
+                labelContent="نام دسته‌ بندی (انگلیسی)"
+                placeholder="Category name"
+                wrapperClassName="w-full"
+                value={enName}
+                onChange={(e) => setEnName(e.target.value)}
+              />
+              <Select
+                mode="single"
+                value={parentId}
+                onChange={(value) => setParentId(value)}
+                options={parentOptions}
+                inputProps={{
+                  labelContent: "دسته‌بندی والد",
+                  placeholder: "بدون والد",
+                }}
+                wrapperClassName="w-full"
+              />
+              {parentId === null && (
                 <Input
                   labelContent="اولویت"
                   placeholder="اولویت"
@@ -159,14 +153,6 @@ function CategoryDetail() {
                   }
                 />
               )}
-              <div className="flex flex-col gap-3">
-                <p className="font-p1-regular text-gray-500">
-                  تعداد درخواست‌‌ها
-                </p>
-                <p className="font-p1-regular text-gray-800">
-                  {data?.artistRequestsCount}
-                </p>
-              </div>
               <Switch
                 label="وضعیت"
                 checked={isActive}
@@ -180,40 +166,6 @@ function CategoryDetail() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
-          </div>
-        </Card>
-        {!data?.parent && (
-          <Card>
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <p className="font-h3-bold text-error-500">فرم ثبت‌نام دسته‌بندی</p>
-                <Button
-                  color="error"
-                  variant="outline"
-                  onClick={() => router.push(`/admin/categories/${id}/form-builder`)}
-                >
-                  مدیریت فرم
-                </Button>
-              </div>
-              <Divider color="gray" size="thin" type="horizontal" />
-              <p className="font-p2-regular text-gray-500">
-                مراحل و فیلدهای فرم ثبت‌نام این دسته‌بندی از صفحه مدیریت فرم قابل تعریف است.
-              </p>
-            </div>
-          </Card>
-        )}
-        <Card>
-          <div className="flex flex-col gap-5">
-            <p className="font-h3-bold text-error-500">پرداخت</p>
-            <Divider color="gray" size="thin" type="horizontal" />
-            <div className="flex flex-col gap-3 border border-solid border-gray-300 rounded-xl p-3">
-              <Input
-                labelContent="مبلغ پرداختی کاربر"
-                placeholder="مبلغ پرداختی کاربر"
-                postfix="تومان"
-                wrapperClassName="w-1/3"
-              />
-            </div>
             <div className="flex justify-end">
               <Button
                 color="error"
@@ -221,7 +173,7 @@ function CategoryDetail() {
                 isLoading={isPending}
                 onClick={handleSubmit}
               >
-                ذخیره تغییرات
+                ذخیره
               </Button>
             </div>
           </div>
@@ -231,4 +183,4 @@ function CategoryDetail() {
   );
 }
 
-export default withNoSSR(CategoryDetail);
+export default CategoryForm;

@@ -1,15 +1,13 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import { Card } from "@dgshahr/ui-kit";
 import { MoveLeft, Loader2 } from "lucide-react";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
-import { artistCategories } from "@/lib/mock/artists";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
-import { Gender, useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
-import { useUserArtistDetail } from "@/lib/services/landing/hook";
+import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
+import { useUserArtistDetail, useUserCategoryList } from "@/lib/services/landing/hook";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
 
@@ -19,9 +17,19 @@ export interface SelectedCategory {
 }
 
 function ArtistRegistrationPageContent() {
+  const { data: categoryData, isLoading: isCategoryLoading } = useUserCategoryList({
+    page: 1,
+    count: 30,
+  });
+
+  const topLevelCategories = useMemo(
+    () => (categoryData?.result ?? []).map((c) => ({ id: c.id, title: c.faName })),
+    [categoryData],
+  );
+
   const rows = isMobile
-    ? mobileSplitPattern(artistCategories)
-    : splitPattern(artistCategories);
+    ? mobileSplitPattern(topLevelCategories)
+    : splitPattern(topLevelCategories);
   const searchParams = useSearchParams();
   const editIdParam = searchParams.get("editId");
   const editId = editIdParam ? Number(editIdParam) : null;
@@ -54,22 +62,7 @@ function ArtistRegistrationPageContent() {
       "categoryId",
       r.categories.map((c) => c.id),
     );
-    setField("firstName", r.user.firstName ?? "");
-    setField("lastName", r.user.lastName ?? "");
-    setField("height", r.user.height);
-    setField("weight", r.user.weight);
-    setField("language", r.user.language ?? "");
-    setField("dialect", r.user.dialect ?? "");
-    setField("email", r.user.email ?? "");
-    setField("address", r.user.address ?? "");
-    setField("province", r.user.province ?? "");
-    setField("city", r.user.city ?? "");
-    setField("postalCode", r.user.postalCode ?? "");
-    setField("education", r.user.education ?? "");
-    setField("major", r.user.major ?? "");
-    setField("avatar", r.user.avatar ?? "");
-    setField("aboutMe", r.user.aboutMe ?? "");
-    if (r.user.gender) setField("gender", r.user.gender as Gender);
+    setField("answers", r.answers ?? {});
     setField(
       "portfolios",
       r.portfolios.map((p) => ({ path: p.filePath, type: p.type })),
@@ -97,7 +90,7 @@ function ArtistRegistrationPageContent() {
     }
   };
 
-  if (editId && editLoading) {
+  if ((editId && editLoading) || (step === 0 && isCategoryLoading)) {
     return (
       <div className="flex justify-center items-center py-24">
         <Loader2 className="animate-spin text-error-500" size={40} />
@@ -137,14 +130,6 @@ function ArtistRegistrationPageContent() {
                       </p>
 
                       <MoveLeft className="text-error-500 z-10" />
-
-                      <Image
-                        src={item.image}
-                        width={90}
-                        height={90}
-                        alt={item.title}
-                        className="absolute md:relative left-3 md:left-0 bottom-0 z-0 w-12.5 h-12.5 md:w-auto md:h-auto"
-                      />
                     </button>
                   ))}
                 </div>

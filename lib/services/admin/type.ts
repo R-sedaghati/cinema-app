@@ -74,24 +74,12 @@ export enum EArtistGender {
 }
 
 interface IArtistUser {
-  aboutMe: string | null;
-  address: string | null;
   avatar: string | null;
-  city: string | null;
   email: string | null;
-  dialect: string | null;
-  education: string | null;
   firstName: string | null;
-  height: number | null;
   id: number;
-  language: string | null;
   lastName: string | null;
-  major: string | null;
   phoneNumber: string | null;
-  postalCode: string | null;
-  province: string | null;
-  weight: number | null;
-  gender: EArtistGender;
   code: string;
 }
 
@@ -104,34 +92,102 @@ export interface IArtistItem {
   portfolios: IArtistPortfolios[];
   status: EArtistRequestStatus;
   user: IArtistUser;
+  answers: Record<string, unknown>;
   sampleType: ESampleType;
   [key: string]: unknown;
 }
 
-export interface ICategoryConfig {
-  aboutMe: boolean;
-  address: boolean;
-  city: boolean;
-  education: boolean;
-  educationField: boolean;
-  email: boolean;
-  fullName: boolean;
-  portfolioImage: boolean;
-  portfolioVideo: boolean;
-  postalCode: boolean;
-  profileImage: boolean;
-  province: boolean;
+export enum EFormFieldType {
+  TEXT = "TEXT",
+  TEXTAREA = "TEXTAREA",
+  NUMBER = "NUMBER",
+  SELECT = "SELECT",
+  RADIO = "RADIO",
+  CHECKBOX = "CHECKBOX",
+  DATE = "DATE",
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
 }
+
+export type SyncToUserField = "firstName" | "lastName" | "avatar" | "email";
+
+export interface IFormFieldOption {
+  label: string;
+  value: string;
+}
+
+export interface IFormFieldValidation {
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+}
+
+export interface IFormField {
+  id: number;
+  key: string;
+  label: string;
+  type: EFormFieldType;
+  placeholder: string | null;
+  required: boolean;
+  order: number;
+  options: IFormFieldOption[] | null;
+  validation: IFormFieldValidation | null;
+  syncToUserField?: SyncToUserField | null;
+}
+
+export interface IFormStep {
+  id: number;
+  title: string;
+  order: number;
+  icon: string | null;
+  fields: IFormField[];
+}
+
+export interface IFormSchema {
+  steps: IFormStep[];
+}
+
+export interface ICreateFormStepRequest {
+  title: string;
+  order?: number;
+  icon?: string;
+}
+
+export interface IUpdateFormStepRequest {
+  title?: string;
+  order?: number;
+  icon?: string;
+}
+
+export interface ICreateFormFieldRequest {
+  key: string;
+  label: string;
+  type: EFormFieldType;
+  placeholder?: string;
+  required?: boolean;
+  order?: number;
+  options?: IFormFieldOption[];
+  validation?: IFormFieldValidation;
+  syncToUserField?: SyncToUserField;
+}
+
+export type IUpdateFormFieldRequest = Partial<ICreateFormFieldRequest>;
+
+export type IFormSchemaRetrieveResponse = IRetriveResponse<IFormSchema>;
+export type IFormStepRetrieveResponse = IRetriveResponse<IFormStep>;
+export type IFormFieldRetrieveResponse = IRetriveResponse<IFormField>;
 
 export interface ICategoryItem {
   artistRequestsCount: number;
-  config: ICategoryConfig | null;
   createdAt: string | null;
   deletedAt: string | null;
   description: string | null;
   enName: string;
   faName: string;
   id: number;
+  image: string | null;
   isActive: boolean;
   updatedAt: string | null;
   priority: number | null;
@@ -194,8 +250,18 @@ export interface IUpdateCategoryRequest {
   faName: string;
   isActive: boolean;
   description: string;
-  config: ICategoryConfig;
   priority: number | null;
+  image?: string | null;
+}
+
+export interface ICreateCategoryRequest {
+  faName: string;
+  enName: string;
+  parentId?: number | null;
+  description?: string;
+  priority?: number | null;
+  isActive?: boolean;
+  image?: string | null;
 }
 
 export interface IFaqItem {
@@ -364,3 +430,33 @@ export interface ParamsTutorialList {
 
 export type ITutorialListResponse = IBasePaginateResponse<ITutorialItem>;
 export type ITutorialRetrieveResponse = IRetriveResponse<ITutorialItem>;
+
+export interface ISiteContentBenefitItem {
+  title: string;
+  desc: string;
+}
+
+export interface ISiteContentSupportItem {
+  title: string;
+  detail: string;
+  footerText: string;
+  buttonValue: string;
+}
+
+export interface ISiteContent {
+  id: number;
+  benefits: {
+    items: ISiteContentBenefitItem[];
+  };
+  support: {
+    title: string;
+    description: string;
+    items: ISiteContentSupportItem[];
+  };
+  terms: {
+    title: string;
+    content: string;
+  };
+}
+
+export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
