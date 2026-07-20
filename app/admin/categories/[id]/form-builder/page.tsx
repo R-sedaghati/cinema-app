@@ -226,7 +226,7 @@ function StepCard({
             value={step.icon ?? null}
             options={ICON_OPTIONS}
             optionCell={(option, isActive) => {
-              const Icon = ICON_COMPONENTS[option.value];
+              const Icon = ICON_COMPONENTS[option.value ?? ""];
               return (
                 <span className={`flex items-center ${isActive ? "text-primary-500" : ""}`}>
                   <Icon size={16} />
