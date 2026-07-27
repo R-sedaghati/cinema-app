@@ -1,19 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ESampleType } from "../services/landing/type";
-
-export type PortfolioType = "IMAGE" | "VIDEO";
-
-export interface Portfolio {
-  path: string;
-  type: PortfolioType;
-}
 
 interface ArtistRegistrationState {
   // Stepper
   step: number;
-
-  sampleType: ESampleType;
 
   // Edit mode — non-null means editing an existing request
   editId: number | null;
@@ -25,7 +15,6 @@ interface ArtistRegistrationState {
   // Form
   categoryId: number[];
   answers: Record<string, unknown>;
-  portfolios: Portfolio[];
 
   // Step Actions
   handleNext: () => void;
@@ -42,9 +31,6 @@ interface ArtistRegistrationState {
   setAnswer: (key: string, value: unknown) => void;
   setAnswers: (answers: Record<string, unknown>) => void;
 
-  addPortfolio: (portfolio: Portfolio) => void;
-  removePortfolio: (path: string) => void;
-
   reset: () => void;
 }
 
@@ -56,10 +42,8 @@ const initialState = {
   selectedCategoryTitle: "",
 
   categoryId: [],
-  sampleType: ESampleType.HAS_SAMPLE,
 
   answers: {} as Record<string, unknown>,
-  portfolios: [] as Portfolio[],
 };
 
 export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
@@ -104,16 +88,6 @@ export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
         })),
 
       setAnswers: (answers) => set({ answers }),
-
-      addPortfolio: (portfolio) =>
-        set((state) => ({
-          portfolios: [...state.portfolios, portfolio],
-        })),
-
-      removePortfolio: (path) =>
-        set((state) => ({
-          portfolios: state.portfolios.filter((item) => item.path !== path),
-        })),
 
       reset: () =>
         set({

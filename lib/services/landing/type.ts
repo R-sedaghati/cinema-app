@@ -113,18 +113,11 @@ export type PortfolioType = "IMAGE" | "VIDEO";
 export type UserCreateArtistRequest = {
   categoryIds: number[];
   answers: Record<string, unknown>;
-  sampleType: ESampleType;
-  portfolios?: { path: string; type: PortfolioType }[];
+  portfolios?: { path: string; type: PortfolioType; fieldKey?: string }[];
 };
 
 export type ArtistRequestResult = {
   artistRequestId: number;
   status: ArtistRequestStatus;
-  portfolios: { id: number; filePath: string; type: PortfolioType }[];
+  portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey?: string | null }[];
 };
-
-export enum ESampleType {
-  HAS_SAMPLE = "HAS_SAMPLE",
-  NO_SAMPLE = "NO_SAMPLE",
-  WANTS_RECORDING = "WANTS_RECORDING",
-}

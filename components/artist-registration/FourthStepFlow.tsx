@@ -9,7 +9,7 @@ import {
   useUpdateUserArtistRequest,
   useUserCreateArtistRequest,
 } from "@/lib/services/landing/hook";
-import { IFormStep } from "@/lib/services/admin/type";
+import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
@@ -32,11 +32,23 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
     useUpdateUserArtistRequest();
   const isPending = isCreating || isUpdating;
 
+  const portfolios = steps
+    .flatMap((step) => step.fields)
+    .filter((field) => field.type === EFormFieldType.IMAGE || field.type === EFormFieldType.VIDEO)
+    .flatMap((field) => {
+      const value = store.answers[field.key];
+      const paths = Array.isArray(value) ? value : value ? [value] : [];
+      return (paths as string[]).map((path) => ({
+        path,
+        type: field.type as "IMAGE" | "VIDEO",
+        fieldKey: field.key,
+      }));
+    });
+
   const formPayload = {
     categoryIds: store.categoryId,
     answers: store.answers,
-    portfolios: store.portfolios.length ? store.portfolios : undefined,
-    sampleType: store.sampleType,
+    portfolios: portfolios.length ? portfolios : undefined,
   };
 
   const handleSubmit = () => {

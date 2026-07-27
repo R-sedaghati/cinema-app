@@ -76,6 +76,8 @@ const HAS_OPTIONS = new Set([
   EFormFieldType.CHECKBOX,
 ]);
 
+const IMAGE_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
+
 function FieldRow({
   field,
   onChanged,
@@ -141,11 +143,20 @@ function FieldRow({
       )}
 
       <div className="flex justify-between items-center">
-        <Checkbox
-          label="اجباری"
-          checked={field.required}
-          onChange={(e) => patch({ required: e.target.checked })}
-        />
+        <div className="flex gap-4 items-center">
+          <Checkbox
+            label="اجباری"
+            checked={field.required}
+            onChange={(e) => patch({ required: e.target.checked })}
+          />
+          {IMAGE_TYPES.has(field.type) && (
+            <Checkbox
+              label="چند فایلی"
+              checked={Boolean(field.multiple)}
+              onChange={(e) => patch({ multiple: e.target.checked })}
+            />
+          )}
+        </div>
         <Button
           color="error"
           variant="text"
@@ -177,6 +188,20 @@ function StepCard({
   const { mutate: createField } = useAdminCreateFormField();
   const [newKey, setNewKey] = useState("");
   const [newLabel, setNewLabel] = useState("");
+  const [newType, setNewType] = useState<EFormFieldType>(EFormFieldType.TEXT);
+  const [newRequired, setNewRequired] = useState(false);
+  const [newMultiple, setNewMultiple] = useState(false);
+  const [newOptionsText, setNewOptionsText] = useState("");
+
+  const parseNewOptions = (): IFormFieldOption[] =>
+    newOptionsText
+      .split(",")
+      .map((chunk) => chunk.trim())
+      .filter(Boolean)
+      .map((chunk) => {
+        const [label, value] = chunk.split(":");
+        return { label: (label ?? "").trim(), value: (value ?? label ?? "").trim() };
+      });
 
   const handleAddField = () => {
     if (!newKey.trim() || !newLabel.trim()) {
@@ -190,7 +215,10 @@ function StepCard({
         payload: {
           key: newKey.trim(),
           label: newLabel.trim(),
-          type: EFormFieldType.TEXT,
+          type: newType,
+          required: newRequired,
+          options: HAS_OPTIONS.has(newType) ? parseNewOptions() : undefined,
+          multiple: IMAGE_TYPES.has(newType) ? newMultiple : undefined,
           order: step.fields.length,
         },
       },
@@ -198,6 +226,10 @@ function StepCard({
         onSuccess: () => {
           setNewKey("");
           setNewLabel("");
+          setNewType(EFormFieldType.TEXT);
+          setNewRequired(false);
+          setNewMultiple(false);
+          setNewOptionsText("");
           onChanged();
         },
         onError: (err: unknown) => {
@@ -266,12 +298,46 @@ function StepCard({
             ))}
         </div>
 
-        <div className="flex gap-2 items-end">
-          <Input labelContent="کلید فیلد جدید" value={newKey} onChange={(e) => setNewKey(e.target.value)} />
-          <Input labelContent="برچسب فیلد جدید" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} />
-          <Button leftIcon={<Plus size={16} />} onClick={handleAddField}>
-            افزودن فیلد
-          </Button>
+        <div className="flex flex-col gap-2">
+          <div className="grid md:grid-cols-4 gap-2 items-end">
+            <Input labelContent="کلید فیلد جدید" value={newKey} onChange={(e) => setNewKey(e.target.value)} />
+            <Input labelContent="برچسب فیلد جدید" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} />
+            <Select
+              inputProps={{ labelContent: "نوع فیلد" }}
+              value={newType}
+              options={FIELD_TYPE_OPTIONS}
+              onChange={(v) => v && setNewType(v as EFormFieldType)}
+              mode="single"
+            />
+            <div className="flex gap-2 items-center">
+              <Checkbox
+                label="اجباری"
+                checked={newRequired}
+                onChange={(e) => setNewRequired(e.target.checked)}
+              />
+              {IMAGE_TYPES.has(newType) && (
+                <Checkbox
+                  label="چند فایلی"
+                  checked={newMultiple}
+                  onChange={(e) => setNewMultiple(e.target.checked)}
+                />
+              )}
+            </div>
+          </div>
+
+          {HAS_OPTIONS.has(newType) && (
+            <Input
+              labelContent="گزینه‌ها (برچسب:مقدار، جدا با کاما)"
+              value={newOptionsText}
+              onChange={(e) => setNewOptionsText(e.target.value)}
+            />
+          )}
+
+          <div className="flex justify-end">
+            <Button leftIcon={<Plus size={16} />} onClick={handleAddField}>
+              افزودن فیلد
+            </Button>
+          </div>
         </div>
       </div>
     </Card>

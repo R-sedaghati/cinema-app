@@ -1,4 +1,3 @@
-import { ESampleType } from "../landing/type";
 
 export interface IRetriveResponse<T> {
   errors: string | null;
@@ -57,6 +56,7 @@ interface IArtistPortfolios {
   filePath: string;
   id: number;
   type: "IMAGE" | "VIDEO";
+  fieldKey: string | null;
   url: string | null;
 }
 
@@ -93,7 +93,6 @@ export interface IArtistItem {
   status: EArtistRequestStatus;
   user: IArtistUser;
   answers: Record<string, unknown>;
-  sampleType: ESampleType;
   [key: string]: unknown;
 }
 
@@ -135,6 +134,7 @@ export interface IFormField {
   options: IFormFieldOption[] | null;
   validation: IFormFieldValidation | null;
   syncToUserField?: SyncToUserField | null;
+  multiple?: boolean;
 }
 
 export interface IFormStep {
@@ -171,6 +171,7 @@ export interface ICreateFormFieldRequest {
   options?: IFormFieldOption[];
   validation?: IFormFieldValidation;
   syncToUserField?: SyncToUserField;
+  multiple?: boolean;
 }
 
 export type IUpdateFormFieldRequest = Partial<ICreateFormFieldRequest>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { artistCategories, type Gender } from "@/lib/mock/artists";
+import { type Gender } from "@/lib/mock/artists";
 import { ChevronDown, MoveLeft, Search, X } from "lucide-react";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import { Chip, Drawer, Input, Select as UiKitSelect } from "@dgshahr/ui-kit";
 import { chevronCn } from "@/lib/utils/chevronCn";
 import {
   useUserArtsitList,
+  useUserCategoryList,
   useUserProvinceList,
 } from "@/lib/services/landing/hook";
 import useDebounce from "@/lib/hooks/useDebounce";
@@ -36,11 +37,13 @@ export function ArtistsSearchClient() {
   });
 
   const { data: provinceData } = useUserProvinceList();
+  const { data: categoryData } = useUserCategoryList({ page: 1, count: 30 });
+  const categories = categoryData?.result ?? [];
 
   const results = data?.result ?? [];
   const rows = isMobile
-    ? mobileSplitPattern(artistCategories)
-    : splitPattern(artistCategories);
+    ? mobileSplitPattern(categories)
+    : splitPattern(categories);
 
   return (
     <div className="space-y-12 relative">
@@ -77,12 +80,10 @@ export function ArtistsSearchClient() {
                 mode="multiple"
                 searchable={false}
                 onChange={(value) => setFilters({ categoryId__in: value })}
-                options={
-                  artistCategories?.map((item) => ({
-                    label: item.title,
-                    value: item.id,
-                  })) ?? []
-                }
+                options={categories.map((item) => ({
+                  label: item.faName,
+                  value: item.id,
+                }))}
                 customInput={(isOpen) => (
                   <Chip
                     label="دسته‌بندی"
@@ -165,10 +166,10 @@ export function ArtistsSearchClient() {
               containerClassName="p-5"
             >
               <div className="flex flex-wrap gap-2 mt-4">
-                {artistCategories.map((item) => (
+                {categories.map((item) => (
                   <Chip
                     key={item.id}
-                    label={item.title}
+                    label={item.faName}
                     filled={filters.categoryId__in.includes(item.id)}
                     onClick={() => {
                       const next = filters.categoryId__in.includes(item.id)
@@ -235,21 +236,21 @@ export function ArtistsSearchClient() {
             <div key={rowIndex} className="flex flex-wrap justify-center gap-4">
               {row.map((item) => (
                 <button
-                  key={item.title}
+                  key={item.id}
                   onClick={() => {
                     setFilters({ categoryId__in: [item.id] });
                   }}
                   className="md:w-60 overflow-hidden w-36 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
                 >
                   <p className="text-nowrap text-sm md:text-base z-1">
-                    {item.title}
+                    {item.faName}
                   </p>
                   <MoveLeft className="text-error-500 z-1" />
                   <Image
-                    src={item.image}
+                    src={item.image ?? "/cat-1.svg"}
                     width={90}
                     height={90}
-                    alt={item.title}
+                    alt={item.faName}
                     className="absolute md:relative left-3 md:left-0 bottom-0 z-0 w-12.5 h-12.5 md:w-auto md:h-auto"
                   />
                 </button>

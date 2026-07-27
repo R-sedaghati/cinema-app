@@ -15,7 +15,6 @@ import { useUserBannerList } from "@/lib/services/landing/hook";
 import { TutorialSection } from "@/components/home/TutorialSection";
 import { MainTutorialVideo } from "@/components/home/MainTutorialVideo";
 import { IArtistItem } from "@/lib/services/admin/type";
-import { artistCategories } from "@/lib/mock/artists";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { useArtistFilterStore } from "@/lib/stores/useArtistFilter";
 
@@ -194,28 +193,28 @@ export default function ApplicationPage() {
               <h2 className="text-sm md:text-lg font-semibold text-zinc-100">
                 ثبت‌نام هنرمند
               </h2>
-              <Link href="/artist-registration" className="text-xs md:text-sm text-error-500">
+              <Link href="/profile" className="text-xs md:text-sm text-error-500">
                 شروع
               </Link>
             </div>
             <div className="overflow-x-auto scrollbar-hidden">
               <div className="flex gap-3 md:gap-4 w-max px-4 pb-1">
-                {artistCategories.map((cat) => (
+                {categories.map((cat) => (
                   <button
                     key={cat.id}
-                    onClick={() => handleCategoryShortcut(cat.id, cat.title)}
+                    onClick={() => handleCategoryShortcut(cat.id, cat.faName)}
                     className="relative overflow-hidden w-40 h-52 md:w-56 md:h-72 shrink-0 rounded-2xl group active:scale-[.98] transition-transform"
                   >
                     <Image
-                      src={cat.image}
-                      alt={cat.title}
+                      src={cat.image ?? "/cat-1.svg"}
+                      alt={cat.faName}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-right">
                       <p className="text-sm md:text-lg font-semibold text-white leading-tight">
-                        {cat.title}
+                        {cat.faName}
                       </p>
                       <span className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
                         شروع

@@ -10,9 +10,8 @@ import {
   LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { SelectedCategory } from "@/app/(main)/artist-registration/page";
+import { SelectedCategory } from "@/app/(main)/artist-registration/ArtistRegistrationPageContent";
 import FirstStepFlow from "./FIrstStepFlow";
-import ThirdStepFlow from "./ThirdStepFlow";
 import FourthStepFlow from "./FourthStepFlow";
 import DynamicFormStep from "./DynamicFormStep";
 import { isDesktop, isMobile } from "react-device-detect";
@@ -65,7 +64,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   }, [data, hasChildren, flowStep]);
 
   const stepperActiveStep = hasChildren ? flowStep : flowStep - 1;
-  const totalFixedTailSteps = 2; // portfolio/sample step + review step
+  const totalFixedTailSteps = 1; // payment step
 
   if (isLoading || isSchemaLoading) {
     return (
@@ -94,10 +93,6 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     }
 
     if (contentIndex === steps.length) {
-      return <ThirdStepFlow onNext={onNext} onPrevious={onPrevious} />;
-    }
-
-    if (contentIndex === steps.length + 1) {
       return (
         <FourthStepFlow steps={steps} onNext={onNext} onPrevious={onPrevious} />
       );
@@ -143,12 +138,6 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
               />
             );
           })}
-          <HorizontalStep
-            activeIcon={<List />}
-            icon={<List />}
-            subTitle={`مرحله ${steps.length + 1 + (hasChildren ? 1 : 0)} از ${totalSteps}`}
-            title="سوابق کاری و پروژه‌ها"
-          />
           <HorizontalStep
             activeIcon={<CreditCard />}
             icon={<CreditCard />}

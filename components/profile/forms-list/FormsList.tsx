@@ -34,7 +34,7 @@ export default function FormsList() {
 
   const handleView = (item: IArtistItem) => {
     if (item.status === EArtistRequestStatus.NEED_TO_REVISION) {
-      router.push(`/artist-registration?editId=${item.id}`);
+      router.push(`/artist-registration/${item.id}`);
     } else {
       router.push(`/artists/${item.id}`);
     }

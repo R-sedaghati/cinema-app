@@ -6,10 +6,9 @@ import { WorksSlider } from "@/components/media/WorksSlider";
 import {
   useAdminArtistRetrieve,
   useAdminArtistStatusUpdate,
+  useAdminFormSchema,
 } from "@/lib/services/admin/hook";
-import { EArtistRequestStatus, EFormFieldType } from "@/lib/services/admin/type";
-import { ESampleType } from "@/lib/services/landing/type";
-import { useUserCategoryFormSchema } from "@/lib/services/landing/hook";
+import { EArtistRequestStatus, EFormFieldType, IFormField } from "@/lib/services/admin/type";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import {
   Badge,
@@ -18,12 +17,20 @@ import {
   Divider,
   FileUploader,
   Input,
-  RadioButton,
 } from "@dgshahr/ui-kit";
-import { Asterisk, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+
+const resolveOptionLabels = (field: IFormField, value: unknown): string => {
+  const values = Array.isArray(value) ? value : value !== undefined && value !== null ? [value] : [];
+  const options = field.options ?? [];
+
+  return values
+    .map((v) => options.find((o) => o.value === String(v))?.label ?? String(v))
+    .join("، ");
+};
 
 function ArtistDetail() {
   const router = useRouter();
@@ -33,21 +40,25 @@ function ArtistDetail() {
   const { data: artistDetail } = useAdminArtistRetrieve(id);
   const data = artistDetail?.result;
 
-  const { data: schemaData } = useUserCategoryFormSchema(data?.categories?.[0]?.id);
+  const { data: schemaData } = useAdminFormSchema(data?.categories?.[0]?.id);
   const steps = [...(schemaData?.result?.steps ?? [])].sort((a, b) => a.order - b.order);
 
   const { mutate, isPending } = useAdminArtistStatusUpdate(id);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const photoWorks =
+  const portfoliosFor = (fieldKey: string) =>
+    data?.portfolios.filter((p) => p.fieldKey === fieldKey) ?? [];
+
+  // Legacy portfolios saved before fieldKey existed — shown ungrouped.
+  const legacyPhotoWorks =
     data?.portfolios
-      .filter((p) => p.type === "IMAGE")
+      .filter((p) => p.type === "IMAGE" && !p.fieldKey)
       .map((p) => ({ id: String(p.id), url: p.url })) ?? [];
 
-  const videoWorks =
+  const legacyVideoWorks =
     data?.portfolios
-      .filter((p) => p.type === "VIDEO")
+      .filter((p) => p.type === "VIDEO" && !p.fieldKey)
       .map((p) => ({ id: String(p.id), url: p.url })) ?? [];
 
   return (
@@ -162,14 +173,21 @@ function ArtistDetail() {
                   .filter((field) => field.type !== EFormFieldType.IMAGE && field.type !== EFormFieldType.VIDEO)
                   .map((field) => {
                     const value = data?.answers?.[field.key];
-                    const display = Array.isArray(value) ? value.join("، ") : (value as string | number | undefined);
+                    const display =
+                      field.type === EFormFieldType.SELECT ||
+                      field.type === EFormFieldType.RADIO ||
+                      field.type === EFormFieldType.CHECKBOX
+                        ? resolveOptionLabels(field, value)
+                        : Array.isArray(value)
+                          ? value.join("، ")
+                          : ((value as string | number | undefined) ?? "");
 
                     return (
                       <Input
                         key={field.id}
                         placeholder={field.label}
                         labelContent={field.label}
-                        value={display ?? ""}
+                        value={display}
                       />
                     );
                   }),
@@ -205,56 +223,51 @@ function ArtistDetail() {
             <p className="font-h3-bold text-error-500">اطلاعات کاری</p>
             <Divider color="gray" size="thin" type="horizontal" />
             <div className="flex gap-5">
-              <Input
-                wrapperClassName="w-1/3"
-                labelContent="زمینه فعالیت"
-                placeholder="زمینه فعالیت"
-                value={data?.categories?.at(0)?.faName}
-              />
-              <Input
-                wrapperClassName="w-1/3"
-                labelContent="زمینه فعالیت (دسته بندی دوم):"
-                placeholder="زمینه فعالیت (دسته بندی دوم)"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex gap-1">
-                <p className="font-p2-medium">نمونه کار</p>
-                <Asterisk size={12} className="text-error-500" />
-              </div>
-              <div className="flex gap-5">
-                <RadioButton
-                  label="دارم"
-                  name="sample"
-                  checked={data?.sampleType === ESampleType.HAS_SAMPLE}
+              {(data?.categories ?? []).map((category) => (
+                <Input
+                  key={category.id}
+                  wrapperClassName="w-1/3"
+                  labelContent="زمینه فعالیت"
+                  placeholder="زمینه فعالیت"
+                  value={category.faName}
                 />
+              ))}
+            </div>
 
-                <RadioButton
-                  label="ندارم"
-                  name="sample"
-                  checked={data?.sampleType === ESampleType.NO_SAMPLE}
-                />
+            {steps.map((step) =>
+              [...step.fields]
+                .sort((a, b) => a.order - b.order)
+                .filter((field) => field.type === EFormFieldType.IMAGE || field.type === EFormFieldType.VIDEO)
+                .map((field) => (
+                  <div key={field.id} className="flex flex-col gap-4">
+                    <p className="font-h5-bold">{field.label}</p>
+                    <WorksSlider
+                      title=""
+                      items={portfoliosFor(field.key).map((p) => ({ id: String(p.id), url: p.url }))}
+                      variant={field.type === EFormFieldType.IMAGE ? "photo" : "video"}
+                      className={field.type === EFormFieldType.IMAGE ? "w-1/4" : undefined}
+                    />
+                  </div>
+                )),
+            )}
 
-                <RadioButton
-                  label="تمایل به ضبط نمونه کار دارم"
-                  name="sample"
-                  checked={data?.sampleType === ESampleType.WANTS_RECORDING}
-                />
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <p className="font-h5-bold">نمونه کارهای تصویری</p>
-              <WorksSlider
-                title=""
-                items={photoWorks}
-                variant="photo"
-                className="w-1/4"
-              />
-            </div>
-            <div className="flex flex-col gap-4">
-              <p className="font-h5-bold">نمونه کارهای ویدئویی</p>
-              <WorksSlider title="" items={videoWorks} variant="video" />
-            </div>
+            {(legacyPhotoWorks.length > 0 || legacyVideoWorks.length > 0) && (
+              <>
+                <div className="flex flex-col gap-4">
+                  <p className="font-h5-bold">همه نمونه‌کارهای تصویری</p>
+                  <WorksSlider
+                    title=""
+                    items={legacyPhotoWorks}
+                    variant="photo"
+                    className="w-1/4"
+                  />
+                </div>
+                <div className="flex flex-col gap-4">
+                  <p className="font-h5-bold">همه نمونه‌کارهای ویدئویی</p>
+                  <WorksSlider title="" items={legacyVideoWorks} variant="video" />
+                </div>
+              </>
+            )}
           </div>
         </Card>
       </div>
