@@ -16,7 +16,6 @@ import { TutorialSection } from "@/components/home/TutorialSection";
 import { MainTutorialVideo } from "@/components/home/MainTutorialVideo";
 import { IArtistItem } from "@/lib/services/admin/type";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
-import { useArtistFilterStore } from "@/lib/stores/useArtistFilter";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 
@@ -30,8 +29,6 @@ export default function ApplicationPage() {
   const router = useRouter();
   const { setSelectedCategory, setStep, reset, setField } =
     useArtistRegistrationStore();
-  const { setFilters: setArtistFilters, reset: resetArtistFilters } =
-    useArtistFilterStore();
   const [search, setSearch] = useState("");
   const { isLoggedIn } = useAuthStore();
   const { open } = useLoginDrawerStore();
@@ -110,10 +107,6 @@ export default function ApplicationPage() {
                       </h2>
                       <Link
                         href={slide.ctaLink}
-                        onClick={() => {
-                          if (slide.ctaLink === "/artists")
-                            resetArtistFilters();
-                        }}
                         className="inline-flex items-center gap-1.5 rounded-full bg-error-500 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold text-zinc-950"
                       >
                         {slide.ctaLabel}
@@ -174,10 +167,7 @@ export default function ApplicationPage() {
           <div className="overflow-x-auto md:overflow-visible scrollbar-hidden pb-1">
             <div className="flex gap-2 w-max md:w-auto md:flex-wrap">
               <button
-                onClick={() => {
-                  resetArtistFilters();
-                  router.push("/artists");
-                }}
+                onClick={() => router.push("/artists")}
                 className="rounded-full px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
               >
                 همه
@@ -256,7 +246,6 @@ export default function ApplicationPage() {
               </h2>
               <Link
                 href="/artists"
-                onClick={() => resetArtistFilters()}
                 className="text-xs md:text-sm text-error-500"
               >
                 همه
