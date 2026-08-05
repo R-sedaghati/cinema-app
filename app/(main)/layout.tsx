@@ -24,6 +24,10 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1 md:mt-10 pb-safe-24 lg:pb-8 overflow-hidden">{children}</main>
         <div className="hidden lg:block"><SiteFooter /></div>
+        {/* ponytail: mobile has no footer, only the copyright line matters there */}
+        <p className="lg:hidden px-4 pt-6 pb-safe-28 text-center text-xs text-zinc-500">
+          تمامی حقوق این سایت محفوظ و متعلق به سایت آرشیو هنر می‌باشد.
+        </p>
         <MobileBottomNav />
         <LoginDrawer />
         <ProfileCompletionChecker />

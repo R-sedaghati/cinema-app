@@ -178,3 +178,9 @@ img {
 @utility bottom-safe-6 {
   bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
 }
+
+/* ponytail: ui-kit Drawer center mode never shrinks its body (flex min-height:auto),
+   so long forms overflow the clipped mask instead of scrolling. */
+.dgsuikit\:overflow-y-auto {
+  min-height: 0;
+}

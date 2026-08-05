@@ -79,6 +79,48 @@ export interface IUserCategoryResponse {
 
 export type IFormSchemaResponse = IRetriveResponse<{ steps: IFormStep[] }>;
 
+/**
+ * Filters are derived per category from its form schema, so the client never hardcodes
+ * field names — `param` / `paramMin` / `paramMax` are the exact query keys to send to
+ * `GET /artists-requests`.
+ */
+export interface IArtistFilterOption {
+  label: string;
+  value: string;
+  count: number;
+}
+
+export type IArtistFilterDescriptor =
+  | {
+      key: string;
+      label: string;
+      kind: "select";
+      param: string;
+      options: IArtistFilterOption[];
+    }
+  | {
+      key: string;
+      label: string;
+      kind: "range";
+      paramMin: string;
+      paramMax: string;
+      min: number;
+      max: number;
+    };
+
+export type IArtistFiltersResponse = IRetriveResponse<IArtistFilterDescriptor[]>;
+
+/**
+ * Public artist search params. Dynamic `answers.*` keys come from filter descriptors,
+ * hence the index signature.
+ */
+export type ParamsPublicArtistList = {
+  page?: number;
+  count?: number;
+  search?: string;
+  category__in?: number[];
+} & Record<string, string | number | string[] | number[] | undefined>;
+
 export type IUserArtistListResponse = IBasePaginateResponse<IArtistItem>;
 export type IUserSupportListResponse = IBasePaginateResponse<ISupportItem>;
 export type IUserCategoryListResponse =
@@ -121,3 +163,45 @@ export type ArtistRequestResult = {
   status: ArtistRequestStatus;
   portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey?: string | null }[];
 };
+
+/** Contact details are paid content — served only after a COMPLETED contact request. */
+export interface IArtistContact {
+  firstName: string | null;
+  lastName: string | null;
+  phoneNumber: string | null;
+  email: string | null;
+  address: string | null;
+  postalCode: string | null;
+}
+
+export type IArtistContactResponse = IRetriveResponse<IArtistContact>;
+
+export type ContactRequestStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELED";
+
+export interface IContactRequestItem {
+  id: number;
+  trackingCode: string;
+  status: ContactRequestStatus;
+  amount: number;
+  createdAt: string | null;
+  artist: {
+    id: number;
+    code: string | null;
+    avatar: string | null;
+    categories: { id: number; faName: string }[];
+  };
+  // The ui-kit Table constrains rows to an indexable record.
+  [key: string]: unknown;
+}
+
+export type IContactRequestListResponse = IBasePaginateResponse<IContactRequestItem>;
+
+export type ICreateContactRequestResponse = IRetriveResponse<{
+  id: number;
+  trackingCode: string;
+  status: ContactRequestStatus;
+  /** Null when the artist was already unlocked, so there is nothing to pay. */
+  redirectUrl: string | null;
+}>;
+
+export type IContactPriceResponse = IRetriveResponse<{ amount: number }>;

@@ -193,6 +193,8 @@ export interface ICategoryItem {
   updatedAt: string | null;
   priority: number | null;
   parent: number | null;
+  /** Price in Toman a viewer pays to unlock contact details in this category. */
+  contactAmount: number | null;
   [key: string]: unknown;
 }
 
@@ -253,6 +255,8 @@ export interface IUpdateCategoryRequest {
   description: string;
   priority: number | null;
   image?: string | null;
+  /** Price in Toman a viewer pays to unlock contact details in this category. */
+  contactAmount?: number | null;
 }
 
 export interface ICreateCategoryRequest {
@@ -263,6 +267,7 @@ export interface ICreateCategoryRequest {
   priority?: number | null;
   isActive?: boolean;
   image?: string | null;
+  contactAmount?: number | null;
 }
 
 export interface IFaqItem {

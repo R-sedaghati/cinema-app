@@ -72,20 +72,14 @@ export default function ApplicationPage() {
     [categoryData],
   );
 
-  const filtered = useMemo(() => {
-    let result = artists;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (a) =>
-          `${a.user.firstName ?? ""} ${a.user.lastName ?? ""}`
-            .toLowerCase()
-            .includes(q) ||
-          a.categories?.some((c) => c.faName.includes(search)),
-      );
-    }
-    return result;
-  }, [artists, search]);
+  // Preview list only — real searching happens on /artists, which filters server-side.
+  const filtered = useMemo(
+    () =>
+      search.trim()
+        ? artists.filter((a) => a.categories?.some((c) => c.faName.includes(search)))
+        : artists,
+    [artists, search],
+  );
 
   return (
     <div className="min-h-screen pb-safe-32">
@@ -164,6 +158,11 @@ export default function ApplicationPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && search.trim()) {
+                  router.push(`/artists?search=${encodeURIComponent(search.trim())}`);
+                }
+              }}
               placeholder="جستجوی هنرمندان، دسته‌بندی‌ها..."
               className="w-full rounded-2xl py-3.5 md:py-4 pr-10 pl-4 text-sm md:text-base outline-none focus:ring-1 focus:ring-error-500/60 border border-zinc-700/40 bg-zinc-900/60"
             />
@@ -186,11 +185,7 @@ export default function ApplicationPage() {
               {categories.map((cat) => (
                 <button
                   key={cat.id}
-                  onClick={() => {
-                    resetArtistFilters();
-                    setArtistFilters({ categoryId__in: [cat.id] });
-                    router.push("/artists");
-                  }}
+                  onClick={() => router.push(`/artists?category=${cat.id}`)}
                   className="flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
                 >
                   <span>{cat.faName}</span>
@@ -220,7 +215,7 @@ export default function ApplicationPage() {
               </Link>
             </div>
             <div className="overflow-x-auto scrollbar-hidden">
-              <div className="flex gap-3 md:gap-4 w-max px-4 pb-1">
+              <div className="flex gap-3 md:gap-4 w-max px-4 md:px-8 pb-1">
                 {categories.map((cat) => (
                   <button
                     key={cat.id}

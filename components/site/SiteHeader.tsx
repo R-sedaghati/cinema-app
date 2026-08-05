@@ -6,6 +6,7 @@ import {
   HelpCircle,
   Info,
   Menu,
+  PenLine,
   UserRound,
   X,
 } from "lucide-react";
@@ -21,12 +22,14 @@ import { isMobile } from "react-device-detect";
 const navItems = [
   { href: "/", label: "خانه" },
   { href: "/artists", label: "جستجوی هنرمندان" },
+  { href: "/artist-registration", label: "فرم‌های درخواست" },
   { href: "/support", label: "پشتیبانی" },
   { href: "/faq", label: "سوالات متداول" },
   { href: "/about", label: "درباره ما" },
 ];
 
 const sidebarItems = [
+  { href: "/artist-registration", label: "فرم‌های درخواست", icon: PenLine },
   { href: "/about", label: "درباره ما", icon: Info },
   { href: "/faq", label: "سوالات متداول", icon: HelpCircle },
   { href: "/support", label: "پشتیبانی", icon: Headphones },

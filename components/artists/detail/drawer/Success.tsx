@@ -1,9 +1,10 @@
 import Button from "@/components/common/Button";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
-const Success = () => {
+const Success = ({ trackingCode }: { trackingCode: string | null }) => {
   return (
     <div className="w-full max-w-xl text-center space-y-6">
       {/* Success Icon */}
@@ -29,20 +30,20 @@ const Success = () => {
       </p>
 
       {/* Tracking Code */}
-      <div className="text-zinc-400 text-sm">
-        شماره پیگیری:
-        <span className="text-zinc-100 font-semibold mr-2">۱۲۳۴۶۵۹۸</span>
-      </div>
+      {trackingCode && (
+        <div className="text-zinc-400 text-sm">
+          شماره پیگیری:
+          <span className="text-zinc-100 font-semibold mr-2">{trackingCode}</span>
+        </div>
+      )}
 
       {/* CTA Button */}
       <div>
-        <Button
-          isFullWidth
-          className="rounded-full!"
-          leftIcon={<ChevronLeft />}
-        >
-          رفتن به پروفایل
-        </Button>
+        <Link href="/profile">
+          <Button isFullWidth className="rounded-full!" leftIcon={<ChevronLeft />}>
+            رفتن به پروفایل
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo } from "react";
 import { Card } from "@dgshahr/ui-kit";
-import { MoveLeft, Loader2 } from "lucide-react";
+import { MoveLeft, MoveRight, Loader2 } from "lucide-react";
+import Link from "next/link";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
@@ -109,6 +110,16 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
   return (
     <div className='mt-4'>
+      <div className={clsx("mx-auto mb-3 w-[90%]", isDesktop && "w-4/5")}>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
+        >
+          <MoveRight size={18} />
+          بازگشت به صفحه اصلی
+        </Link>
+      </div>
+
       {step === 0 && !editId && (
         <Card
           wrapperClassName={clsx(

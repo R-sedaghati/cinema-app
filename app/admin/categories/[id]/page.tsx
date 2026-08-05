@@ -35,6 +35,7 @@ function CategoryDetail() {
   const [isActive, setIsActive] = useState(false);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
+  const [contactAmount, setContactAmount] = useState<string>("");
 
   const uploadImage = useAdminUploadBannerImage();
 
@@ -47,6 +48,7 @@ function CategoryDetail() {
     setPriority(data.priority);
     setImagePath(data.image ?? "");
     setImageFile(data.image ? { src: data.image } : null);
+    setContactAmount(data.contactAmount ? String(data.contactAmount) : "");
   }, [data]);
 
   const handleImageChange = (file: File | undefined) => {
@@ -81,6 +83,7 @@ function CategoryDetail() {
           description,
           priority,
           image: imagePath || null,
+          contactAmount: contactAmount ? Number(contactAmount) : null,
         },
       },
       {
@@ -211,6 +214,10 @@ function CategoryDetail() {
                 labelContent="مبلغ پرداختی کاربر"
                 placeholder="مبلغ پرداختی کاربر"
                 postfix="تومان"
+                type="number"
+                value={contactAmount}
+                onChange={(e) => setContactAmount(e.target.value)}
+                hintMessage="مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند."
                 wrapperClassName="w-1/3"
               />
             </div>
