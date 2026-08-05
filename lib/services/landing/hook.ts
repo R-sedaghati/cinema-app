@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import {
   IAboutUsResponse,
   IArtistRetriveResponse,
@@ -11,14 +11,19 @@ import {
   ITutorialListResponse,
   LoginResponse,
   ParamsArtistList,
-  ParamsCategoryList,
 } from "../admin/type";
 import { AxiosError } from "axios";
 import {
   ArtistRequestResult,
   ICityListResponse,
+  IArtistContactResponse,
+  IArtistFiltersResponse,
+  IContactPriceResponse,
+  IContactRequestListResponse,
+  ICreateContactRequestResponse,
   IFormSchemaResponse,
   IPagination,
+  ParamsPublicArtistList,
   IUserArtistListResponse,
   IUserCategoryListResponse,
   IUserProfile,
@@ -51,6 +56,11 @@ import {
   userUploadImage,
   userUploadVideo,
   userGetCategoryFormSchema,
+  userCategoryFilters,
+  userContactPrice,
+  userCreateContactRequest,
+  userArtistContact,
+  userContactRequests,
 } from "./api";
 import useAuthStore from "@/lib/stores/useAuthStore";
 
@@ -60,7 +70,7 @@ export const useUserLogin = () =>
   });
 
 export const useUserArtsitList = (
-  params?: Partial<ParamsCategoryList> | undefined,
+  params?: ParamsPublicArtistList | undefined,
 ) => {
   return useQuery<IUserArtistListResponse>({
     queryKey: ["userArtsitList", params],
@@ -70,6 +80,32 @@ export const useUserArtsitList = (
     refetchOnWindowFocus: false,
   });
 };
+
+/** Paginated variant backing the "نمایش بیشتر" button on the artist search page. */
+export const useUserArtistListInfinite = (
+  params?: ParamsPublicArtistList | undefined,
+  pageSize = 12,
+) => {
+  return useInfiniteQuery<IUserArtistListResponse>({
+    queryKey: ["userArtistListInfinite", params, pageSize],
+    queryFn: ({ pageParam }) =>
+      userArtsitList({ ...params, page: pageParam as number, count: pageSize }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.next ? allPages.length + 1 : undefined,
+    // Filter changes shouldn't blank the grid while the new page loads.
+    placeholderData: (previous) => previous,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserCategoryFilters = (categoryId?: number | null) =>
+  useQuery<IArtistFiltersResponse>({
+    queryKey: ["userCategoryFilters", categoryId],
+    queryFn: () => userCategoryFilters(categoryId!),
+    enabled: !!categoryId,
+    refetchOnWindowFocus: false,
+  });
 
 export const useUserProvinceList = (
   params?: Partial<ParamsArtistList> | undefined,
@@ -255,3 +291,46 @@ export const useUpdateUserArtistRequest = () => {
       updateUserArtistRequest(id, payload, accessToken),
   });
 };
+
+export const useUserContactPrice = (artistId?: number | null) =>
+  useQuery<IContactPriceResponse>({
+    queryKey: ["userContactPrice", artistId],
+    queryFn: () => userContactPrice(artistId!),
+    enabled: Boolean(artistId),
+    refetchOnWindowFocus: false,
+  });
+
+export const useUserContactRequests = (params: IPagination) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IContactRequestListResponse>({
+    queryKey: ["userContactRequests", params],
+    queryFn: () => userContactRequests(params),
+    enabled: Boolean(accessToken),
+    refetchOnWindowFocus: false,
+  });
+};
+
+/**
+ * Only enable once the caller knows the artist is unlocked — the endpoint answers 403
+ * otherwise, which the axios interceptor would surface as an error toast.
+ */
+export const useUserArtistContact = (artistId?: number | null, enabled = false) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IArtistContactResponse>({
+    queryKey: ["userArtistContact", artistId],
+    queryFn: () => userArtistContact(artistId!),
+    enabled: Boolean(accessToken) && Boolean(artistId) && enabled,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserCreateContactRequest = () =>
+  useMutation<
+    ICreateContactRequestResponse,
+    AxiosError,
+    { artistId: number; requesterName: string }
+  >({
+    mutationFn: userCreateContactRequest,
+  });

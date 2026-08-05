@@ -10,14 +10,19 @@ import {
   ITutorialListResponse,
   LoginResponse,
   ParamsArtistList,
-  ParamsCategoryList,
 } from "../admin/type";
 import landingApi from "../landingAxiosInstance";
 import {
   ArtistRequestResult,
   ICityListResponse,
+  IArtistContactResponse,
+  IArtistFiltersResponse,
+  IContactPriceResponse,
+  IContactRequestListResponse,
+  ICreateContactRequestResponse,
   IFormSchemaResponse,
   IPagination,
+  ParamsPublicArtistList,
   IUserArtistListResponse,
   IUserCategoryListResponse,
   IUserProfile,
@@ -39,7 +44,7 @@ export const userLogin = async (
 };
 
 export const userArtsitList = async (
-  params: Partial<ParamsCategoryList> | undefined,
+  params: ParamsPublicArtistList | undefined,
 ) => {
   const { data } = await landingApi.get<IUserArtistListResponse>(
     "/artists-requests",
@@ -203,6 +208,13 @@ export const userGetCategoryFormSchema = async (categoryId: number) => {
   return data;
 };
 
+export const userCategoryFilters = async (categoryId: number) => {
+  const { data } = await landingApi.get<IArtistFiltersResponse>(
+    `/categories/${categoryId}/filters/`,
+  );
+  return data;
+};
+
 export const userCreateArtistRequest = async (
   payload: UserCreateArtistRequest,
 ) => {
@@ -229,6 +241,42 @@ export const updateUserArtistRequest = async (
     `/user/artist-requests/${id}/`,
     payload,
     { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const userContactPrice = async (artistId: number) => {
+  const { data } = await landingApi.get<IContactPriceResponse>(
+    `/artists-requests/${artistId}/contact-price/`,
+  );
+  return data;
+};
+
+export const userCreateContactRequest = async ({
+  artistId,
+  requesterName,
+}: {
+  artistId: number;
+  requesterName: string;
+}) => {
+  const { data } = await landingApi.post<ICreateContactRequestResponse>(
+    `/user/artists-requests/${artistId}/contact-requests/`,
+    { requesterName },
+  );
+  return data;
+};
+
+export const userArtistContact = async (artistId: number) => {
+  const { data } = await landingApi.get<IArtistContactResponse>(
+    `/user/artists-requests/${artistId}/contact/`,
+  );
+  return data;
+};
+
+export const userContactRequests = async (params: IPagination) => {
+  const { data } = await landingApi.get<IContactRequestListResponse>(
+    "/user/contact-requests/",
+    { params: { ...params } },
   );
   return data;
 };

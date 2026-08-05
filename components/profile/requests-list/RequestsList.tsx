@@ -5,9 +5,8 @@ import { Table } from "@dgshahr/ui-kit";
 import { columns } from "./Columns";
 import { useState } from "react";
 import { IPagination } from "@/lib/services/landing/type";
-import { useUserSupport } from "@/lib/services/landing/hook";
+import { useUserContactRequests } from "@/lib/services/landing/hook";
 import { hasValidParams } from "@/lib/utils/hasValidParams";
-import Header from "@/components/admin/users/Header";
 import TableEmptyState from "@/components/common/TableEmptyState";
 import { tableEmptyMessage } from "@/lib/mock/messages";
 
@@ -22,7 +21,7 @@ export default function RequestsList() {
     count: pagination.count,
   };
 
-  const { data, isPending } = useUserSupport(finalParams);
+  const { data, isPending } = useUserContactRequests(finalParams);
 
   const isValidParams = hasValidParams(finalParams);
 

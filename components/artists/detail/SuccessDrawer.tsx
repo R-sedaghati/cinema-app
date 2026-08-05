@@ -6,9 +6,11 @@ import Success from "./drawer/Success";
 const SuccessDrawer = ({
   open,
   setOpen,
+  trackingCode,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
+  trackingCode: string | null;
 }) => {
   return (
     <Drawer
@@ -21,7 +23,7 @@ const SuccessDrawer = ({
       onClose={() => setOpen(false)}
       containerClassName="min-h-96"
     >
-      <Success />
+      <Success trackingCode={trackingCode} />
     </Drawer>
   );
 };

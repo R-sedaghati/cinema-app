@@ -78,6 +78,10 @@ export function SiteFooter() {
             <div className="h-24 w-24 rounded-xl bg-zinc-800" />
           </div>
         </div>
+
+        <p className="border-t border-zinc-800 pt-6 text-center text-xs text-zinc-500">
+          تمامی حقوق این سایت محفوظ و متعلق به سایت آرشیو هنر می‌باشد.
+        </p>
       </div>
     </footer>
   );

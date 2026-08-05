@@ -6,11 +6,11 @@ import CallDetail from "./drawer/CallDetail";
 const CallDetailDrawer = ({
   open,
   setOpen,
-  setOpenSuccess,
+  artistId,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
-  setOpenSuccess: (open: boolean) => void;
+  artistId: number;
 }) => {
   return (
     <Drawer
@@ -23,7 +23,7 @@ const CallDetailDrawer = ({
       onClose={() => setOpen(false)}
       containerClassName="min-h-96"
     >
-      <CallDetail setOpenSuccess={setOpenSuccess} setOpen={setOpen} />
+      <CallDetail artistId={artistId} setOpen={setOpen} />
     </Drawer>
   );
 };
