@@ -11,7 +11,9 @@ type ErrorResponse = {
 };
 
 const landingApi = axios.create({
-  baseURL: "http://api.archivehonar.ir/api",
+  // https, not http: the CDN answers http with a 301 that carries no CORS headers, so
+  // every XHR from a plain-http origin (dev on localhost) is blocked before it lands.
+  baseURL: "https://api.archivehonar.ir/api",
   paramsSerializer: {
     serialize: (params) =>
       qs.stringify(params, {

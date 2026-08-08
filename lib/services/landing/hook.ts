@@ -85,8 +85,10 @@ export const useUserArtsitList = (
 export const useUserArtistListInfinite = (
   params?: ParamsPublicArtistList | undefined,
   pageSize = 12,
+  enabled = true,
 ) => {
   return useInfiniteQuery<IUserArtistListResponse>({
+    enabled,
     queryKey: ["userArtistListInfinite", params, pageSize],
     queryFn: ({ pageParam }) =>
       userArtsitList({ ...params, page: pageParam as number, count: pageSize }),
