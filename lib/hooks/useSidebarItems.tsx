@@ -10,6 +10,7 @@ import {
   GalleryHorizontal,
   Video,
   Plus,
+  BookOpen,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -91,6 +92,12 @@ export const useSidebarItems = (): {
         title: "مدیریت آموزش‌ها",
         link: "/admin/tutorials",
         active: pathname.startsWith("/admin/tutorials"),
+      },
+      {
+        icon: <BookOpen />,
+        title: "راهنمای پنل",
+        link: "/admin/guide",
+        active: pathname.startsWith("/admin/guide"),
       },
     ],
   };
