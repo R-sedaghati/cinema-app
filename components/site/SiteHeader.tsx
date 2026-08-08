@@ -74,22 +74,22 @@ export function SiteHeader() {
               />
             </div>
           ) : (
-            <div className="flex gap-2 items-center">
+            <Link href="/" className="flex gap-2 items-center">
               <Image
                 src="/assets/images/logo.svg"
                 alt="logo"
-                width={60}
-                height={60}
+                width={44}
+                height={44}
               />
-              <span className="text-xl font-semibold text-error-500 text-nowrap">
+              <span className="text-base font-semibold text-error-500 text-nowrap">
                 آرشیو هنر
               </span>
-            </div>
+            </Link>
           )}
 
           <nav className="flex min-w-0 flex-1 items-center justify-center lg:justify-center">
             {isMobile && (
-              <div className="flex gap-1 items-center">
+              <Link href="/" className="flex gap-1 items-center">
                 <Image
                   src="/assets/images/logo.svg"
                   alt="logo"
@@ -99,9 +99,9 @@ export function SiteHeader() {
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
                   آرشیو هنر
                 </span>
-              </div>
+              </Link>
             )}
-            <div className="hidden lg:flex items-center justify-center gap-2 rounded-full bg-zinc-800/80 p-2 border border-zinc-800 backdrop-blur-xs">
+            <div className="hidden lg:flex items-center justify-center gap-1 rounded-full bg-zinc-800/80 p-1 border border-zinc-800 backdrop-blur-xs">
               {navItems.map((item) => {
                 const active = isActive(pathname, item.href);
                 return (
@@ -109,7 +109,7 @@ export function SiteHeader() {
                     key={item.href}
                     href={item.href}
                     className={[
-                      "rounded-full px-6 py-2 text-base transition-colors text-nowrap border border-transparent",
+                      "rounded-full px-3 py-1.5 text-sm transition-colors text-nowrap border border-transparent",
                       active
                         ? "bg-zinc-700 text-error-500!"
                         : "text-zinc-300 hover:bg-zinc-800/60 hover:border-zinc-700",

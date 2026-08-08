@@ -2,16 +2,9 @@
 
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
-import { Home, LogIn, PenLine, Search, User, Users } from "lucide-react";
+import { Home, LogIn, PenLine, Search, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const bottomNavItems = [
-  { href: "/", label: "خانه", icon: Home },
-  { href: "/artist-registration", label: "فرم‌ها", icon: PenLine },
-  { href: "/artists", label: "هنرمندان", icon: Users },
-  { href: "/profile", label: "پروفایل", icon: User },
-];
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -26,6 +19,7 @@ export function MobileBottomNav() {
   const bottomNavItems = [
     { href: "/", label: "خانه", icon: Home },
     { href: "/artists", label: "جستجو", icon: Search },
+    { href: "/artist-registration", label: "فرم‌ها", icon: PenLine },
     isLoggedIn
       ? { href: "/profile", label: "پروفایل", icon: User }
       : { href: "#", label: "ورود", icon: LogIn },
@@ -47,7 +41,7 @@ export function MobileBottomNav() {
                 key={item.label}
                 type="button"
                 onClick={open}
-                className="flex flex-col items-center gap-1 rounded-full px-5 py-2 text-zinc-400 transition-colors hover:text-zinc-300"
+                className="flex flex-col items-center gap-1 rounded-full px-4 py-2 text-zinc-400 transition-colors hover:text-zinc-300"
               >
                 <Icon size={22} strokeWidth={1.5} />
                 <span className="text-xs font-medium">{item.label}</span>
@@ -60,7 +54,7 @@ export function MobileBottomNav() {
               key={item.href}
               href={item.href}
               className={[
-                "flex flex-col items-center gap-1 rounded-full px-5 py-2 transition-colors",
+                "flex flex-col items-center gap-1 rounded-full px-4 py-2 transition-colors",
                 active ? "text-error-500" : "text-zinc-400 hover:text-zinc-300",
               ].join(" ")}
             >
