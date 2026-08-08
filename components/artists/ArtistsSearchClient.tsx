@@ -1,25 +1,23 @@
 "use client";
 
-import { ChevronDown, MoveLeft, Search, X } from "lucide-react";
+import { MoveLeft, Search, X } from "lucide-react";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import Image from "next/image";
 import ArtistCard from "./Card";
 import NotFoundSearch from "../common/NotFoundSearch";
-import { Button, Chip, Drawer, Input, Select as UiKitSelect } from "@dgshahr/ui-kit";
-import { chevronCn } from "@/lib/utils/chevronCn";
+import { Button, Input } from "@dgshahr/ui-kit";
+import { ArtistFilterBar } from "./filters/ArtistFilterBar";
+import { CategoryChips } from "./filters/CategoryChips";
+import { buildParams } from "./filters/buildParams";
 import {
   useUserArtistListInfinite,
   useUserCategoryFilters,
   useUserCategoryList,
 } from "@/lib/services/landing/hook";
 import useDebounce from "@/lib/hooks/useDebounce";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useArtistSearchParams } from "@/lib/hooks/useArtistSearchParams";
-import type {
-  IArtistFilterDescriptor,
-  ParamsPublicArtistList,
-} from "@/lib/services/landing/type";
 import { useEffect, useState } from "react";
-import { isMobile } from "react-device-detect";
 
 const PAGE_SIZE = 12;
 
@@ -33,7 +31,6 @@ export function ArtistsSearchClient() {
     setCategory,
     setSearch,
     setSelection,
-    toggleSelection,
     setRange,
     clearFilters,
   } = useArtistSearchParams();
@@ -41,7 +38,7 @@ export function ArtistsSearchClient() {
   // The input is local so typing doesn't push a history entry per keystroke.
   const [queryDraft, setQueryDraft] = useState(search);
   const debouncedQuery = useDebounce(queryDraft, 500);
-  const [openDrawerKey, setOpenDrawerKey] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (debouncedQuery !== search) setSearch(debouncedQuery);
@@ -49,24 +46,29 @@ export function ArtistsSearchClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery]);
 
+  // A back-navigation or a shared link changes the URL without touching the draft.
+  useEffect(() => {
+    if (search !== debouncedQuery) setQueryDraft(search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
   const { data: categoryData } = useUserCategoryList({ page: 1, count: 30 });
   const categories = categoryData?.result ?? [];
-  const selectedCategory = categories.find((item) => item.id === categoryId);
 
   const { data: filtersData, isPending: filtersPending } =
     useUserCategoryFilters(categoryId);
   const descriptors = filtersData?.result ?? [];
 
-  const {
-    data,
-    isPending,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useUserArtistListInfinite(
-    buildParams({ categoryId, search, selections, ranges, descriptors }),
-    PAGE_SIZE,
-  );
+  // buildParams maps filter keys onto query params via the descriptors, so searching
+  // before they land would silently drop every filter from a deep-linked URL.
+  const filtersReady = !categoryId || !filtersPending;
+
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useUserArtistListInfinite(
+      buildParams({ categoryId, search, selections, ranges, descriptors }),
+      PAGE_SIZE,
+      filtersReady,
+    );
 
   const artists = data?.pages.flatMap((page) => page.result ?? []) ?? [];
   const total = data?.pages.at(0)?.count ?? artists.length;
@@ -99,60 +101,24 @@ export function ArtistsSearchClient() {
         </div>
 
         {categoryId && (
-          <div className="flex flex-wrap justify-center gap-2 mt-5">
-            <Chip
-              label={selectedCategory?.faName ?? "دسته‌بندی"}
-              filled
-              leftIcon={<X size={14} />}
-              onClick={() => setCategory(null)}
+          <>
+            <CategoryChips
+              categories={categories}
+              categoryId={categoryId}
+              onSelect={setCategory}
             />
 
-            {selectedCategory?.children?.map((child) => (
-              <Chip
-                key={child.id}
-                label={child.faName}
-                filled={categoryId === child.id}
-                onClick={() => setCategory(child.id)}
-              />
-            ))}
-          </div>
-        )}
-
-        {categoryId && descriptors.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2">
-            {descriptors.map((descriptor) =>
-              descriptor.kind === "select" ? (
-                <SelectFilter
-                  key={descriptor.key}
-                  descriptor={descriptor}
-                  values={selections[descriptor.key] ?? []}
-                  onChange={(values) => setSelection(descriptor.key, values)}
-                  onToggle={(value) => toggleSelection(descriptor.key, value)}
-                  drawerOpen={openDrawerKey === descriptor.key}
-                  onDrawerOpenChange={(open) =>
-                    setOpenDrawerKey(open ? descriptor.key : null)
-                  }
-                />
-              ) : (
-                <RangeFilter
-                  key={descriptor.key}
-                  descriptor={descriptor}
-                  value={ranges[descriptor.key] ?? {}}
-                  onChange={(bound, value) => setRange(descriptor.key, bound, value)}
-                />
-              ),
-            )}
-
-            {activeFilterCount > 0 && (
-              <Chip label="حذف فیلترها" leftIcon={<X size={14} />} onClick={clearFilters} />
-            )}
-          </div>
-        )}
-
-        {categoryId && !filtersPending && descriptors.length === 0 && (
-          <p className="text-sm text-zinc-500">
-            برای این دسته‌بندی فیلتری تعریف نشده است.
-          </p>
+            <ArtistFilterBar
+              descriptors={descriptors}
+              isPending={filtersPending}
+              selections={selections}
+              ranges={ranges}
+              activeFilterCount={activeFilterCount}
+              onSelectionChange={setSelection}
+              onRangeChange={setRange}
+              onClear={clearFilters}
+            />
+          </>
         )}
       </div>
 
@@ -214,161 +180,6 @@ export function ArtistsSearchClient() {
 
       <div className="w-170 h-170 rounded-full absolute opacity-20 -bottom-44 -right-96 -z-1 bg-radial-primary" />
       <div className="w-170 h-170 rounded-full absolute opacity-20 bottom-12 -left-96 -z-1 bg-radial-primary" />
-    </div>
-  );
-}
-
-/**
- * Descriptors carry the exact API query key (`param`/`paramMin`/`paramMax`), so the
- * client never has to guess how a schema field maps onto a filter param.
- */
-function buildParams({
-  categoryId,
-  search,
-  selections,
-  ranges,
-  descriptors,
-}: {
-  categoryId: number | null;
-  search: string;
-  selections: Record<string, string[]>;
-  ranges: Record<string, { min?: string; max?: string }>;
-  descriptors: IArtistFilterDescriptor[];
-}): ParamsPublicArtistList {
-  const params: ParamsPublicArtistList = {};
-
-  if (categoryId) params.category__in = [categoryId];
-  if (search) params.search = search;
-
-  for (const descriptor of descriptors) {
-    if (descriptor.kind === "select") {
-      const values = selections[descriptor.key];
-      if (values?.length) params[descriptor.param] = values;
-      continue;
-    }
-
-    const range = ranges[descriptor.key];
-    if (range?.min) params[descriptor.paramMin] = range.min;
-    if (range?.max) params[descriptor.paramMax] = range.max;
-  }
-
-  return params;
-}
-
-function SelectFilter({
-  descriptor,
-  values,
-  onChange,
-  onToggle,
-  drawerOpen,
-  onDrawerOpenChange,
-}: Readonly<{
-  descriptor: Extract<IArtistFilterDescriptor, { kind: "select" }>;
-  values: string[];
-  onChange: (values: string[]) => void;
-  onToggle: (value: string) => void;
-  drawerOpen: boolean;
-  onDrawerOpenChange: (open: boolean) => void;
-}>) {
-  const chip = (isOpen: boolean) => (
-    <Chip
-      label={descriptor.label}
-      badgeNumber={values.length || undefined}
-      filled={isOpen || values.length > 0}
-      leftIcon={<ChevronDown className={chevronCn(isOpen)} />}
-    />
-  );
-
-  return (
-    <>
-      <div className="hidden md:block">
-        <UiKitSelect
-          value={values}
-          mode="multiple"
-          searchable={descriptor.options.length > 8}
-          onChange={(value) => onChange(value as string[])}
-          options={descriptor.options.map((option) => ({
-            label: option.label,
-            value: option.value,
-          }))}
-          customInput={chip}
-        />
-      </div>
-
-      <div className="md:hidden">
-        <Chip
-          label={descriptor.label}
-          badgeNumber={values.length || undefined}
-          filled={values.length > 0}
-          leftIcon={<ChevronDown size={14} />}
-          onClick={() => onDrawerOpenChange(true)}
-        />
-      </div>
-
-      <Drawer
-        open={drawerOpen}
-        onClose={() => onDrawerOpenChange(false)}
-        position="bottom"
-        header={{ title: descriptor.label, haveCloseIcon: true }}
-        containerClassName="p-5"
-      >
-        <div className="flex flex-wrap gap-2 mt-4">
-          {descriptor.options.map((option) => (
-            <Chip
-              key={option.value}
-              label={option.label}
-              filled={values.includes(option.value)}
-              onClick={() => onToggle(option.value)}
-            />
-          ))}
-        </div>
-      </Drawer>
-    </>
-  );
-}
-
-function RangeFilter({
-  descriptor,
-  value,
-  onChange,
-}: Readonly<{
-  descriptor: Extract<IArtistFilterDescriptor, { kind: "range" }>;
-  value: { min?: string; max?: string };
-  onChange: (bound: "min" | "max", value: string) => void;
-}>) {
-  const [draft, setDraft] = useState(value);
-  const debounced = useDebounce(draft, 600);
-
-  useEffect(() => {
-    if ((debounced.min ?? "") !== (value.min ?? "")) onChange("min", debounced.min ?? "");
-    if ((debounced.max ?? "") !== (value.max ?? "")) onChange("max", debounced.max ?? "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounced]);
-
-  return (
-    <div className="flex items-center gap-2 rounded-full border border-zinc-800 px-3 py-1">
-      <span className="text-sm text-zinc-400 text-nowrap">{descriptor.label}</span>
-      <input
-        type="number"
-        inputMode="numeric"
-        min={descriptor.min}
-        max={descriptor.max}
-        placeholder={String(descriptor.min)}
-        value={draft.min ?? ""}
-        onChange={(e) => setDraft((prev) => ({ ...prev, min: e.target.value }))}
-        className="w-14 bg-transparent text-sm text-zinc-100 outline-none"
-      />
-      <span className="text-zinc-600">تا</span>
-      <input
-        type="number"
-        inputMode="numeric"
-        min={descriptor.min}
-        max={descriptor.max}
-        placeholder={String(descriptor.max)}
-        value={draft.max ?? ""}
-        onChange={(e) => setDraft((prev) => ({ ...prev, max: e.target.value }))}
-        className="w-14 bg-transparent text-sm text-zinc-100 outline-none"
-      />
     </div>
   );
 }
