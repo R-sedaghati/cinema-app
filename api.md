@@ -35,6 +35,18 @@ enum PortfolioType {
   VIDEO = "VIDEO",
 }
 
+// Named validations an admin picks in the form-builder; enforced on submit by the API
+// (backend/utils/fieldValidation.ts) and mirrored client-side for instant feedback.
+enum ValidationPreset {
+  MOBILE = "MOBILE",               // 09xxxxxxxxx
+  LANDLINE = "LANDLINE",
+  NATIONAL_CODE = "NATIONAL_CODE", // 10 digits + mod-11 checksum
+  POSTAL_CODE = "POSTAL_CODE",     // 10 digits
+  EMAIL = "EMAIL",
+  IBAN = "IBAN",                   // IR + 24 digits
+  URL = "URL",
+}
+
 enum ArtistRequestStatus {
   PENDING = "PENDING",
   PENDING_PAYMENT = "PENDING_PAYMENT",
@@ -61,8 +73,11 @@ enum FormFieldType {
   TEXTAREA = "TEXTAREA",
   NUMBER = "NUMBER",
   SELECT = "SELECT",
+  SELECT_PROVINCE = "SELECT_PROVINCE",   // options served by GET /provinces
+  SELECT_CITY = "SELECT_CITY",           // options served by GET /provinces/:id/cities
   RADIO = "RADIO",
   CHECKBOX = "CHECKBOX",
+  BOOLEAN = "BOOLEAN",   // single checkbox, answer is true/false
   DATE = "DATE",
   IMAGE = "IMAGE",
   VIDEO = "VIDEO",
@@ -102,7 +117,7 @@ interface FormField {
   required: boolean;
   order: number;
   options?: { label: string; value: string }[] | null;
-  validation?: { min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+  validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
 }
 
 interface FormStep {
@@ -160,6 +175,7 @@ interface FAQ {
 interface AboutUs {
   id: number;
   text: string;
+  fontSize: number | null; // px override for the about text; null = use the default size
 }
 
 interface Payment {
@@ -174,6 +190,8 @@ interface Banner {
   id: number;
   title: string;
   subtitle: string;
+  titleFontSize: number | null; // px override for the title; null = use the default size
+  subtitleFontSize: number | null; // px override for the subtitle; null = use the default size
   image: string; // full public URL on read; storage path on write (see POST /admin/upload/image)
   ctaLabel: string;
   ctaLink: string;
@@ -286,13 +304,15 @@ Get site-wide editable copy (about-page benefit cards, support-page copy, terms/
 ```ts
 interface SiteContent {
   id: 1;
-  benefits: { items: { title: string; desc: string }[] }; // exactly 3, fixed order (mission, vision, responsibility)
+  // every `fontSize` is a px override; null/absent = use the default size
+  benefits: { items: { title: string; desc: string }[]; fontSize?: number | null }; // exactly 3, fixed order (mission, vision, responsibility)
   support: {
     title: string;
     description: string;
     items: { title: string; detail: string; footerText: string; buttonValue: string }[]; // exactly 3, fixed order (phone, email, telegram)
+    fontSize?: number | null;
   };
-  terms: { title: string; content: string };
+  terms: { title: string; content: string; fontSize?: number | null };
 }
 ```
 
@@ -448,12 +468,12 @@ ApiResponse<{
       id: number;
       key: string;
       label: string;
-      type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "RADIO" | "CHECKBOX" | "DATE" | "IMAGE" | "VIDEO";
+      type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "SELECT_PROVINCE" | "SELECT_CITY" | "RADIO" | "CHECKBOX" | "BOOLEAN" | "DATE" | "IMAGE" | "VIDEO";
       placeholder: string | null;
       required: boolean;
       order: number;
       options: { label: string; value: string }[] | null;
-      validation: { min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+      validation: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
     }[];
   }[];
 }>
@@ -634,12 +654,12 @@ Create a field on a step.
 {
   key: string;             // unique within the top-level category
   label: string;
-  type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "RADIO" | "CHECKBOX" | "DATE" | "IMAGE" | "VIDEO";
+  type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "SELECT_PROVINCE" | "SELECT_CITY" | "RADIO" | "CHECKBOX" | "BOOLEAN" | "DATE" | "IMAGE" | "VIDEO";
   placeholder?: string;
   required?: boolean;
   order?: number;
   options?: { label: string; value: string }[];   // SELECT/RADIO/CHECKBOX
-  validation?: { min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string };
+  validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string };
   syncToUserField?: "firstName" | "lastName" | "avatar" | "email";
 }
 ```
@@ -647,7 +667,13 @@ Create a field on a step.
 ---
 
 ### `PATCH /admin/form-fields/:fieldId/`
-Update a field. **Body:** same shape as create, all optional.
+Update a field. **Body:** same shape as create, all optional, plus:
+
+```ts
+{
+  stepId?: number;   // move the field to another step (must belong to the same category)
+}
+```
 
 ---
 
@@ -759,7 +785,7 @@ Update about-us text.
 
 **Body:**
 ```json
-{ "text": "string" }
+{ "text": "string", "fontSize": null }
 ```
 
 **Response:** `ApiResponse<AboutUs>`
@@ -810,7 +836,9 @@ Create a banner slide.
   "ctaLabel": "string",
   "ctaLink": "string",
   "priority": 0,
-  "isActive": true
+  "isActive": true,
+  "titleFontSize": null,
+  "subtitleFontSize": null
 }
 ```
 

@@ -8,6 +8,7 @@ import NumberField from "./NumberField";
 import SelectField from "./SelectField";
 import RadioField from "./RadioField";
 import CheckboxField from "./CheckboxField";
+import BooleanField from "./BooleanField";
 import DateField from "./DateField";
 import ImageUploadField from "./ImageUploadField";
 import VideoUploadField from "./VideoUploadField";
@@ -17,8 +18,11 @@ const FIELD_COMPONENTS: Record<EFormFieldType, React.FC<FieldProps>> = {
   [EFormFieldType.TEXTAREA]: TextareaField,
   [EFormFieldType.NUMBER]: NumberField,
   [EFormFieldType.SELECT]: SelectField,
+  [EFormFieldType.SELECT_PROVINCE]: SelectField,
+  [EFormFieldType.SELECT_CITY]: SelectField,
   [EFormFieldType.RADIO]: RadioField,
   [EFormFieldType.CHECKBOX]: CheckboxField,
+  [EFormFieldType.BOOLEAN]: BooleanField,
   [EFormFieldType.DATE]: DateField,
   [EFormFieldType.IMAGE]: ImageUploadField,
   [EFormFieldType.VIDEO]: VideoUploadField,

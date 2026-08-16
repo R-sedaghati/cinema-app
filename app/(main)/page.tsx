@@ -18,6 +18,7 @@ import { IArtistItem } from "@/lib/services/admin/type";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
+import { fontSizeStyle } from "@/lib/utils/fontSize";
 
 const BANNER_GRADIENTS = [
   "from-zinc-950 via-amber-950/50 to-zinc-900",
@@ -99,10 +100,16 @@ export default function ApplicationPage() {
                     className={`relative h-full w-full bg-linear-to-bl ${BANNER_GRADIENTS[index % BANNER_GRADIENTS.length]} flex items-center px-6 md:px-16 overflow-hidden`}
                   >
                     <div className="relative z-10 flex-1 md:max-w-xl">
-                      <p className="text-error-400 text-sm md:text-base font-medium mb-1 md:mb-2">
+                      <p
+                        className="text-error-400 text-sm md:text-base font-medium mb-1 md:mb-2"
+                        style={fontSizeStyle(slide.subtitleFontSize)}
+                      >
                         {slide.subtitle}
                       </p>
-                      <h2 className="text-white text-2xl md:text-5xl font-bold mb-4 md:mb-6">
+                      <h2
+                        className="text-white text-2xl md:text-5xl font-bold mb-4 md:mb-6"
+                        style={fontSizeStyle(slide.titleFontSize)}
+                      >
                         {slide.title}
                       </h2>
                       <Link

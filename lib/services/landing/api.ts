@@ -1,3 +1,4 @@
+import { prepareImage, prepareVideo } from "@/lib/utils/prepareUpload";
 import {
   IAboutUsResponse,
   IArtistRetriveResponse,
@@ -173,7 +174,7 @@ export const userCityList = async (provinceId: number) => {
 
 export const userUploadAvatar = async (file: File) => {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", await prepareImage(file));
   const { data } = await landingApi.post<{ path: string }>(
     "/user/avatar",
     form,
@@ -183,7 +184,7 @@ export const userUploadAvatar = async (file: File) => {
 
 export const userUploadVideo = async (file: File) => {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", prepareVideo(file));
   const { data } = await landingApi.post<{ path: string; filename: string }>(
     "/user/upload/video",
     form,
@@ -193,7 +194,7 @@ export const userUploadVideo = async (file: File) => {
 
 export const userUploadImage = async (file: File) => {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", await prepareImage(file));
   const { data } = await landingApi.post<{ path: string; filename: string }>(
     "/user/upload/image",
     form,

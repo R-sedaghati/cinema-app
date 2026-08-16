@@ -301,8 +301,8 @@ export const useAdminAboutUsUpdate = () => {
   const { accessToken } = useAdminAuthStore();
 
   return useMutation({
-    mutationFn: ({ text }: { text: string }) =>
-      adminAboutUsUpdate(text, accessToken),
+    mutationFn: (payload: { text: string; fontSize: number | null }) =>
+      adminAboutUsUpdate(payload, accessToken),
   });
 };
 

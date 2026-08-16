@@ -2,6 +2,7 @@
 
 import { supportCardVisuals } from "@/lib/mock/support";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
+import { fontSizeStyle } from "@/lib/utils/fontSize";
 import Image from "next/image";
 import Button from "../common/Button";
 
@@ -9,13 +10,17 @@ const SupportCenter = () => {
   const { data } = useUserSiteContent();
   const support = data?.result?.support;
   const items = support?.items ?? [];
+  const fontSize = support?.fontSize;
 
   return (
     <section className="flex flex-col justify-center items-center gap-10">
       <h3 className="text-4xl font-h1-regular">
         {support?.title ?? "مرکز پشتیبانی"}
       </h3>
-      <p className="font-p1-regular whitespace-pre-line">
+      <p
+        className="font-p1-regular whitespace-pre-line"
+        style={fontSizeStyle(fontSize)}
+      >
         {support?.description}
       </p>
       <div className="flex flex-wrap justify-center md:justify-between w-full items-center gap-10">
@@ -34,7 +39,10 @@ const SupportCenter = () => {
                 height={160}
               />
               <h5 className="font-h3-bold h-7.5">{item.title}</h5>
-              <p className="font-p1-regular flex-1 text-zinc-400 text-center">
+              <p
+                className="font-p1-regular flex-1 text-zinc-400 text-center"
+                style={fontSizeStyle(fontSize)}
+              >
                 {item.detail}
               </p>
               <div className="flex flex-col gap-2 items-start w-full">

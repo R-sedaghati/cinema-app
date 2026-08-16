@@ -1,4 +1,5 @@
-import { IFormStep } from "@/lib/services/admin/type";
+import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
+import { FIELD_VALIDATION_PRESETS, isValidPreset } from "./fieldValidationPresets";
 
 export function getStepErrors(
   step: IFormStep,
@@ -9,6 +10,7 @@ export function getStepErrors(
   for (const field of step.fields) {
     const value = answers[field.key];
     const isEmpty =
+      (field.type === EFormFieldType.BOOLEAN && value !== true) ||
       value === undefined ||
       value === null ||
       value === "" ||
@@ -21,7 +23,7 @@ export function getStepErrors(
 
     if (isEmpty || !field.validation) continue;
 
-    const { min, max, minLength, maxLength, pattern } = field.validation;
+    const { preset, min, max, minLength, maxLength, pattern } = field.validation;
 
     if (typeof value === "number") {
       if (min !== undefined && value < min) errors.push(`${field.label} باید حداقل ${min} باشد`);
@@ -29,6 +31,9 @@ export function getStepErrors(
     }
 
     if (typeof value === "string") {
+      if (preset && FIELD_VALIDATION_PRESETS[preset] && !isValidPreset(preset, value)) {
+        errors.push(`${field.label}: ${FIELD_VALIDATION_PRESETS[preset].message}`);
+      }
       if (minLength !== undefined && value.length < minLength) errors.push(`${field.label} باید حداقل ${minLength} کاراکتر باشد`);
       if (maxLength !== undefined && value.length > maxLength) errors.push(`${field.label} باید حداکثر ${maxLength} کاراکتر باشد`);
       if (pattern) {

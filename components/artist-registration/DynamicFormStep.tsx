@@ -13,11 +13,12 @@ import clsx from "clsx";
 
 interface Props {
   step: IFormStep;
+  provinceKey?: string;
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const DynamicFormStep: React.FC<Props> = ({ step, onNext, onPrevious }) => {
+const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, onNext, onPrevious }) => {
   const store = useArtistRegistrationStore();
 
   const handleNext = () => {
@@ -41,6 +42,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, onNext, onPrevious }) => {
             key={field.id}
             field={field}
             value={store.answers[field.key]}
+            provinceKey={provinceKey}
             onChange={(value) => store.setAnswer(field.key, value)}
           />
         ))}

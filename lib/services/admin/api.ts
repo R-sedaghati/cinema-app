@@ -1,3 +1,4 @@
+import { prepareImage } from "@/lib/utils/prepareUpload";
 import api from "../axiosInstance";
 import {
   IAboutUsResponse,
@@ -284,10 +285,13 @@ export const adminAboutUs = async (accessToken: string) => {
   return data;
 };
 
-export const adminAboutUsUpdate = async (text: string, accessToken: string) => {
+export const adminAboutUsUpdate = async (
+  payload: { text: string; fontSize: number | null },
+  accessToken: string,
+) => {
   const { data } = await api.patch(
     `/admin/about-us/1`,
-    { text },
+    payload,
     {
       headers: {
         Authorization: accessToken,
@@ -480,7 +484,7 @@ export const adminUploadBannerImage = async (
   accessToken: string,
 ) => {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", await prepareImage(file));
   const { data } = await api.post<{ path: string }>(
     "/admin/upload/image",
     form,
@@ -558,7 +562,7 @@ export const adminUploadTutorialThumbnail = async (
   accessToken: string,
 ) => {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", await prepareImage(file));
   const { data } = await api.post<{ path: string }>(
     "/admin/upload/image",
     form,

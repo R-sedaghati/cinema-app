@@ -178,9 +178,13 @@ function ArtistDetail() {
                       field.type === EFormFieldType.RADIO ||
                       field.type === EFormFieldType.CHECKBOX
                         ? resolveOptionLabels(field, value)
-                        : Array.isArray(value)
-                          ? value.join("، ")
-                          : ((value as string | number | undefined) ?? "");
+                        : typeof value === "boolean"
+                          ? value
+                            ? "بله"
+                            : "خیر"
+                          : Array.isArray(value)
+                            ? value.join("، ")
+                            : ((value as string | number | undefined) ?? "");
 
                     return (
                       <Input

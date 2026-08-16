@@ -14,6 +14,7 @@ import {
   ISiteContentBenefitItem,
   ISiteContentSupportItem,
 } from "@/lib/services/admin/type";
+import FontSizeInput from "@/components/admin/FontSizeInput";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Button, Card, Divider, Input, Textarea } from "@dgshahr/ui-kit";
 import { Trash2 } from "lucide-react";
@@ -66,6 +67,10 @@ function ContentManagement() {
     useState<ISiteContentSupportItem[]>(emptySupportItems);
   const [termsTitle, setTermsTitle] = useState("");
   const [termsContent, setTermsContent] = useState("");
+  const [aboutFontSize, setAboutFontSize] = useState<number | null>(null);
+  const [benefitsFontSize, setBenefitsFontSize] = useState<number | null>(null);
+  const [supportFontSize, setSupportFontSize] = useState<number | null>(null);
+  const [termsFontSize, setTermsFontSize] = useState<number | null>(null);
 
   useEffect(() => {
     const content = siteContentData?.result;
@@ -77,11 +82,15 @@ function ContentManagement() {
     setSupportItems(content.support?.items ?? emptySupportItems);
     setTermsTitle(content.terms?.title ?? "");
     setTermsContent(content.terms?.content ?? "");
+    setBenefitsFontSize(content.benefits?.fontSize ?? null);
+    setSupportFontSize(content.support?.fontSize ?? null);
+    setTermsFontSize(content.terms?.fontSize ?? null);
   }, [siteContentData]);
 
   useEffect(() => {
     if (aboutData?.result?.length) {
       setAboutText(aboutData.result[0].text ?? "");
+      setAboutFontSize(aboutData.result[0].fontSize ?? null);
     }
   }, [aboutData]);
 
@@ -146,7 +155,9 @@ function ContentManagement() {
 
   const handleBenefitsSubmit = () => {
     updateSiteContent(
-      { benefits: { items: benefits } },
+      {
+        benefits: { items: benefits, fontSize: benefitsFontSize },
+      },
       {
         onSuccess: () => {
           toast.success("با موفقیت تغییر کرد");
@@ -164,6 +175,7 @@ function ContentManagement() {
           title: supportTitle,
           description: supportDescription,
           items: supportItems,
+          fontSize: supportFontSize,
         },
       },
       {
@@ -178,7 +190,13 @@ function ContentManagement() {
 
   const handleTermsSubmit = () => {
     updateSiteContent(
-      { terms: { title: termsTitle, content: termsContent } },
+      {
+        terms: {
+          title: termsTitle,
+          content: termsContent,
+          fontSize: termsFontSize,
+        },
+      },
       {
         onSuccess: () => {
           toast.success("با موفقیت تغییر کرد");
@@ -191,10 +209,11 @@ function ContentManagement() {
 
   const handleAboutSubmit = () => {
     updateAbout(
-      { text: aboutText },
+      { text: aboutText, fontSize: aboutFontSize },
       {
         onSuccess: () => {
           toast.success("با موفقیت تغییر کرد");
+          queryClient.invalidateQueries({ queryKey: ["adminAboutUs"] });
         },
       },
     );
@@ -338,6 +357,13 @@ function ContentManagement() {
               onChange={(e) => setAboutText(e.target.value)}
             />
 
+            <FontSizeInput
+              label="اندازه فونت متن درباره ما"
+              wrapperClassName="w-1/3"
+              value={aboutFontSize}
+              onChange={setAboutFontSize}
+            />
+
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
@@ -345,6 +371,7 @@ function ContentManagement() {
                 onClick={() => {
                   if (aboutData?.result?.length) {
                     setAboutText(aboutData.result[0].text ?? "");
+                    setAboutFontSize(aboutData.result[0].fontSize ?? null);
                   }
                 }}
               >
@@ -370,6 +397,13 @@ function ContentManagement() {
             </p>
 
             <Divider color="gray" size="thin" type="horizontal" />
+
+            <FontSizeInput
+              label="اندازه فونت متن کارت‌ها"
+              wrapperClassName="w-1/3"
+              value={benefitsFontSize}
+              onChange={setBenefitsFontSize}
+            />
 
             {benefits.map((item, index) => (
               <div key={index} className="flex justify-between gap-3">
@@ -424,6 +458,13 @@ function ContentManagement() {
               rows={3}
               value={supportDescription}
               onChange={(e) => setSupportDescription(e.target.value)}
+            />
+
+            <FontSizeInput
+              label="اندازه فونت توضیحات و متن کارت‌ها"
+              wrapperClassName="w-1/3"
+              value={supportFontSize}
+              onChange={setSupportFontSize}
             />
 
             {supportItems.map((item, index) => (
@@ -508,6 +549,13 @@ function ContentManagement() {
               rows={12}
               value={termsContent}
               onChange={(e) => setTermsContent(e.target.value)}
+            />
+
+            <FontSizeInput
+              label="اندازه فونت متن قوانین"
+              wrapperClassName="w-1/3"
+              value={termsFontSize}
+              onChange={setTermsFontSize}
             />
 
             <div className="flex justify-end gap-3">

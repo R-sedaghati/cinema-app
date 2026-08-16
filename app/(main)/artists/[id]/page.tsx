@@ -1,13 +1,15 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { WorksSlider } from "@/components/media/WorksSlider";
 import Aside from "@/components/artists/detail/Aside";
 import { useUserArtistDetail } from "@/lib/services/landing/hook";
 
 export default function ArtistDetailsPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const id = Number(params.id);
 
   const { data, isPending } = useUserArtistDetail(id || undefined);
@@ -43,6 +45,15 @@ export default function ArtistDetailsPage() {
         bg-radial-primary"
         />
       </div>
+
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="relative mx-auto mb-6 flex w-full max-w-7xl cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+      >
+        <ArrowRight size={20} />
+        بازگشت
+      </button>
 
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="mt-16 lg:mt-0">
