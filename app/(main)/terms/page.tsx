@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserSiteContent } from "@/lib/services/landing/hook";
+import { fontSizeStyle } from "@/lib/utils/fontSize";
 
 export default function TermsPage() {
   const { data } = useUserSiteContent();
@@ -12,7 +13,10 @@ export default function TermsPage() {
         {terms?.title ?? "قوانین و حریم خصوصی"}
       </h3>
 
-      <div className="relative backdrop-blur-sm border-2 border-error-500/30 shadow-card text-xl rounded-4xl p-5 md:p-20 bg-zinc-900/40 w-full whitespace-pre-line">
+      <div
+        className="relative backdrop-blur-sm border-2 border-error-500/30 shadow-card text-xl rounded-4xl p-5 md:p-20 bg-zinc-900/40 w-full whitespace-pre-line"
+        style={fontSizeStyle(terms?.fontSize)}
+      >
         {terms?.content}
       </div>
     </div>

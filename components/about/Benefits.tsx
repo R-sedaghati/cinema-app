@@ -2,11 +2,13 @@
 
 import { benefitImages } from "@/lib/mock/about";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
+import { fontSizeStyle } from "@/lib/utils/fontSize";
 import Image from "next/image";
 
 const Benefits = () => {
   const { data } = useUserSiteContent();
   const items = data?.result?.benefits?.items ?? [];
+  const fontSize = data?.result?.benefits?.fontSize;
 
   return (
     <section className="w-full flex flex-col md:flex-row justify-center gap-8 items-center">
@@ -31,7 +33,10 @@ const Benefits = () => {
 
           <h5 className="font-h3-bold text-white">{item.title}</h5>
 
-          <div className="font-p1-regular text-zinc-400 text-base whitespace-pre-line">
+          <div
+            className="font-p1-regular text-zinc-400 text-base whitespace-pre-line"
+            style={fontSizeStyle(fontSize)}
+          >
             {item.desc}
           </div>
         </div>

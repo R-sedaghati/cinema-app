@@ -1,5 +1,6 @@
 import { useUserCategoryFormSchema, useUserCategoryList } from "@/lib/services/landing/hook";
 import { IUserCategoryResponse } from "@/lib/services/landing/type";
+import { EFormFieldType } from "@/lib/services/admin/type";
 import { Card, HorizontalStep, HorizontalStepper } from "@dgshahr/ui-kit";
 import {
   LayoutGrid,
@@ -57,6 +58,14 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     [schemaData],
   );
 
+  const provinceKey = useMemo(
+    () =>
+      steps
+        .flatMap((step) => step.fields)
+        .find((field) => field.type === EFormFieldType.SELECT_PROVINCE)?.key,
+    [steps],
+  );
+
   useEffect(() => {
     if (data && !hasChildren && flowStep === 0) {
       onNext();
@@ -89,7 +98,14 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
     if (contentIndex < steps.length) {
       const step = steps[contentIndex];
-      return <DynamicFormStep step={step} onNext={onNext} onPrevious={onPrevious} />;
+      return (
+        <DynamicFormStep
+          step={step}
+          provinceKey={provinceKey}
+          onNext={onNext}
+          onPrevious={onPrevious}
+        />
+      );
     }
 
     if (contentIndex === steps.length) {

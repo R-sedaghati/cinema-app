@@ -6,6 +6,7 @@ import {
   useAdminUploadBannerImage,
 } from "@/lib/services/admin/hook";
 import { IBannerItem } from "@/lib/services/admin/type";
+import FontSizeInput from "@/components/admin/FontSizeInput";
 import { Button, Card, Divider, Input, Switch } from "@dgshahr/ui-kit";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,8 @@ function SliderForm({ mode, id, initialData }: Props) {
   const [isActive, setIsActive] = useState(true);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
+  const [titleFontSize, setTitleFontSize] = useState<number | null>(null);
+  const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
 
   const uploadImage = useAdminUploadBannerImage();
   const { mutate: createBanner, isPending: isCreating } = useAdminBannerCreate();
@@ -46,6 +49,8 @@ function SliderForm({ mode, id, initialData }: Props) {
     setIsActive(initialData.isActive);
     setImagePath(initialData.image);
     setImageFile(initialData.image ? { src: initialData.image } : null);
+    setTitleFontSize(initialData.titleFontSize ?? null);
+    setSubtitleFontSize(initialData.subtitleFontSize ?? null);
   }, [initialData]);
 
   const handleImageChange = (file: File | undefined) => {
@@ -79,6 +84,8 @@ function SliderForm({ mode, id, initialData }: Props) {
       priority,
       isActive,
       image: imagePath,
+      titleFontSize,
+      subtitleFontSize,
     };
 
     const onSuccess = () => {
@@ -147,6 +154,16 @@ function SliderForm({ mode, id, initialData }: Props) {
                 wrapperClassName="w-full"
                 value={subtitle}
                 onChange={(e) => setSubtitle(e.target.value)}
+              />
+              <FontSizeInput
+                label="اندازه فونت عنوان"
+                value={titleFontSize}
+                onChange={setTitleFontSize}
+              />
+              <FontSizeInput
+                label="اندازه فونت زیرعنوان"
+                value={subtitleFontSize}
+                onChange={setSubtitleFontSize}
               />
               <Input
                 labelContent="عنوان دکمه"

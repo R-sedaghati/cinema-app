@@ -1,6 +1,7 @@
 "use client";
 
-import { MoveLeft, Search, X } from "lucide-react";
+import { ArrowRight, MoveLeft, Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import Image from "next/image";
 import ArtistCard from "./Card";
@@ -39,6 +40,7 @@ export function ArtistsSearchClient() {
   const [queryDraft, setQueryDraft] = useState(search);
   const debouncedQuery = useDebounce(queryDraft, 500);
   const isMobile = useIsMobile();
+  const router = useRouter();
 
   useEffect(() => {
     if (debouncedQuery !== search) setSearch(debouncedQuery);
@@ -76,6 +78,15 @@ export function ArtistsSearchClient() {
 
   return (
     <div className="space-y-12 relative">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+      >
+        <ArrowRight size={20} />
+        بازگشت
+      </button>
+
       <div className="flex flex-col items-center justify-center gap-5">
         <h1 className="text-[24px] ma:text-[32px] text-zinc-50 w-full text-center">
           {categoryId ? "هنرمند مورد نظرت رو پیدا کن" : "دسته بندی رو سرچ کن یا انتخاب کن"}

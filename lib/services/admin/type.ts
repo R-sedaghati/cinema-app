@@ -101,8 +101,11 @@ export enum EFormFieldType {
   TEXTAREA = "TEXTAREA",
   NUMBER = "NUMBER",
   SELECT = "SELECT",
+  SELECT_PROVINCE = "SELECT_PROVINCE",
+  SELECT_CITY = "SELECT_CITY",
   RADIO = "RADIO",
   CHECKBOX = "CHECKBOX",
+  BOOLEAN = "BOOLEAN",
   DATE = "DATE",
   IMAGE = "IMAGE",
   VIDEO = "VIDEO",
@@ -115,7 +118,10 @@ export interface IFormFieldOption {
   value: string;
 }
 
+import type { FieldValidationPreset } from "@/lib/utils/fieldValidationPresets";
+
 export interface IFormFieldValidation {
+  preset?: FieldValidationPreset;
   min?: number;
   max?: number;
   minLength?: number;
@@ -174,7 +180,9 @@ export interface ICreateFormFieldRequest {
   multiple?: boolean;
 }
 
-export type IUpdateFormFieldRequest = Partial<ICreateFormFieldRequest>;
+export type IUpdateFormFieldRequest = Partial<ICreateFormFieldRequest> & {
+  stepId?: number;
+};
 
 export type IFormSchemaRetrieveResponse = IRetriveResponse<IFormSchema>;
 export type IFormStepRetrieveResponse = IRetriveResponse<IFormStep>;
@@ -286,6 +294,7 @@ export interface IAdminAboutUs {
   id: number;
   isActive: boolean;
   text: string;
+  fontSize: number | null;
   updatedAt: string;
 }
 
@@ -377,6 +386,8 @@ export interface IBannerItem {
   isActive: boolean;
   priority: number;
   subtitle: string;
+  titleFontSize: number | null;
+  subtitleFontSize: number | null;
   title: string;
   updatedAt: string | null;
   [key: string]: unknown;
@@ -390,6 +401,8 @@ export interface IBannerUpsertRequest {
   ctaLink: string;
   priority: number;
   isActive: boolean;
+  titleFontSize: number | null;
+  subtitleFontSize: number | null;
 }
 
 export interface ParamsBannerList {
@@ -453,15 +466,18 @@ export interface ISiteContent {
   id: number;
   benefits: {
     items: ISiteContentBenefitItem[];
+    fontSize?: number | null;
   };
   support: {
     title: string;
     description: string;
     items: ISiteContentSupportItem[];
+    fontSize?: number | null;
   };
   terms: {
     title: string;
     content: string;
+    fontSize?: number | null;
   };
 }
 

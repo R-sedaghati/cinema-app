@@ -111,6 +111,7 @@ export const useUserCategoryFilters = (categoryId?: number | null) =>
 
 export const useUserProvinceList = (
   params?: Partial<ParamsArtistList> | undefined,
+  enabled = true,
 ) => {
   return useQuery<IProvinceListResponse>({
     queryKey: ["userProvinceList", params],
@@ -118,6 +119,7 @@ export const useUserProvinceList = (
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
+    enabled,
   });
 };
 

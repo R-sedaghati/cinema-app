@@ -1,5 +1,8 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+
+// ponytail: one-shot cleanup of the removed persist key; delete once users have loaded the app again
+if (typeof window !== "undefined")
+  localStorage.removeItem("artist-registration-storage");
 
 interface ArtistRegistrationState {
   // Stepper
@@ -47,53 +50,50 @@ const initialState = {
 };
 
 export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
-  persist(
-    (set) => ({
-      ...initialState,
+  (set) => ({
+    ...initialState,
 
       setStep: (step) => set({ step }),
 
-      setSelectedCategory: (id, title) =>
-        set({ selectedCategoryId: id, selectedCategoryTitle: title }),
+    setSelectedCategory: (id, title) =>
+      set({ selectedCategoryId: id, selectedCategoryTitle: title }),
 
-      handleNext: () =>
-        set((state) => ({
-          step: state.step + 1,
-        })),
+    handleNext: () =>
+      set((state) => ({
+        step: state.step + 1,
+      })),
 
-      handlePrevious: () =>
-        set((state) => {
-          if (state.step === 1) {
-            return {
-              step: 0,
-              categoryId: [],
-              selectedCategoryId: null,
-              selectedCategoryTitle: "",
-            };
-          }
-
+    handlePrevious: () =>
+      set((state) => {
+        if (state.step === 1) {
           return {
-            step: Math.max(state.step - 1, 0),
+            step: 0,
+            categoryId: [],
+            selectedCategoryId: null,
+            selectedCategoryTitle: "",
           };
-        }),
+        }
 
-      setField: (field, value) =>
-        set({
-          [field]: value,
-        } as Pick<ArtistRegistrationState, typeof field>),
+        return {
+          step: Math.max(state.step - 1, 0),
+        };
+      }),
 
-      setAnswer: (key, value) =>
-        set((state) => ({
-          answers: { ...state.answers, [key]: value },
-        })),
+    setField: (field, value) =>
+      set({
+        [field]: value,
+      } as Pick<ArtistRegistrationState, typeof field>),
 
-      setAnswers: (answers) => set({ answers }),
+    setAnswer: (key, value) =>
+      set((state) => ({
+        answers: { ...state.answers, [key]: value },
+      })),
 
-      reset: () =>
-        set({
-          ...initialState,
-        }),
-    }),
-    { name: "artist-registration-storage" },
-  ),
+    setAnswers: (answers) => set({ answers }),
+
+    reset: () =>
+      set({
+        ...initialState,
+      }),
+  }),
 );

@@ -89,9 +89,14 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
                   .sort((a, b) => a.order - b.order)
                   .map((field) => {
                     const value = store.answers[field.key];
-                    const display = Array.isArray(value)
-                      ? value.join("، ")
-                      : (value as string | number | undefined) ?? "-";
+                    const display =
+                      typeof value === "boolean"
+                        ? value
+                          ? "بله"
+                          : "خیر"
+                        : Array.isArray(value)
+                          ? value.join("، ")
+                          : ((value as string | number | undefined) ?? "-");
 
                     return (
                       <div key={field.id} className="flex gap-1">
