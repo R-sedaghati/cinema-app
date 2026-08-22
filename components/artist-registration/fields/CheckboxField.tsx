@@ -22,6 +22,7 @@ const CheckboxField: React.FC<FieldProps> = ({ field, value, onChange }) => {
           <Checkbox
             key={option.value}
             label={option.label}
+            containerClassName="w-full"
             checked={selected.includes(option.value)}
             onChange={() => toggle(option.value)}
           />

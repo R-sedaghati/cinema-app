@@ -1,5 +1,6 @@
 "use client";
 
+import { FORM_COPY, FormCopyKey } from "@/lib/constants/formCopy";
 import {
   useAdminCategoryRetrieve,
   useAdminCreateFormField,
@@ -8,6 +9,7 @@ import {
   useAdminDeleteFormStep,
   useAdminFormSchema,
   useAdminUpdateFormField,
+  useAdminUpdateFormResultPages,
   useAdminUpdateFormStep,
 } from "@/lib/services/admin/hook";
 import {
@@ -15,6 +17,8 @@ import {
   IFormField,
   IFormFieldOption,
   IFormFieldValidation,
+  IFormResultPages,
+  IFormSchema,
   IFormSchemaRetrieveResponse,
   IFormStep,
   SyncToUserField,
@@ -127,6 +131,9 @@ function FieldRow({
     (field.options ?? []).map((o) => `${o.label}:${o.value}`).join(", "),
   );
   const [grabbed, setGrabbed] = useState(false);
+  // ponytail: free-text copy is saved on blur, not on every keystroke like the rest
+  const [placeholder, setPlaceholder] = useState(field.placeholder ?? "");
+  const [helpText, setHelpText] = useState(field.helpText ?? "");
 
   const parseOptions = (): IFormFieldOption[] =>
     optionsText
@@ -201,6 +208,21 @@ function FieldRow({
           options={SYNC_OPTIONS}
           onChange={(v) => patch({ syncToUserField: (v as SyncToUserField) || undefined })}
           mode="single"
+        />
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-2">
+        <Input
+          labelContent="متن راهنمای داخل فیلد (placeholder)"
+          value={placeholder}
+          onChange={(e) => setPlaceholder(e.target.value)}
+          onBlur={() => patch({ placeholder })}
+        />
+        <Input
+          labelContent="توضیح زیر فیلد"
+          value={helpText}
+          onChange={(e) => setHelpText(e.target.value)}
+          onBlur={() => patch({ helpText })}
         />
       </div>
 
@@ -317,6 +339,7 @@ function StepCard({
   const { mutate: updateStep } = useAdminUpdateFormStep();
   const { mutate: deleteStep } = useAdminDeleteFormStep();
   const { mutate: createField } = useAdminCreateFormField();
+  const [stepDescription, setStepDescription] = useState(step.description ?? "");
   const [newKey, setNewKey] = useState("");
   const [newLabel, setNewLabel] = useState("");
   const [newType, setNewType] = useState<EFormFieldType>(EFormFieldType.TEXT);
@@ -421,6 +444,18 @@ function StepCard({
           </div>
         </div>
 
+        <Input
+          labelContent="توضیح مرحله (زیر عنوان در فرم)"
+          value={stepDescription}
+          onChange={(e) => setStepDescription(e.target.value)}
+          onBlur={() =>
+            updateStep(
+              { stepId: step.id, payload: { description: stepDescription } },
+              { onSuccess: onChanged },
+            )
+          }
+        />
+
         <Divider color="gray" size="thin" type="horizontal" />
 
         <div
@@ -492,6 +527,110 @@ function StepCard({
               افزودن فیلد
             </Button>
           </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function FormCopyCard({
+  categoryId,
+  schema,
+  onSaved,
+}: {
+  categoryId: number;
+  schema: IFormSchema | undefined;
+  onSaved: () => void;
+}) {
+  const { mutate: save, isPending } = useAdminUpdateFormResultPages();
+  const [copy, setCopy] = useState<IFormResultPages | null>(null);
+
+  // The inputs are local until saved, so seed them once the schema arrives.
+  useEffect(() => {
+    if (schema && !copy) {
+      setCopy({
+        successTitle: schema.successTitle ?? "",
+        successDescription: schema.successDescription ?? "",
+        failTitle: schema.failTitle ?? "",
+        failDescription: schema.failDescription ?? "",
+        formCopy: { ...(schema.formCopy ?? {}) },
+      });
+    }
+  }, [schema, copy]);
+
+  if (!copy) return null;
+
+  const set = (key: keyof IFormResultPages) => (value: string) =>
+    setCopy({ ...copy, [key]: value });
+
+  const setCopyKey = (key: FormCopyKey) => (value: string) =>
+    setCopy({ ...copy, formCopy: { ...(copy.formCopy ?? {}), [key]: value } });
+
+  return (
+    <Card>
+      <div className="flex flex-col gap-3">
+        <p className="font-h6-bold">متن‌های فرم و صفحه نتیجه پرداخت</p>
+
+        <div className="grid md:grid-cols-2 gap-2">
+          <Input
+            labelContent="عنوان صفحه موفقیت"
+            value={copy.successTitle ?? ""}
+            onChange={(e) => set("successTitle")(e.target.value)}
+          />
+          <Input
+            labelContent="توضیح صفحه موفقیت"
+            value={copy.successDescription ?? ""}
+            onChange={(e) => set("successDescription")(e.target.value)}
+          />
+          <Input
+            labelContent="عنوان صفحه ناموفق"
+            value={copy.failTitle ?? ""}
+            onChange={(e) => set("failTitle")(e.target.value)}
+          />
+          <Input
+            labelContent="توضیح صفحه ناموفق"
+            value={copy.failDescription ?? ""}
+            onChange={(e) => set("failDescription")(e.target.value)}
+          />
+        </div>
+
+        <Divider color="gray" size="thin" type="horizontal" />
+
+        <p className="font-h6-bold">سایر متن‌های فرم</p>
+        <p className="text-xs text-gray-500">
+          خالی گذاشتن هر فیلد یعنی استفاده از متن پیش‌فرض (همان متنی که به عنوان راهنما نمایش داده می‌شود).
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-2">
+          {(Object.keys(FORM_COPY) as FormCopyKey[]).map((key) => (
+            <Input
+              key={key}
+              labelContent={FORM_COPY[key].admin}
+              placeholder={FORM_COPY[key].value}
+              value={copy.formCopy?.[key] ?? ""}
+              onChange={(e) => setCopyKey(key)(e.target.value)}
+            />
+          ))}
+        </div>
+
+        <div className="flex justify-end">
+          <Button
+            isLoading={isPending}
+            onClick={() =>
+              save(
+                { categoryId, payload: copy },
+                {
+                  onSuccess: () => {
+                    toast.success("متن‌ها ذخیره شد");
+                    onSaved();
+                  },
+                  onError: () => toast.error("خطا در ذخیره متن‌ها"),
+                },
+              )
+            }
+          >
+            ذخیره متن‌ها
+          </Button>
         </div>
       </div>
     </Card>
@@ -649,6 +788,12 @@ function FormBuilder() {
             onFieldDrop={handleFieldDrop}
           />
         ))}
+
+        <FormCopyCard
+          categoryId={id}
+          schema={schemaData?.result}
+          onSaved={() => refetch()}
+        />
 
         <Card>
           <div className="flex gap-2 items-end">

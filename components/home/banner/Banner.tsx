@@ -3,6 +3,7 @@
 import Button from "@/components/common/Button";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,17 +13,16 @@ const Banner = () => {
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
   const { open } = useLoginDrawerStore();
+  const copy = useLandingCopy();
 
   return (
     <div className="w-full relative ">
       <div className="bg-secondary-black flex-col md:flex-row min-h-52 relative rounded-4xl border border-error-500/30 shadow-card w-full p-9 flex justify-between items-center">
         <div className="flex flex-col justify-center gap-8">
           <h1 className="text-right flex flex-col gap-4 font-bold text-3xl bg-linear-to-r from-white from-30% to-zinc-600 bg-clip-text text-transparent">
-            اگر عاشق یکی از شاخه‌های هنری هستی،
-            <br />
-            <span className="text-xl">
-              {" "}
-              فرم رو پر کن و شانست رو برای ورود به دنیای حرفه‌ای هنر امتحان کن.
+            <span className="whitespace-pre-line">{copy("promoTitle")}</span>
+            <span className="text-xl whitespace-pre-line">
+              {copy("promoSubtitle")}
             </span>
           </h1>
           <Button
@@ -33,7 +33,7 @@ const Banner = () => {
               isLoggedIn ? () => router.push("/artist-registration") : open
             }
           >
-            ثبت‌ نام هنرمند
+            {copy("promoCta")}
           </Button>
         </div>
         <div className="h-42 md:h-auto">

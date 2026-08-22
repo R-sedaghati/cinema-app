@@ -10,11 +10,12 @@ const RadioField: React.FC<FieldProps> = ({ field, value, onChange }) => (
       <p className="font-p2-medium">{field.label}</p>
       {field.required && <Asterisk size={12} className="text-error-500" />}
     </div>
-    <div className="flex flex-wrap gap-5">
+    <div className="flex flex-col gap-2">
       {(field.options ?? []).map((option) => (
         <RadioButton
           key={option.value}
           label={option.label}
+          containerClassName="w-full"
           name={field.key}
           checked={value === option.value}
           onChange={() => onChange(option.value)}

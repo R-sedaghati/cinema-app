@@ -135,6 +135,7 @@ export interface IFormField {
   label: string;
   type: EFormFieldType;
   placeholder: string | null;
+  helpText?: string | null;
   required: boolean;
   order: number;
   options: IFormFieldOption[] | null;
@@ -146,23 +147,39 @@ export interface IFormField {
 export interface IFormStep {
   id: number;
   title: string;
+  description?: string | null;
   order: number;
   icon: string | null;
   fields: IFormField[];
 }
 
-export interface IFormSchema {
+/**
+ * Admin-editable copy of a category's registration form: the post-payment
+ * result pages plus the per-key overrides for the fixed flow copy (see
+ * `lib/constants/formCopy.ts`).
+ */
+export interface IFormResultPages {
+  successTitle: string | null;
+  successDescription: string | null;
+  failTitle: string | null;
+  failDescription: string | null;
+  formCopy?: Record<string, string> | null;
+}
+
+export interface IFormSchema extends IFormResultPages {
   steps: IFormStep[];
 }
 
 export interface ICreateFormStepRequest {
   title: string;
+  description?: string | null;
   order?: number;
   icon?: string;
 }
 
 export interface IUpdateFormStepRequest {
   title?: string;
+  description?: string | null;
   order?: number;
   icon?: string;
 }
@@ -172,6 +189,7 @@ export interface ICreateFormFieldRequest {
   label: string;
   type: EFormFieldType;
   placeholder?: string;
+  helpText?: string | null;
   required?: boolean;
   order?: number;
   options?: IFormFieldOption[];
@@ -388,6 +406,7 @@ export interface IBannerItem {
   subtitle: string;
   titleFontSize: number | null;
   subtitleFontSize: number | null;
+  ctaLabelFontSize: number | null;
   title: string;
   updatedAt: string | null;
   [key: string]: unknown;
@@ -403,6 +422,7 @@ export interface IBannerUpsertRequest {
   isActive: boolean;
   titleFontSize: number | null;
   subtitleFontSize: number | null;
+  ctaLabelFontSize: number | null;
 }
 
 export interface ParamsBannerList {
@@ -462,6 +482,30 @@ export interface ISiteContentSupportItem {
   buttonValue: string;
 }
 
+/** One field of the admin-editable support contact form. */
+export interface IContactFormField {
+  key: string;
+  label: string;
+  type: EFormFieldType;
+  placeholder?: string | null;
+  helpText?: string | null;
+  required: boolean;
+  options?: IFormFieldOption[] | null;
+  validation?: IFormFieldValidation | null;
+}
+
+export interface ISiteContentContactForm {
+  title: string;
+  submitLabel: string;
+  fields: IContactFormField[];
+}
+
+export interface ISiteContentFooter {
+  phone: string;
+  instagramUrl: string;
+  copyright: string;
+}
+
 export interface ISiteContent {
   id: number;
   benefits: {
@@ -479,6 +523,11 @@ export interface ISiteContent {
     content: string;
     fontSize?: number | null;
   };
+  footer?: ISiteContentFooter | null;
+  /** Overrides for the public-site copy, keyed by `lib/constants/landingCopy.ts`. */
+  landing?: Record<string, string> | null;
+  /** Field definition of the support contact form (see `lib/constants/contactForm.ts`). */
+  contactForm?: ISiteContentContactForm | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;

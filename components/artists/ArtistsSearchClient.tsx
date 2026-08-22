@@ -19,10 +19,19 @@ import useDebounce from "@/lib/hooks/useDebounce";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useArtistSearchParams } from "@/lib/hooks/useArtistSearchParams";
 import { useEffect, useState } from "react";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const PAGE_SIZE = 12;
 
+/**
+ * Category names carry ZWNJ ("تهیه\u200cکنندگی") and admins type both the Arabic and the
+ * Persian forms of ی/ک, so a raw `includes` misses tiles the user clearly meant.
+ */
+const normalizeFa = (value: string) =>
+  value.replace(/\u200c/g, "").replace(/\u064a/g, "\u06cc").replace(/\u0643/g, "\u06a9").trim();
+
 export function ArtistsSearchClient() {
+  const copy = useLandingCopy();
   const {
     categoryId,
     search,
@@ -74,7 +83,22 @@ export function ArtistsSearchClient() {
 
   const artists = data?.pages.flatMap((page) => page.result ?? []) ?? [];
   const total = data?.pages.at(0)?.count ?? artists.length;
-  const rows = isMobile ? mobileSplitPattern(categories) : splitPattern(categories);
+  // Tile filtering follows the draft, not the committed `search`, so the grid reacts to
+  // the keystroke instead of waiting out the 500ms debounce the artist query needs.
+  const tileQuery = normalizeFa(queryDraft);
+  const visibleCategories = tileQuery
+    ? categories.filter(
+        (item) =>
+          normalizeFa(item.faName).includes(tileQuery) ||
+          item.children?.some((child) =>
+            normalizeFa(child.faName).includes(tileQuery),
+          ),
+      )
+    : categories;
+
+  const rows = isMobile
+    ? mobileSplitPattern(visibleCategories)
+    : splitPattern(visibleCategories);
 
   return (
     <div className="space-y-12 relative">
@@ -89,14 +113,14 @@ export function ArtistsSearchClient() {
 
       <div className="flex flex-col items-center justify-center gap-5">
         <h1 className="text-[24px] ma:text-[32px] text-zinc-50 w-full text-center">
-          {categoryId ? "هنرمند مورد نظرت رو پیدا کن" : "دسته بندی رو سرچ کن یا انتخاب کن"}
+          {categoryId ? copy("artistsTitle") : copy("artistsSubtitle")}
         </h1>
 
         <div className="relative md:w-131.5 w-full">
           <Input
             value={queryDraft}
             onChange={(e) => setQueryDraft(e.target.value)}
-            placeholder="مثلاً: کارگردان، تهران..."
+            placeholder={copy("artistsSearchPlaceholder")}
             rightIcon={<Search className="text-zinc-500" size={20} />}
             containerClassName="rounded-full!"
             leftIcon={
@@ -182,7 +206,7 @@ export function ArtistsSearchClient() {
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
               >
-                {isFetchingNextPage ? "در حال بارگذاری..." : "نمایش بیشتر"}
+                {isFetchingNextPage ? copy("artistsLoading") : copy("artistsLoadMore")}
               </Button>
             </div>
           )}

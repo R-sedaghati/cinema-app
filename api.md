@@ -114,6 +114,7 @@ interface FormField {
   label: string;
   type: FormFieldType;
   placeholder?: string | null;
+  helpText?: string | null;   // hint rendered under the input
   required: boolean;
   order: number;
   options?: { label: string; value: string }[] | null;
@@ -123,6 +124,7 @@ interface FormField {
 interface FormStep {
   id: number;
   title: string;
+  description?: string | null;   // copy under the step title
   order: number;
   icon?: string | null;
   fields: FormField[];
@@ -192,6 +194,7 @@ interface Banner {
   subtitle: string;
   titleFontSize: number | null; // px override for the title; null = use the default size
   subtitleFontSize: number | null; // px override for the subtitle; null = use the default size
+  ctaLabelFontSize: number | null; // px override for the CTA label; null = use the default size
   image: string; // full public URL on read; storage path on write (see POST /admin/upload/image)
   ctaLabel: string;
   ctaLink: string;
@@ -313,6 +316,34 @@ interface SiteContent {
     fontSize?: number | null;
   };
   terms: { title: string; content: string; fontSize?: number | null };
+  // site-wide footer; null/absent = the frontend defaults in `lib/constants/footer.ts`
+  footer?: {
+    phone: string;         // support number, displayed as typed (Persian digits ok)
+    instagramUrl: string;  // href of the Instagram icon
+    copyright: string;     // bottom line of the footer
+  } | null;
+  // overrides for the public-site copy (hero, statistics, "why", homepage
+  // sections, artists search, page titles), keyed by the frontend LANDING_COPY
+  // registry in `lib/constants/landingCopy.ts`. Missing keys fall back to the
+  // defaults, so this may be `{}` or absent.
+  landing?: Record<string, string> | null;
+  // field definition of the support contact form; null/absent = the default
+  // form in `lib/constants/contactForm.ts`
+  contactForm?: {
+    title: string;
+    submitLabel: string;
+    fields: {
+      key: string;         // a built-in key (firstName, lastName, email, phoneNumber,
+                           // category, subCategory, subject, message) or any custom id
+      label: string;
+      type: FormFieldType;
+      placeholder?: string | null;
+      helpText?: string | null;
+      required: boolean;
+      options?: { label: string; value: string }[] | null;
+      validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+    }[];
+  } | null;
 }
 ```
 
@@ -462,6 +493,7 @@ ApiResponse<{
   steps: {
     id: number;
     title: string;
+    description: string | null;
     order: number;
     icon: string | null;
     fields: {
@@ -470,12 +502,22 @@ ApiResponse<{
       label: string;
       type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "SELECT_PROVINCE" | "SELECT_CITY" | "RADIO" | "CHECKBOX" | "BOOLEAN" | "DATE" | "IMAGE" | "VIDEO";
       placeholder: string | null;
+      helpText: string | null;
       required: boolean;
       order: number;
       options: { label: string; value: string }[] | null;
       validation: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
     }[];
   }[];
+  // copy for the post-payment result pages, set in the admin form builder
+  successTitle: string | null;
+  successDescription: string | null;
+  failTitle: string | null;
+  failDescription: string | null;
+  // overrides for the form's fixed copy (button labels, step counter, payment
+  // block, validation messages ...), keyed by the frontend FORM_COPY registry
+  // in `lib/constants/formCopy.ts`. Missing keys fall back to the defaults.
+  formCopy: Record<string, string>;
 }>
 ```
 
@@ -492,6 +534,10 @@ ApiResponse<{
 
 ### `POST /user/supports/`
 Create a support ticket. No auth required.
+
+The form is admin-defined (`SiteContent.contactForm`). Fields whose key is one of
+the built-ins below map to the columns; answers to admin-added fields are appended
+to `message` as `label: value` lines, since there is no free-form answers column.
 
 **Body:**
 ```ts
@@ -629,15 +675,27 @@ Get the step/field schema for a top-level category. 400 if `:id` has a parent.
 
 ---
 
+### `PATCH /admin/categories/:id/form-schema/`
+Set the editable copy of a top-level category's form. 400 if `:id` has a parent.
+
+**Body:** `{ successTitle?, successDescription?, failTitle?, failDescription? }` (all `string | null`)
+plus `formCopy?: Record<string, string>` — merged key by key into the stored
+overrides; a key sent empty/blank deletes that override so the frontend default
+applies again.
+
+**Response:** `ApiResponse<{ successTitle, successDescription, failTitle, failDescription, formCopy }>`
+
+---
+
 ### `POST /admin/categories/:id/form-steps/`
 Create a step for a top-level category.
 
-**Body:** `{ title: string; order?: number; icon?: string }`
+**Body:** `{ title: string; description?: string; order?: number; icon?: string }`
 
 ---
 
 ### `PATCH /admin/form-steps/:stepId/`
-Update a step. **Body:** `{ title?: string; order?: number; icon?: string }`
+Update a step. **Body:** `{ title?: string; description?: string; order?: number; icon?: string }`
 
 ---
 
@@ -656,11 +714,13 @@ Create a field on a step.
   label: string;
   type: "TEXT" | "TEXTAREA" | "NUMBER" | "SELECT" | "SELECT_PROVINCE" | "SELECT_CITY" | "RADIO" | "CHECKBOX" | "BOOLEAN" | "DATE" | "IMAGE" | "VIDEO";
   placeholder?: string;
+  helpText?: string;       // hint rendered under the input
   required?: boolean;
   order?: number;
   options?: { label: string; value: string }[];   // SELECT/RADIO/CHECKBOX
   validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string };
   syncToUserField?: "firstName" | "lastName" | "avatar" | "email";
+  multiple?: boolean;      // IMAGE/VIDEO: allow more than one upload
 }
 ```
 
@@ -800,7 +860,7 @@ Get site-content (see `GET /site-content/` above for shape). Admin auth.
 ---
 
 ### `PATCH /admin/site-content/:id/`
-Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`) may be sent independently; unspecified keys are left unchanged.
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`) may be sent independently; unspecified keys are left unchanged.
 
 **Body:** `Partial<Omit<SiteContent, "id">>`
 
@@ -838,7 +898,8 @@ Create a banner slide.
   "priority": 0,
   "isActive": true,
   "titleFontSize": null,
-  "subtitleFontSize": null
+  "subtitleFontSize": null,
+  "ctaLabelFontSize": null
 }
 ```
 

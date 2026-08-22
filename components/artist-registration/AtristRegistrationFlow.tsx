@@ -17,6 +17,7 @@ import FourthStepFlow from "./FourthStepFlow";
 import DynamicFormStep from "./DynamicFormStep";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
+import { makeCopy } from "@/lib/utils/formCopy";
 
 interface ArtistProps {
   category: SelectedCategory | null;
@@ -49,6 +50,11 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
       (item: IUserCategoryResponse) => item.id === category.id,
     );
   }, [data, category]);
+
+  const copy = useMemo(
+    () => makeCopy(schemaData?.result?.formCopy),
+    [schemaData],
+  );
 
   const children = selectedCategory?.children || [];
   const hasChildren = children.length > 0;
@@ -90,6 +96,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
       return hasChildren ? (
         <FirstStepFlow
           childrenList={children}
+          copy={copy}
           onNext={onNext}
           onPrevious={onPrevious}
         />
@@ -102,6 +109,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
         <DynamicFormStep
           step={step}
           provinceKey={provinceKey}
+          copy={copy}
           onNext={onNext}
           onPrevious={onPrevious}
         />
@@ -110,7 +118,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
     if (contentIndex === steps.length) {
       return (
-        <FourthStepFlow steps={steps} onNext={onNext} onPrevious={onPrevious} />
+        <FourthStepFlow steps={steps} copy={copy} onNext={onNext} onPrevious={onPrevious} />
       );
     }
 
@@ -121,7 +129,9 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
   return (
     <div className="flex flex-col gap-3 items-center">
-      <p className="font-h2-bold mt-5 mb-1 md:mb-7 md:mt-0">{`فرم حوزه ${category?.title}`}</p>
+      <p className="font-h2-bold mt-5 mb-1 md:mb-7 md:mt-0">
+        {copy("formTitle", { category: category?.title ?? "" })}
+      </p>
 
       <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} className="py-4">
         <HorizontalStepper
@@ -137,8 +147,8 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
             <HorizontalStep
               activeIcon={<LayoutGrid />}
               icon={<LayoutGrid />}
-              subTitle={`مرحله ۱ از ${totalSteps}`}
-              title="زمینه فعالیت"
+              subTitle={copy("stepCounter", { n: 1, total: totalSteps })}
+              title={copy("categoryStepTitle")}
             />
           )}
           {steps.map((step, index) => {
@@ -149,7 +159,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
                 key={step.id}
                 activeIcon={<Icon />}
                 icon={<Icon />}
-                subTitle={`مرحله ${stepNumber} از ${totalSteps}`}
+                subTitle={copy("stepCounter", { n: stepNumber, total: totalSteps })}
                 title={step.title}
               />
             );
@@ -157,8 +167,8 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
           <HorizontalStep
             activeIcon={<CreditCard />}
             icon={<CreditCard />}
-            subTitle="مرحله پایانی"
-            title="پرداخت"
+            subTitle={copy("finalStepLabel")}
+            title={copy("paymentStepTitle")}
           />
         </HorizontalStepper>
       </Card>

@@ -14,6 +14,9 @@ import {
   ISiteContentBenefitItem,
   ISiteContentSupportItem,
 } from "@/lib/services/admin/type";
+import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
+import LandingCopyCard from "@/components/admin/content/LandingCopyCard";
+import ContactFormCard from "@/components/admin/content/ContactFormCard";
 import FontSizeInput from "@/components/admin/FontSizeInput";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Button, Card, Divider, Input, Textarea } from "@dgshahr/ui-kit";
@@ -65,6 +68,9 @@ function ContentManagement() {
   const [supportDescription, setSupportDescription] = useState("");
   const [supportItems, setSupportItems] =
     useState<ISiteContentSupportItem[]>(emptySupportItems);
+  const [footerPhone, setFooterPhone] = useState("");
+  const [footerInstagram, setFooterInstagram] = useState("");
+  const [footerCopyright, setFooterCopyright] = useState("");
   const [termsTitle, setTermsTitle] = useState("");
   const [termsContent, setTermsContent] = useState("");
   const [aboutFontSize, setAboutFontSize] = useState<number | null>(null);
@@ -80,6 +86,9 @@ function ContentManagement() {
     setSupportTitle(content.support?.title ?? "");
     setSupportDescription(content.support?.description ?? "");
     setSupportItems(content.support?.items ?? emptySupportItems);
+    setFooterPhone(content.footer?.phone ?? "");
+    setFooterInstagram(content.footer?.instagramUrl ?? "");
+    setFooterCopyright(content.footer?.copyright ?? "");
     setTermsTitle(content.terms?.title ?? "");
     setTermsContent(content.terms?.content ?? "");
     setBenefitsFontSize(content.benefits?.fontSize ?? null);
@@ -195,6 +204,33 @@ function ContentManagement() {
           title: termsTitle,
           content: termsContent,
           fontSize: termsFontSize,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("با موفقیت تغییر کرد");
+          queryClient.invalidateQueries({ queryKey: ["adminSiteContent"] });
+        },
+        onError: () => toast.error("خطا در ذخیره‌سازی"),
+      },
+    );
+  };
+
+  const saveSiteContent = () => ({
+    onSuccess: () => {
+      toast.success("با موفقیت تغییر کرد");
+      queryClient.invalidateQueries({ queryKey: ["adminSiteContent"] });
+    },
+    onError: () => toast.error("خطا در ذخیره‌سازی"),
+  });
+
+  const handleFooterSubmit = () => {
+    updateSiteContent(
+      {
+        footer: {
+          phone: footerPhone,
+          instagramUrl: footerInstagram,
+          copyright: footerCopyright,
         },
       },
       {
@@ -570,6 +606,68 @@ function ContentManagement() {
             </div>
           </div>
         </Card>
+        <Card>
+          <div className="flex flex-col gap-4">
+            <p className="font-h3-bold text-error-500">پابرگ سایت</p>
+
+            <Divider color="gray" size="thin" type="horizontal" />
+
+            <p className="text-xs text-gray-500">
+              خالی گذاشتن هر فیلد یعنی استفاده از مقدار پیش‌فرض (همان متنی که به
+              عنوان راهنما نمایش داده می‌شود).
+            </p>
+
+            <div className="flex justify-between gap-3">
+              <Input
+                labelContent="تلفن پشتیبانی"
+                wrapperClassName="w-1/2"
+                placeholder={FOOTER_DEFAULTS.phone}
+                value={footerPhone}
+                onChange={(e) => setFooterPhone(e.target.value)}
+              />
+
+              <Input
+                labelContent="لینک اینستاگرام"
+                wrapperClassName="w-1/2"
+                placeholder={FOOTER_DEFAULTS.instagramUrl}
+                value={footerInstagram}
+                onChange={(e) => setFooterInstagram(e.target.value)}
+              />
+            </div>
+
+            <Input
+              labelContent="متن حق نشر (پایین پابرگ)"
+              placeholder={FOOTER_DEFAULTS.copyright}
+              value={footerCopyright}
+              onChange={(e) => setFooterCopyright(e.target.value)}
+            />
+
+            <div className="flex justify-end gap-3">
+              <Button
+                color="error"
+                isLoading={isSiteContentPending}
+                disabled={isSiteContentPending}
+                onClick={handleFooterSubmit}
+              >
+                ثبت تغییرات
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        <LandingCopyCard
+          ready={Boolean(siteContentData?.result)}
+          stored={siteContentData?.result?.landing}
+          isPending={isSiteContentPending}
+          onSave={(landing) => updateSiteContent({ landing }, saveSiteContent())}
+        />
+
+        <ContactFormCard
+          ready={Boolean(siteContentData?.result)}
+          stored={siteContentData?.result?.contactForm}
+          isPending={isSiteContentPending}
+          onSave={(contactForm) => updateSiteContent({ contactForm }, saveSiteContent())}
+        />
       </div>
     </div>
   );

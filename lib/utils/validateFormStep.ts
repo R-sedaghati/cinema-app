@@ -1,9 +1,11 @@
 import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
 import { FIELD_VALIDATION_PRESETS, isValidPreset } from "./fieldValidationPresets";
+import { CopyFn, defaultCopy } from "./formCopy";
 
 export function getStepErrors(
   step: IFormStep,
   answers: Record<string, unknown>,
+  copy: CopyFn = defaultCopy,
 ): string[] {
   const errors: string[] = [];
 
@@ -17,7 +19,7 @@ export function getStepErrors(
       (Array.isArray(value) && value.length === 0);
 
     if (field.required && isEmpty) {
-      errors.push(`${field.label} الزامی است`);
+      errors.push(copy("requiredMessage", { label: field.label }));
       continue;
     }
 
@@ -26,19 +28,19 @@ export function getStepErrors(
     const { preset, min, max, minLength, maxLength, pattern } = field.validation;
 
     if (typeof value === "number") {
-      if (min !== undefined && value < min) errors.push(`${field.label} باید حداقل ${min} باشد`);
-      if (max !== undefined && value > max) errors.push(`${field.label} باید حداکثر ${max} باشد`);
+      if (min !== undefined && value < min) errors.push(copy("minMessage", { label: field.label, min }));
+      if (max !== undefined && value > max) errors.push(copy("maxMessage", { label: field.label, max }));
     }
 
     if (typeof value === "string") {
       if (preset && FIELD_VALIDATION_PRESETS[preset] && !isValidPreset(preset, value)) {
         errors.push(`${field.label}: ${FIELD_VALIDATION_PRESETS[preset].message}`);
       }
-      if (minLength !== undefined && value.length < minLength) errors.push(`${field.label} باید حداقل ${minLength} کاراکتر باشد`);
-      if (maxLength !== undefined && value.length > maxLength) errors.push(`${field.label} باید حداکثر ${maxLength} کاراکتر باشد`);
+      if (minLength !== undefined && value.length < minLength) errors.push(copy("minLengthMessage", { label: field.label, n: minLength }));
+      if (maxLength !== undefined && value.length > maxLength) errors.push(copy("maxLengthMessage", { label: field.label, n: maxLength }));
       if (pattern) {
         try {
-          if (!new RegExp(pattern).test(value)) errors.push(`${field.label} نامعتبر است`);
+          if (!new RegExp(pattern).test(value)) errors.push(copy("invalidMessage", { label: field.label }));
         } catch {
           // ponytail: admin-authored regex, ignore invalid patterns rather than crash the form
         }

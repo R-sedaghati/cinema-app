@@ -10,6 +10,7 @@ import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { useUserArtistDetail, useUserCategoryList } from "@/lib/services/landing/hook";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
+import { defaultCopy } from "@/lib/utils/formCopy";
 
 export interface SelectedCategory {
   id: number;
@@ -116,7 +117,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
         >
           <MoveRight size={18} />
-          بازگشت به صفحه اصلی
+          {defaultCopy("backHome")}
         </Link>
       </div>
 
@@ -130,7 +131,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
         >
           <div className="flex flex-col gap-3 items-center">
             <p className={clsx("font-h4-bold", isDesktop && "font-h3-bold")}>
-              لطفاً زمینه فعالیت خود را مشخص نمایید:
+              {defaultCopy("categoryPrompt")}
             </p>
 
             <div className="flex flex-col gap-4">

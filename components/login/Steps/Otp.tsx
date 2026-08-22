@@ -13,6 +13,7 @@ import { useUserLogin } from "@/lib/services/landing/hook";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
+import TermsNotice from "@/components/login/TermsNotice";
 
 const OTP_EXPIRATION_KEY = "otpExpirationDate";
 
@@ -167,6 +168,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       >
         ورود
       </Button>
+      <TermsNotice />
     </>
   );
 };
