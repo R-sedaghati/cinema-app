@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import qs from "qs";
 import { toast } from "react-toastify";
+import { apiErrorFa } from "../utils/apiErrorFa";
 import useAdminAuthStore from "../stores/useAdminAuthStore";
 
 type ErrorResponse = {
@@ -40,8 +41,7 @@ api.interceptors.request.use(
 function handleAxiosError(error: AxiosError) {
   const data = error.response?.data as ErrorResponse | undefined;
 
-  const message =
-    data?.error || data?.message || "خطایی در ارتباط با سرور رخ داده است.";
+  const message = apiErrorFa(data?.error || data?.message);
 
   const requestUrl = error.config?.url || "";
 
@@ -53,7 +53,18 @@ function handleAxiosError(error: AxiosError) {
     toast.error(message, { toastId: message });
   }
 
-  if (error.response?.status === 401) {
+  // Only an authenticated request that comes back 401 means the session died.
+  // A 401 from /admin/login is a wrong password, and a 401 on a request that
+  // carried no token at all says nothing about the stored one.
+  const isLoginRequest = requestUrl.includes("/admin/login");
+  const wasAuthenticated = Boolean(error.config?.headers?.Authorization);
+
+  if (
+    error.response?.status === 401 &&
+    !isLoginRequest &&
+    wasAuthenticated &&
+    useAdminAuthStore.getState().isLoggedIn()
+  ) {
     useAdminAuthStore.getState().logout();
     window.location.href = "/admin/login";
   }

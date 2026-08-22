@@ -6,6 +6,7 @@ import { FieldProps } from "./types";
 const BooleanField: React.FC<FieldProps> = ({ field, value, onChange }) => (
   <Checkbox
     label={field.label}
+    containerClassName="w-full"
     checked={value === true}
     onChange={(e) => onChange(e.target.checked)}
   />

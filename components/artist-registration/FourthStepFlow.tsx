@@ -14,16 +14,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
+import { CopyFn } from "@/lib/utils/formCopy";
 
 const PAYMENT_AMOUNT = 200000;
 
 interface Props {
   steps: IFormStep[];
+  copy: CopyFn;
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
+const FourthStepFlow: React.FC<Props> = ({ steps, copy, onPrevious }) => {
   const store = useArtistRegistrationStore();
   const router = useRouter();
   const { mutate: create, isPending: isCreating } =
@@ -57,11 +59,11 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
         { id: store.editId, ...formPayload },
         {
           onSuccess: () => {
-            toast.success("فرم با موفقیت ویرایش شد");
+            toast.success(copy("editSuccessToast"));
             store.reset();
             router.push("/profile");
           },
-          onError: () => toast.error("خطا در ویرایش فرم"),
+          onError: () => toast.error(copy("editErrorToast")),
         },
       );
     } else {
@@ -92,11 +94,12 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
                     const display =
                       typeof value === "boolean"
                         ? value
-                          ? "بله"
-                          : "خیر"
+                          ? copy("booleanYes")
+                          : copy("booleanNo")
                         : Array.isArray(value)
                           ? value.join("، ")
-                          : ((value as string | number | undefined) ?? "-");
+                          : ((value as string | number | undefined) ??
+                            copy("emptyValue"));
 
                     return (
                       <div key={field.id} className="flex gap-1">
@@ -115,22 +118,18 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
             <div className="flex flex-col gap-3">
               <div className="flex gap-2 items-center">
                 <div className="w-1 h-6 bg-error-500" />
-                <p className="font-h5-bold">
-                  هزینه پرداخت ثبت‌نام نهایی در سایت آرشیو هنر
-                </p>
+                <p className="font-h5-bold">{copy("paymentTitle")}</p>
               </div>
-              <p className="font-p2-regular">
-                هزینه یکبار برای همیشه در این دسته بندی میباشد
-              </p>
+              <p className="font-p2-regular">{copy("paymentNote")}</p>
             </div>
             <Card wrapperClassName="w-full md:w-1/3">
               <div className="flex justify-between items-center">
-                <p className="font-p2-medium">مبلغ قابل پرداخت</p>
+                <p className="font-p2-medium">{copy("amountLabel")}</p>
                 <div className="flex gap-1">
                   <p className="font-p2-medium">
                     {convertEnNumberToFaNumberWithSeparation(PAYMENT_AMOUNT)}
                   </p>
-                  <p className="font-p2-medium">تومان</p>
+                  <p className="font-p2-medium">{copy("currency")}</p>
                 </div>
               </div>
             </Card>
@@ -140,7 +139,7 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
         {store.editId && (
           <div className="flex gap-2 items-center">
             <div className="w-1 h-6 bg-error-500" />
-            <p className="font-h5-bold">بررسی و ثبت تغییرات فرم</p>
+            <p className="font-h5-bold">{copy("reviewTitle")}</p>
           </div>
         )}
 
@@ -153,7 +152,7 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            مرحله قبل
+            {copy("prevLabel")}
           </Button>
 
           <Button
@@ -165,7 +164,7 @@ const FourthStepFlow: React.FC<Props> = ({ steps, onPrevious }) => {
             size={isMobile ? "small" : "medium"}
             disabled={isPending}
           >
-            {store.editId ? "ثبت تغییرات" : "پرداخت و ثبت‌نام نهایی"}
+            {store.editId ? copy("editSubmitLabel") : copy("submitLabel")}
           </Button>
         </div>
       </div>

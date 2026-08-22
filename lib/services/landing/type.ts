@@ -1,7 +1,7 @@
 import {
   IArtistItem,
   IBasePaginateResponse,
-  IFormStep,
+  IFormSchema,
   IRetriveResponse,
   ISupportItem,
 } from "../admin/type";
@@ -77,7 +77,7 @@ export interface IUserCategoryResponse {
   updatedAt: string | null;
 }
 
-export type IFormSchemaResponse = IRetriveResponse<{ steps: IFormStep[] }>;
+export type IFormSchemaResponse = IRetriveResponse<IFormSchema>;
 
 /**
  * Filters are derived per category from its form schema, so the client never hardcodes

@@ -10,7 +10,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { isLoggedIn } = useAdminAuthStore();
+  const isLoggedIn = useAdminAuthStore((s) => !!s.accessToken);
+  const hasHydrated = useAdminAuthStore((s) => s.hasHydrated);
 
   const excludedPaths = ["/admin/login"];
   const isLoginPage = excludedPaths.includes(pathname);
@@ -18,13 +19,15 @@ export default function RootLayout({ children }: PropsWithChildren) {
   const queryClient = useMemo(() => new QueryClient(), []);
 
   useEffect(() => {
-    if (!isLoggedIn && !isLoginPage) {
+    if (hasHydrated && !isLoggedIn && !isLoginPage) {
       router.replace("/admin/login");
     }
-  }, [isLoggedIn, isLoginPage, router]);
+  }, [hasHydrated, isLoggedIn, isLoginPage, router]);
 
-  if (!isLoggedIn && !isLoginPage) {
-    return null;
+  // Until the persisted token is read back, "no token" is not the same as
+  // "logged out" — rendering the guard early would bounce a valid session.
+  if (!isLoginPage && (!hasHydrated || !isLoggedIn)) {
+    return <div className="dot-flashing" />;
   }
 
   return (

@@ -2,13 +2,15 @@
 
 import { useUserFaqList } from "@/lib/services/landing/hook";
 import { AccordionGroup, AccordionItem } from "@dgshahr/ui-kit";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export function FaqClient() {
   const { data } = useUserFaqList();
+  const copy = useLandingCopy();
 
   return (
     <div className="flex relative flex-col justify-center items-center gap-10 md:pb-28">
-      <h3 className="font-h1-regular text-4xl">سوالات متداول</h3>
+      <h3 className="font-h1-regular text-4xl">{copy("faqPageTitle")}</h3>
       <AccordionGroup className="gap-4" defaultActiveKey={"f1"}>
         {data?.result?.map((item) => (
           <AccordionItem

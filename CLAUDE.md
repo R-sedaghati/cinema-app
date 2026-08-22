@@ -12,7 +12,11 @@ pnpm cap:sync   # sync web assets to Android
 pnpm cap:android  # open Android Studio
 ```
 
-No test suite configured.
+```bash
+pnpm test       # node:test over lib/**/*.test.ts (type-stripping, no framework)
+```
+
+Test files import with explicit `.ts` extensions and relative paths (node resolves neither `@/` aliases nor extensionless specifiers).
 
 ## Architecture
 

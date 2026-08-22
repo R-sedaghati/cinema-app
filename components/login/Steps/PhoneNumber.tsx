@@ -7,6 +7,7 @@ import { formatPhoneNumber } from "@/lib/utils/formatPhoneNumber";
 import { is_phone_number } from "@/lib/validation/regexValidations";
 import convertFaNumberToEnNumber from "@/lib/utils/convertFaNumberToEnNumber";
 import Button from "@/components/common/Button";
+import TermsNotice from "@/components/login/TermsNotice";
 import { useUserLogin } from "@/lib/services/landing/hook";
 import { toast } from "react-toastify";
 
@@ -117,6 +118,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
       >
         دریافت کد
       </Button>
+      <TermsNotice />
     </div>
   );
 };

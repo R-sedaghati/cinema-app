@@ -1,8 +1,24 @@
+"use client";
+
 import { Instagram, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
+import { useUserSiteContent } from "@/lib/services/landing/hook";
+import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
 
 export function SiteFooter() {
+  const { data } = useUserSiteContent();
+  const footer = data?.result?.footer;
+
+  const phone = footer?.phone?.trim() || FOOTER_DEFAULTS.phone;
+  const instagramUrl =
+    footer?.instagramUrl?.trim() || FOOTER_DEFAULTS.instagramUrl;
+  const copyright = footer?.copyright?.trim() || FOOTER_DEFAULTS.copyright;
+
+  // tel: needs latin digits even when the displayed number is Persian.
+  const phoneHref = `tel:${convertFaNumericStringToEnNumericString(phone).replace(/\s/g, "")}`;
+
   return (
     <footer className="bg-zinc-950/40 text-white">
       <div className="mx-auto max-w-7xl px-6 py-16 flex flex-col gap-14">
@@ -20,11 +36,23 @@ export function SiteFooter() {
             </h3>
           </div>
           <div className="flex items-center font-bold gap-6 text-zinc-400 text-sm">
-            <span className="tracking-wider ss02">
-              تلفن پشتیبانی ۰۹۱۹۸۶۱۲۲۶۱
-            </span>
-            <Instagram />
-            <Phone />
+            <span className="tracking-wider ss02">تلفن پشتیبانی {phone}</span>
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="اینستاگرام"
+              className="hover:text-white transition-colors"
+            >
+              <Instagram />
+            </a>
+            <a
+              href={phoneHref}
+              aria-label="تماس با پشتیبانی"
+              className="hover:text-white transition-colors"
+            >
+              <Phone />
+            </a>
           </div>
         </div>
 
@@ -80,7 +108,7 @@ export function SiteFooter() {
         </div>
 
         <p className="border-t border-zinc-800 pt-6 text-center text-xs text-zinc-500">
-          تمامی حقوق این سایت محفوظ و متعلق به سایت آرشیو هنر می‌باشد.
+          {copyright}
         </p>
       </div>
     </footer>

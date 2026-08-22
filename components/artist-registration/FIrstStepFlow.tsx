@@ -7,15 +7,18 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import Button from "../common/Button";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
+import { CopyFn } from "@/lib/utils/formCopy";
 
 interface Props {
   childrenList: IUserCaategoryItem[];
+  copy: CopyFn;
   onNext: () => void;
   onPrevious: () => void;
 }
 
 const FirstStepFlow: React.FC<Props> = ({
   childrenList,
+  copy,
   onNext,
   onPrevious,
 }) => {
@@ -35,13 +38,14 @@ const FirstStepFlow: React.FC<Props> = ({
   return (
     <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
       <div className={clsx("flex flex-col gap-6", isDesktop && "gap-4!")}>
-        <p className="font-p2-medium">لطفاً زمینه فعالیت خود را مشخص نمایید:</p>
+        <p className="font-p2-medium">{copy("categoryPrompt")}</p>
 
         <div className="flex flex-col gap-2">
           {childrenList?.map((child) => (
             <Checkbox
               key={child.id}
               label={child?.faName ?? ""}
+              containerClassName="w-full"
               checked={categoryId.includes(child.id)}
               onChange={() => toggleCategory(child.id)}
             />
@@ -57,7 +61,7 @@ const FirstStepFlow: React.FC<Props> = ({
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            مرحله قبل
+            {copy("prevLabel")}
           </Button>
 
           <Button
@@ -67,7 +71,7 @@ const FirstStepFlow: React.FC<Props> = ({
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            مرحله بعد
+            {copy("nextLabel")}
           </Button>
         </div>
       </div>

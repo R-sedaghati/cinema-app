@@ -17,6 +17,7 @@ import {
   IFaqItem,
   IFaqListResponse,
   IFormFieldRetrieveResponse,
+  IFormResultPages,
   IFormSchemaRetrieveResponse,
   IFormStepRetrieveResponse,
   IProvinceListResponse,
@@ -121,6 +122,19 @@ export const adminCategoryRetrieve = async (
 export const adminGetFormSchema = async (categoryId: number, accessToken: string) => {
   const { data } = await api.get<IFormSchemaRetrieveResponse>(
     `/admin/categories/${categoryId}/form-schema/`,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminUpdateFormResultPages = async (
+  categoryId: number,
+  payload: Partial<IFormResultPages>,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IRetriveResponse<IFormResultPages>>(
+    `/admin/categories/${categoryId}/form-schema/`,
+    payload,
     { headers: { Authorization: accessToken } },
   );
   return data;

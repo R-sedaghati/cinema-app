@@ -10,19 +10,21 @@ import FieldRenderer from "./fields/FieldRenderer";
 import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
+import { CopyFn } from "@/lib/utils/formCopy";
 
 interface Props {
   step: IFormStep;
   provinceKey?: string;
+  copy: CopyFn;
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, onNext, onPrevious }) => {
+const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, copy, onNext, onPrevious }) => {
   const store = useArtistRegistrationStore();
 
   const handleNext = () => {
-    const errors = getStepErrors(step, store.answers);
+    const errors = getStepErrors(step, store.answers, copy);
 
     if (errors.length) {
       toast.error(errors[0]);
@@ -37,6 +39,10 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, onNext, onPreviou
   return (
     <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
       <div className="flex flex-col gap-5">
+        {step.description && (
+          <p className="font-p2-medium text-gray-700">{step.description}</p>
+        )}
+
         {sortedFields.map((field) => (
           <FieldRenderer
             key={field.id}
@@ -56,7 +62,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, onNext, onPreviou
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            مرحله قبل
+            {copy("prevLabel")}
           </Button>
 
           <Button
@@ -66,7 +72,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, onNext, onPreviou
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            مرحله بعد
+            {copy("nextLabel")}
           </Button>
         </div>
       </div>

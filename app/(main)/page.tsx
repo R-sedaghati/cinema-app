@@ -19,6 +19,7 @@ import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const BANNER_GRADIENTS = [
   "from-zinc-950 via-amber-950/50 to-zinc-900",
@@ -33,6 +34,7 @@ export default function ApplicationPage() {
   const [search, setSearch] = useState("");
   const { isLoggedIn } = useAuthStore();
   const { open } = useLoginDrawerStore();
+  const copy = useLandingCopy();
 
   const handleCategoryShortcut = (id: number, title: string) => {
     reset();
@@ -100,25 +102,32 @@ export default function ApplicationPage() {
                     className={`relative h-full w-full bg-linear-to-bl ${BANNER_GRADIENTS[index % BANNER_GRADIENTS.length]} flex items-center px-6 md:px-16 overflow-hidden`}
                   >
                     <div className="relative z-10 flex-1 md:max-w-xl">
-                      <p
-                        className="text-error-400 text-sm md:text-base font-medium mb-1 md:mb-2"
-                        style={fontSizeStyle(slide.subtitleFontSize)}
-                      >
-                        {slide.subtitle}
-                      </p>
-                      <h2
-                        className="text-white text-2xl md:text-5xl font-bold mb-4 md:mb-6"
-                        style={fontSizeStyle(slide.titleFontSize)}
-                      >
-                        {slide.title}
-                      </h2>
-                      <Link
-                        href={slide.ctaLink}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-error-500 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold text-zinc-950"
-                      >
-                        {slide.ctaLabel}
-                        <ArrowLeft size={14} />
-                      </Link>
+                      {slide.subtitle && (
+                        <p
+                          className="text-error-400 text-sm md:text-base font-medium mb-1 md:mb-2"
+                          style={fontSizeStyle(slide.subtitleFontSize)}
+                        >
+                          {slide.subtitle}
+                        </p>
+                      )}
+                      {slide.title && (
+                        <h2
+                          className="text-white text-2xl md:text-5xl font-bold mb-4 md:mb-6"
+                          style={fontSizeStyle(slide.titleFontSize)}
+                        >
+                          {slide.title}
+                        </h2>
+                      )}
+                      {slide.ctaLabel && slide.ctaLink && (
+                        <Link
+                          href={slide.ctaLink}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-error-500 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold text-zinc-950"
+                          style={fontSizeStyle(slide.ctaLabelFontSize)}
+                        >
+                          {slide.ctaLabel}
+                          <ArrowLeft size={14} />
+                        </Link>
+                      )}
                     </div>
                     <div className="absolute inset-0 opacity-30 pointer-events-none">
                       <Image
@@ -136,17 +145,15 @@ export default function ApplicationPage() {
         )
       )}
 
-      <MainTutorialVideo />
-
       <div className="mx-auto max-w-6xl px-4">
         {/* Header + Search */}
         <div className="pt-5 md:pt-8 pb-3 md:pb-5 space-y-3 md:space-y-4">
           <div>
             <h1 className="text-xl md:text-3xl font-bold text-zinc-100">
-              کاوش
+              {copy("homeExploreKicker")}
             </h1>
             <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
-              هنرمندان سینما را کشف کنید
+              {copy("homeExploreTitle")}
             </p>
           </div>
           <div className="relative md:w-131.5">
@@ -163,7 +170,7 @@ export default function ApplicationPage() {
                   router.push(`/artists?search=${encodeURIComponent(search.trim())}`);
                 }
               }}
-              placeholder="جستجوی هنرمندان، دسته‌بندی‌ها..."
+              placeholder={copy("homeSearchPlaceholder")}
               className="w-full rounded-2xl py-3.5 md:py-4 pr-10 pl-4 text-sm md:text-base outline-none focus:ring-1 focus:ring-error-500/60 border border-zinc-700/40 bg-zinc-900/60"
             />
           </div>
@@ -177,7 +184,7 @@ export default function ApplicationPage() {
                 onClick={() => router.push("/artists")}
                 className="rounded-full px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
               >
-                همه
+                {copy("homeAllLabel")}
               </button>
               {categories.map((cat) => (
                 <button
@@ -198,21 +205,23 @@ export default function ApplicationPage() {
         )}
 
         <div className="mt-5 md:mt-8 space-y-8 md:space-y-12">
+          <MainTutorialVideo />
+
           {/* Artist Registration — full width blog-card slider */}
           <section className="-mx-4">
             <div className="flex items-center justify-between mb-3 md:mb-4 px-4">
               <h2 className="text-sm md:text-lg font-semibold text-zinc-100">
-                ثبت‌نام هنرمند
+                {copy("homeRegistrationTitle")}
               </h2>
               <Link
                 href="/profile"
                 className="text-xs md:text-sm text-error-500"
               >
-                شروع
+                {copy("homeRegistrationCta")}
               </Link>
             </div>
             <div className="overflow-x-auto scrollbar-hidden">
-              <div className="flex gap-3 md:gap-4 w-max px-4 md:px-8 pb-1">
+              <div className="flex gap-3 md:gap-4 w-max px-4 pb-1">
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
@@ -235,7 +244,7 @@ export default function ApplicationPage() {
                         {cat.faName}
                       </p>
                       <span className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
-                        شروع
+                        {copy("homeRegistrationCta")}
                         <ArrowLeft size={12} />
                       </span>
                     </div>
@@ -249,13 +258,13 @@ export default function ApplicationPage() {
           <section>
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h2 className="text-sm md:text-lg font-semibold text-zinc-100">
-                هنرمندان
+                {copy("homeArtistsTitle")}
               </h2>
               <Link
                 href="/artists"
                 className="text-xs md:text-sm text-error-500"
               >
-                همه
+                {copy("homeArtistsCta")}
               </Link>
             </div>
 
@@ -272,10 +281,10 @@ export default function ApplicationPage() {
             >
               <div>
                 <p className="text-sm md:text-base font-semibold text-zinc-100">
-                  پشتیبانی
+                  {copy("homeSupportTitle")}
                 </p>
                 <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
-                  با تیم ما در ارتباط باشید
+                  {copy("homeSupportSubtitle")}
                 </p>
               </div>
               <ArrowLeft
@@ -290,10 +299,10 @@ export default function ApplicationPage() {
             >
               <div>
                 <p className="text-sm md:text-base font-semibold text-zinc-100">
-                  راهنمای ویدیویی
+                  {copy("homeTutorialsTitle")}
                 </p>
                 <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
-                  آموزش استفاده از اپلیکیشن
+                  {copy("homeTutorialsSubtitle")}
                 </p>
               </div>
               <ArrowLeft
@@ -308,10 +317,10 @@ export default function ApplicationPage() {
             >
               <div>
                 <p className="text-sm md:text-base font-semibold text-zinc-100">
-                  سوالات متداول
+                  {copy("homeFaqTitle")}
                 </p>
                 <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
-                  پاسخ سوالات خود را پیدا کنید
+                  {copy("homeFaqSubtitle")}
                 </p>
               </div>
               <ArrowLeft
@@ -335,6 +344,8 @@ function ArtistSection({
   loading: boolean;
   artists: IArtistItem[];
 }) {
+  const copy = useLandingCopy();
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-5">
@@ -362,7 +373,7 @@ function ArtistSection({
           height={72}
           className="mx-auto mb-4 opacity-30"
         />
-        <p className="text-zinc-500 text-sm">هنرمندی یافت نشد</p>
+        <p className="text-zinc-500 text-sm">{copy("homeEmptyArtists")}</p>
       </div>
     );
   }

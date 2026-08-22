@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import qs from "qs";
 import { toast } from "react-toastify";
+import { apiErrorFa } from "../utils/apiErrorFa";
 import useAuthStore from "../stores/useAuthStore";
 
 type ErrorResponse = {
@@ -50,8 +51,7 @@ function handleError(error: AxiosError) {
 
   const data = error.response?.data as ErrorResponse | undefined;
 
-  const message =
-    data?.error || data?.message || "خطایی در ارتباط با سرور رخ داده است.";
+  const message = apiErrorFa(data?.error || data?.message);
 
   toast.error(message, {
     toastId: message,

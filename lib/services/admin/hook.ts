@@ -16,6 +16,7 @@ import {
   ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
+  IFormResultPages,
   IFormSchemaRetrieveResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -64,6 +65,7 @@ import {
   adminFaqList,
   adminFaqUpdate,
   adminGetFormSchema,
+  adminUpdateFormResultPages,
   adminLogin,
   adminProvinceList,
   adminSiteContent,
@@ -126,6 +128,15 @@ export const useAdminFormSchema = (categoryId?: number) => {
     enabled: Boolean(categoryId),
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminUpdateFormResultPages = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (data: { categoryId: number; payload: Partial<IFormResultPages> }) =>
+      adminUpdateFormResultPages(data.categoryId, data.payload, accessToken),
   });
 };
 

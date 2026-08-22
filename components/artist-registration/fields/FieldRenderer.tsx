@@ -31,7 +31,16 @@ const FIELD_COMPONENTS: Record<EFormFieldType, React.FC<FieldProps>> = {
 const FieldRenderer: React.FC<FieldProps> = (props) => {
   const Component = FIELD_COMPONENTS[props.field.type];
   if (!Component) return null;
-  return <Component {...props} />;
+
+  // ponytail: help text is rendered here once instead of in all twelve field components
+  if (!props.field.helpText) return <Component {...props} />;
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Component {...props} />
+      <p className="font-p3-regular text-gray-500">{props.field.helpText}</p>
+    </div>
+  );
 };
 
 export default FieldRenderer;
