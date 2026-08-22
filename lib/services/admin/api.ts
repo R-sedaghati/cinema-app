@@ -2,10 +2,13 @@ import { prepareImage } from "@/lib/utils/prepareUpload";
 import api from "../axiosInstance";
 import {
   IAboutUsResponse,
+  IAdjustWalletRequest,
   IAdminFaqUpdateItem,
+  IAdminWalletResponse,
   IArtistListResponse,
   IArtistRetriveResponse,
   IArtistStatusUpdateRequest,
+  IBasePaginateResponse,
   IBannerListResponse,
   IBannerRetrieveResponse,
   IBannerUpsertRequest,
@@ -20,17 +23,22 @@ import {
   IFormResultPages,
   IFormSchemaRetrieveResponse,
   IFormStepRetrieveResponse,
+  IPaymentSettingResponse,
+  INotificationSettingResponse,
   IProvinceListResponse,
   IRetriveResponse,
   ISiteContent,
   ISiteContentResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
+  ITransactionItem,
   ITutorialListResponse,
   ITutorialRetrieveResponse,
   ITutorialUpsertRequest,
   IUpdateCategoryRequest,
   IUpdateFormFieldRequest,
+  IUpdatePaymentSettingRequest,
+  IUpdateNotificationSettingRequest,
   IUpdateFormStepRequest,
   IUserRetrive,
   IUsersListResponse,
@@ -39,6 +47,7 @@ import {
   ParamsArtistList,
   ParamsBannerList,
   ParamsCategoryList,
+  ParamsTransactionList,
   ParamsTutorialList,
   ParamsUsersList,
 } from "./type";
@@ -356,6 +365,84 @@ export const adminSiteContentUpdate = async (
     "/admin/site-content/1",
     payload,
     { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminUserWallet = async (id: number, accessToken: string) => {
+  const { data } = await api.get<IAdminWalletResponse>(
+    `/admin/users/${id}/wallet/`,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminAdjustUserWallet = async (
+  id: number,
+  payload: IAdjustWalletRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IRetriveResponse<{ balance: number }>>(
+    `/admin/users/${id}/wallet/`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminPaymentSettings = async (accessToken: string) => {
+  const { data } = await api.get<IPaymentSettingResponse>("/admin/payment-settings/", {
+    headers: { Authorization: accessToken },
+  });
+
+  return data;
+};
+
+export const adminPaymentSettingsUpdate = async (
+  payload: IUpdatePaymentSettingRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IPaymentSettingResponse>(
+    "/admin/payment-settings/",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminNotificationSettings = async (accessToken: string) => {
+  const { data } = await api.get<INotificationSettingResponse>(
+    "/admin/notification-settings/",
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminNotificationSettingsUpdate = async (
+  payload: IUpdateNotificationSettingRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<INotificationSettingResponse>(
+    "/admin/notification-settings/",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminTransactionList = async (
+  params: Partial<ParamsTransactionList> | undefined,
+  accessToken: string,
+) => {
+  const { data } = await api.get<IBasePaginateResponse<ITransactionItem>>(
+    "/admin/contact-requests/",
+    { params: { count: 10, ...params }, headers: { Authorization: accessToken } },
   );
 
   return data;

@@ -2,7 +2,8 @@
 
 import ContentCard from "../ContentCard";
 import { Table } from "@dgshahr/ui-kit";
-import { columns } from "./Columns";
+import { generateColumns } from "./Columns";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useState } from "react";
 import { IPagination } from "@/lib/services/landing/type";
 import { useUserContactRequests } from "@/lib/services/landing/hook";
@@ -24,14 +25,15 @@ export default function RequestsList() {
   const { data, isPending } = useUserContactRequests(finalParams);
 
   const isValidParams = hasValidParams(finalParams);
+  const copy = useLandingCopy();
 
   return (
-    <ContentCard title="درخواست‌های ارتباط با هنرمندان">
+    <ContentCard title={copy("profileRequestsTitle")}>
       <Table
         rowKey="id"
         className="w-full"
         stickyTableHeader
-        columns={columns}
+        columns={generateColumns(copy)}
         data={data?.result ?? []}
         {...(isValidParams && isPending && { loading: { size: 45 } })}
         {...(data?.count && {

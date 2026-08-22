@@ -4,33 +4,24 @@ import { Table } from "@dgshahr/ui-kit";
 import TableEmptyState from "@/components/common/TableEmptyState";
 import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
+import useTransactionListParams from "@/lib/hooks/tables/useTransactionListParams";
+import { useAdminTransactionList } from "@/lib/services/admin/hook";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
 import Header from "../users/Header";
 
 function TransactionTable() {
-  const {
-    params,
-    setParams,
-    resetParams,
-    finalParams,
-    pagination,
-    setPagination,
-    isValidParams,
-  } = useArtistListParams();
+  const { params, setParams, resetParams, finalParams, pagination, setPagination } =
+    useTransactionListParams();
 
-  //   const { data, isPending } = useAdminArtistList(
-  //     isValidParams ? finalParams : undefined,
-  //   );
+  const { data, isPending } = useAdminTransactionList(finalParams);
 
   return (
     <div className="ss02">
       <FilterBar
         setParams={setParams}
         params={params}
-        // loading={isValidParams && isPending}
-        loading={false}
+        loading={isPending}
         resetParams={resetParams}
       />
 
@@ -43,24 +34,19 @@ function TransactionTable() {
         }}
         stickyTableHeader
         columns={generateColumns()}
-        data={[]}
-        // data={isValidParams ? (data?.results ?? []) : []}
-        // {...(isValidParams && isPending && { loading: { size: 45 } })}
-        // {...(data?.count && {
-        //   pagination: {
-        //     pageSize: pagination.count,
-        //     defaultCurrent: pagination.p,
-        //     totalCount: data?.count ?? 0,
-        //     onPageChange: (p) => setPagination((state) => ({ ...state, p: p })),
-        //   },
-        // })}
+        data={data?.result ?? []}
+        {...(isPending && { loading: { size: 45 } })}
+        {...(data?.count && {
+          pagination: {
+            pageSize: pagination.count,
+            defaultCurrent: pagination.page,
+            totalCount: data.count,
+            onPageChange: (page) =>
+              setPagination((state) => ({ ...state, page })),
+          },
+        })}
         emptyContent={
-          <TableEmptyState
-            showImage={!isValidParams}
-            message={
-              tableEmptyMessage[isValidParams ? "notFound" : "emptyParam"]
-            }
-          />
+          <TableEmptyState showImage={false} message={tableEmptyMessage.notFound} />
         }
       />
     </div>

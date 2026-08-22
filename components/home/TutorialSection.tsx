@@ -3,21 +3,25 @@
 import { useUserTutorialList } from "@/lib/services/landing/hook";
 import Link from "next/link";
 import Image from "next/image";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const PREVIEW_COUNT = 4;
 
 export function TutorialSection() {
   const { data } = useUserTutorialList();
   const tutorials = (data?.result ?? []).slice(0, PREVIEW_COUNT);
+  const copy = useLandingCopy();
 
   if (tutorials.length === 0) return null;
 
   return (
     <section>
       <div className="flex items-center justify-between mb-3 md:mb-4">
-        <h2 className="text-sm md:text-lg font-semibold text-zinc-100">آموزش‌ها</h2>
+        <h2 className="text-sm md:text-lg font-semibold text-zinc-100">
+          {copy("tutorialsSectionTitle")}
+        </h2>
         <Link href="/tutorials" className="text-xs md:text-sm text-error-500">
-          همه
+          {copy("tutorialsSectionCta")}
         </Link>
       </div>
 

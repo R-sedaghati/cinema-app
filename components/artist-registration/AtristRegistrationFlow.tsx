@@ -118,7 +118,13 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
     if (contentIndex === steps.length) {
       return (
-        <FourthStepFlow steps={steps} copy={copy} onNext={onNext} onPrevious={onPrevious} />
+        <FourthStepFlow
+          steps={steps}
+          copy={copy}
+          registrationAmount={schemaData?.result?.registrationAmount}
+          onNext={onNext}
+          onPrevious={onPrevious}
+        />
       );
     }
 

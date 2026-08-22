@@ -1,4 +1,7 @@
+"use client";
+
 import { EArtistGender, IArtistItem } from "@/lib/services/admin/type";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,6 +9,8 @@ import Link from "next/link";
 export default function ArtistCard({
   artist,
 }: Readonly<{ artist: IArtistItem }>) {
+  const copy = useLandingCopy();
+
   return (
     <Link
       href={`/artists/${artist.id}`}
@@ -32,7 +37,9 @@ export default function ArtistCard({
           {artist?.categories?.at(0)?.faName ?? ""}
         </span>
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-          {artist?.answers?.gender === EArtistGender.MAN ? "مرد" : "زن"}
+          {artist?.answers?.gender === EArtistGender.MAN
+            ? copy("labelGenderMan")
+            : copy("labelGenderWoman")}
         </span>
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {(artist?.answers?.city as string | undefined) ?? ""}
@@ -42,7 +49,7 @@ export default function ArtistCard({
         {artist?.answers?.aboutMe as string | undefined}
       </p>
       <div className="flex items-center justify-end">
-        <p className="text-error-500 font-p2-medium">مشاهده پروفایل</p>
+        <p className="text-error-500 font-p2-medium">{copy("artistsCardCta")}</p>
         <ArrowLeft className="text-error-500 self-start mx-1.5" />
       </div>
     </Link>

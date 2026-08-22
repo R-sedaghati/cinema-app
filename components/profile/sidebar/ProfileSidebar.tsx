@@ -6,6 +6,7 @@ import {
   UserRound,
   MessageCircle,
   CreditCard,
+  Wallet,
   LogOut,
   ChevronLeft,
   Headset,
@@ -15,6 +16,8 @@ import Button from "../../common/Button";
 import MenuSection from "./MenuSection";
 import { useUserProfile } from "@/lib/services/landing/hook";
 import clsx from "clsx";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
 export interface SideBarSections {
   id: SectionId;
@@ -22,33 +25,39 @@ export interface SideBarSections {
   icon: React.ReactNode;
 }
 
-const sections1: SideBarSections[] = [
+// Labels are copy keys; the admin-editable text is resolved at render time.
+const sectionDefs1: { id: SectionId; label: LandingCopyKey; icon: React.ReactNode }[] = [
   {
     id: "forms",
-    label: "لیست فرم‌ها",
+    label: "profileFormsTitle",
     icon: <FileText className="h-4 w-4" />,
   },
   {
     id: "requests",
-    label: "درخواست‌های ارتباط با هنرمندان",
+    label: "profileRequestsTitle",
     icon: <MessageCircle className="h-4 w-4" />,
   },
   {
     id: "payments",
-    label: "تاریخچه پرداخت‌ها",
+    label: "profilePaymentsTitle",
     icon: <CreditCard className="h-4 w-4" />,
+  },
+  {
+    id: "wallet",
+    label: "profileWalletTitle",
+    icon: <Wallet className="h-4 w-4" />,
   },
 ];
 
-const sections2: SideBarSections[] = [
+const sectionDefs2: { id: SectionId; label: LandingCopyKey; icon: React.ReactNode }[] = [
   {
     id: "support",
-    label: "پشتیبانی",
+    label: "profileSupportTitle",
     icon: <Headset className="h-4 w-4" />,
   },
   {
     id: "logout",
-    label: "خروج از حساب",
+    label: "profileLogoutTitle",
     icon: <LogOut className="h-4 w-4" />,
   },
 ];
@@ -61,6 +70,9 @@ export default function ProfileSidebar({
   setActive: (s: SectionId | null) => void;
 }>) {
   const { data } = useUserProfile();
+  const copy = useLandingCopy();
+  const resolve = (defs: typeof sectionDefs1): SideBarSections[] =>
+    defs.map((s) => ({ ...s, label: copy(s.label) }));
 
   return (
     <aside className="relative flex-2 z-10 w-full space-y-2 text-right">
@@ -87,12 +99,12 @@ export default function ProfileSidebar({
           className="text-sm text-zinc-400! transition hover:text-zinc-200 p-0!"
           onClick={() => setActive("overview")}
         >
-          ویرایش
+          {copy("actionEdit")}
         </Button>
       </div>
 
-      <MenuSection sections={sections1} active={active} setActive={setActive} />
-      <MenuSection sections={sections2} active={active} setActive={setActive} />
+      <MenuSection sections={resolve(sectionDefs1)} active={active} setActive={setActive} />
+      <MenuSection sections={resolve(sectionDefs2)} active={active} setActive={setActive} />
     </aside>
   );
 }

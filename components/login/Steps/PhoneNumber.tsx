@@ -8,6 +8,7 @@ import { is_phone_number } from "@/lib/validation/regexValidations";
 import convertFaNumberToEnNumber from "@/lib/utils/convertFaNumberToEnNumber";
 import Button from "@/components/common/Button";
 import TermsNotice from "@/components/login/TermsNotice";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useUserLogin } from "@/lib/services/landing/hook";
 import { toast } from "react-toastify";
 
@@ -15,6 +16,7 @@ const OTP_EXPIRATION_KEY = "otpExpirationDate";
 
 const PhoneNumberStep: FC<StepBaseProps> = (props) => {
   const { setStep } = props;
+  const copy = useLandingCopy();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isValid, setIsValid] = useState(true);
   const { phoneNumber: storePhoneNumber, setPhoneNumber: setStorePhoneNumber } =
@@ -43,7 +45,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
       { phone_number: cleanedPhone },
       {
         onSuccess: () => {
-          toast.success("کد ورود ارسال شد");
+          toast.success(copy("loginOtpSent"));
           setStorePhoneNumber(cleanedPhone);
           setStep("otp");
         },
@@ -86,9 +88,9 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
     <div className="flex flex-col justify-center items-center w-full">
       <Input
         value={formatPhoneNumber(phoneNumber)}
-        labelContent="شماره موبایل را وارد کنید"
+        labelContent={copy("loginPhoneLabel")}
         dir="ltr"
-        placeholder="۰۹**  ***  ****"
+        placeholder={copy("loginPhonePlaceholder")}
         className="w-full text-left"
         wrapperClassName="w-full"
         pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
@@ -106,7 +108,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         onKeyDown={handleKeyDown}
         onChange={handleChangePhoneNumber}
         onClear={() => setPhoneNumber("")}
-        errorMessage={isValid ? "" : "شماره موبایل اشتباه است."}
+        errorMessage={isValid ? "" : copy("loginPhoneError")}
       />
       <Button
         className="mt-4 rounded-full!"
@@ -116,7 +118,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         disabled={isPending}
         onClick={handleSubmit}
       >
-        دریافت کد
+        {copy("loginPhoneCta")}
       </Button>
       <TermsNotice />
     </div>

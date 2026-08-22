@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import { useRef, useState } from "react";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export type WorksSliderItem = {
   id: string;
@@ -23,6 +24,7 @@ export function WorksSlider({
   variant,
   className,
 }: Readonly<WorksSliderProps>) {
+  const copy = useLandingCopy();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -92,7 +94,7 @@ export function WorksSlider({
                 />
               ) : (
                 <div className="grid h-full place-items-center text-xs font-semibold text-zinc-200">
-                  {variant === "photo" ? "نمونه تصویری" : "نمونه ویدیویی"}
+                  {variant === "photo" ? copy("artistWorkPhoto") : copy("artistWorkVideo")}
                 </div>
               )}
             </div>
@@ -104,7 +106,7 @@ export function WorksSlider({
             )}
 
             {item.year && (
-              <div className="mt-2 text-xs text-zinc-500">{`سال ${item.year}`}</div>
+              <div className="mt-2 text-xs text-zinc-500">{copy("artistWorkYear", { year: item.year })}</div>
             )}
           </div>
         ))}

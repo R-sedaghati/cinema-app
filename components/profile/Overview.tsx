@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ContentCard from "./ContentCard";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { Input } from "@dgshahr/ui-kit";
 import Button from "../common/Button";
 import { isMobile } from "react-device-detect";
@@ -16,6 +17,7 @@ export default function Overview() {
   const router = useRouter();
   const { data } = useUserProfile();
   const { mutate, isPending } = useUpdateUserProfile();
+  const copy = useLandingCopy();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -54,7 +56,7 @@ export default function Overview() {
       },
       {
         onSuccess: () => {
-          toast.success("با موفقیت تغییر کرد");
+          toast.success(copy("saveSuccess"));
           router.push("/profile");
         },
       },
@@ -62,7 +64,7 @@ export default function Overview() {
   };
 
   return (
-    <ContentCard title="ویرایش پروفایل">
+    <ContentCard title={copy("profileOverviewTitle")}>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-8 rounded-xl border-2 border-zinc-700/60 bg-gray-100/60 p-4 backdrop-blur-sm"
@@ -70,35 +72,35 @@ export default function Overview() {
         <div className="grid w-full gap-4 md:grid-cols-2">
           <Input
             id="first-name"
-            labelContent="نام"
+            labelContent={copy("fieldFirstName")}
             required
-            placeholder="نام خود را وارد کنید."
+            placeholder={copy("fieldFirstNamePlaceholder")}
             value={form.firstName}
             onChange={handleChange("firstName")}
           />
 
           <Input
             id="last-name"
-            labelContent="نام خانوادگی"
+            labelContent={copy("fieldLastName")}
             required
-            placeholder="نام خانوادگی خود را وارد کنید."
+            placeholder={copy("fieldLastNamePlaceholder")}
             value={form.lastName}
             onChange={handleChange("lastName")}
           />
 
           <Input
             id="email"
-            labelContent="ایمیل"
+            labelContent={copy("fieldEmail")}
             required
             dir="ltr"
-            placeholder="ایمیل خود را وارد کنید."
+            placeholder={copy("fieldEmailPlaceholder")}
             value={form.email}
             onChange={handleChange("email")}
           />
 
           <Input
             id="phone"
-            labelContent="شماره موبایل"
+            labelContent={copy("fieldPhone")}
             required
             dir="ltr"
             type="tel"
@@ -116,7 +118,7 @@ export default function Overview() {
             isLoading={isPending}
             disabled={isPending}
           >
-            به‌روزرسانی پروفایل
+            {copy("profileOverviewCta")}
           </Button>
         </div>
       </form>

@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { Chip } from "@dgshahr/ui-kit";
 import type { IUserCategoryResponse } from "@/lib/services/landing/type";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 /**
  * The selected id may be a child, so the parent has to be found by scanning children too —
@@ -17,6 +18,7 @@ export function CategoryChips({
   categoryId: number;
   onSelect: (id: number | null) => void;
 }>) {
+  const copy = useLandingCopy();
   const parent = categories.find(
     (item) =>
       item.id === categoryId ||
@@ -28,7 +30,7 @@ export function CategoryChips({
       <Chip
         clickable
         type="button"
-        label={parent?.faName ?? "دسته‌بندی"}
+        label={parent?.faName ?? copy("artistsCategoryLabel")}
         filled
         leftIcon={<X size={14} />}
         onClick={() => onSelect(null)}

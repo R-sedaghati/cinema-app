@@ -1,5 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  IAdjustWalletRequest,
+  IAdminWalletResponse,
+  ParamsTransactionList,
+  IUpdatePaymentSettingRequest,
+  IUpdateNotificationSettingRequest,
+  ITransactionItem,
+  IPaymentSettingResponse,
+  INotificationSettingResponse,
+  IBasePaginateResponse,
   EArtistRequestStatus,
   IAboutUsResponse,
   IAdminFaqUpdateItem,
@@ -68,8 +77,15 @@ import {
   adminUpdateFormResultPages,
   adminLogin,
   adminProvinceList,
+  adminAdjustUserWallet,
+  adminPaymentSettings,
+  adminUserWallet,
+  adminPaymentSettingsUpdate,
+  adminNotificationSettings,
+  adminNotificationSettingsUpdate,
   adminSiteContent,
   adminSiteContentUpdate,
+  adminTransactionList,
   adminSupportList,
   adminSupportRetrieve,
   adminSupportUpdate,
@@ -342,6 +358,79 @@ export const useAdminSiteContent = () => {
     queryFn: () => adminSiteContent(accessToken),
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminUserWallet = (id?: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IAdminWalletResponse>({
+    queryKey: ["adminUserWallet", id],
+    queryFn: () => adminUserWallet(id!, accessToken),
+    enabled: Boolean(id),
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminAdjustUserWallet = (id?: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: IAdjustWalletRequest) =>
+      adminAdjustUserWallet(id!, payload, accessToken),
+  });
+};
+
+export const useAdminPaymentSettings = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IPaymentSettingResponse>({
+    queryKey: ["adminPaymentSettings"],
+    queryFn: () => adminPaymentSettings(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminPaymentSettingsUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: IUpdatePaymentSettingRequest) =>
+      adminPaymentSettingsUpdate(payload, accessToken),
+  });
+};
+
+export const useAdminNotificationSettings = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<INotificationSettingResponse>({
+    queryKey: ["adminNotificationSettings"],
+    queryFn: () => adminNotificationSettings(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminNotificationSettingsUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: IUpdateNotificationSettingRequest) =>
+      adminNotificationSettingsUpdate(payload, accessToken),
+  });
+};
+
+export const useAdminTransactionList = (
+  params?: Partial<ParamsTransactionList>,
+) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IBasePaginateResponse<ITransactionItem>>({
+    queryKey: ["adminTransactionList", params],
+    queryFn: () => adminTransactionList(params, accessToken),
+    refetchInterval: 30 * 1000,
     refetchOnWindowFocus: false,
   });
 };

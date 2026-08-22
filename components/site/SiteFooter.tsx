@@ -3,6 +3,7 @@
 import { Instagram, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
@@ -10,8 +11,10 @@ import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumeri
 export function SiteFooter() {
   const { data } = useUserSiteContent();
   const footer = data?.result?.footer;
+  const copy = useLandingCopy();
 
-  const phone = footer?.phone?.trim() || FOOTER_DEFAULTS.phone;
+  // ponytail: no phone configured -> hide the label and the tel: link entirely.
+  const phone = footer?.phone?.trim() ?? "";
   const instagramUrl =
     footer?.instagramUrl?.trim() || FOOTER_DEFAULTS.instagramUrl;
   const copyright = footer?.copyright?.trim() || FOOTER_DEFAULTS.copyright;
@@ -32,11 +35,15 @@ export function SiteFooter() {
               height={60}
             />
             <h3 className="text-3xl text-error-500 font-extrabold">
-              آرشیو هنر
+              {copy("brandName")}
             </h3>
           </div>
           <div className="flex items-center font-bold gap-6 text-zinc-400 text-sm">
-            <span className="tracking-wider ss02">تلفن پشتیبانی {phone}</span>
+            {phone && (
+              <span className="tracking-wider ss02">
+                {copy("footerPhoneLabel")} {phone}
+              </span>
+            )}
             <a
               href={instagramUrl}
               target="_blank"
@@ -46,42 +53,44 @@ export function SiteFooter() {
             >
               <Instagram />
             </a>
-            <a
-              href={phoneHref}
-              aria-label="تماس با پشتیبانی"
-              className="hover:text-white transition-colors"
-            >
-              <Phone />
-            </a>
+            {phone && (
+              <a
+                href={phoneHref}
+                aria-label="تماس با پشتیبانی"
+                className="hover:text-white transition-colors"
+              >
+                <Phone />
+              </a>
+            )}
           </div>
         </div>
 
         {/* mid */}
         <nav className="flex flex-col font-bold gap-4 text-sm text-zinc-300">
           <Link href="/artists" className="hover:text-white transition-colors">
-            جستجوی هنرمندان
+            {copy("footerArtists")}
           </Link>
           <Link href="/about" className="hover:text-white transition-colors">
-            درباره ما
+            {copy("footerAbout")}
           </Link>
           <Link href="/contact" className="hover:text-white transition-colors">
-            تماس با ما
+            {copy("footerContact")}
           </Link>
           <Link href="/faq" className="hover:text-white transition-colors">
-            سوالات متداول
+            {copy("footerFaq")}
           </Link>
           <Link href="/support" className="hover:text-white transition-colors">
-            پشتیبانی
+            {copy("footerSupport")}
           </Link>
           <Link href="/terms" className="hover:text-white transition-colors">
-            قوانین و حریم خصوصی
+            {copy("footerTerms")}
           </Link>
         </nav>
         {/* bottom */}
         <div className="flex flex-col md:flex-row justify-between gap-5 items-center">
           <div className="flex flex-col items-start justify-center gap-8">
             <h3 className="text-xl font-semibold text-white">
-              دریافت اپلیکیشن
+              {copy("footerAppDownload")}
             </h3>
 
             <div className="flex flex-col md:flex-row gap-4 w-full">

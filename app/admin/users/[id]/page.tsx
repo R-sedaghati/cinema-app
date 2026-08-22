@@ -1,6 +1,7 @@
 "use client";
 
 import ArtistStatus from "@/components/admin/artist-registration/ArtistStatus";
+import UserWallet from "@/components/admin/users/UserWallet";
 import { useAdminUserRequest } from "@/lib/services/admin/hook";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import withNoSSR from "@/lib/utils/withNoSSR";
@@ -116,6 +117,8 @@ function ArtistDetail() {
             </div>
           </div>
         </Card>
+
+        <UserWallet userId={id} />
 
         <Card>
           <div className="flex flex-col gap-4">

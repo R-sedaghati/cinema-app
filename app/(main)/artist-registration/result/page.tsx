@@ -10,23 +10,25 @@ import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { makeCopy } from "@/lib/utils/formCopy";
-
-// ponytail: fallbacks live here, so a category with no copy set still shows a sane page
-const DEFAULTS = {
-  success: {
-    title: "ثبت‌نام شما با موفقیت انجام شد",
-    description: "درخواست شما ثبت شد و پس از بررسی کارشناسان نتیجه به شما اطلاع داده می‌شود.",
-  },
-  failed: {
-    title: "پرداخت ناموفق بود",
-    description: "مبلغی از حساب شما کسر نشده است. می‌توانید دوباره تلاش کنید.",
-  },
-};
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 function ResultContent() {
   const params = useSearchParams();
   const router = useRouter();
   const reset = useArtistRegistrationStore((state) => state.reset);
+  const landingCopy = useLandingCopy();
+
+  // ponytail: fallbacks, so a category with no copy set still shows a sane page
+  const DEFAULTS = {
+    success: {
+      title: landingCopy("regResultSuccessTitle"),
+      description: landingCopy("regResultSuccessDesc"),
+    },
+    failed: {
+      title: landingCopy("regResultFailTitle"),
+      description: landingCopy("regResultFailDesc"),
+    },
+  };
 
   const isSuccess = params.get("status") === "success";
   const categoryId = Number(params.get("categoryId")) || null;

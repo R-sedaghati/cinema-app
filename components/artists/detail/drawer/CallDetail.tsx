@@ -1,4 +1,7 @@
+"use client";
+
 import Button from "@/components/common/Button";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { Input } from "@dgshahr/ui-kit";
 import {
   useUserContactPrice,
@@ -17,15 +20,19 @@ const CallDetail = ({
   setOpen: (open: boolean) => void;
 }) => {
   const { accessToken } = useAuthStore();
+  const copy = useLandingCopy();
   const { open: openLoginDrawer } = useLoginDrawerStore();
   const [requesterName, setRequesterName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const { data: priceData } = useUserContactPrice(artistId);
+  const { data: priceData, isLoading: isPriceLoading } =
+    useUserContactPrice(artistId);
   const { mutate, isPending } = useUserCreateContactRequest();
 
-  // Admins set this per category, in Toman.
-  const amountToman = priceData?.result?.amount ?? 0;
+  // Admins set this per category, in Toman. A price of 0 is a real answer — the
+  // category is free — so it must not be conflated with "not loaded yet".
+  const amountToman = priceData?.result?.amount;
+  const isFree = amountToman === 0;
 
   const submit = () => {
     if (!accessToken) {
@@ -35,7 +42,7 @@ const CallDetail = ({
     }
 
     if (!requesterName.trim()) {
-      setError("نام و نام خانوادگی را وارد کنید.");
+      setError(copy("callNameError"));
       return;
     }
 
@@ -56,24 +63,27 @@ const CallDetail = ({
   return (
     <div className="w-full space-y-8">
       <p className="text-zinc-300 leading-8 text-sm text-center">
-        برای مشاهده اطلاعات تماس هنرمند، بعد از پرکردن فرم اطلاعات، هزینه خدمات
-        سایت را پرداخت کنید تا درخواست مشاهده شما ثبت گردد.
+        {isFree
+          ? copy("callFormFreeDesc")
+          : copy("callFormPaidDesc")}
       </p>
       <Input
-        labelContent="نام و نام خانوادگی"
+        labelContent={copy("callNameLabel")}
         required
         type="text"
         value={requesterName}
         onChange={(e) => setRequesterName(e.target.value)}
-        placeholder="نام و نام خانوادگی خود را وارد کنید."
+        placeholder={copy("callNamePlaceholder")}
         {...(error && { status: "error", hintMessage: error })}
       />
       <div className="border border-zinc-600 rounded-2xl p-6 flex justify-between items-center">
-        <span className="text-zinc-400 text-sm">مبلغ قابل پرداخت</span>
+        <span className="text-zinc-400 text-sm">{copy("callAmountLabel")}</span>
         <span className="text-zinc-100 text-lg font-semibold">
-          {amountToman
-            ? `${convertEnNumberToFaNumberWithSeparation(amountToman)} تومان`
-            : "—"}
+          {isPriceLoading || amountToman === undefined
+            ? "—"
+            : isFree
+              ? copy("labelFree")
+              : `${convertEnNumberToFaNumberWithSeparation(amountToman)} ${copy("labelCurrency")}`}
         </span>
       </div>
       <div className="flex gap-4">
@@ -83,7 +93,7 @@ const CallDetail = ({
           variant="outline"
           onClick={() => setOpen(false)}
         >
-          انصراف
+          {copy("actionCancel")}
         </Button>
         <Button
           onClick={submit}
@@ -91,7 +101,13 @@ const CallDetail = ({
           className="flex-1 rounded-full!"
           isFullWidth
         >
-          {isPending ? "در حال انتقال به درگاه..." : "پرداخت و ثبت درخواست"}
+          {isPending
+            ? isFree
+              ? copy("callSubmittingFree")
+              : copy("callSubmittingPaid")
+            : isFree
+              ? copy("callSubmitFree")
+              : copy("callSubmitPaid")}
         </Button>
       </div>
     </div>

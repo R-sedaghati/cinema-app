@@ -12,14 +12,18 @@ import {
   useUserContactRequests,
 } from "@/lib/services/landing/hook";
 import useAuthStore from "@/lib/stores/useAuthStore";
-
-const genderMap: Record<string, string> = { MAN: "مرد", WOMAN: "زن" };
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const Aside = ({ artist }: { artist: IArtistItem }) => {
   const [openCallDetail, setOpenCallDetail] = useState<boolean>(false);
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const { accessToken } = useAuthStore();
+  const copy = useLandingCopy();
+  const genderMap: Record<string, string> = {
+    MAN: copy("labelGenderMan"),
+    WOMAN: copy("labelGenderWoman"),
+  };
 
   // The gateway sends the buyer back here after paying.
   const paymentOutcome = searchParams.get("contact");
@@ -80,23 +84,23 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
         <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:text-base text-zinc-300 lg:grid-cols-1 lg:gap-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-            <span className="text-zinc-500">استان</span>
+            <span className="text-zinc-500">{copy("artistProvince")}</span>
             <span>{(artist.answers?.province as string | undefined) ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-            <span className="text-zinc-500">دسته‌بندی</span>
+            <span className="text-zinc-500">{copy("artistCategory")}</span>
             <span>{artist.categories[0]?.faName ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-            <span className="text-zinc-500">جنسیت</span>
+            <span className="text-zinc-500">{copy("artistGender")}</span>
             <span>{genderMap[artist.answers?.gender as string] ?? "—"}</span>
           </div>
 
           {typeof artist.answers?.dialect === "string" && artist.answers.dialect && (
             <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-              <span className="text-zinc-500">لهجه</span>
+              <span className="text-zinc-500">{copy("artistAccent")}</span>
               <span>{artist.answers.dialect as string}</span>
             </div>
           )}
@@ -104,10 +108,10 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
         {isUnlocked && contact && (
           <div className="mt-6 sm:mt-10 space-y-3 rounded-2xl border border-emerald-800/60 bg-emerald-950/20 p-4 text-sm">
-            <p className="text-emerald-500">اطلاعات تماس</p>
+            <p className="text-emerald-500">{copy("artistContactTitle")}</p>
             {contact.phoneNumber && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">شماره تماس</span>
+                <span className="text-zinc-500">{copy("artistContactPhone")}</span>
                 <a href={`tel:${contact.phoneNumber}`} className="text-zinc-100" dir="ltr">
                   {contact.phoneNumber}
                 </a>
@@ -115,7 +119,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
             )}
             {contact.email && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">ایمیل</span>
+                <span className="text-zinc-500">{copy("artistContactEmail")}</span>
                 <a href={`mailto:${contact.email}`} className="text-zinc-100" dir="ltr">
                   {contact.email}
                 </a>
@@ -123,13 +127,13 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
             )}
             {contact.address && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">آدرس</span>
+                <span className="text-zinc-500">{copy("artistContactAddress")}</span>
                 <span className="text-zinc-100 text-left">{contact.address}</span>
               </div>
             )}
             {contact.postalCode && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">کد پستی</span>
+                <span className="text-zinc-500">{copy("artistContactPostalCode")}</span>
                 <span className="text-zinc-100" dir="ltr">
                   {contact.postalCode}
                 </span>
@@ -147,7 +151,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
               className="rounded-full!"
               leftIcon={<Lock size={16} />}
             >
-              مشاهده اطلاعات تماس
+              {copy("artistContactCta")}
             </Button>
           )}
           <Button
@@ -164,13 +168,13 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
               }
             }}
           >
-            اشتراک گذاری
+            {copy("artistShareCta")}
           </Button>
         </div>
 
         {!accessToken && (
           <p className="mt-4 text-center text-xs text-zinc-500">
-            برای مشاهده اطلاعات تماس ابتدا وارد شوید.
+            {copy("artistLoginFirst")}
           </p>
         )}
       </aside>
