@@ -1,11 +1,11 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import Button from "@/components/common/Button";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { ChevronLeft } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -37,7 +37,7 @@ const Banner = () => {
           </Button>
         </div>
         <div className="h-42 md:h-auto">
-          <Image
+          <img
             src={"./camera-1.svg"}
             alt="camera-1"
             className="absolute bottom-0 left-0 md:left-10"
@@ -45,14 +45,14 @@ const Banner = () => {
             height={428}
           />
         </div>
-        <Image
+        <img
           src={"./film-1.svg"}
           alt="camera-1"
           className="absolute hidden md:block -bottom-16 right-10"
           width={102}
           height={105}
         />
-        <Image
+        <img
           src={"./action-1.svg"}
           alt="camera-1"
           className="absolute hidden md:block -top-28 left-10"

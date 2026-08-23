@@ -1,8 +1,8 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useUserTutorialList } from "@/lib/services/landing/hook";
 import Link from "next/link";
-import Image from "next/image";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const PREVIEW_COUNT = 4;
@@ -34,11 +34,10 @@ export function TutorialSection() {
           >
             <div className="relative w-full aspect-video bg-gray-100">
               {tutorial.thumbnail && (
-                <Image
+                <img
                   src={tutorial.thumbnail}
                   alt={tutorial.title}
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               )}
             </div>

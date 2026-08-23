@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import Button from "@/components/common/Button";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { ChevronLeft } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -14,7 +14,7 @@ const Success = ({ trackingCode }: { trackingCode: string | null }) => {
     <div className="w-full max-w-xl text-center space-y-6">
       {/* Success Icon */}
       <div className="flex justify-center">
-        <Image
+        <img
           src="/check_circle_line.svg"
           alt="موفق"
           width={112}

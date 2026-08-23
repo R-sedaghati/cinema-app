@@ -1,9 +1,9 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 const NotFoundSearch = () => {
   return (
     <div className="flex flex-col gap-6 justify-center items-center p-8 text-center">
-      <Image
+      <img
         src={"./not-found-search.svg"}
         width={138}
         height={136}

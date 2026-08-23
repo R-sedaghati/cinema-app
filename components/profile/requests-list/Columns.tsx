@@ -55,7 +55,9 @@ export const generateColumns = (
     className: "align-middle min-w-28",
     render: (data) => (
       <span className="text-sm">
-        {convertEnNumberToFaNumberWithSeparation(data.amount)} {copy("labelCurrency")}
+        {data.amount === 0
+          ? copy("labelFree")
+          : `${convertEnNumberToFaNumberWithSeparation(data.amount)} ${copy("labelCurrency")}`}
       </span>
     ),
   },

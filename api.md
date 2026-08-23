@@ -446,6 +446,14 @@ Fields are dynamic — driven by the `FormStep`/`FormField` schema defined per t
 category in the admin panel. Fetch the schema first via `GET /categories/:id/form-schema/`
 to know which keys/types/required-ness apply to the selected category.
 
+**One form per account per top-level category.** An account (one phone number, one
+account) that already has a request in the selected category — filed under it or under
+any of its children — gets `409` with «شما قبلاً در این دسته‌بندی فرم ثبت کرده‌اید.».
+Every status counts, `REJECTED` included; a request needing changes is edited via
+`PATCH /user/artist-requests/:id/`, never re-submitted here. The check runs inside the
+create transaction, under the write lock on the user row, so parallel submissions cannot
+both pass it.
+
 **Body:**
 ```ts
 {
@@ -486,6 +494,10 @@ Update own artist request. **Auth required.**
 ### `GET /categories/:id/form-schema/`
 Fetch the dynamic step/field schema for a category. No auth. Resolves child categories to
 their top-level parent's schema (only top-level categories own a schema).
+
+Auth is optional and only changes `registrationAmount`: a caller who has already paid one
+registration fee gets `0` here, because the fee is charged once per user (see
+`GET /user/purchase/`). Anonymous callers always see the category price.
 
 **Response:**
 ```ts
@@ -575,6 +587,13 @@ The fee is resolved server-side from the request's category (`registrationAmount
 inherited from the top-level category, falling back to `REGISTRATION_AMOUNT`). A
 client-supplied `amount` is ignored — it used to be honored, which let a user pick
 what they paid by editing the URL.
+
+The registration fee is charged **once per user**: if the caller already has a COMPLETED
+payment on one of their own artist requests where money actually moved (gateway amount or
+wallet share above zero), the fee resolves to `0` and every later registration form is
+free for them, in any category. A COMPLETED payment of `0` for a free category does not
+count — otherwise one free form would make every later paid form free. A fee later
+refunded (rejection or revision) still counts as paid.
 
 When the resolved fee is `0` the category is free: a `COMPLETED` payment is recorded,
 the request moves to `PENDING`, and the browser is redirected straight to the result
