@@ -130,11 +130,13 @@ export default function ApplicationPage() {
                       )}
                     </div>
                     <div className="absolute inset-0 opacity-30 pointer-events-none">
-                      <Image
+                      {/* ponytail: plain img — banner hosts vary and the Capacitor WebView has no Next optimizer */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
                         src={slide.image}
                         alt=""
-                        fill
-                        className="object-cover"
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover"
                       />
                     </div>
                   </div>
