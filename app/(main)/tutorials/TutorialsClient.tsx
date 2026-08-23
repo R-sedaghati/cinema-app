@@ -2,18 +2,20 @@
 
 import { useUserTutorialList } from "@/lib/services/landing/hook";
 import Image from "next/image";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export function TutorialsClient() {
   const { data } = useUserTutorialList();
   const tutorials = data?.result ?? [];
+  const copy = useLandingCopy();
 
   return (
     <div className="flex flex-col gap-10 md:pb-28">
-      <h3 className="font-h1-regular text-4xl text-center">آموزش‌ها</h3>
+      <h3 className="font-h1-regular text-4xl text-center">{copy("tutorialsTitle")}</h3>
 
       {tutorials.length === 0 && (
         <p className="text-center text-zinc-500">
-          تا این لحظه آموزشی ثبت نشده است.
+          {copy("tutorialsEmpty")}
         </p>
       )}
 

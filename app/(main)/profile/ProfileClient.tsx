@@ -6,18 +6,23 @@ import { SectionId } from "../../../components/profile/types";
 import ProfileSidebar from "../../../components/profile/sidebar/ProfileSidebar";
 import ProfileContent from "../../../components/profile/ProfileContent";
 import useResponsiveSidebar from "../../../components/profile/useResponsiveSidebar";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
-const sectionLabels: Record<SectionId, string> = {
-  overview: "ویرایش پروفایل",
-  forms: "لیست فرم‌ها",
-  requests: "درخواست‌های ارتباط",
-  payments: "تاریخچه پرداخت‌ها",
-  support: "پشتیبانی",
-  logout: "خروج از حساب",
+const sectionLabelKeys: Record<SectionId, LandingCopyKey> = {
+  overview: "profileOverviewTitle",
+  forms: "profileFormsTitle",
+  requests: "profileRequestsTabTitle",
+  payments: "profilePaymentsTitle",
+  wallet: "profileWalletTitle",
+  support: "profileSupportTitle",
+  logout: "profileLogoutTitle",
 };
 
 export function ProfileClient() {
   const [active, setActive] = useState<SectionId | null>("forms");
+  const copy = useLandingCopy();
+  const sectionLabels = (id: SectionId) => copy(sectionLabelKeys[id]);
 
   const { isMobile, showSidebar, setShowSidebar, handleSelect } =
     useResponsiveSidebar(setActive);
@@ -44,7 +49,7 @@ export function ProfileClient() {
                 <ArrowRight size={22} />
               </button>
               <span className="text-base font-semibold text-zinc-100">
-                {active ? sectionLabels[active] : ""}
+                {active ? sectionLabels(active) : ""}
               </span>
             </div>
           )}

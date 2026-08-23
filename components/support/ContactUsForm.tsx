@@ -15,6 +15,7 @@ import { EFormFieldType } from "@/lib/services/admin/type";
 import type { IContactFormField, IFormField, IFormStep } from "@/lib/services/admin/type";
 import { getStepErrors } from "@/lib/utils/validateFormStep";
 import { toast } from "react-toastify";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 /** The dynamic definition carries no ids/order, which FieldRenderer expects. */
 const asFormField = (field: IContactFormField, index: number): IFormField => ({
@@ -34,6 +35,7 @@ const ContactUsForm = () => {
   const { mutate, isPending } = useCreateUserSupport();
   const { data } = useUserCategoryList({ page: 1, count: 30 });
   const { data: siteContent } = useUserSiteContent();
+  const copy = useLandingCopy();
 
   const form = useMemo(
     () => contactFormOf(siteContent?.result?.contactForm),
@@ -70,7 +72,7 @@ const ContactUsForm = () => {
     );
 
     if (missingCategory) {
-      toast.error(`${missingCategory.label} الزامی است`);
+      toast.error(copy("contactRequiredError", { field: missingCategory.label }));
       return;
     }
 
@@ -103,11 +105,11 @@ const ContactUsForm = () => {
       },
       {
         onSuccess: () => {
-          toast.success("درخواست شما با موفقیت ارسال شد.");
+          toast.success(copy("contactSubmitSuccess"));
           setAnswers({});
         },
         onError: () => {
-          toast.error("ارسال درخواست با خطا مواجه شد.");
+          toast.error(copy("contactSubmitError"));
         },
       },
     );

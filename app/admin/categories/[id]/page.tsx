@@ -36,6 +36,7 @@ function CategoryDetail() {
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
   const [contactAmount, setContactAmount] = useState<string>("");
+  const [registrationAmount, setRegistrationAmount] = useState<string>("");
 
   const uploadImage = useAdminUploadBannerImage();
 
@@ -48,7 +49,16 @@ function CategoryDetail() {
     setPriority(data.priority);
     setImagePath(data.image ?? "");
     setImageFile(data.image ? { src: data.image } : null);
-    setContactAmount(data.contactAmount ? String(data.contactAmount) : "");
+    setContactAmount(
+      data.contactAmount === null || data.contactAmount === undefined
+        ? ""
+        : String(data.contactAmount),
+    );
+    setRegistrationAmount(
+      data.registrationAmount === null || data.registrationAmount === undefined
+        ? ""
+        : String(data.registrationAmount),
+    );
   }, [data]);
 
   const handleImageChange = (file: File | undefined) => {
@@ -83,7 +93,10 @@ function CategoryDetail() {
           description,
           priority,
           image: imagePath || null,
-          contactAmount: contactAmount ? Number(contactAmount) : null,
+          // An empty field means "not set" (inherit / fall back); a typed 0 means free.
+          contactAmount: contactAmount === "" ? null : Number(contactAmount),
+          registrationAmount:
+            registrationAmount === "" ? null : Number(registrationAmount),
         },
       },
       {
@@ -217,7 +230,17 @@ function CategoryDetail() {
                 type="number"
                 value={contactAmount}
                 onChange={(e) => setContactAmount(e.target.value)}
-                hintMessage="مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند."
+                hintMessage="مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی استفاده از مبلغ پیش‌فرض."
+                wrapperClassName="w-1/3"
+              />
+              <Input
+                labelContent="مبلغ ثبت‌نام هنرمند"
+                placeholder="مبلغ ثبت‌نام هنرمند"
+                postfix="تومان"
+                type="number"
+                value={registrationAmount}
+                onChange={(e) => setRegistrationAmount(e.target.value)}
+                hintMessage="مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی استفاده از مبلغ پیش‌فرض."
                 wrapperClassName="w-1/3"
               />
             </div>

@@ -14,25 +14,28 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Button from "../common/Button";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import Image from "next/image";
 import { isMobile } from "react-device-detect";
 
-const navItems = [
-  { href: "/", label: "خانه" },
-  { href: "/artists", label: "جستجوی هنرمندان" },
-  { href: "/artist-registration", label: "فرم‌های درخواست" },
-  { href: "/support", label: "پشتیبانی" },
-  { href: "/faq", label: "سوالات متداول" },
-  { href: "/about", label: "درباره ما" },
+// Labels are copy keys; the admin-editable text is resolved at render time.
+const navItems: { href: string; label: LandingCopyKey }[] = [
+  { href: "/", label: "navHome" },
+  { href: "/artists", label: "navArtists" },
+  { href: "/artist-registration", label: "navForms" },
+  { href: "/support", label: "navSupport" },
+  { href: "/faq", label: "navFaq" },
+  { href: "/about", label: "navAbout" },
 ];
 
-const sidebarItems = [
-  { href: "/artist-registration", label: "فرم‌های درخواست", icon: PenLine },
-  { href: "/about", label: "درباره ما", icon: Info },
-  { href: "/faq", label: "سوالات متداول", icon: HelpCircle },
-  { href: "/support", label: "پشتیبانی", icon: Headphones },
+const sidebarItems: { href: string; label: LandingCopyKey; icon: typeof PenLine }[] = [
+  { href: "/artist-registration", label: "navForms", icon: PenLine },
+  { href: "/about", label: "navAbout", icon: Info },
+  { href: "/faq", label: "navFaq", icon: HelpCircle },
+  { href: "/support", label: "navSupport", icon: Headphones },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -46,6 +49,7 @@ export function SiteHeader() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { open: openLoginDrawer } = useLoginDrawerStore();
   const { isLoggedIn } = useAuthStore();
+  const copy = useLandingCopy();
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -82,7 +86,7 @@ export function SiteHeader() {
                 height={44}
               />
               <span className="text-base font-semibold text-error-500 text-nowrap">
-                آرشیو هنر
+                {copy("brandName")}
               </span>
             </Link>
           )}
@@ -97,7 +101,7 @@ export function SiteHeader() {
                   height={60}
                 />
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
-                  آرشیو هنر
+                  {copy("brandName")}
                 </span>
               </Link>
             )}
@@ -115,7 +119,7 @@ export function SiteHeader() {
                         : "text-zinc-300 hover:bg-zinc-800/60 hover:border-zinc-700",
                     ].join(" ")}
                   >
-                    {item.label}
+                    {copy(item.label)}
                   </Link>
                 );
               })}
@@ -131,7 +135,7 @@ export function SiteHeader() {
               rightIcon={<UserRound size={20} />}
               className="rounded-full! hidden! md:flex!"
             >
-              {isLoggedIn ? "پروفایل" : "ورود / ثبت‌نام کاربر"}
+              {isLoggedIn ? copy("navProfile") : copy("navLogin")}
             </Button>
             <div className="w-11 lg:hidden" />
           </div>
@@ -176,7 +180,7 @@ export function SiteHeader() {
                   height={40}
                 />
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
-                  آرشیو هنر
+                  {copy("brandName")}
                 </span>
               </div>
               <button
@@ -206,7 +210,7 @@ export function SiteHeader() {
                   >
                     <div className="flex justify-center items-center gap-2">
                       <Icon size={16} className="text-zinc-400" />
-                      {item.label}
+                      {copy(item.label)}
                     </div>
                     <div className="flex items-center gap-3">
                       <ChevronLeft size={20} className="text-zinc-200" />

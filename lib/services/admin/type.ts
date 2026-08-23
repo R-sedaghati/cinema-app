@@ -168,6 +168,8 @@ export interface IFormResultPages {
 
 export interface IFormSchema extends IFormResultPages {
   steps: IFormStep[];
+  /** Registration fee in Toman, already resolved server-side. 0 means free. */
+  registrationAmount: number;
 }
 
 export interface ICreateFormStepRequest {
@@ -219,8 +221,10 @@ export interface ICategoryItem {
   updatedAt: string | null;
   priority: number | null;
   parent: number | null;
-  /** Price in Toman a viewer pays to unlock contact details in this category. */
+  /** Price in Toman a viewer pays to unlock contact details in this category. 0 means free. */
   contactAmount: number | null;
+  /** One-off fee in Toman an artist pays to register in this category. 0 means free. */
+  registrationAmount: number | null;
   [key: string]: unknown;
 }
 
@@ -281,8 +285,10 @@ export interface IUpdateCategoryRequest {
   description: string;
   priority: number | null;
   image?: string | null;
-  /** Price in Toman a viewer pays to unlock contact details in this category. */
+  /** Price in Toman a viewer pays to unlock contact details in this category. 0 means free. */
   contactAmount?: number | null;
+  /** One-off fee in Toman an artist pays to register in this category. 0 means free. */
+  registrationAmount?: number | null;
 }
 
 export interface ICreateCategoryRequest {
@@ -294,6 +300,7 @@ export interface ICreateCategoryRequest {
   isActive?: boolean;
   image?: string | null;
   contactAmount?: number | null;
+  registrationAmount?: number | null;
 }
 
 export interface IFaqItem {
@@ -531,3 +538,94 @@ export interface ISiteContent {
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
+
+/**
+ * Gateway credentials. `merchantId` always arrives masked — the real key never leaves
+ * the server — so sending the mask back on save means "leave it unchanged".
+ */
+export interface IPaymentSetting {
+  merchantId: string | null;
+  hasMerchantId: boolean;
+  sandbox: boolean;
+  /** True while the gateway is still running off the server's env var. */
+  usingEnvFallback: boolean;
+}
+
+export type IPaymentSettingResponse = IRetriveResponse<IPaymentSetting>;
+
+export interface IUpdatePaymentSettingRequest {
+  merchantId?: string;
+  sandbox?: boolean;
+}
+
+/** Events that fan out an SMS to the admin numbers below. */
+export type NotificationEvent = "REGISTRATION" | "TRANSACTION" | "SUPPORT_TICKET";
+
+export interface INotificationSetting {
+  phones: string[];
+  events: NotificationEvent[];
+}
+
+export type INotificationSettingResponse = IRetriveResponse<INotificationSetting>;
+
+export interface IUpdateNotificationSettingRequest {
+  phones?: string[];
+  events?: NotificationEvent[];
+}
+
+export type ITransactionStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELED";
+
+export interface ParamsTransactionList {
+  count: number;
+  page: number;
+  search: string | null;
+  status: ITransactionStatus | null;
+}
+
+export interface ITransactionItem {
+  id: number;
+  trackingCode: string;
+  status: ITransactionStatus;
+  amount: number;
+  paymentGateway: string;
+  createdAt: string | null;
+  requesterName: string;
+  buyer: { id: number | null; phoneNumber: string | null };
+  artist: {
+    id: number | null;
+    code: string | null;
+    categories: { id: number; faName: string }[];
+  };
+  [key: string]: unknown;
+}
+
+export type IWalletTransactionType =
+  | "REFUND_REJECTED"
+  | "REFUND_REVISION"
+  | "REFUND_FAILED_PAYMENT"
+  | "ADMIN_ADJUST"
+  | "SPEND_REGISTRATION"
+  | "SPEND_CONTACT";
+
+export interface IAdminWalletTransaction {
+  id: number;
+  /** Toman, signed: positive credits the user, negative debits them. */
+  amount: number;
+  type: IWalletTransactionType;
+  typeLabel: string;
+  description: string | null;
+  /** Set only for manual adjustments. */
+  adminUsername: string | null;
+  createdAt: string | null;
+}
+
+export type IAdminWalletResponse = IRetriveResponse<{
+  balance: number;
+  transactions: IAdminWalletTransaction[];
+}>;
+
+export interface IAdjustWalletRequest {
+  /** Signed: positive adds balance, negative removes it. Never zero. */
+  amount: number;
+  description: string;
+}

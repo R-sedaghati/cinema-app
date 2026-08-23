@@ -2,13 +2,15 @@
 
 import React from "react";
 import ContentCard from "./ContentCard";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export default function SupportCard() {
+  const copy = useLandingCopy();
+
   return (
-    <ContentCard title="پشتیبانی">
+    <ContentCard title={copy("profileSupportTitle")}>
       <p className="text-sm leading-8 text-zinc-300">
-        این بخش می‌تواند برای نمایش تیکت‌های پشتیبانی و پیام‌های شما با تیم
-        پشتیبانی استفاده شود. در حال حاضر فقط نمای کلی صفحه پیاده‌سازی شده است.
+        {copy("profileSupportDesc")}
       </p>
     </ContentCard>
   );

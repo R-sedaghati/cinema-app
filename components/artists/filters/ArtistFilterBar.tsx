@@ -6,6 +6,7 @@ import { SelectFilter } from "./SelectFilter";
 import { RangeFilter } from "./RangeFilter";
 import type { RangeValue } from "@/lib/hooks/useArtistSearchParams";
 import type { IArtistFilterDescriptor } from "@/lib/services/landing/type";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export function ArtistFilterBar({
   descriptors,
@@ -26,12 +27,14 @@ export function ArtistFilterBar({
   onRangeChange: (key: string, bound: "min" | "max", value: string) => void;
   onClear: () => void;
 }>) {
+  const copy = useLandingCopy();
+
   if (isPending) return null;
 
   if (descriptors.length === 0) {
     return (
       <p className="text-sm text-zinc-500">
-        برای این دسته‌بندی فیلتری تعریف نشده است.
+        {copy("artistsNoFilters")}
       </p>
     );
   }
@@ -60,7 +63,7 @@ export function ArtistFilterBar({
         <Chip
           clickable
           type="button"
-          label="حذف فیلترها"
+          label={copy("artistsClearFilters")}
           leftIcon={<X size={14} />}
           onClick={onClear}
         />

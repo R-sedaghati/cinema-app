@@ -19,6 +19,8 @@ import {
   IArtistContactResponse,
   IArtistFiltersResponse,
   IContactPriceResponse,
+  IWalletBalanceResponse,
+  IWalletTransactionListResponse,
   IContactRequestListResponse,
   ICreateContactRequestResponse,
   IFormSchemaResponse,
@@ -270,6 +272,19 @@ export const userCreateContactRequest = async ({
 export const userArtistContact = async (artistId: number) => {
   const { data } = await landingApi.get<IArtistContactResponse>(
     `/user/artists-requests/${artistId}/contact/`,
+  );
+  return data;
+};
+
+export const userWalletBalance = async () => {
+  const { data } = await landingApi.get<IWalletBalanceResponse>("/user/wallet/");
+  return data;
+};
+
+export const userWalletTransactions = async (params: IPagination) => {
+  const { data } = await landingApi.get<IWalletTransactionListResponse>(
+    "/user/wallet/transactions/",
+    { params: { ...params } },
   );
   return data;
 };

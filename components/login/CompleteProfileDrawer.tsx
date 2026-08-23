@@ -7,6 +7,7 @@ import getDrawerWidth from "@/lib/utils/getDrawerWidth";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";
 import { useUpdateUserProfile } from "@/lib/services/landing/hook";
 import Button from "@/components/common/Button";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 interface Props {
   open: boolean;
@@ -15,6 +16,7 @@ interface Props {
 
 const CompleteProfileDrawer = ({ open, onClose }: Props) => {
   const { mutate, isPending } = useUpdateUserProfile();
+  const copy = useLandingCopy();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
@@ -26,7 +28,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
       { firstName, lastName },
       {
         onSuccess: () => {
-          toast.success("پروفایل با موفقیت تکمیل شد");
+          toast.success(copy("completeProfileSuccess"));
           onClose();
         },
       },
@@ -36,7 +38,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
   return (
     <Drawer
       header={{
-        title: "تکمیل پروفایل",
+        title: copy("completeProfileTitle"),
         haveCloseIcon: true,
       }}
       width={getDrawerWidth(420)}
@@ -46,23 +48,23 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
         <p className="text-sm text-zinc-400">
-          برای استفاده کامل از سایت، لطفاً نام و نام خانوادگی خود را وارد کنید.
+          {copy("completeProfileDesc")}
         </p>
 
         <Input
           id="complete-first-name"
-          labelContent="نام"
+          labelContent={copy("fieldFirstName")}
           required
-          placeholder="نام خود را وارد کنید"
+          placeholder={copy("fieldFirstNamePlaceholder")}
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
 
         <Input
           id="complete-last-name"
-          labelContent="نام خانوادگی"
+          labelContent={copy("fieldLastName")}
           required
-          placeholder="نام خانوادگی خود را وارد کنید"
+          placeholder={copy("fieldLastNamePlaceholder")}
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
         />
@@ -74,7 +76,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
           className="w-full rounded-full!"
           isFullWidth
         >
-          ذخیره
+          {copy("actionSave")}
         </Button>
       </form>
     </Drawer>

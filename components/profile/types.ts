@@ -3,5 +3,6 @@ export type SectionId =
   | "forms"
   | "requests"
   | "payments"
+  | "wallet"
   | "support"
   | "logout";

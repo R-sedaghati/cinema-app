@@ -4,15 +4,18 @@ import { EArtistRequestStatus, IArtistItem } from "@/lib/services/admin/type";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
+import type { CopyResolver } from "@/lib/utils/copy";
+import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
 export const generateColumns = (
   onView: (item: IArtistItem) => void,
+  copy: CopyResolver<LandingCopyKey>,
 ): ColumnsType<IArtistItem>[] => [
   {
     align: "start",
     key: "title",
     dataIndex: "title",
-    title: "نام فرم",
+    title: copy("profileFormsColName"),
     className: "align-middle min-w-48",
     render: (data) =>
       data.id && (
@@ -23,7 +26,7 @@ export const generateColumns = (
     align: "center",
     key: "createAt",
     dataIndex: "titcreateAtle",
-    title: "تاریخ ارسال",
+    title: copy("profileFormsColDate"),
     className: "align-middle min-w-32",
     render: (data) => {
       return (
@@ -37,7 +40,7 @@ export const generateColumns = (
     align: "center",
     key: "status",
     dataIndex: "status",
-    title: "وضعیت",
+    title: copy("profileColStatus"),
     className: "align-middle min-w-32",
     render: (data) => <ArtistStatus status={data.status} isSolid />,
   },
@@ -45,7 +48,7 @@ export const generateColumns = (
     align: "center",
     key: "actions",
     dataIndex: "actions",
-    title: "عملیات",
+    title: copy("profileColActions"),
     className: "align-middle",
     render: (data) => (
       <Button
@@ -54,8 +57,8 @@ export const generateColumns = (
         onClick={() => onView(data)}
       >
         {data.status === EArtistRequestStatus.NEED_TO_REVISION
-          ? "ویرایش فرم"
-          : "مشاهده فرم"}
+          ? copy("profileFormEdit")
+          : copy("profileFormView")}
       </Button>
     ),
   },

@@ -4,13 +4,8 @@ import convertEnNumberToFaNumberWithSeparation from "@/lib/utils/convertEnNumber
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-
-const statusLabels: Record<IContactRequestItem["status"], string> = {
-  PENDING: "در انتظار پرداخت",
-  COMPLETED: "پرداخت شده",
-  FAILED: "ناموفق",
-  CANCELED: "لغو شده",
-};
+import type { CopyResolver } from "@/lib/utils/copy";
+import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
 const statusClasses: Record<IContactRequestItem["status"], string> = {
   PENDING: "bg-amber-900/40 text-amber-400",
@@ -19,12 +14,21 @@ const statusClasses: Record<IContactRequestItem["status"], string> = {
   CANCELED: "bg-zinc-800 text-zinc-400",
 };
 
-export const columns: ColumnsType<IContactRequestItem>[] = [
+const statusKeys: Record<IContactRequestItem["status"], LandingCopyKey> = {
+  PENDING: "paymentPending",
+  COMPLETED: "paymentCompleted",
+  FAILED: "paymentFailed",
+  CANCELED: "paymentCanceled",
+};
+
+export const generateColumns = (
+  copy: CopyResolver<LandingCopyKey>,
+): ColumnsType<IContactRequestItem>[] => [
   {
     align: "start",
     key: "artist",
     dataIndex: "artist",
-    title: "هنرمند",
+    title: copy("profileRequestsColArtist"),
     className: "align-middle min-w-60",
     render: (data) => (
       <div className="flex flex-col gap-1">
@@ -39,7 +43,7 @@ export const columns: ColumnsType<IContactRequestItem>[] = [
     align: "center",
     key: "trackingCode",
     dataIndex: "trackingCode",
-    title: "شماره پیگیری",
+    title: copy("profileRequestsColTracking"),
     className: "align-middle min-w-32",
     render: (data) => <span className="text-sm">{data.trackingCode}</span>,
   },
@@ -47,11 +51,11 @@ export const columns: ColumnsType<IContactRequestItem>[] = [
     align: "center",
     key: "amount",
     dataIndex: "amount",
-    title: "مبلغ",
+    title: copy("profileRequestsColAmount"),
     className: "align-middle min-w-28",
     render: (data) => (
       <span className="text-sm">
-        {convertEnNumberToFaNumberWithSeparation(data.amount)} تومان
+        {convertEnNumberToFaNumberWithSeparation(data.amount)} {copy("labelCurrency")}
       </span>
     ),
   },
@@ -59,13 +63,13 @@ export const columns: ColumnsType<IContactRequestItem>[] = [
     align: "center",
     key: "status",
     dataIndex: "status",
-    title: "وضعیت",
+    title: copy("profileColStatus"),
     className: "align-middle min-w-32",
     render: (data) => (
       <span
         className={`rounded-full px-3 py-1 text-xs ${statusClasses[data.status]}`}
       >
-        {statusLabels[data.status]}
+        {copy(statusKeys[data.status])}
       </span>
     ),
   },
@@ -73,12 +77,12 @@ export const columns: ColumnsType<IContactRequestItem>[] = [
     align: "center",
     key: "actions",
     dataIndex: "actions",
-    title: "عملیات",
+    title: copy("profileColActions"),
     className: "align-middle max-w-52",
     render: (data) => (
       <Link href={`/artists/${data.artist?.id}`}>
         <Button variant="text" leftIcon={<ChevronLeft />}>
-          مشاهده پروفایل هنرمند
+          {copy("profileRequestsViewArtist")}
         </Button>
       </Link>
     ),

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { Home, LogIn, PenLine, Search, User } from "lucide-react";
@@ -15,14 +16,15 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { isLoggedIn } = useAuthStore();
   const { open } = useLoginDrawerStore();
+  const copy = useLandingCopy();
 
   const bottomNavItems = [
-    { href: "/", label: "خانه", icon: Home },
-    { href: "/artists", label: "جستجو", icon: Search },
-    { href: "/artist-registration", label: "فرم‌ها", icon: PenLine },
+    { href: "/", label: copy("navHome"), icon: Home },
+    { href: "/artists", label: copy("navMobileSearch"), icon: Search },
+    { href: "/artist-registration", label: copy("navMobileForms"), icon: PenLine },
     isLoggedIn
-      ? { href: "/profile", label: "پروفایل", icon: User }
-      : { href: "#", label: "ورود", icon: LogIn },
+      ? { href: "/profile", label: copy("navProfile"), icon: User }
+      : { href: "#", label: copy("navMobileLogin"), icon: LogIn },
   ];
 
   return (
@@ -35,7 +37,7 @@ export function MobileBottomNav() {
           const active = item.href !== "#" && isActive(pathname, item.href);
           const Icon = item.icon;
 
-          if (!isLoggedIn && item.label === "ورود") {
+          if (!isLoggedIn && item.href === "#") {
             return (
               <button
                 key={item.label}

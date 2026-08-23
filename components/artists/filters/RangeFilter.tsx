@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import useDebounce from "@/lib/hooks/useDebounce";
 import type { RangeValue } from "@/lib/hooks/useArtistSearchParams";
 import type { IArtistFilterDescriptor } from "@/lib/services/landing/type";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export function RangeFilter({
   descriptor,
@@ -14,6 +15,7 @@ export function RangeFilter({
   value: RangeValue;
   onChange: (bound: "min" | "max", value: string) => void;
 }>) {
+  const copy = useLandingCopy();
   // Local draft so typing doesn't push a URL entry per keystroke.
   const [draft, setDraft] = useState(value);
   const debounced = useDebounce(draft, 600);
@@ -56,7 +58,7 @@ export function RangeFilter({
         onChange={(e) => setDraft((prev) => ({ ...prev, min: e.target.value }))}
         className="w-14 bg-transparent text-sm text-zinc-100 outline-none"
       />
-      <span className="text-zinc-600">تا</span>
+      <span className="text-zinc-600">{copy("artistsRangeTo")}</span>
       <input
         type="number"
         inputMode="numeric"

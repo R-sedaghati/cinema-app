@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import TermsNotice from "@/components/login/TermsNotice";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const OTP_EXPIRATION_KEY = "otpExpirationDate";
 
@@ -22,6 +23,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
   const { setStep } = props;
   const { phoneNumber, login } = useAuthStore();
   const { close } = useLoginDrawerStore();
+  const copy = useLandingCopy();
 
   const [isTimerEnded, setIsTimerEnded] = useState(false);
   const [code, setCode] = useState("");
@@ -68,10 +70,10 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       },
       {
         onSuccess: () => {
-          toast.success("کد ورود ارسال شد");
+          toast.success(copy("loginOtpSent"));
         },
         onError: () => {
-          setErrorMessage("کد وارد شده اشتباه است.");
+          setErrorMessage(copy("loginOtpWrong"));
         },
       },
     );
@@ -91,14 +93,14 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       },
       {
         onSuccess: (res) => {
-          toast.success("با موفقیت وارد شدید");
+          toast.success(copy("loginSuccess"));
           const { accessToken } = res?.result ?? {};
           login(accessToken, "", true);
           close();
           router.push("/");
         },
         onError: () => {
-          setErrorMessage("کد وارد شده اشتباه است.");
+          setErrorMessage(copy("loginOtpWrong"));
         },
       },
     );
@@ -108,11 +110,11 @@ const OtpStep: FC<StepBaseProps> = (props) => {
     <>
       <div className="flex flex-col items-start gap-2">
         <h6 className="ss02 font-h6-bold flex flex-wrap gap-1.5 text-gray-600">
-          کد پیامک شده به شماره{" "}
+          {copy("loginOtpPrefix")}{" "}
           <span dir="ltr" className="inline-block text-left">
             {formatPhoneNumber(phoneNumber)}
           </span>{" "}
-          را وارد کنید.
+          {copy("loginOtpSuffix")}
         </h6>
         <Button
           className="p-0!"
@@ -121,7 +123,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
           rightIcon={<Pencil />}
           onClick={() => setStep("phoneNumber")}
         >
-          تغییر شماره موبایل
+          {copy("loginOtpChangeNumber")}
         </Button>
       </div>
       <OtpInput
@@ -148,13 +150,13 @@ const OtpStep: FC<StepBaseProps> = (props) => {
             size="small"
             onClick={resendOtp}
           >
-            ارسال مجدد کد
+            {copy("loginOtpResend")}
           </Button>
         ) : (
           <>
             <h6 className="text-gray-700 ss02 font-h6-bold">{remainingTime}</h6>
             <span className="font-button-small text-primary-600/40">
-              تا ارسال مجدد کد
+              {copy("loginOtpCountdown")}
             </span>
           </>
         )}
@@ -166,7 +168,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
         isLoading={isPending}
         onClick={() => handleSubmit()}
       >
-        ورود
+        {copy("loginOtpSubmit")}
       </Button>
       <TermsNotice />
     </>

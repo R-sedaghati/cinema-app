@@ -15,17 +15,23 @@ import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { CopyFn } from "@/lib/utils/formCopy";
-
-const PAYMENT_AMOUNT = 200000;
+import landingApi from "@/lib/services/landingAxiosInstance";
 
 interface Props {
   steps: IFormStep[];
   copy: CopyFn;
+  /** Resolved server-side from the category. 0 means registration is free here. */
+  registrationAmount?: number;
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const FourthStepFlow: React.FC<Props> = ({ steps, copy, onPrevious }) => {
+const FourthStepFlow: React.FC<Props> = ({
+  steps,
+  copy,
+  registrationAmount,
+  onPrevious,
+}) => {
   const store = useArtistRegistrationStore();
   const router = useRouter();
   const { mutate: create, isPending: isCreating } =
@@ -58,9 +64,18 @@ const FourthStepFlow: React.FC<Props> = ({ steps, copy, onPrevious }) => {
       update(
         { id: store.editId, ...formPayload },
         {
-          onSuccess: () => {
-            toast.success(copy("editSuccessToast"));
+          onSuccess: (res) => {
             store.reset();
+
+            // A request sent back for revision had its fee refunded to the wallet, so it
+            // goes through payment again. The wallet normally covers it in full, in which
+            // case the server settles it and redirects without a gateway stop.
+            if (res.result.requiresPayment) {
+              window.location.href = `${landingApi.defaults.baseURL}/user/purchase/?requestId=${res.result.artistRequestId}`;
+              return;
+            }
+
+            toast.success(copy("editSuccessToast"));
             router.push("/profile");
           },
           onError: () => toast.error(copy("editErrorToast")),
@@ -70,7 +85,9 @@ const FourthStepFlow: React.FC<Props> = ({ steps, copy, onPrevious }) => {
       create(formPayload, {
         onSuccess: (res) => {
           // The amount is fixed server-side; sending one here let users choose their own price.
-          window.location.href = `http://api.archivehonar.ir/api/user/purchase/?requestId=${res.result.artistRequestId}`;
+          // The server resolves the fee (and skips the gateway when it is 0), so this
+          // is the same redirect whether the category is paid or free.
+          window.location.href = `${landingApi.defaults.baseURL}/user/purchase/?requestId=${res.result.artistRequestId}`;
         },
       });
     }
@@ -113,7 +130,7 @@ const FourthStepFlow: React.FC<Props> = ({ steps, copy, onPrevious }) => {
           ))}
         </div>
 
-        {!store.editId && (
+        {!store.editId && registrationAmount !== 0 && (
           <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center">
             <div className="flex flex-col gap-3">
               <div className="flex gap-2 items-center">
@@ -127,7 +144,11 @@ const FourthStepFlow: React.FC<Props> = ({ steps, copy, onPrevious }) => {
                 <p className="font-p2-medium">{copy("amountLabel")}</p>
                 <div className="flex gap-1">
                   <p className="font-p2-medium">
-                    {convertEnNumberToFaNumberWithSeparation(PAYMENT_AMOUNT)}
+                    {registrationAmount === undefined
+                      ? "—"
+                      : convertEnNumberToFaNumberWithSeparation(
+                          registrationAmount,
+                        )}
                   </p>
                   <p className="font-p2-medium">{copy("currency")}</p>
                 </div>

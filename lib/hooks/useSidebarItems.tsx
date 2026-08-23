@@ -11,6 +11,7 @@ import {
   Video,
   Plus,
   BookOpen,
+  Settings,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -92,6 +93,12 @@ export const useSidebarItems = (): {
         title: "مدیریت آموزش‌ها",
         link: "/admin/tutorials",
         active: pathname.startsWith("/admin/tutorials"),
+      },
+      {
+        icon: <Settings />,
+        title: "تنظیمات",
+        link: "/admin/settings",
+        active: pathname.startsWith("/admin/settings"),
       },
       {
         icon: <BookOpen />,

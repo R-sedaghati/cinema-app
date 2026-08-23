@@ -564,13 +564,21 @@ List own support tickets. **Auth required.**
 ---
 
 ### `GET /user/purchase/`
-Initiate Zarinpal payment — redirects browser to gateway. **Auth required.**
+Initiate the artist registration payment — redirects the browser to the gateway. **Auth required.**
 
 **Query params:**
 | Param | Type | Description |
 |-------|------|-------------|
-| amount | number | Payment amount (positive) |
 | requestId | number | Artist request ID |
+
+The fee is resolved server-side from the request's category (`registrationAmount`,
+inherited from the top-level category, falling back to `REGISTRATION_AMOUNT`). A
+client-supplied `amount` is ignored — it used to be honored, which let a user pick
+what they paid by editing the URL.
+
+When the resolved fee is `0` the category is free: a `COMPLETED` payment is recorded,
+the request moves to `PENDING`, and the browser is redirected straight to the result
+page without touching the gateway.
 
 **Response:** HTML redirect page (not JSON)
 
@@ -578,6 +586,93 @@ Initiate Zarinpal payment — redirects browser to gateway. **Auth required.**
 
 ### `ALL /user/purchase/callback/`
 Zarinpal payment callback (internal, called by gateway). No auth.
+
+---
+
+## Contact-detail purchases
+
+An artist's contact fields are the paid product. They are served only by
+`GET /user/artists-requests/:id/contact/`, and only to a caller who owns a `COMPLETED`
+`ContactRequest` for that artist (or is the artist). Every other endpoint strips them.
+
+### `GET /artists-requests/:id/contact-price/`
+Price, in Toman, to unlock this artist's contact details. No auth.
+
+The price comes from the artist's category (`contactAmount`), inherited from the
+top-level category, falling back to `CONTACT_REQUEST_AMOUNT`. **`0` means free.**
+
+**Response:** `ApiResponse<{ amount: number }>`
+
+---
+
+### `POST /user/artists-requests/:id/contact-requests/`
+Start a purchase. **Auth required.**
+
+**Body:** `{ requesterName: string }`
+
+The amount is read from the category — a client-supplied price is never trusted.
+
+**Response:** `ApiResponse<{ id, trackingCode, status, redirectUrl }>`
+
+`redirectUrl` is the gateway's StartPay page, or `null` when there is nothing to pay:
+either the artist was already unlocked, or the category is free (in which case the
+request is stored as `COMPLETED` immediately).
+
+---
+
+### `ALL /contact-requests/callback/?contactRequestId=` 
+Gateway return URL. No auth (the gateway drives the browser here, so it cannot carry a
+token). Verifies the payment, then redirects to
+`/artists/{id}?contact=success|failed|canceled`.
+
+---
+
+### `GET /user/artists-requests/:id/contact/`
+The paid payload: `firstName`, `lastName`, `phoneNumber`, `email`, `address`,
+`postalCode`. **Auth required.**
+
+**403** unless the caller owns a `COMPLETED` `ContactRequest` for this artist or is the
+artist themselves.
+
+---
+
+### `GET /user/contact-requests/`
+The caller's own purchases, paginated. **Auth required.**
+
+---
+
+## Wallet
+
+A ledger, not a stored balance: the balance is always `SUM(amount)` over the user's
+`wallet_transactions` rows, so it cannot drift from its own history. `amount` is signed —
+positive credits, negative debits.
+
+**Money enters** when an admin sets an artist request to `REJECTED` or
+`NEED_TO_REVISION` (the registration fee is returned, once per payment), when a gateway
+leg fails and a reservation is released, or when an admin adjusts a balance by hand.
+
+**Money leaves** automatically: both purchase flows take from the wallet first and send
+only the remainder to the gateway. The wallet is reserved when the purchase starts — not
+at the callback — because that reservation is what stops a second purchase spending the
+same balance while the first is still at the gateway. A leg that never settles returns it.
+
+A request sent back for revision has its fee refunded, so resubmitting charges again;
+the refund normally covers it in full, so the artist never sees a gateway.
+
+### `GET /user/wallet/`
+Current balance. **Auth required.**
+
+**Response:** `ApiResponse<{ balance: number }>`
+
+---
+
+### `GET /user/wallet/transactions/`
+The caller's own ledger, paginated. **Auth required.**
+
+**Response:** `ApiResponse<{ id, amount, type, typeLabel, description, createdAt }[]>`
+
+`type` is one of `REFUND_REJECTED`, `REFUND_REVISION`, `REFUND_FAILED_PAYMENT`,
+`ADMIN_ADJUST`, `SPEND_REGISTRATION`, `SPEND_CONTACT`.
 
 ---
 
@@ -664,7 +759,97 @@ Update category.
 
 **Body:** partial `Category` fields (`config` is no longer supported — use the form-builder endpoints below)
 
+Two price fields, both in Toman, both following the same rule — **`0` means free, `null`
+means "not set here"** (inherit the top-level category, then the env fallback):
+
+| Field | Who pays | Fallback |
+|-------|----------|----------|
+| contactAmount | a viewer unlocking an artist's contact details | `CONTACT_REQUEST_AMOUNT` |
+| registrationAmount | an artist registering in this category | `REGISTRATION_AMOUNT` |
+
 **Response:** `ApiResponse<Category>`
+
+---
+
+### `GET /admin/payment-settings/`
+Gateway credentials.
+
+**Response:** `ApiResponse<{ merchantId, hasMerchantId, sandbox, usingEnvFallback }>`
+
+`merchantId` is always **masked** (`****-****-****-abc1`) — the real key never leaves
+the server. `usingEnvFallback` is true while no key is stored and the gateway is still
+running off `ZARINPAL_MERCHANT_ID`.
+
+---
+
+### `PATCH /admin/payment-settings/`
+Update gateway credentials.
+
+**Body:** `{ merchantId?: string, sandbox?: boolean }`
+
+Because reads are masked, a submitted `merchantId` that still looks like a mask is
+treated as *unchanged* rather than written. An empty string clears the stored key,
+falling back to the env var.
+
+---
+
+### `GET /admin/notification-settings/`
+Admin SMS recipients, and which events trigger a message.
+
+**Response:** `ApiResponse<{ phones: string[]; events: NotificationEvent[] }>`
+
+---
+
+### `PATCH /admin/notification-settings/`
+Update recipients / events.
+
+**Body:** `{ phones?: string[], events?: NotificationEvent[] }`
+
+Each field **replaces** the stored list rather than merging into it — the admin form
+always sends the full list. Numbers are normalized to `09xxxxxxxxx` (Persian digits
+accepted) and deduped; an invalid number is a `400`. An empty `phones` disables admin SMS.
+
+`NotificationEvent` is one of:
+
+| Value | Fires when |
+|-------|-----------|
+| REGISTRATION | a new artist request is submitted, or its registration payment completes |
+| TRANSACTION | a contact-detail purchase or registration payment reaches `COMPLETED` |
+| SUPPORT_TICKET | a user opens a support ticket |
+
+The toggles are global: every stored number receives every enabled event.
+
+---
+
+### `GET /admin/users/:id/wallet/`
+One user's balance and ledger.
+
+**Response:** `ApiResponse<{ balance, transactions[] }>` — each row adds `adminUsername`,
+set only for manual adjustments.
+
+---
+
+### `POST /admin/users/:id/wallet/`
+Manual adjustment.
+
+**Body:** `{ amount: number, description: string }`
+
+`amount` is signed and must not be zero; `description` is required, because this is the
+only place a balance moves without a payment behind it. A deduction may take the balance
+negative — refusing that would leave an admin unable to correct a mistaken credit the
+user has already partly spent.
+
+**Response:** `ApiResponse<{ balance: number }>`
+
+---
+
+### `GET /admin/contact-requests/`
+Every contact-detail purchase, paginated — the transactions table.
+
+**Query params:** `page`, `count`, `status` (`PENDING` / `COMPLETED` / `FAILED` /
+`CANCELED`), `search` (tracking code, requester name, or buyer phone)
+
+**Response:** `ApiResponse<Transaction[]>` with buyer and artist summaries
 
 ---
 

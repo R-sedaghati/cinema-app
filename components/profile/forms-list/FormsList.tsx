@@ -15,6 +15,7 @@ import ArtistStatus from "@/components/admin/artist-registration/ArtistStatus";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import Button from "@/components/common/Button";
 import { ChevronLeft } from "lucide-react";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export default function FormsList() {
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function FormsList() {
   const { data, isPending } = useUserAtristRequests(finalParams);
 
   const isValidParams = hasValidParams(finalParams);
+  const copy = useLandingCopy();
 
   const handleView = (item: IArtistItem) => {
     if (item.status === EArtistRequestStatus.NEED_TO_REVISION) {
@@ -43,7 +45,7 @@ export default function FormsList() {
   const items = data?.result ?? [];
 
   return (
-    <ContentCard title="لیست فرم‌ها">
+    <ContentCard title={copy("profileFormsTitle")}>
       {/* Mobile card list */}
       <div className="flex flex-col gap-3 md:hidden">
         {isPending &&
@@ -63,7 +65,7 @@ export default function FormsList() {
 
         {!isPending && items.length === 0 && (
           <p className="py-8 text-center text-sm text-zinc-500">
-            هیچ فرمی ثبت نشده است.
+            {copy("profileFormsEmpty")}
           </p>
         )}
 
@@ -83,7 +85,9 @@ export default function FormsList() {
               <div className="flex items-center gap-2 text-xs text-zinc-500">
                 {item.trackingCode && (
                   <>
-                    <span>کد پیگیری: {item.trackingCode}</span>
+                    <span>
+                      {copy("profileFormsTracking")} {item.trackingCode}
+                    </span>
                     {item.createdAt && <span>•</span>}
                   </>
                 )}
@@ -100,8 +104,8 @@ export default function FormsList() {
                   className="p-0! text-sm"
                 >
                   {item.status === EArtistRequestStatus.NEED_TO_REVISION
-                    ? "ویرایش فرم"
-                    : "مشاهده فرم"}
+                    ? copy("profileFormEdit")
+                    : copy("profileFormView")}
                 </Button>
               </div>
             </div>
@@ -114,7 +118,7 @@ export default function FormsList() {
           rowKey="id"
           className="w-full"
           stickyTableHeader
-          columns={generateColumns(handleView)}
+          columns={generateColumns(handleView, copy)}
           data={items}
           {...(isValidParams && isPending && { loading: { size: 45 } })}
           {...(data?.count && {

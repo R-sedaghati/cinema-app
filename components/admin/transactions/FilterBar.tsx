@@ -1,13 +1,13 @@
 import { Button, Input } from "@dgshahr/ui-kit";
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { ParamsArtistList } from "@/lib/services/admin/type";
+import { ParamsTransactionList } from "@/lib/services/admin/type";
 import ObjectUtils from "@/lib/utils/objectUtils";
 import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
 
 interface Props {
-  setParams: Dispatch<SetStateAction<Partial<ParamsArtistList>>>;
+  setParams: Dispatch<SetStateAction<Partial<ParamsTransactionList>>>;
   loading: boolean;
-  params: Partial<ParamsArtistList>;
+  params: Partial<ParamsTransactionList>;
   resetParams?: () => void;
 }
 

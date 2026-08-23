@@ -162,6 +162,11 @@ export type ArtistRequestResult = {
   artistRequestId: number;
   status: ArtistRequestStatus;
   portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey?: string | null }[];
+  /**
+   * Set when editing a request the admin sent back for revision: its fee was refunded to
+   * the wallet, so resubmitting charges again (usually covered by that same refund).
+   */
+  requiresPayment?: boolean;
 };
 
 /** Contact details are paid content — served only after a COMPLETED contact request. */
@@ -205,3 +210,27 @@ export type ICreateContactRequestResponse = IRetriveResponse<{
 }>;
 
 export type IContactPriceResponse = IRetriveResponse<{ amount: number }>;
+
+export type WalletTransactionType =
+  | "REFUND_REJECTED"
+  | "REFUND_REVISION"
+  | "REFUND_FAILED_PAYMENT"
+  | "ADMIN_ADJUST"
+  | "SPEND_REGISTRATION"
+  | "SPEND_CONTACT";
+
+export interface IWalletTransactionItem {
+  id: number;
+  /** Toman, signed: positive credits the user, negative debits them. */
+  amount: number;
+  type: WalletTransactionType;
+  /** Persian label for `type`, resolved server-side. */
+  typeLabel: string;
+  description: string | null;
+  createdAt: string | null;
+  [key: string]: unknown;
+}
+
+export type IWalletBalanceResponse = IRetriveResponse<{ balance: number }>;
+export type IWalletTransactionListResponse =
+  IBasePaginateResponse<IWalletTransactionItem>;

@@ -19,6 +19,8 @@ import {
   IArtistContactResponse,
   IArtistFiltersResponse,
   IContactPriceResponse,
+  IWalletBalanceResponse,
+  IWalletTransactionListResponse,
   IContactRequestListResponse,
   ICreateContactRequestResponse,
   IFormSchemaResponse,
@@ -61,6 +63,8 @@ import {
   userCreateContactRequest,
   userArtistContact,
   userContactRequests,
+  userWalletBalance,
+  userWalletTransactions,
 } from "./api";
 import useAuthStore from "@/lib/stores/useAuthStore";
 
@@ -326,6 +330,28 @@ export const useUserArtistContact = (artistId?: number | null, enabled = false) 
     queryKey: ["userArtistContact", artistId],
     queryFn: () => userArtistContact(artistId!),
     enabled: Boolean(accessToken) && Boolean(artistId) && enabled,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserWalletBalance = () => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IWalletBalanceResponse>({
+    queryKey: ["userWalletBalance"],
+    queryFn: userWalletBalance,
+    enabled: Boolean(accessToken),
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserWalletTransactions = (params: IPagination) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IWalletTransactionListResponse>({
+    queryKey: ["userWalletTransactions", params],
+    queryFn: () => userWalletTransactions(params),
+    enabled: Boolean(accessToken),
     refetchOnWindowFocus: false,
   });
 };
