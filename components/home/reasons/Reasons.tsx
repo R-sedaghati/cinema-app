@@ -1,6 +1,6 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
-import Image from "next/image";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 // ponytail: image per card is positional, exactly like the about-page benefit cards
@@ -29,7 +29,7 @@ const Reasons = () => {
             key={item.id}
             className="w-73 min-h-109 flex bg-secondary-black flex-col justify-between items-center gap-8 border border-error-500/30 shadow-card rounded-4xl p-8"
           >
-            <Image src={item.image} alt={item.title} width={216} height={160} />
+            <img src={item.image} alt={item.title} width={216} height={160} />
             <h5 className="font-h3-bold h-7.5">{item.title}</h5>
             <p className="font-p1-regular flex-1 text-zinc-400">
               {item.detail}

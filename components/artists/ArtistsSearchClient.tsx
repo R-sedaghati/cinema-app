@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { ArrowRight, MoveLeft, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
-import Image from "next/image";
 import ArtistCard from "./Card";
 import NotFoundSearch from "../common/NotFoundSearch";
 import { Button, Input } from "@dgshahr/ui-kit";
@@ -169,7 +169,7 @@ export function ArtistsSearchClient() {
                 >
                   <p className="text-nowrap text-sm md:text-base z-1">{item.faName}</p>
                   <MoveLeft className="text-error-500 z-1" />
-                  <Image
+                  <img
                     src={item.image ?? "/cat-1.svg"}
                     width={90}
                     height={90}

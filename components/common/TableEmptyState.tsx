@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 type EmptyStateProps = {
   showImage?: boolean;
@@ -12,7 +12,7 @@ export default function TableEmptyState({
   return (
     <div className="flex flex-col items-center justify-center w-full py-10 text-center text-gray-600">
       {showImage && (
-        <Image
+        <img
           src="/assets/images/onmount-empty-state.webp"
           alt="emptyState"
           width={400}

@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { benefitImages } from "@/lib/mock/about";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
-import Image from "next/image";
 
 const Benefits = () => {
   const { data } = useUserSiteContent();
@@ -24,7 +24,7 @@ const Benefits = () => {
              p-6
              text-right"
         >
-          <Image
+          <img
             src={benefitImages[index]}
             alt={item.title}
             width={216}

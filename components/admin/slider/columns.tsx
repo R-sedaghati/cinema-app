@@ -1,8 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 import { IBannerItem } from "@/lib/services/admin/type";
 import { Badge, Button } from "@dgshahr/ui-kit";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { Pencil, Trash2 } from "lucide-react";
-import Image from "next/image";
 
 export const generateColumns = (
   onEditClick: (id: number) => void,
@@ -26,7 +26,7 @@ export const generateColumns = (
       render: (data) => (
         <div className="relative w-16 h-10 rounded-lg overflow-hidden bg-gray-100">
           {data.image && (
-            <Image src={data.image} alt={data.title} fill className="object-cover" />
+            <img src={data.image} alt={data.title} className="absolute inset-0 h-full w-full object-cover" />
           )}
         </div>
       ),

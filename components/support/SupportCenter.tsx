@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { supportCardVisuals } from "@/lib/mock/support";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
-import Image from "next/image";
 import Button from "../common/Button";
 
 const SupportCenter = () => {
@@ -32,7 +32,7 @@ const SupportCenter = () => {
               key={item.title}
               className="w-73 min-h-[530px] flex bg-secondary-black flex-col justify-between items-center gap-8 border border-error-500/30 shadow-card rounded-4xl p-6"
             >
-              <Image
+              <img
                 src={visual.image}
                 alt={item.title}
                 width={216}

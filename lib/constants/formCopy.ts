@@ -14,6 +14,14 @@ export const FORM_COPY = {
     value: "لطفاً زمینه فعالیت خود را مشخص نمایید:",
   },
   categoryStepTitle: { admin: "عنوان مرحله زمینه فعالیت", value: "زمینه فعالیت" },
+  alreadyRegistered: {
+    admin: "برچسب دسته‌بندی ثبت‌شده",
+    value: "قبلاً ثبت‌نام کرده‌اید",
+  },
+  duplicateErrorToast: {
+    admin: "پیام خطای فرم تکراری",
+    value: "شما قبلاً در این دسته‌بندی فرم ثبت کرده‌اید.",
+  },
   formTitle: { admin: "عنوان فرم ({category})", value: "فرم حوزه {category}" },
   stepCounter: { admin: "شمارنده مرحله ({n} و {total})", value: "مرحله {n} از {total}" },
   finalStepLabel: { admin: "زیرعنوان مرحله پایانی", value: "مرحله پایانی" },
@@ -37,7 +45,13 @@ export const FORM_COPY = {
   },
   amountLabel: { admin: "برچسب مبلغ", value: "مبلغ قابل پرداخت" },
   currency: { admin: "واحد پول", value: "تومان" },
+  labelFree: { admin: "نمایش رایگان", value: "رایگان" },
+  paymentFreeTitle: {
+    admin: "عنوان باکس رایگان",
+    value: "ثبت‌نام در این دسته‌بندی رایگان است",
+  },
   submitLabel: { admin: "دکمه پرداخت نهایی", value: "پرداخت و ثبت‌نام نهایی" },
+  freeSubmitLabel: { admin: "دکمه ثبت (رایگان)", value: "ادامه" },
   editSubmitLabel: { admin: "دکمه ثبت تغییرات", value: "ثبت تغییرات" },
   editSuccessToast: { admin: "پیام موفقیت ویرایش", value: "فرم با موفقیت ویرایش شد" },
   editErrorToast: { admin: "پیام خطای ویرایش", value: "خطا در ویرایش فرم" },

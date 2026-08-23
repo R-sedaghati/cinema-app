@@ -7,7 +7,11 @@ import Link from "next/link";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
-import { useUserArtistDetail, useUserCategoryList } from "@/lib/services/landing/hook";
+import {
+  useUserArtistDetail,
+  useUserAtristRequests,
+  useUserCategoryList,
+} from "@/lib/services/landing/hook";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
 import { defaultCopy } from "@/lib/utils/formCopy";
@@ -23,9 +27,31 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     count: 30,
   });
 
+  // Each account fills a given form once, so a category already registered in is shown
+  // but not selectable. The backend enforces the same rule on submit.
+  const { data: ownRequests } = useUserAtristRequests({ page: 1, count: 100 });
+
+  const registeredCategoryIds = useMemo(
+    () =>
+      new Set(
+        (ownRequests?.result ?? []).flatMap((request) =>
+          request.categories.map((c) => c.id),
+        ),
+      ),
+    [ownRequests],
+  );
+
   const topLevelCategories = useMemo(
-    () => (categoryData?.result ?? []).map((c) => ({ id: c.id, title: c.faName })),
-    [categoryData],
+    () =>
+      (categoryData?.result ?? []).map((c) => ({
+        id: c.id,
+        title: c.faName,
+        // A request filed under a child category occupies its parent's form too.
+        isRegistered:
+          registeredCategoryIds.has(c.id) ||
+          (c.children ?? []).some((child) => registeredCategoryIds.has(child.id)),
+      })),
+    [categoryData, registeredCategoryIds],
   );
 
   const rows = isMobile
@@ -144,13 +170,26 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
                     <button
                       key={item.id}
                       onClick={() => handleSelectCategory(item.id, item.title)}
-                      className="md:w-60 overflow-hidden w-32.5 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
+                      disabled={item.isRegistered}
+                      className={clsx(
+                        "md:w-60 overflow-hidden w-32.5 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent",
+                        item.isRegistered
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:border-red-900 cursor-pointer",
+                      )}
                     >
-                      <p className="text-nowrap text-sm md:text-base z-10">
-                        {item.title}
-                      </p>
+                      <div className="flex flex-col items-start gap-1 z-10">
+                        <p className="text-nowrap text-sm md:text-base">
+                          {item.title}
+                        </p>
+                        {item.isRegistered && (
+                          <span className="text-[10px] md:text-xs text-zinc-400">
+                            {defaultCopy("alreadyRegistered")}
+                          </span>
+                        )}
+                      </div>
 
-                      <MoveLeft className="text-error-500 z-10" />
+                      {!item.isRegistered && <MoveLeft className="text-error-500 z-10" />}
                     </button>
                   ))}
                 </div>

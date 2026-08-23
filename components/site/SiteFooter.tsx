@@ -1,7 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { Instagram, Phone } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
@@ -28,7 +28,7 @@ export function SiteFooter() {
         {/* top */}
         <div className="flex flex-col md:flex-row gap-5 justify-between items-center">
           <div className="flex gap-2 items-center">
-            <Image
+            <img
               src="/assets/images/logo.svg"
               alt="logo"
               width={60}
@@ -94,14 +94,14 @@ export function SiteFooter() {
             </h3>
 
             <div className="flex flex-col md:flex-row gap-4 w-full">
-              <Image
+              <img
                 src="/download-android.svg"
                 alt="App Store"
                 className="h-18.75 w-64"
                 width={256}
                 height={75}
               />
-              <Image
+              <img
                 src="/download-bazar.svg"
                 alt="App Store"
                 className="h-18.75 w-64"

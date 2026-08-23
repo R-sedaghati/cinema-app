@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { EArtistGender, IArtistItem } from "@/lib/services/admin/type";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function ArtistCard({
@@ -18,12 +18,10 @@ export default function ArtistCard({
     >
       <div className="relative w-full h-27 rounded-lg overflow-hidden bg-zinc-800 mb-4">
         {artist?.user?.avatar ? (
-          <Image
+          <img
             src={artist.user.avatar}
             alt={artist.user.code ?? "artist"}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-zinc-800" />

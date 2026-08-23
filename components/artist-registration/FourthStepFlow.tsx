@@ -33,6 +33,9 @@ const FourthStepFlow: React.FC<Props> = ({
   onPrevious,
 }) => {
   const store = useArtistRegistrationStore();
+  // Resolved server-side from the category. 0 is a real answer — the category is free —
+  // so it must not be conflated with `undefined`, which means "not loaded yet".
+  const isFree = registrationAmount === 0;
   const router = useRouter();
   const { mutate: create, isPending: isCreating } =
     useUserCreateArtistRequest();
@@ -89,6 +92,19 @@ const FourthStepFlow: React.FC<Props> = ({
           // is the same redirect whether the category is paid or free.
           window.location.href = `${landingApi.defaults.baseURL}/user/purchase/?requestId=${res.result.artistRequestId}`;
         },
+        onError: (error) => {
+          // 409 = this account already filled this category's form. The server owns the
+          // rule, so its message wins; the copy key is the fallback.
+          const message = (error.response?.data as { message?: string } | undefined)
+            ?.message;
+
+          toast.error(
+            message ??
+              (error.response?.status === 409
+                ? copy("duplicateErrorToast")
+                : copy("editErrorToast")),
+          );
+        },
       });
     }
   };
@@ -130,28 +146,34 @@ const FourthStepFlow: React.FC<Props> = ({
           ))}
         </div>
 
-        {!store.editId && registrationAmount !== 0 && (
+        {!store.editId && (
           <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center">
             <div className="flex flex-col gap-3">
               <div className="flex gap-2 items-center">
                 <div className="w-1 h-6 bg-error-500" />
-                <p className="font-h5-bold">{copy("paymentTitle")}</p>
+                <p className="font-h5-bold">
+                  {isFree ? copy("paymentFreeTitle") : copy("paymentTitle")}
+                </p>
               </div>
-              <p className="font-p2-regular">{copy("paymentNote")}</p>
+              {!isFree && <p className="font-p2-regular">{copy("paymentNote")}</p>}
             </div>
             <Card wrapperClassName="w-full md:w-1/3">
               <div className="flex justify-between items-center">
                 <p className="font-p2-medium">{copy("amountLabel")}</p>
-                <div className="flex gap-1">
-                  <p className="font-p2-medium">
-                    {registrationAmount === undefined
-                      ? "—"
-                      : convertEnNumberToFaNumberWithSeparation(
-                          registrationAmount,
-                        )}
-                  </p>
-                  <p className="font-p2-medium">{copy("currency")}</p>
-                </div>
+                {isFree ? (
+                  <p className="font-p2-medium">{copy("labelFree")}</p>
+                ) : (
+                  <div className="flex gap-1">
+                    <p className="font-p2-medium">
+                      {registrationAmount === undefined
+                        ? "—"
+                        : convertEnNumberToFaNumberWithSeparation(
+                            registrationAmount,
+                          )}
+                    </p>
+                    <p className="font-p2-medium">{copy("currency")}</p>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
@@ -185,7 +207,11 @@ const FourthStepFlow: React.FC<Props> = ({
             size={isMobile ? "small" : "medium"}
             disabled={isPending}
           >
-            {store.editId ? copy("editSubmitLabel") : copy("submitLabel")}
+            {store.editId
+              ? copy("editSubmitLabel")
+              : isFree
+                ? copy("freeSubmitLabel")
+                : copy("submitLabel")}
           </Button>
         </div>
       </div>

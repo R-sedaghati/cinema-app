@@ -1,8 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 import { ICategoryItem } from "@/lib/services/admin/type";
 import { Badge, Button } from "@dgshahr/ui-kit";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft, Pencil, Trash2 } from "lucide-react";
-import Image from "next/image";
 
 export const generateColumns = (
   onProfileClick: (id: number) => void,
@@ -26,7 +26,7 @@ export const generateColumns = (
       className: "align-middle",
       render: (data) =>
         data.image ? (
-          <Image
+          <img
             src={data.image}
             alt={data.faName}
             width={40}

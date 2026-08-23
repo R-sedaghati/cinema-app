@@ -1,7 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useUserTutorialList } from "@/lib/services/landing/hook";
-import Image from "next/image";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 export function TutorialsClient() {
@@ -27,11 +27,10 @@ export function TutorialsClient() {
           >
             {tutorial.thumbnail && (
               <div className="relative w-full h-48 md:h-72 rounded-xl overflow-hidden bg-gray-100">
-                <Image
+                <img
                   src={tutorial.thumbnail}
                   alt={tutorial.title}
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
             )}

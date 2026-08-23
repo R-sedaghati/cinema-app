@@ -1,11 +1,11 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Search, ArrowLeft } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -131,7 +131,6 @@ export default function ApplicationPage() {
                     </div>
                     <div className="absolute inset-0 opacity-30 pointer-events-none">
                       {/* ponytail: plain img — banner hosts vary and the Capacitor WebView has no Next optimizer */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={slide.image}
                         alt=""
@@ -234,11 +233,10 @@ export default function ApplicationPage() {
                     }
                     className="relative overflow-hidden w-40 h-52 md:w-56 md:h-72 shrink-0 rounded-2xl group active:scale-[.98] transition-transform"
                   >
-                    <Image
+                    <img
                       src={cat.image ?? "/cat-1.svg"}
                       alt={cat.faName}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-right">
@@ -368,7 +366,7 @@ function ArtistSection({
   if (artists.length === 0) {
     return (
       <div className="py-16 text-center">
-        <Image
+        <img
           src="/not-found-search.svg"
           alt=""
           width={72}
@@ -397,7 +395,7 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
     >
       <div className="w-full aspect-square rounded-xl bg-zinc-800 mb-3 md:mb-4 overflow-hidden">
         {artist.user.avatar ? (
-          <Image
+          <img
             src={artist.user.avatar}
             alt=""
             width={200}
