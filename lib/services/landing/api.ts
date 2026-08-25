@@ -25,6 +25,7 @@ import {
   ICreateContactRequestResponse,
   IFormSchemaResponse,
   IPagination,
+  IPurchaseResponse,
   ParamsPublicArtistList,
   IUserArtistListResponse,
   IUserCategoryListResponse,
@@ -294,5 +295,12 @@ export const userContactRequests = async (params: IPagination) => {
     "/user/contact-requests/",
     { params: { ...params } },
   );
+  return data;
+};
+
+export const userPurchase = async (requestId: number) => {
+  const { data } = await landingApi.get<IPurchaseResponse>("/user/purchase/", {
+    params: { requestId },
+  });
   return data;
 };

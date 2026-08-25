@@ -41,6 +41,9 @@ const NotificationSettingsForm = () => {
   const [phones, setPhones] = useState<string[]>([]);
   const [events, setEvents] = useState<NotificationEvent[]>([]);
   const [isDirty, setIsDirty] = useState(false);
+  const [invalidIndexes, setInvalidIndexes] = useState<Set<number>>(new Set());
+  /** Second click arms the save that would wipe every number. */
+  const [isConfirmingClear, setIsConfirmingClear] = useState(false);
 
   useEffect(() => {
     // The query refetches every 30s — don't clobber a half-typed number.
@@ -50,25 +53,40 @@ const NotificationSettingsForm = () => {
     setEvents(setting.events ?? []);
   }, [setting, isDirty]);
 
-  const patchPhone = (index: number, value: string) => {
+  // Any edit invalidates a pending "yes, wipe them all" confirmation.
+  const markDirty = () => {
     setIsDirty(true);
+    setIsConfirmingClear(false);
+  };
+
+  const patchPhone = (index: number, value: string) => {
+    markDirty();
+    setInvalidIndexes((previous) => {
+      if (!previous.has(index)) return previous;
+      const next = new Set(previous);
+      next.delete(index);
+      return next;
+    });
     setPhones((previous) =>
       previous.map((phone, i) => (i === index ? value : phone)),
     );
   };
 
   const removePhone = (index: number) => {
-    setIsDirty(true);
+    markDirty();
+    // The flags are keyed by position, so a removal shifts them — drop the lot
+    // rather than re-index; the next save recomputes them anyway.
+    setInvalidIndexes(new Set());
     setPhones((previous) => previous.filter((_, i) => i !== index));
   };
 
   const addPhone = () => {
-    setIsDirty(true);
+    markDirty();
     setPhones((previous) => [...previous, ""]);
   };
 
   const toggleEvent = (event: NotificationEvent) => {
-    setIsDirty(true);
+    markDirty();
     setEvents((previous) =>
       previous.includes(event)
         ? previous.filter((item) => item !== event)
@@ -77,26 +95,49 @@ const NotificationSettingsForm = () => {
   };
 
   const handleSubmit = () => {
-    const normalized = [
-      ...new Set(
-        phones.map((phone) => toEnglishDigits(phone).trim()).filter(Boolean),
-      ),
-    ];
+    const trimmed = phones.map((phone) => toEnglishDigits(phone).trim());
 
-    if (!normalized.every(FIELD_VALIDATION_PRESETS.MOBILE.test)) {
+    const invalid = new Set<number>();
+    trimmed.forEach((phone, index) => {
+      if (phone && !FIELD_VALIDATION_PRESETS.MOBILE.test(phone))
+        invalid.add(index);
+    });
+
+    if (invalid.size > 0) {
+      setInvalidIndexes(invalid);
       toast.error(FIELD_VALIDATION_PRESETS.MOBILE.message);
       return;
     }
 
+    setInvalidIndexes(new Set());
+
+    const normalized = [...new Set(trimmed.filter(Boolean))];
+
+    // Saving an empty list turns admin SMS off entirely — make that a two-step.
+    if (
+      normalized.length === 0 &&
+      (setting?.phones?.length ?? 0) > 0 &&
+      !isConfirmingClear
+    ) {
+      setIsConfirmingClear(true);
+      return;
+    }
+
+    // Blank and duplicate rows are dropped on save — show that in the form too,
+    // instead of leaving ghost rows behind.
+    setPhones(normalized);
+
     mutate(
       { phones: normalized, events },
       {
-        onSuccess: () => {
+        // The PATCH echoes the stored settings, so seed the cache with them rather
+        // than invalidating: an invalidated refetch lands *after* isDirty clears and
+        // the effect above would briefly repaint the form from the stale entry.
+        onSuccess: (response) => {
+          queryClient.setQueryData(["adminNotificationSettings"], response);
           toast.success("با موفقیت تغییر کرد");
           setIsDirty(false);
-          queryClient.invalidateQueries({
-            queryKey: ["adminNotificationSettings"],
-          });
+          setIsConfirmingClear(false);
         },
         onError: () => toast.error("خطا در ذخیره‌سازی"),
       },
@@ -119,11 +160,17 @@ const NotificationSettingsForm = () => {
           ) : null}
 
           {phones.map((phone, index) => (
-            <div key={index} className="flex items-end gap-2">
+            <div key={index} className="flex items-start gap-2">
               <Input
                 placeholder="09xxxxxxxxx"
                 value={phone}
                 disabled={isLoading}
+                isError={invalidIndexes.has(index)}
+                errorMessage={
+                  invalidIndexes.has(index)
+                    ? FIELD_VALIDATION_PRESETS.MOBILE.message
+                    : undefined
+                }
                 onChange={(e) => patchPhone(index, e.target.value)}
                 wrapperClassName="w-full md:w-2/3"
               />
@@ -159,14 +206,21 @@ const NotificationSettingsForm = () => {
           ))}
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex flex-col items-end gap-2">
+          {isConfirmingClear ? (
+            <p className="font-p2-regular text-error-500">
+              با این ذخیره همه شماره‌ها حذف می‌شوند و دیگر هیچ پیامکی برای مدیران
+              ارسال نمی‌شود.
+            </p>
+          ) : null}
+
           <Button
             color="error"
             disabled={isPending || isLoading}
             isLoading={isPending}
             onClick={handleSubmit}
           >
-            ذخیره
+            {isConfirmingClear ? "حذف همه شماره‌ها و غیرفعال کردن پیامک" : "ذخیره"}
           </Button>
         </div>
       </div>
