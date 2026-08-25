@@ -234,3 +234,10 @@ export interface IWalletTransactionItem {
 export type IWalletBalanceResponse = IRetriveResponse<{ balance: number }>;
 export type IWalletTransactionListResponse =
   IBasePaginateResponse<IWalletTransactionItem>;
+
+/**
+ * `GET /user/purchase/` returns the gateway URL as JSON — a bare browser navigation
+ * cannot carry the Authorization header the endpoint requires.
+ * Null when there was nothing to pay (free category or already settled from the wallet).
+ */
+export type IPurchaseResponse = IRetriveResponse<{ redirectUrl: string | null }>;

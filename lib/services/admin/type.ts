@@ -540,23 +540,35 @@ export interface ISiteContent {
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
 
 /**
- * Gateway credentials. `merchantId` always arrives masked — the real key never leaves
- * the server — so sending the mask back on save means "leave it unchanged".
+ * SEP gateway credentials. `terminalId` always arrives masked — the real terminal never
+ * leaves the server — so sending the mask back on save means "leave it unchanged".
  */
-export interface IPaymentSetting {
-  merchantId: string | null;
-  hasMerchantId: boolean;
-  sandbox: boolean;
+export interface ISepEndpoints {
+  tokenUrl: string;
+  verifyUrl: string;
+  paymentUrl: string;
+}
+
+export interface IPaymentSetting extends ISepEndpoints {
+  terminalId: string | null;
+  hasTerminalId: boolean;
+  /** The shipped endpoints, so the page can show which ones are overridden. */
+  defaults: ISepEndpoints;
   /** True while the gateway is still running off the server's env var. */
   usingEnvFallback: boolean;
 }
 
 export type IPaymentSettingResponse = IRetriveResponse<IPaymentSetting>;
 
-export interface IUpdatePaymentSettingRequest {
-  merchantId?: string;
-  sandbox?: boolean;
+/** An endpoint sent as `""` clears the override and falls back to the shipped default. */
+export interface IUpdatePaymentSettingRequest extends Partial<ISepEndpoints> {
+  terminalId?: string;
 }
+
+export type IPaymentSettingTestResponse = IRetriveResponse<{
+  ok: boolean;
+  message: string;
+}>;
 
 /** Events that fan out an SMS to the admin numbers below. */
 export type NotificationEvent = "REGISTRATION" | "TRANSACTION" | "SUPPORT_TICKET";

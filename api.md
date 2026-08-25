@@ -576,7 +576,7 @@ List own support tickets. **Auth required.**
 ---
 
 ### `GET /user/purchase/`
-Initiate the artist registration payment — redirects the browser to the gateway. **Auth required.**
+Initiate the artist registration payment — returns the gateway URL to redirect to. **Auth required.**
 
 **Query params:**
 | Param | Type | Description |
@@ -596,15 +596,28 @@ count — otherwise one free form would make every later paid form free. A fee l
 refunded (rejection or revision) still counts as paid.
 
 When the resolved fee is `0` the category is free: a `COMPLETED` payment is recorded,
-the request moves to `PENDING`, and the browser is redirected straight to the result
-page without touching the gateway.
+the request moves to `PENDING`, and `redirectUrl` comes back `null` — there is no
+gateway stop to make, so the client goes straight to the result page. The wallet
+covering the whole fee settles the same way.
 
-**Response:** HTML redirect page (not JSON)
+**Response:**
+```json
+{ "result": { "redirectUrl": "https://sep.shaparak.ir/OnlinePG/OnlinePG?Token=...&GetMethod=true|null" } }
+```
+
+The client fetches this over XHR rather than navigating at it, because the route
+requires the `Authorization` header.
 
 ---
 
 ### `ALL /user/purchase/callback/`
-Zarinpal payment callback (internal, called by gateway). No auth.
+SEP payment callback (internal, called by gateway). No auth.
+
+SEP returns the result as a **urlencoded form POST**, not a query string — `State`,
+`Status`, `RefNum`, `ResNum`, `TraceNo`, `Amount`, `SecurePan`. The leg counts as settled
+only when `State` is `OK` and a `RefNum` is present; the server then calls SEP's
+`verifyTransaction` and rejects the payment unless the amount it settled matches what was
+charged.
 
 ---
 
@@ -633,7 +646,7 @@ The amount is read from the category — a client-supplied price is never truste
 
 **Response:** `ApiResponse<{ id, trackingCode, status, redirectUrl }>`
 
-`redirectUrl` is the gateway's StartPay page, or `null` when there is nothing to pay:
+`redirectUrl` is SEP's hosted payment page, or `null` when there is nothing to pay:
 either the artist was already unlocked, or the category is free (in which case the
 request is stored as `COMPLETED` immediately).
 
@@ -791,24 +804,51 @@ means "not set here"** (inherit the top-level category, then the env fallback):
 ---
 
 ### `GET /admin/payment-settings/`
-Gateway credentials.
+SEP gateway settings.
 
-**Response:** `ApiResponse<{ merchantId, hasMerchantId, sandbox, usingEnvFallback }>`
+**Response:**
+`ApiResponse<{ terminalId, hasTerminalId, tokenUrl, verifyUrl, paymentUrl, defaults, usingEnvFallback }>`
 
-`merchantId` is always **masked** (`****-****-****-abc1`) — the real key never leaves
-the server. `usingEnvFallback` is true while no key is stored and the gateway is still
-running off `ZARINPAL_MERCHANT_ID`.
+`terminalId` is always **masked** (`****-****-****-abc1`) — the real terminal never
+leaves the server. `usingEnvFallback` is true while no terminal is stored and the gateway
+is still running off `SEP_TERMINAL_ID`.
+
+The three endpoints come back **resolved**, so the response always shows what the gateway
+will actually call rather than an empty box; `defaults` carries the shipped values, so a
+client can tell an override from an inherited one. They only need changing to point at a
+UAT host.
+
+There is no sandbox flag: SEP's test environment is a separate terminal ID against the
+same host, so testing means storing the test terminal here.
 
 ---
 
 ### `PATCH /admin/payment-settings/`
-Update gateway credentials.
+Update gateway settings.
 
-**Body:** `{ merchantId?: string, sandbox?: boolean }`
+**Body:** `{ terminalId?: string, tokenUrl?: string, verifyUrl?: string, paymentUrl?: string }`
 
-Because reads are masked, a submitted `merchantId` that still looks like a mask is
-treated as *unchanged* rather than written. An empty string clears the stored key,
-falling back to the env var.
+Because reads are masked, a submitted `terminalId` that still looks like a mask is
+treated as *unchanged* rather than written. An empty string clears the stored terminal,
+falling back to the env var; an empty endpoint clears the override, falling back to the
+shipped default.
+
+**400** if an endpoint is not a valid `http`/`https` URL. Nothing is written in that
+case — the settings row is validated in full before any field is applied.
+
+---
+
+### `POST /admin/payment-settings/test/`
+Prove the stored settings work. **Admin auth required.**
+
+Requests a throwaway token from SEP with whatever is currently stored. No money moves and
+nobody is sent to the payment page — the token simply expires.
+
+**Response:** `ApiResponse<{ ok: boolean, message: string }>`
+
+A rejected terminal is a normal answer, not a transport error: the call succeeds with
+`ok: false` and SEP's own message. Note this checks what is **stored**, so unsaved edits
+in the admin form are not covered.
 
 ---
 

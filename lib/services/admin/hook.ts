@@ -81,6 +81,7 @@ import {
   adminPaymentSettings,
   adminUserWallet,
   adminPaymentSettingsUpdate,
+  adminPaymentSettingsTest,
   adminNotificationSettings,
   adminNotificationSettingsUpdate,
   adminSiteContent,
@@ -399,6 +400,14 @@ export const useAdminPaymentSettingsUpdate = () => {
   return useMutation({
     mutationFn: (payload: IUpdatePaymentSettingRequest) =>
       adminPaymentSettingsUpdate(payload, accessToken),
+  });
+};
+
+export const useAdminPaymentSettingsTest = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: () => adminPaymentSettingsTest(accessToken),
   });
 };
 

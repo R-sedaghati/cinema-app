@@ -24,6 +24,7 @@ import {
   IFormSchemaRetrieveResponse,
   IFormStepRetrieveResponse,
   IPaymentSettingResponse,
+  IPaymentSettingTestResponse,
   INotificationSettingResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -408,6 +409,21 @@ export const adminPaymentSettingsUpdate = async (
   const { data } = await api.patch<IPaymentSettingResponse>(
     "/admin/payment-settings/",
     payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+/**
+ * Asks the server to request a throwaway token from SEP with the stored settings. A
+ * rejected connection comes back as `ok: false` with the gateway's own message, so this
+ * resolves rather than throws on a bad terminal.
+ */
+export const adminPaymentSettingsTest = async (accessToken: string) => {
+  const { data } = await api.post<IPaymentSettingTestResponse>(
+    "/admin/payment-settings/test/",
+    undefined,
     { headers: { Authorization: accessToken } },
   );
 

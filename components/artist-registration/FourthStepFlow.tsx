@@ -11,11 +11,12 @@ import {
 } from "@/lib/services/landing/hook";
 import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { CopyFn } from "@/lib/utils/formCopy";
-import landingApi from "@/lib/services/landingAxiosInstance";
+import { userPurchase } from "@/lib/services/landing/api";
 
 interface Props {
   steps: IFormStep[];
@@ -41,7 +42,10 @@ const FourthStepFlow: React.FC<Props> = ({
     useUserCreateArtistRequest();
   const { mutate: update, isPending: isUpdating } =
     useUpdateUserArtistRequest();
-  const isPending = isCreating || isUpdating;
+  // Stays true until the browser leaves the page: the mutation is done but the purchase
+  // call and the redirect are not, and an un-disabled button here means a second request.
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const isPending = isCreating || isUpdating || isRedirecting;
 
   const portfolios = steps
     .flatMap((step) => step.fields)
@@ -62,6 +66,24 @@ const FourthStepFlow: React.FC<Props> = ({
     portfolios: portfolios.length ? portfolios : undefined,
   };
 
+  // The purchase endpoint needs the Authorization header, which a plain
+  // `window.location.href` navigation cannot carry — so ask for the gateway URL over
+  // XHR (the axios instance injects the token) and navigate to whatever comes back.
+  const startPayment = (requestId: number) => {
+    setIsRedirecting(true);
+
+    return userPurchase(requestId)
+      .then(({ result }) => {
+        // No redirectUrl means the server already settled it — a free category, or the
+        // wallet covered the fee — so there is no gateway stop to make.
+        window.location.href =
+          result?.redirectUrl ??
+          `/artist-registration/result?status=success&categoryId=${store.categoryId[0] ?? ""}`;
+      })
+      // landingApi's interceptor already toasts the failure.
+      .catch(() => setIsRedirecting(false));
+  };
+
   const handleSubmit = () => {
     if (store.editId) {
       update(
@@ -74,7 +96,7 @@ const FourthStepFlow: React.FC<Props> = ({
             // goes through payment again. The wallet normally covers it in full, in which
             // case the server settles it and redirects without a gateway stop.
             if (res.result.requiresPayment) {
-              window.location.href = `${landingApi.defaults.baseURL}/user/purchase/?requestId=${res.result.artistRequestId}`;
+              startPayment(res.result.artistRequestId);
               return;
             }
 
@@ -90,7 +112,7 @@ const FourthStepFlow: React.FC<Props> = ({
           // The amount is fixed server-side; sending one here let users choose their own price.
           // The server resolves the fee (and skips the gateway when it is 0), so this
           // is the same redirect whether the category is paid or free.
-          window.location.href = `${landingApi.defaults.baseURL}/user/purchase/?requestId=${res.result.artistRequestId}`;
+          startPayment(res.result.artistRequestId);
         },
         onError: (error) => {
           // 409 = this account already filled this category's form. The server owns the
