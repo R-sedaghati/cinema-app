@@ -15,7 +15,9 @@ import {
   ISiteContentSupportItem,
 } from "@/lib/services/admin/type";
 import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
-import LandingCopyCard from "@/components/admin/content/LandingCopyCard";
+import CopyCard from "@/components/admin/content/CopyCard";
+import { LANDING_COPY, LANDING_COPY_GROUPS } from "@/lib/constants/landingCopy";
+import { FORM_COPY } from "@/lib/constants/formCopy";
 import ContactFormCard from "@/components/admin/content/ContactFormCard";
 import FontSizeInput from "@/components/admin/FontSizeInput";
 import withNoSSR from "@/lib/utils/withNoSSR";
@@ -655,11 +657,23 @@ function ContentManagement() {
           </div>
         </Card>
 
-        <LandingCopyCard
+        <CopyCard
+          title="متن‌های صفحات سایت"
+          registry={LANDING_COPY}
+          groups={LANDING_COPY_GROUPS}
           ready={Boolean(siteContentData?.result)}
           stored={siteContentData?.result?.landing}
           isPending={isSiteContentPending}
           onSave={(landing) => updateSiteContent({ landing }, saveSiteContent())}
+        />
+
+        <CopyCard
+          title="متن‌های فرم ثبت‌نام هنرمند"
+          registry={FORM_COPY}
+          ready={Boolean(siteContentData?.result)}
+          stored={siteContentData?.result?.form}
+          isPending={isSiteContentPending}
+          onSave={(form) => updateSiteContent({ form }, saveSiteContent())}
         />
 
         <ContactFormCard

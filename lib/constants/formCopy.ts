@@ -2,10 +2,10 @@
  * Every fixed string of the artist-registration flow, with its default Persian
  * text and the label the admin sees for it in the form builder.
  *
- * `value` is the default; an admin can override any key per top-level category
- * (stored in `Category.formCopy`, resolved by `makeCopy` in
- * `lib/utils/formCopy.ts`). Adding a new editable string = adding a key here.
- * `{name}` placeholders are substituted by `makeCopy`.
+ * `value` is the default; an admin can override any key site-wide from the
+ * content-management panel (stored in `SiteContent.form`, resolved by
+ * `useFormCopy` in `lib/hooks/useFormCopy.ts`). Adding a new editable string =
+ * adding a key here. `{name}` placeholders are substituted by `makeCopy`.
  */
 export const FORM_COPY = {
   backHome: { admin: "لینک بازگشت به صفحه اصلی", value: "بازگشت به صفحه اصلی" },

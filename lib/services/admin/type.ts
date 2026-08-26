@@ -154,16 +154,14 @@ export interface IFormStep {
 }
 
 /**
- * Admin-editable copy of a category's registration form: the post-payment
- * result pages plus the per-key overrides for the fixed flow copy (see
- * `lib/constants/formCopy.ts`).
+ * Admin-editable copy of a category's post-payment result pages. The fixed
+ * flow copy is site-wide instead — see `ISiteContent.form`.
  */
 export interface IFormResultPages {
   successTitle: string | null;
   successDescription: string | null;
   failTitle: string | null;
   failDescription: string | null;
-  formCopy?: Record<string, string> | null;
 }
 
 export interface IFormSchema extends IFormResultPages {
@@ -533,6 +531,8 @@ export interface ISiteContent {
   footer?: ISiteContentFooter | null;
   /** Overrides for the public-site copy, keyed by `lib/constants/landingCopy.ts`. */
   landing?: Record<string, string> | null;
+  /** Overrides for the registration-form copy, keyed by `lib/constants/formCopy.ts`. */
+  form?: Record<string, string> | null;
   /** Field definition of the support contact form (see `lib/constants/contactForm.ts`). */
   contactForm?: ISiteContentContactForm | null;
 }
