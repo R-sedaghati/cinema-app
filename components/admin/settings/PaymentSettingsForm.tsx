@@ -30,8 +30,8 @@ const ENDPOINTS: { key: keyof ISepEndpoints; label: string; hint: string }[] = [
   },
   {
     key: "verifyUrl",
-    label: "آدرس تأیید تراکنش (WSDL)",
-    hint: "سرویس SOAP تأیید تراکنش پس از بازگشت کاربر (referencepayment).",
+    label: "آدرس تأیید تراکنش",
+    hint: "سرویس REST تأیید و برگشت تراکنش پس از بازگشت کاربر (VerifyTransaction).",
   },
   {
     key: "paymentUrl",
