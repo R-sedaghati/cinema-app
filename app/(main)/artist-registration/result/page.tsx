@@ -9,7 +9,7 @@ import { useUserCategoryFormSchema } from "@/lib/services/landing/hook";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { isMobile } from "react-device-detect";
 import clsx from "clsx";
-import { makeCopy } from "@/lib/utils/formCopy";
+import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 function ResultContent() {
@@ -30,6 +30,8 @@ function ResultContent() {
     },
   };
 
+  const copy = useFormCopy();
+
   const isSuccess = params.get("status") === "success";
   const categoryId = Number(params.get("categoryId")) || null;
 
@@ -47,8 +49,6 @@ function ResultContent() {
       </div>
     );
   }
-
-  const copy = makeCopy(schema?.formCopy);
 
   const title =
     (isSuccess ? schema?.successTitle : schema?.failTitle) ||

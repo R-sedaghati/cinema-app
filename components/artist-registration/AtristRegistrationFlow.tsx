@@ -17,7 +17,7 @@ import FourthStepFlow from "./FourthStepFlow";
 import DynamicFormStep from "./DynamicFormStep";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
-import { makeCopy } from "@/lib/utils/formCopy";
+import { useFormCopy } from "@/lib/hooks/useFormCopy";
 
 interface ArtistProps {
   category: SelectedCategory | null;
@@ -51,10 +51,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     );
   }, [data, category]);
 
-  const copy = useMemo(
-    () => makeCopy(schemaData?.result?.formCopy),
-    [schemaData],
-  );
+  const copy = useFormCopy();
 
   const children = selectedCategory?.children || [];
   const hasChildren = children.length > 0;

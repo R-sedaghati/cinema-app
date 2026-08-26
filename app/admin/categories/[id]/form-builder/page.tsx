@@ -1,6 +1,5 @@
 "use client";
 
-import { FORM_COPY, FormCopyKey } from "@/lib/constants/formCopy";
 import {
   useAdminCategoryRetrieve,
   useAdminCreateFormField,
@@ -553,7 +552,6 @@ function FormCopyCard({
         successDescription: schema.successDescription ?? "",
         failTitle: schema.failTitle ?? "",
         failDescription: schema.failDescription ?? "",
-        formCopy: { ...(schema.formCopy ?? {}) },
       });
     }
   }, [schema, copy]);
@@ -563,13 +561,10 @@ function FormCopyCard({
   const set = (key: keyof IFormResultPages) => (value: string) =>
     setCopy({ ...copy, [key]: value });
 
-  const setCopyKey = (key: FormCopyKey) => (value: string) =>
-    setCopy({ ...copy, formCopy: { ...(copy.formCopy ?? {}), [key]: value } });
-
   return (
     <Card>
       <div className="flex flex-col gap-3">
-        <p className="font-h6-bold">متن‌های فرم و صفحه نتیجه پرداخت</p>
+        <p className="font-h6-bold">متن‌های صفحه نتیجه پرداخت</p>
 
         <div className="grid md:grid-cols-2 gap-2">
           <Input
@@ -592,25 +587,6 @@ function FormCopyCard({
             value={copy.failDescription ?? ""}
             onChange={(e) => set("failDescription")(e.target.value)}
           />
-        </div>
-
-        <Divider color="gray" size="thin" type="horizontal" />
-
-        <p className="font-h6-bold">سایر متن‌های فرم</p>
-        <p className="text-xs text-gray-500">
-          خالی گذاشتن هر فیلد یعنی استفاده از متن پیش‌فرض (همان متنی که به عنوان راهنما نمایش داده می‌شود).
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-2">
-          {(Object.keys(FORM_COPY) as FormCopyKey[]).map((key) => (
-            <Input
-              key={key}
-              labelContent={FORM_COPY[key].admin}
-              placeholder={FORM_COPY[key].value}
-              value={copy.formCopy?.[key] ?? ""}
-              onChange={(e) => setCopyKey(key)(e.target.value)}
-            />
-          ))}
         </div>
 
         <div className="flex justify-end">
@@ -646,7 +622,11 @@ function FormBuilder() {
   const category = categoryData?.result;
 
   const queryClient = useQueryClient();
-  const { data: schemaData, refetch } = useAdminFormSchema(id);
+  // Wait for the category before asking for a schema: subcategories have none and the
+  // request would only 400.
+  const { data: schemaData, refetch } = useAdminFormSchema(
+    category && !category.parent ? id : undefined,
+  );
   const { mutate: createStep } = useAdminCreateFormStep();
   const { mutate: updateStep } = useAdminUpdateFormStep();
   const { mutateAsync: updateField } = useAdminUpdateFormField();
@@ -655,11 +635,18 @@ function FormBuilder() {
   const [dragging, setDragging] = useState<{ fieldId: number; fromStepId: number } | null>(null);
   const [dropTarget, setDropTarget] = useState<{ stepId: number; index: number } | null>(null);
 
+  // Subcategories have no form of their own — send the admin to the parent's builder
+  // instead of dropping them on an empty page.
   useEffect(() => {
-    if (category && category.parent) {
-      router.replace(`/admin/categories/${id}`);
+    if (category?.parent) {
+      toast.info(
+        "زیر‌دسته فرم اختصاصی ندارد؛ فرم دسته‌بندی اصلی باز شد.",
+      );
+      router.replace(`/admin/categories/${category.parent}/form-builder`);
     }
-  }, [category, id, router]);
+  }, [category, router]);
+
+  if (category?.parent) return null;
 
   const steps = [...(schemaData?.result?.steps ?? [])].sort((a, b) => a.order - b.order);
 

@@ -14,7 +14,7 @@ import {
 } from "@/lib/services/landing/hook";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
-import { defaultCopy } from "@/lib/utils/formCopy";
+import { useFormCopy } from "@/lib/hooks/useFormCopy";
 
 export interface SelectedCategory {
   id: number;
@@ -22,6 +22,8 @@ export interface SelectedCategory {
 }
 
 export default function ArtistRegistrationPageContent({ editId }: { editId: number | null }) {
+  const copy = useFormCopy();
+
   const { data: categoryData, isLoading: isCategoryLoading } = useUserCategoryList({
     page: 1,
     count: 30,
@@ -143,7 +145,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
         >
           <MoveRight size={18} />
-          {defaultCopy("backHome")}
+          {copy("backHome")}
         </Link>
       </div>
 
@@ -157,7 +159,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
         >
           <div className="flex flex-col gap-3 items-center">
             <p className={clsx("font-h4-bold", isDesktop && "font-h3-bold")}>
-              {defaultCopy("categoryPrompt")}
+              {copy("categoryPrompt")}
             </p>
 
             <div className="flex flex-col gap-4">
@@ -184,7 +186,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
                         </p>
                         {item.isRegistered && (
                           <span className="text-[10px] md:text-xs text-zinc-400">
-                            {defaultCopy("alreadyRegistered")}
+                            {copy("alreadyRegistered")}
                           </span>
                         )}
                       </div>

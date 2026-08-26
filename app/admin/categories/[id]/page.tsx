@@ -27,6 +27,11 @@ function CategoryDetail() {
   const { data: retriveDate } = useAdminCategoryRetrieve(id);
   const data = retriveDate?.result;
 
+  // A subcategory borrows its parent's form and price fallbacks, so the parent is
+  // named wherever we explain that inheritance.
+  const { data: parentData } = useAdminCategoryRetrieve(data?.parent ?? undefined);
+  const parentName = parentData?.result?.faName;
+
   const { mutate, isPending } = useAdminCategoryUpdate();
 
   const [faName, setFaName] = useState("");
@@ -83,6 +88,10 @@ function CategoryDetail() {
     });
   };
 
+  const amountFallbackHint = data?.parent
+    ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
+    : "استفاده از مبلغ پیش‌فرض.";
+
   const handleSubmit = () => {
     mutate(
       {
@@ -125,7 +134,7 @@ function CategoryDetail() {
         <Card>
           <div className="flex flex-col gap-4">
             <p className="font-h3-bold text-error-500">
-              اطلاعات دسته‌بندی صحنه و لباس
+              {`اطلاعات دسته‌بندی ${data?.faName ?? ""}`}
             </p>
             <Divider
               className="mb-5"
@@ -153,6 +162,11 @@ function CategoryDetail() {
                 wrapperClassName: "w-fit",
               }}
             />
+            {data?.parent ? (
+              <p className="font-p2-regular text-gray-500">
+                {`زیر‌دسته${parentName ? ` «${parentName}»` : " یک دسته‌بندی اصلی"} است؛ ترتیب نمایش آن از دسته‌بندی اصلی پیروی می‌کند و اولویت جداگانه‌ای ندارد.`}
+              </p>
+            ) : null}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <Input
                 labelContent="نام دسته ‌بندی"
@@ -198,26 +212,32 @@ function CategoryDetail() {
             </div>
           </div>
         </Card>
-        {!data?.parent && (
-          <Card>
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <p className="font-h3-bold text-error-500">فرم ثبت‌نام دسته‌بندی</p>
-                <Button
-                  color="error"
-                  variant="outline"
-                  onClick={() => router.push(`/admin/categories/${id}/form-builder`)}
-                >
-                  مدیریت فرم
-                </Button>
-              </div>
-              <Divider color="gray" size="thin" type="horizontal" />
-              <p className="font-p2-regular text-gray-500">
-                مراحل و فیلدهای فرم ثبت‌نام این دسته‌بندی از صفحه مدیریت فرم قابل تعریف است.
-              </p>
+        <Card>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <p className="font-h3-bold text-error-500">فرم ثبت‌نام دسته‌بندی</p>
+              <Button
+                color="error"
+                variant="outline"
+                onClick={() =>
+                  router.push(
+                    `/admin/categories/${data?.parent ?? id}/form-builder`,
+                  )
+                }
+              >
+                {data?.parent ? "مدیریت فرم دسته‌بندی اصلی" : "مدیریت فرم"}
+              </Button>
             </div>
-          </Card>
-        )}
+            <Divider color="gray" size="thin" type="horizontal" />
+            <p className="font-p2-regular text-gray-500">
+              {data?.parent
+                ? `این زیر‌دسته فرم اختصاصی ندارد و از فرم دسته‌بندی اصلی${
+                    parentName ? ` «${parentName}»` : ""
+                  } استفاده می‌کند. تغییر مراحل و فیلدها از همان‌جا انجام می‌شود و روی همه زیر‌دسته‌ها اثر می‌گذارد.`
+                : "مراحل و فیلدهای فرم ثبت‌نام این دسته‌بندی از صفحه مدیریت فرم قابل تعریف است."}
+            </p>
+          </div>
+        </Card>
         <Card>
           <div className="flex flex-col gap-5">
             <p className="font-h3-bold text-error-500">پرداخت</p>
@@ -230,7 +250,7 @@ function CategoryDetail() {
                 type="number"
                 value={contactAmount}
                 onChange={(e) => setContactAmount(e.target.value)}
-                hintMessage="مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی استفاده از مبلغ پیش‌فرض."
+                hintMessage={`مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
                 wrapperClassName="w-1/3"
               />
               <Input
@@ -240,7 +260,7 @@ function CategoryDetail() {
                 type="number"
                 value={registrationAmount}
                 onChange={(e) => setRegistrationAmount(e.target.value)}
-                hintMessage="مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی استفاده از مبلغ پیش‌فرض."
+                hintMessage={`مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
                 wrapperClassName="w-1/3"
               />
             </div>
