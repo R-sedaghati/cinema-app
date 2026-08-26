@@ -13,6 +13,7 @@ import {
 } from "@/lib/services/landing/hook";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { toast } from "react-toastify";
 
 const Aside = ({ artist }: { artist: IArtistItem }) => {
   const [openCallDetail, setOpenCallDetail] = useState<boolean>(false);
@@ -31,6 +32,18 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
   useEffect(() => {
     if (paymentOutcome === "success") setOpenSuccess(true);
+
+    // Anything other than success needs saying out loud — a buyer who is told nothing
+    // assumes the payment did not happen and pays again.
+    if (paymentOutcome === "pending") {
+      toast.info(
+        "پرداخت شما ثبت شد و در حال تأیید نهایی است. نتیجه تا دقایقی دیگر مشخص می‌شود؛ لطفاً دوباره پرداخت نکنید.",
+      );
+    }
+
+    if (paymentOutcome === "failed" || paymentOutcome === "canceled") {
+      toast.error("پرداخت انجام نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد.");
+    }
   }, [paymentOutcome]);
 
   // Asking the contact endpoint directly would 403 (and toast) for everyone who has not
