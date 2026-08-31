@@ -1,7 +1,9 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 import { SectionId } from "../../../components/profile/types";
 import ProfileSidebar from "../../../components/profile/sidebar/ProfileSidebar";
 import ProfileContent from "../../../components/profile/ProfileContent";
@@ -26,6 +28,20 @@ export function ProfileClient() {
 
   const { isMobile, showSidebar, setShowSidebar, handleSelect } =
     useResponsiveSidebar(setActive);
+
+  // The contact-request callback lands here with `contact=notfound` when the id it was
+  // sent back with resolved to nothing. Saying nothing reads as a silent failure, and a
+  // buyer who is told nothing pays again.
+  const searchParams = useSearchParams();
+  const contactOutcome = searchParams.get("contact");
+
+  useEffect(() => {
+    if (contactOutcome === "notfound") {
+      toast.error(
+        "این پرداخت پیدا نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد؛ در غیر این صورت دوباره تلاش کنید.",
+      );
+    }
+  }, [contactOutcome]);
 
   const goBack = () => {
     setShowSidebar(true);

@@ -12,6 +12,7 @@ import {
   useUserContactRequests,
 } from "@/lib/services/landing/hook";
 import useAuthStore from "@/lib/stores/useAuthStore";
+import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { toast } from "react-toastify";
 
@@ -20,6 +21,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const { accessToken } = useAuthStore();
+  const { open: openLoginDrawer } = useLoginDrawerStore();
   const copy = useLandingCopy();
   const genderMap: Record<string, string> = {
     MAN: copy("labelGenderMan"),
@@ -48,7 +50,9 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
   // Asking the contact endpoint directly would 403 (and toast) for everyone who has not
   // paid, so ownership is established from the buyer's own purchase list first.
-  const { data: myRequests } = useUserContactRequests({ page: 1, count: 100 });
+  // ponytail: 50 is the server's max page size; a buyer with more purchases than that
+  // sees page 1 only — paginate here if that ever happens in practice.
+  const { data: myRequests } = useUserContactRequests({ page: 1, count: 50 });
 
   const isUnlocked = useMemo(
     () =>
@@ -158,7 +162,11 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
         <div className="mt-6 sm:mt-10 space-y-3">
           {!isUnlocked && (
             <Button
-              onClick={() => setOpenCallDetail(true)}
+              // Nothing here can be bought signed out, so ask for the account before the
+              // form rather than after it is filled in.
+              onClick={() =>
+                accessToken ? setOpenCallDetail(true) : openLoginDrawer()
+              }
               size="small"
               isFullWidth
               className="rounded-full!"
