@@ -4,6 +4,7 @@ import { LANDING_COPY } from "@/lib/constants/landingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { makeResolver } from "@/lib/utils/copy";
+import { setLandingCopy } from "@/lib/utils/landingCopy";
 import type { CopyResolver } from "@/lib/utils/copy";
 import { useMemo } from "react";
 
@@ -16,5 +17,11 @@ export function useLandingCopy(): CopyResolver<LandingCopyKey> {
   const { data } = useUserSiteContent();
   const overrides = data?.result?.landing;
 
-  return useMemo(() => makeResolver(LANDING_COPY, overrides), [overrides]);
+  return useMemo(() => {
+    const resolver = makeResolver(LANDING_COPY, overrides);
+    // Non-React callers (axios interceptors, upload helpers) read the same overrides.
+    setLandingCopy(resolver);
+
+    return resolver;
+  }, [overrides]);
 }

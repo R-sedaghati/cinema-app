@@ -35,6 +35,33 @@ enum PortfolioType {
   VIDEO = "VIDEO",
 }
 
+// CRM pipeline stage. Independent of ArtistRequestStatus: that one drives payment and
+// publication, this one only tracks how far an admin has got with the applicant.
+enum CrmStage {
+  NEW = "NEW",
+  CONTACTED = "CONTACTED",
+  AWAITING_DOCS = "AWAITING_DOCS",
+  NEGOTIATING = "NEGOTIATING",
+  WON = "WON",
+  LOST = "LOST",
+}
+
+enum CrmNoteChannel {
+  INTERNAL = "INTERNAL",  // admin-only
+  SMS = "SMS",            // also texted to the applicant
+}
+
+// Pipeline events that can fire an automated SMS. Closed set — the backend owns the
+// trigger points, the admin owns only the text and the on/off switch of each row.
+enum SmsEvent {
+  FORM_SUBMITTED  = "FORM_SUBMITTED",   // applicant completed and submitted the registration form
+  NEED_REVISION   = "NEED_REVISION",    // admin moved the request to NEED_TO_REVISION
+  APPROVED        = "APPROVED",         // admin approved / published the request
+  REJECTED        = "REJECTED",         // admin rejected the request
+  PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
+  PAYMENT_FAILED  = "PAYMENT_FAILED",
+}
+
 // Named validations an admin picks in the form-builder; enforced on submit by the API
 // (backend/utils/fieldValidation.ts) and mirrored client-side for instant feedback.
 enum ValidationPreset {
@@ -544,6 +571,46 @@ ApiResponse<{
 
 ---
 
+### `GET /user/messages/`
+The caller's message inbox, newest first. One row is written here for every message the
+system sends the user — both an automated `SmsEvent` send and an admin's `CrmNote` with
+`channel: "SMS"` — so the inbox is complete by construction rather than by an admin
+remembering to post the text twice.
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| page | number | Page number |
+| count | number | Items per page |
+
+**Response:** `ApiResponse<UserMessage[]>` + pagination
+```ts
+{
+  id: number;
+  body: string;                    // already rendered — placeholders substituted at send time
+  event: SmsEvent | null;          // null when an admin typed the message
+  artistRequestId: number | null;  // the request the message is about, when there is one
+  readAt: string | null;
+  createdAt: string;
+}
+```
+
+---
+
+### `PATCH /user/messages/:id/`
+Mark one message read. Idempotent — re-sending on an already-read message keeps the original
+`readAt`.
+
+**Body:**
+```ts
+{ read: true }
+```
+
+**Response:** `ApiResponse<UserMessage>`
+404 when the message does not belong to the caller (deliberately not 403 — a stranger's
+message id should not be confirmable).
+
+---
+
 ### `POST /user/supports/`
 Create a support ticket. No auth required.
 
@@ -745,8 +812,12 @@ List all artist requests with full detail.
 | sort | string | Sort by `category` |
 | createdAt | string | Filter by created date |
 | updatedAt | string | Filter by updated date |
+| crmStage__in | CrmStage[] | Filter by CRM pipeline stage (comma-separated) |
+| assignedAdminId | number | Filter by assigned admin |
+| followUpAt__lte | string | Follow-ups due on or before this date |
 
-**Response:** `ApiResponse<ArtistRequest[]>` (includes `rejectedReasons`) + pagination
+**Response:** `ApiResponse<ArtistRequest[]>` (includes `rejectedReasons`, and the CRM fields
+`crmStage`, `followUpAt`, `assignedAdmin`) + pagination
 
 ---
 
@@ -758,7 +829,10 @@ Retrieve single artist request (admin view, includes rejectedReasons).
 ---
 
 ### `PATCH /admin/artist-requests/:id/`
-Update artist request status (triggers SMS to user).
+Update artist request status. Sends the applicant the SMS template bound to the new status
+(`NEED_TO_REVISION` → `NEED_REVISION`, `ACCEPTED` → `APPROVED`, `REJECTED` → `REJECTED`) and
+records it in the applicant's message inbox. When that template's `isActive` is false, no SMS
+and no inbox row are produced — the status change itself still applies.
 
 **Body:**
 ```ts
@@ -769,6 +843,132 @@ Update artist request status (triggers SMS to user).
 ```
 
 **Response:** `ApiResponse<ArtistRequest>`
+
+---
+
+### `PATCH /admin/artist-requests/:id/crm/`
+Update the CRM fields of an artist request. Deliberately separate from the status PATCH
+above — nothing here touches `status`, so no CRM edit can trigger payment, refund, or
+publication side effects. Every field is optional; `null` clears the owner or follow-up.
+
+**Body:**
+```ts
+{
+  crmStage?: CrmStage;
+  assignedAdminId?: number | null;
+  followUpAt?: string | null;   // ISO date
+}
+```
+
+**Response:** `ApiResponse<{ id, crmStage, followUpAt, assignedAdmin }>`
+400 on an unknown stage or a non-existent admin, 404 on an unknown request.
+
+---
+
+### `GET /admin/artist-requests/:id/notes/`
+CRM timeline for one request, newest first.
+
+**Response:** `ApiResponse<CrmNote[]>`
+```ts
+{
+  id: number;
+  body: string;
+  channel: CrmNoteChannel;
+  smsDelivered: boolean | null;   // null for INTERNAL notes
+  admin: { id, username, firstName, lastName } | null;
+  createdAt: string;
+}
+```
+
+---
+
+### `POST /admin/artist-requests/:id/notes/`
+Add a note to the timeline. With `channel: "SMS"` the body is also texted to the applicant
+before the note is stored; the send is awaited, and the outcome recorded in `smsDelivered`.
+
+**Body:**
+```ts
+{
+  body: string;              // required, max 500 chars when channel is SMS
+  channel?: CrmNoteChannel;  // default INTERNAL
+}
+```
+
+**Response:** `201` + `ApiResponse<CrmNote>`.
+A failed SMS still stores the note but returns `502` with `smsDelivered: false`, so the UI
+must not report success on a 2xx assumption. 400 on an empty body, an over-long SMS, an
+invalid channel, or an applicant with no phone number.
+
+---
+
+### `GET /admin/admins/`
+Admin list for the CRM assignee picker. Never includes `password`.
+
+**Response:** `ApiResponse<{ id, username, firstName, lastName, role }[]>`
+
+---
+
+### `GET /admin/sms-templates/`
+The automated-SMS pipeline. The backend seeds exactly one row per `SmsEvent` — there is no
+create and no delete, because a template no trigger point references would never fire.
+
+**Response:** `ApiResponse<SmsTemplate[]>`
+```ts
+{
+  event: SmsEvent;
+  body: string;            // Persian text, may contain {placeholders}
+  isActive: boolean;       // false = this event sends nothing
+  variables: string[];     // placeholders valid for THIS event, e.g. ["firstName", "reason"]
+  updatedAt: string;
+  updatedBy: { id, username, firstName, lastName } | null;
+}
+```
+
+`variables` is served per event rather than assumed client-side, so the panel can only offer
+placeholders the renderer will actually substitute.
+
+---
+
+### `PATCH /admin/sms-templates/:event/`
+Edit one template's text or flip it on/off. `:event` is the `SmsEvent` value, not an id.
+
+**Body:**
+```ts
+{
+  body?: string;      // max 500 chars
+  isActive?: boolean;
+}
+```
+
+**Response:** `ApiResponse<SmsTemplate>`
+400 on an unknown event, an empty body, a body over 500 chars, or a `{placeholder}` that is
+not in that event's `variables`. 404 on an event with no seeded row.
+
+---
+
+### `POST /admin/sms-templates/:event/test/`
+Send one sample of this template to the admin phone numbers stored in
+`/admin/notification-settings/` — never to an applicant, so a test can never leak a
+half-written message to a real user. Placeholders are filled with sample values by the
+server, and the rendered text is prefixed with a marker so a recipient cannot mistake it
+for a live notification.
+
+**Body:**
+```ts
+{
+  body?: string;   // the unsaved draft to test; omitted = test what is stored
+}
+```
+
+The optional `body` exists because the point of a test is to check the text *before*
+committing it. It is validated exactly like a `PATCH` body (max 500 chars, placeholders
+must be in `variables`).
+
+**Response:** `ApiResponse<{ ok: boolean, sentTo: number, message: string }>`
+
+A provider rejection is a normal answer, not a transport error: the call succeeds with
+`ok: false` and the provider's own message. `sentTo` is the count of numbers actually
+texted. 400 when no admin phone numbers are configured — there is nowhere to send it.
 
 ---
 

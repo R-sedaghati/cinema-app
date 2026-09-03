@@ -87,7 +87,8 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
           onChange={(value) => {
             setParams((prev) => ({
               ...prev,
-              isActive: value,
+              // clicking the selected option clears the filter
+              isActive: value === prev.isActive ? null : value,
               page: 1,
             }));
           }}

@@ -38,15 +38,13 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
     // Anything other than success needs saying out loud — a buyer who is told nothing
     // assumes the payment did not happen and pays again.
     if (paymentOutcome === "pending") {
-      toast.info(
-        "پرداخت شما ثبت شد و در حال تأیید نهایی است. نتیجه تا دقایقی دیگر مشخص می‌شود؛ لطفاً دوباره پرداخت نکنید.",
-      );
+      toast.info(copy("contactPaymentPendingToast"));
     }
 
     if (paymentOutcome === "failed" || paymentOutcome === "canceled") {
-      toast.error("پرداخت انجام نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد.");
+      toast.error(copy("contactPaymentFailedToast"));
     }
-  }, [paymentOutcome]);
+  }, [paymentOutcome, copy]);
 
   // Asking the contact endpoint directly would 403 (and toast) for everyone who has not
   // paid, so ownership is established from the buyer's own purchase list first.

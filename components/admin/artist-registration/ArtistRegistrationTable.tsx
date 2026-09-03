@@ -10,7 +10,8 @@ import { useAdminArtistList } from "@/lib/services/admin/hook";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "../users/Header";
 import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import CrmDrawer from "./CrmDrawer";
 
 function ArtistRegistrationTable() {
   const router = useRouter();
@@ -32,6 +33,12 @@ function ArtistRegistrationTable() {
     isValidParams ? finalParams : undefined,
   );
 
+  const [crmArtistId, setCrmArtistId] = useState<number | null>(null);
+  // Read off the current page rather than kept in state, so the drawer shows the
+  // freshly-fetched row after a save invalidates the list.
+  const crmArtist =
+    data?.result?.find((item) => item.id === crmArtistId) ?? null;
+
   useEffect(() => {
     if (!categoryId) return;
 
@@ -42,9 +49,12 @@ function ArtistRegistrationTable() {
     }));
   }, [categoryId, setParams]);
 
-  const columns = generateColumns((id) => {
-    router.push(`/admin/artist-registration/${id}`);
-  });
+  const columns = generateColumns(
+    (id) => {
+      router.push(`/admin/artist-registration/${id}`);
+    },
+    (id) => setCrmArtistId(id),
+  );
 
   return (
     <div className="ss02 mb-5">
@@ -83,6 +93,12 @@ function ArtistRegistrationTable() {
             }
           />
         }
+      />
+
+      <CrmDrawer
+        open={Boolean(crmArtistId)}
+        onClose={() => setCrmArtistId(null)}
+        artist={crmArtist}
       />
     </div>
   );

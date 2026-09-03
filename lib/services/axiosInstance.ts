@@ -14,8 +14,9 @@ type ErrorResponse = {
 const EXCLUDED_TOAST_ENDPOINTS = ["/login"];
 
 const api = axios.create({
-  // See landingAxiosInstance: http gets a CORS-header-less 301 and the XHR never lands.
-  baseURL: "https://api.archivehonar.ir/api",
+  // See landingAxiosInstance: same-origin /api, proxied by nginx (prod) or the
+  // next.config.ts rewrite (dev).
+  baseURL: "/api",
   paramsSerializer: {
     serialize: (params) =>
       qs.stringify(params, {

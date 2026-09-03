@@ -1,16 +1,18 @@
 "use client";
 
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
 
 export default function TermsPage() {
   const { data } = useUserSiteContent();
+  const copy = useLandingCopy();
   const terms = data?.result?.terms;
 
   return (
     <div className="relative mx-auto max-w-6xl px-4 py-10 text-right">
       <h3 className="text-4xl font-h1-regular mb-10">
-        {terms?.title ?? "قوانین و حریم خصوصی"}
+        {terms?.title ?? copy("termsDefaultTitle")}
       </h3>
 
       <div

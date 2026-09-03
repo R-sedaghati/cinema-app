@@ -14,7 +14,15 @@ import {
   IAdminFaqUpdateItem,
   IArtistListResponse,
   IArtistRetriveResponse,
+  IAdminListItem,
   IArtistStatusUpdateRequest,
+  ICrmNote,
+  ICrmNoteCreateRequest,
+  ESmsEvent,
+  ISmsTemplate,
+  ISmsTemplateUpdateRequest,
+  ISmsTemplateTestRequest,
+  ICrmUpdateRequest,
   IBannerListResponse,
   IBannerRetrieveResponse,
   IBannerUpsertRequest,
@@ -53,8 +61,15 @@ import {
   adminAboutUs,
   adminAboutUsUpdate,
   adminArtistList,
+  adminAdminList,
+  adminSmsTemplateList,
+  adminSmsTemplateUpdate,
+  adminSmsTemplateTest,
+  adminArtistCrmUpdate,
   adminArtistRetrieve,
   adminArtistStatusUpdate,
+  adminCrmNoteCreate,
+  adminCrmNoteList,
   adminBannerCreate,
   adminBannerDelete,
   adminBannerList,
@@ -623,5 +638,93 @@ export const useAdminUploadTutorialThumbnail = () => {
 
   return useMutation({
     mutationFn: (file: File) => adminUploadTutorialThumbnail(file, accessToken),
+  });
+};
+
+// --- CRM ---------------------------------------------------------------------
+
+export const useAdminArtistCrmUpdate = (id: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (body: ICrmUpdateRequest) =>
+      adminArtistCrmUpdate(id, body, accessToken),
+  });
+};
+
+export const useAdminCrmNoteList = (id?: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IRetriveResponse<ICrmNote[]>>({
+    queryKey: ["crmNoteList", id],
+    queryFn: () => adminCrmNoteList(id!, accessToken),
+    enabled: Boolean(id && accessToken),
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminCrmNoteCreate = (id: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (body: ICrmNoteCreateRequest) =>
+      adminCrmNoteCreate(id, body, accessToken),
+  });
+};
+
+// The admin roster barely changes; no point re-fetching it on the shared 30s interval.
+export const useAdminAdminList = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IRetriveResponse<IAdminListItem[]>>({
+    queryKey: ["adminList"],
+    queryFn: () => adminAdminList(accessToken),
+    enabled: Boolean(accessToken),
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// --- SMS templates -----------------------------------------------------------
+
+export const useAdminSmsTemplateList = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IRetriveResponse<ISmsTemplate[]>>({
+    queryKey: ["smsTemplateList"],
+    queryFn: () => adminSmsTemplateList(accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminSmsTemplateUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: ({
+      event,
+      payload,
+    }: {
+      event: ESmsEvent;
+      payload: ISmsTemplateUpdateRequest;
+    }) => adminSmsTemplateUpdate(event, payload, accessToken),
+  });
+};
+
+export const useAdminSmsTemplateTest = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: ({
+      event,
+      payload,
+    }: {
+      event: ESmsEvent;
+      payload: ISmsTemplateTestRequest;
+    }) => adminSmsTemplateTest(event, payload, accessToken),
   });
 };

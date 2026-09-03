@@ -14,6 +14,7 @@ import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 const sectionLabelKeys: Record<SectionId, LandingCopyKey> = {
   overview: "profileOverviewTitle",
   forms: "profileFormsTitle",
+  messages: "profileMessagesTitle",
   requests: "profileRequestsTabTitle",
   payments: "profilePaymentsTitle",
   wallet: "profileWalletTitle",
@@ -37,11 +38,9 @@ export function ProfileClient() {
 
   useEffect(() => {
     if (contactOutcome === "notfound") {
-      toast.error(
-        "این پرداخت پیدا نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد؛ در غیر این صورت دوباره تلاش کنید.",
-      );
+      toast.error(copy("contactPaymentNotFoundToast"));
     }
-  }, [contactOutcome]);
+  }, [contactOutcome, copy]);
 
   const goBack = () => {
     setShowSidebar(true);

@@ -28,6 +28,7 @@ export default function CopyCard({
   onSave,
 }: Props) {
   const [values, setValues] = useState<Record<string, string> | null>(null);
+  const [search, setSearch] = useState("");
 
   // Local until saved, so seed once the site-content request lands.
   useEffect(() => {
@@ -38,6 +39,19 @@ export default function CopyCard({
 
   const set = (key: string, value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
+
+  /** Matches the panel label, the default text, the saved value, and the key itself. */
+  const matches = (key: string) => {
+    const term = search.trim();
+    if (!term) return true;
+
+    return [key, registry[key].admin, registry[key].value, values[key] ?? ""]
+      .join(" ")
+      .toLowerCase()
+      .includes(term.toLowerCase());
+  };
+
+  const visibleKeys = Object.keys(registry).filter(matches);
 
   /** Multi-line defaults get a textarea; everything else a single-line input. */
   const isLong = (key: string) =>
@@ -73,22 +87,34 @@ export default function CopyCard({
           راهنما داخل کادر می‌بینید).
         </p>
 
-        {groups ? (
-          groups.map((group) => (
-            <div key={group} className="flex flex-col gap-3">
-              <Divider color="gray" size="thin" type="horizontal" />
-              <p className="font-h6-bold">{group}</p>
+        <Input
+          placeholder="جستجو در متن‌ها…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
 
-              <div className="grid md:grid-cols-2 gap-2">
-                {Object.keys(registry)
-                  .filter((key) => registry[key].group === group)
-                  .map(renderField)}
+        {visibleKeys.length === 0 && (
+          <p className="text-sm text-gray-500">متنی با این عبارت پیدا نشد.</p>
+        )}
+
+        {groups ? (
+          groups.map((group) => {
+            const groupKeys = visibleKeys.filter((key) => registry[key].group === group);
+            // A search that matches nothing in this group hides the whole section.
+            if (groupKeys.length === 0) return null;
+
+            return (
+              <div key={group} className="flex flex-col gap-3">
+                <Divider color="gray" size="thin" type="horizontal" />
+                <p className="font-h6-bold">{group}</p>
+
+                <div className="grid md:grid-cols-2 gap-2">{groupKeys.map(renderField)}</div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="grid md:grid-cols-2 gap-2">
-            {Object.keys(registry).map(renderField)}
+            {visibleKeys.map(renderField)}
           </div>
         )}
 

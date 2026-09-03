@@ -3,6 +3,7 @@ import qs from "qs";
 import { toast } from "react-toastify";
 import { apiErrorFa } from "../utils/apiErrorFa";
 import useAuthStore from "../stores/useAuthStore";
+import useLoginDrawerStore from "../stores/useLoginDrawerStore";
 
 type ErrorResponse = {
   data: null;
@@ -12,9 +13,9 @@ type ErrorResponse = {
 };
 
 const landingApi = axios.create({
-  // https, not http: the CDN answers http with a 301 that carries no CORS headers, so
-  // every XHR from a plain-http origin (dev on localhost) is blocked before it lands.
-  baseURL: "https://api.archivehonar.ir/api",
+  // Same-origin: nginx routes /api on the main domain to the backend. In dev the
+  // next.config.ts rewrite forwards it to API_ORIGIN.
+  baseURL: "/api",
   paramsSerializer: {
     serialize: (params) =>
       qs.stringify(params, {
@@ -44,7 +45,9 @@ function handleError(error: AxiosError) {
   if (status === 401) {
     logout();
 
-    globalThis.location.href = "/";
+    // No full-page redirect: drop the dead session and surface the login drawer in place,
+    // so the user keeps the page they were on.
+    useLoginDrawerStore.getState().open();
 
     return Promise.reject(error);
   }

@@ -2,7 +2,9 @@ import { Button, Input, Select } from "@dgshahr/ui-kit";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Chip from "@/components/common/CustomChip";
 import {
+  CrmStageLabel,
   EArtistRequestStatus,
+  ECrmStage,
   ParamsArtistList,
 } from "@/lib/services/admin/type";
 import { chevronCn } from "@/lib/utils/chevronCn";
@@ -12,9 +14,11 @@ import ExtendedDatePicker from "../../common/ExtendedUiDatePicker";
 import { ChevronDown } from "lucide-react";
 import SelectBeforeOption from "@/components/common/SelectBeforeOption";
 import {
+  useAdminAdminList,
   useAdminCategoryList,
   useAdminProvinceList,
 } from "@/lib/services/admin/hook";
+import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
 
 interface Props {
   setParams: Dispatch<SetStateAction<Partial<ParamsArtistList>>>;
@@ -26,6 +30,8 @@ interface Props {
 const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
   const { data } = useAdminCategoryList();
   const { data: provinceData } = useAdminProvinceList();
+  const { data: adminData } = useAdminAdminList();
+  const { adminId } = useAdminAuthStore();
 
   const [search, setSearch] = useState<string>("");
   const showCleanFilters = ObjectUtils.hasMeaningfulValues(params, [
@@ -40,6 +46,18 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
       search: search,
       page: 1,
     });
+  };
+
+  const crmStages = Object.values(ECrmStage).map((stage) => ({
+    label: CrmStageLabel[stage],
+    value: stage,
+  }));
+
+  // "Due" means on or before today; the API compares against followUpAt__lte.
+  const endOfToday = () => {
+    const date = new Date();
+    date.setHours(23, 59, 59, 999);
+    return date.toISOString();
   };
 
   const status = [
@@ -220,6 +238,91 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
             />
           )}
         />
+
+        <Select
+          searchable={false}
+          isLoading={false}
+          mode="multiple"
+          value={params.crmStage__in ?? []}
+          options={crmStages}
+          onChange={(value) => {
+            setParams((prev) => ({
+              ...prev,
+              crmStage__in: value,
+              page: 1,
+            }));
+          }}
+          optionCellClassName="!bg-transparent hover:!bg-primary-50"
+          beforeOptions={
+            <SelectBeforeOption
+              onSelectNone={() =>
+                setParams({ ...params, crmStage__in: [], page: 1 })
+              }
+              onSelectAll={() =>
+                setParams({
+                  ...params,
+                  crmStage__in: crmStages.map((st) => st.value),
+                  page: 1,
+                })
+              }
+            />
+          }
+          customInput={(isShownOption) => (
+            <Chip
+              label="مرحله پیگیری"
+              badgeNumber={params.crmStage__in?.length || undefined}
+              filled={isShownOption || !!params.crmStage__in?.length}
+              leftIcon={<ChevronDown className={chevronCn(isShownOption)} />}
+            />
+          )}
+        />
+
+        <Select
+          searchable={false}
+          isLoading={false}
+          value={params.assignedAdminId ?? ""}
+          options={[
+            { label: "همه", value: "" as string | number },
+            ...(adminId ? [{ label: "پیگیری‌های من", value: adminId }] : []),
+            ...(adminData?.result ?? []).map((admin) => ({
+              label:
+                `${admin.firstName ?? ""} ${admin.lastName ?? ""}`.trim() ||
+                admin.username,
+              value: admin.id as string | number,
+            })),
+          ]}
+          onChange={(value) => {
+            setParams((prev) => ({
+              ...prev,
+              assignedAdminId: value === "" ? null : Number(value),
+              page: 1,
+            }));
+          }}
+          optionCellClassName="!bg-transparent hover:!bg-primary-50"
+          customInput={(isShownOption) => (
+            <Chip
+              label="مسئول پیگیری"
+              filled={isShownOption || params.assignedAdminId != null}
+              leftIcon={<ChevronDown className={chevronCn(isShownOption)} />}
+            />
+          )}
+        />
+
+        <button
+          type="button"
+          onClick={() =>
+            setParams((prev) => ({
+              ...prev,
+              followUpAt__lte: prev.followUpAt__lte ? null : endOfToday(),
+              page: 1,
+            }))
+          }
+        >
+          <Chip
+            label="پیگیری‌های سررسیدشده"
+            filled={!!params.followUpAt__lte}
+          />
+        </button>
 
         <ExtendedDatePicker
           dateParamName="createdAt"

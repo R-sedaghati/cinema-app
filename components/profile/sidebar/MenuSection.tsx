@@ -39,7 +39,14 @@ export default function MenuSection({
               </span>
               <span className="text-sm text-right">{s.label}</span>
             </div>
-            <ChevronLeft className="text-zinc-500" size={20} />
+            <div className="flex items-center gap-2">
+              {Boolean(s.badge) && (
+                <span className="min-w-5 rounded-full bg-error-500 px-1.5 py-0.5 text-center text-xs leading-4 text-white">
+                  {s.badge}
+                </span>
+              )}
+              <ChevronLeft className="text-zinc-500" size={20} />
+            </div>
             <div
               className={clsx(
                 "h-1/2 bg-error-500 absolute left-0 top-1/2 rounded-r-2xl -translate-y-1/2 transition-all hidden md:block",

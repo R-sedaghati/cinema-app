@@ -29,6 +29,7 @@ import {
   IUserArtistListResponse,
   IUserCategoryListResponse,
   IUserProfile,
+  IUserMessageListResponse,
   IUserSupportListResponse,
   UserCreateArtistRequest,
   UserCreateSupport,
@@ -38,6 +39,8 @@ import {
 import {
   getUserArtistDetail,
   updateUserArtistRequest,
+  userMessages,
+  userMessageRead,
   userAboutUs,
   userArtistRequests,
   userArtsitList,
@@ -364,3 +367,23 @@ export const useUserCreateContactRequest = () =>
   >({
     mutationFn: userCreateContactRequest,
   });
+
+export const useUserMessages = (params: IPagination) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IUserMessageListResponse>({
+    queryKey: ["userMessages", params],
+    queryFn: () => userMessages(params, accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserMessageRead = () => {
+  const { accessToken } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => userMessageRead(id, accessToken),
+  });
+};

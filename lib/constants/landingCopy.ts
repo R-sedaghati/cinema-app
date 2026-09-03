@@ -231,6 +231,7 @@ export const LANDING_COPY = {
   actionCancel: { group: "فیلدهای مشترک", admin: "دکمه انصراف", value: "انصراف" },
   actionBack: { group: "فیلدهای مشترک", admin: "دکمه بازگشت", value: "بازگشت" },
   actionEdit: { group: "فیلدهای مشترک", admin: "دکمه ویرایش", value: "ویرایش" },
+  actionMore: { group: "فیلدهای مشترک", admin: "دکمه نمایش بیشتر", value: "نمایش بیشتر" },
   labelLoading: { group: "فیلدهای مشترک", admin: "متن در حال بارگذاری", value: "در حال بارگذاری..." },
   labelFree: { group: "فیلدهای مشترک", admin: "متن رایگان", value: "رایگان" },
   labelCurrency: { group: "فیلدهای مشترک", admin: "واحد پول", value: "تومان" },
@@ -318,6 +319,8 @@ export const LANDING_COPY = {
   profileFormsColDate: { group: "پروفایل کاربر", admin: "ستون تاریخ ارسال", value: "تاریخ ارسال" },
   profileColStatus: { group: "پروفایل کاربر", admin: "ستون وضعیت", value: "وضعیت" },
   profileColActions: { group: "پروفایل کاربر", admin: "ستون عملیات", value: "عملیات" },
+  profileMessagesTitle: { group: "پروفایل کاربر", admin: "عنوان صندوق پیام", value: "پیام‌ها" },
+  profileMessagesEmpty: { group: "پروفایل کاربر", admin: "متن نبودن پیام", value: "هنوز پیامی برای شما ثبت نشده است." },
   profileRequestsTitle: { group: "پروفایل کاربر", admin: "عنوان درخواست‌های ارتباط", value: "درخواست‌های ارتباط با هنرمندان" },
   profileRequestsTabTitle: { group: "پروفایل کاربر", admin: "عنوان تب درخواست‌ها", value: "درخواست‌های ارتباط" },
   profileRequestsColArtist: { group: "پروفایل کاربر", admin: "ستون هنرمند", value: "هنرمند" },
@@ -387,6 +390,73 @@ export const LANDING_COPY = {
   contactRequiredError: { group: "فرم تماس با ما", admin: "خطای فیلد الزامی ({field} = نام فیلد)", value: "{field} الزامی است" },
   contactSubmitSuccess: { group: "فرم تماس با ما", admin: "پیام ارسال موفق", value: "درخواست شما با موفقیت ارسال شد." },
   contactSubmitError: { group: "فرم تماس با ما", admin: "پیام ارسال ناموفق", value: "ارسال درخواست با خطا مواجه شد." },
+
+  // --- عناصر مشترک ---
+  searchEmptyTitle: { group: "عناصر مشترک", admin: "متن نتیجه‌نداشتن جستجو", value: "نتیجه‌ای یافت نشد!" },
+  searchEmptyAlt: { group: "عناصر مشترک", admin: "متن جایگزین تصویر نتیجه‌نداشتن", value: "یافت نشد" },
+  successIconAlt: { group: "عناصر مشترک", admin: "متن جایگزین تصویر موفقیت", value: "موفق" },
+  listSeparator: { group: "عناصر مشترک", admin: "جداکننده فهرست‌ها", value: "، " },
+  avatarFallback: { group: "عناصر مشترک", admin: "حرف جایگزین عکس پروفایل", value: "؟" },
+  supportDefaultTitle: { group: "عنوان صفحات", admin: "عنوان پیش‌فرض صفحه پشتیبانی", value: "مرکز پشتیبانی" },
+  termsDefaultTitle: { group: "عنوان صفحات", admin: "عنوان پیش‌فرض صفحه قوانین", value: "قوانین و حریم خصوصی" },
+
+  // --- دسترس‌پذیری (متن‌های صفحه‌خوان) ---
+  ariaMenuOpen: { group: "دسترس‌پذیری", admin: "دکمه باز کردن منو", value: "منو" },
+  ariaMenuClose: { group: "دسترس‌پذیری", admin: "بستن منو (پس‌زمینه)", value: "بستن منو" },
+  ariaMenuDialog: { group: "دسترس‌پذیری", admin: "کشوی منوی اصلی", value: "منوی اصلی" },
+  ariaClose: { group: "دسترس‌پذیری", admin: "دکمه بستن", value: "بستن" },
+  ariaBottomNav: { group: "دسترس‌پذیری", admin: "نوار ناوبری موبایل", value: "ناوبری اصلی" },
+  ariaInstagram: { group: "دسترس‌پذیری", admin: "لینک اینستاگرام", value: "اینستاگرام" },
+  ariaSupportCall: { group: "دسترس‌پذیری", admin: "لینک تماس با پشتیبانی", value: "تماس با پشتیبانی" },
+  ariaRangeFrom: { group: "دسترس‌پذیری", admin: "ورودی «از» فیلتر بازه ({label})", value: "{label} از" },
+  ariaRangeTo: { group: "دسترس‌پذیری", admin: "ورودی «تا» فیلتر بازه ({label})", value: "{label} تا" },
+
+  // --- پیام‌های پرداخت درخواست تماس ---
+  contactPaymentPendingToast: {
+    group: "وضعیت پرداخت",
+    admin: "پیام پرداخت در انتظار تأیید",
+    value: "پرداخت شما ثبت شد و در حال تأیید نهایی است. نتیجه تا دقایقی دیگر مشخص می‌شود؛ لطفاً دوباره پرداخت نکنید.",
+  },
+  contactPaymentFailedToast: {
+    group: "وضعیت پرداخت",
+    admin: "پیام پرداخت ناموفق",
+    value: "پرداخت انجام نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد.",
+  },
+  contactPaymentNotFoundToast: {
+    group: "وضعیت پرداخت",
+    admin: "پیام پیدا نشدن پرداخت",
+    value:
+      "این پرداخت پیدا نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد؛ در غیر این صورت دوباره تلاش کنید.",
+  },
+
+  // --- آپلود فایل ---
+  uploadImageTypeError: { group: "آپلود فایل", admin: "خطای فرمت تصویر", value: "فرمت تصویر باید JPG، PNG یا WebP باشد." },
+  uploadImageSizeError: {
+    group: "آپلود فایل",
+    admin: "خطای حجم تصویر ({mb} = مگابایت مجاز)",
+    value: "حجم تصویر نباید بیشتر از {mb} مگابایت باشد.",
+  },
+  uploadVideoTypeError: { group: "آپلود فایل", admin: "خطای فرمت ویدیو", value: "فرمت ویدیو باید MP4، WebM یا MOV باشد." },
+  uploadVideoSizeError: {
+    group: "آپلود فایل",
+    admin: "خطای حجم ویدیو ({mb} = مگابایت مجاز)",
+    value: "حجم ویدیو نباید بیشتر از {mb} مگابایت باشد.",
+  },
+
+  // --- خطاهای سرور ---
+  errorGeneric: { group: "خطاهای سرور", admin: "خطای عمومی", value: "خطایی در ارتباط با سرور رخ داده است." },
+  errorUnauthorized: { group: "خطاهای سرور", admin: "خطای انقضای دسترسی", value: "دسترسی شما منقضی شده است. دوباره وارد شوید." },
+  errorForbidden: { group: "خطاهای سرور", admin: "خطای نداشتن دسترسی", value: "اجازه دسترسی به این بخش را ندارید." },
+  errorNotFound: { group: "خطاهای سرور", admin: "خطای پیدا نشدن مورد", value: "موردی با این مشخصات پیدا نشد." },
+  errorServer: { group: "خطاهای سرور", admin: "خطای داخلی سرور", value: "خطای داخلی سرور. کمی بعد دوباره تلاش کنید." },
+  errorNetwork: { group: "خطاهای سرور", admin: "خطای شبکه", value: "ارتباط با سرور برقرار نشد. اینترنت خود را بررسی کنید." },
+  errorCredentials: { group: "خطاهای سرور", admin: "خطای نام کاربری یا رمز", value: "نام کاربری یا رمز عبور اشتباه است." },
+  errorRequiredFields: { group: "خطاهای سرور", admin: "خطای فیلدهای الزامی", value: "پر کردن همه فیلدهای الزامی ضروری است." },
+  errorNumber: { group: "خطاهای سرور", admin: "خطای مقدار عددی", value: "مقدار عددی نامعتبر است." },
+  errorInvalidValue: { group: "خطاهای سرور", admin: "خطای مقدار نامعتبر", value: "مقدار وارد شده معتبر نیست." },
+  errorDuplicate: { group: "خطاهای سرور", admin: "خطای مورد تکراری", value: "این مورد از قبل ثبت شده است." },
+  errorFileTooLarge: { group: "خطاهای سرور", admin: "خطای حجم فایل", value: "حجم فایل بیش از حد مجاز است." },
+  errorTimeout: { group: "خطاهای سرور", admin: "خطای عدم پاسخ سرور", value: "پاسخی از سرور دریافت نشد. دوباره تلاش کنید." },
 } as const;
 
 export type LandingCopyKey = keyof typeof LANDING_COPY;

@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: "ArchiveHonar",
   webDir: "public",
   server: {
-    url: "https://ui.archivehonar.ir",
+    url: "https://archivehonar.ir",
     androidScheme: "https",
   },
 };

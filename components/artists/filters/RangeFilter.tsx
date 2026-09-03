@@ -50,7 +50,7 @@ export function RangeFilter({
       <input
         type="number"
         inputMode="numeric"
-        aria-label={`${descriptor.label} از`}
+        aria-label={copy("ariaRangeFrom", { label: descriptor.label })}
         min={descriptor.min}
         max={descriptor.max}
         placeholder={String(descriptor.min)}
@@ -62,7 +62,7 @@ export function RangeFilter({
       <input
         type="number"
         inputMode="numeric"
-        aria-label={`${descriptor.label} تا`}
+        aria-label={copy("ariaRangeTo", { label: descriptor.label })}
         min={descriptor.min}
         max={descriptor.max}
         placeholder={String(descriptor.max)}
