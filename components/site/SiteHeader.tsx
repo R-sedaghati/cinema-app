@@ -74,7 +74,7 @@ export function SiteHeader() {
                 onClick={() => setSidebarOpen(true)}
                 size={24}
                 className="text-zinc-300"
-                aria-label="منو"
+                aria-label={copy("ariaMenuOpen")}
               />
             </div>
           ) : (
@@ -157,7 +157,7 @@ export function SiteHeader() {
             "absolute inset-0 bg-black/60 transition-opacity duration-300 ease-out",
             sidebarOpen ? "opacity-100" : "opacity-0",
           ].join(" ")}
-          aria-label="بستن منو"
+          aria-label={copy("ariaMenuClose")}
         />
         <div
           className={[
@@ -168,7 +168,7 @@ export function SiteHeader() {
           ].join(" ")}
           role="dialog"
           aria-modal="true"
-          aria-label="منوی اصلی"
+          aria-label={copy("ariaMenuDialog")}
         >
           <div className="flex flex-col h-full p-4">
             <div className="flex items-center justify-between mb-6">
@@ -187,7 +187,7 @@ export function SiteHeader() {
                 type="button"
                 onClick={handleClose}
                 className="rounded-xl p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
-                aria-label="بستن"
+                aria-label={copy("ariaClose")}
               >
                 <X size={24} />
               </button>

@@ -30,6 +30,8 @@ import {
   IUserArtistListResponse,
   IUserCategoryListResponse,
   IUserProfile,
+  IUserMessage,
+  IUserMessageListResponse,
   IUserSupportListResponse,
   UserCreateArtistRequest,
   UserCreateSupport,
@@ -302,5 +304,36 @@ export const userPurchase = async (requestId: number) => {
   const { data } = await landingApi.get<IPurchaseResponse>("/user/purchase/", {
     params: { requestId },
   });
+  return data;
+};
+
+export const userMessages = async (
+  params: IPagination,
+  accessToken: string,
+) => {
+  const { data } = await landingApi.get<IUserMessageListResponse>(
+    "/user/messages/",
+    {
+      params: { ...params },
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const userMessageRead = async (id: number, accessToken: string) => {
+  const { data } = await landingApi.patch<IRetriveResponse<IUserMessage>>(
+    `/user/messages/${id}/`,
+    { read: true },
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
   return data;
 };

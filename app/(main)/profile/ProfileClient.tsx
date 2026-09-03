@@ -1,7 +1,9 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 import { SectionId } from "../../../components/profile/types";
 import ProfileSidebar from "../../../components/profile/sidebar/ProfileSidebar";
 import ProfileContent from "../../../components/profile/ProfileContent";
@@ -12,6 +14,7 @@ import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 const sectionLabelKeys: Record<SectionId, LandingCopyKey> = {
   overview: "profileOverviewTitle",
   forms: "profileFormsTitle",
+  messages: "profileMessagesTitle",
   requests: "profileRequestsTabTitle",
   payments: "profilePaymentsTitle",
   wallet: "profileWalletTitle",
@@ -26,6 +29,18 @@ export function ProfileClient() {
 
   const { isMobile, showSidebar, setShowSidebar, handleSelect } =
     useResponsiveSidebar(setActive);
+
+  // The contact-request callback lands here with `contact=notfound` when the id it was
+  // sent back with resolved to nothing. Saying nothing reads as a silent failure, and a
+  // buyer who is told nothing pays again.
+  const searchParams = useSearchParams();
+  const contactOutcome = searchParams.get("contact");
+
+  useEffect(() => {
+    if (contactOutcome === "notfound") {
+      toast.error(copy("contactPaymentNotFoundToast"));
+    }
+  }, [contactOutcome, copy]);
 
   const goBack = () => {
     setShowSidebar(true);

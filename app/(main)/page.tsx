@@ -388,6 +388,8 @@ function ArtistSection({
 }
 
 function ArtistCard({ artist }: { artist: IArtistItem }) {
+  const copy = useLandingCopy();
+
   return (
     <Link
       href={`/artists/${artist.id}`}
@@ -405,7 +407,7 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-2xl md:text-3xl font-bold text-zinc-600">
-              {artist.user.firstName?.[0] ?? "؟"}
+              {artist.user.firstName?.[0] ?? copy("avatarFallback")}
             </span>
           </div>
         )}

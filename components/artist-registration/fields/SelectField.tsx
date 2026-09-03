@@ -46,7 +46,8 @@ const SelectField: React.FC<FieldProps> = ({ field, value, onChange, provinceKey
       value={(value as string) || null}
       options={options}
       wrapperClassName="w-full"
-      onChange={(selected) => onChange(selected ?? "")}
+      // ponytail: single mode fires onChange even for the already-selected option, so toggle it off
+      onChange={(selected) => onChange(selected === value ? "" : (selected ?? ""))}
       mode="single"
     />
   );

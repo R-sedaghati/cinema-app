@@ -18,7 +18,9 @@ const RadioField: React.FC<FieldProps> = ({ field, value, onChange }) => (
           containerClassName="w-full"
           name={field.key}
           checked={value === option.value}
-          onChange={() => onChange(option.value)}
+          // change never fires on an already-checked radio, so toggle on click
+          onChange={() => {}}
+          onClick={() => onChange(value === option.value ? "" : option.value)}
         />
       ))}
     </div>

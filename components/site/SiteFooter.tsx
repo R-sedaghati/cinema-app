@@ -48,7 +48,7 @@ export function SiteFooter() {
               href={instagramUrl}
               target="_blank"
               rel="noreferrer"
-              aria-label="اینستاگرام"
+              aria-label={copy("ariaInstagram")}
               className="hover:text-white transition-colors"
             >
               <Instagram />
@@ -56,7 +56,7 @@ export function SiteFooter() {
             {phone && (
               <a
                 href={phoneHref}
-                aria-label="تماس با پشتیبانی"
+                aria-label={copy("ariaSupportCall")}
                 className="hover:text-white transition-colors"
               >
                 <Phone />

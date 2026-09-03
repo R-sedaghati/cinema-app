@@ -7,7 +7,17 @@ import {
   IAdminWalletResponse,
   IArtistListResponse,
   IArtistRetriveResponse,
+  IAdminListItem,
+  IArtistCrmFields,
   IArtistStatusUpdateRequest,
+  ICrmNote,
+  ICrmNoteCreateRequest,
+  ESmsEvent,
+  ISmsTemplate,
+  ISmsTemplateUpdateRequest,
+  ISmsTemplateTestRequest,
+  ISmsTemplateTestResponse,
+  ICrmUpdateRequest,
   IBasePaginateResponse,
   IBannerListResponse,
   IBannerRetrieveResponse,
@@ -684,6 +694,126 @@ export const adminUploadTutorialThumbnail = async (
     "/admin/upload/image",
     form,
     { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+// --- CRM ---------------------------------------------------------------------
+
+export const adminArtistCrmUpdate = async (
+  id: number,
+  payload: ICrmUpdateRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IRetriveResponse<IArtistCrmFields>>(
+    `/admin/artist-requests/${id}/crm/`,
+    payload,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const adminCrmNoteList = async (id: number, accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<ICrmNote[]>>(
+    `/admin/artist-requests/${id}/notes/`,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const adminCrmNoteCreate = async (
+  id: number,
+  payload: ICrmNoteCreateRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IRetriveResponse<ICrmNote>>(
+    `/admin/artist-requests/${id}/notes/`,
+    payload,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const adminAdminList = async (accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<IAdminListItem[]>>(
+    "/admin/admins/",
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+// --- SMS templates -----------------------------------------------------------
+
+export const adminSmsTemplateList = async (accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<ISmsTemplate[]>>(
+    "/admin/sms-templates/",
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+export const adminSmsTemplateUpdate = async (
+  event: ESmsEvent,
+  payload: ISmsTemplateUpdateRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IRetriveResponse<ISmsTemplate>>(
+    `/admin/sms-templates/${event}/`,
+    payload,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
+/**
+ * Texts one sample of the template to the admin numbers in the notification settings.
+ * A provider rejection comes back as `ok: false` with its own message, so this resolves
+ * rather than throws on a bad send.
+ */
+export const adminSmsTemplateTest = async (
+  event: ESmsEvent,
+  payload: ISmsTemplateTestRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.post<ISmsTemplateTestResponse>(
+    `/admin/sms-templates/${event}/test/`,
+    payload,
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
   );
 
   return data;

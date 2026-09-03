@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@dgshahr/ui-kit";
 import { MoveLeft, MoveRight, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -15,6 +15,10 @@ import {
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import useAuthStore from "@/lib/stores/useAuthStore";
+import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
+import Button from "@/components/common/Button";
 
 export interface SelectedCategory {
   id: number;
@@ -23,6 +27,26 @@ export interface SelectedCategory {
 
 export default function ArtistRegistrationPageContent({ editId }: { editId: number | null }) {
   const copy = useFormCopy();
+  const landingCopy = useLandingCopy();
+
+  // The form is only worth filling once there is an account to attach it to: submitting
+  // it signed out 401s, and the interceptor's logout redirect throws every answer away.
+  // The token is persisted, so it is empty until zustand rehydrates — gating before that
+  // flashes the sign-in card at users who are in fact logged in.
+  const { accessToken } = useAuthStore();
+  const { open: openLoginDrawer } = useLoginDrawerStore();
+  const [isAuthReady, setIsAuthReady] = useState(false);
+
+  // ponytail: mount flag, not a persist subscription — localStorage rehydration is
+  // synchronous, so the token is settled by the first effect, and `persist` is not
+  // there to subscribe to during the prerender anyway.
+  useEffect(() => setIsAuthReady(true), []);
+
+  const isSignedOut = isAuthReady && !accessToken;
+
+  useEffect(() => {
+    if (isSignedOut) openLoginDrawer();
+  }, [isSignedOut, openLoginDrawer]);
 
   const { data: categoryData, isLoading: isCategoryLoading } = useUserCategoryList({
     page: 1,
@@ -129,7 +153,28 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     }
   };
 
-  if ((editId && editLoading) || (step === 0 && isCategoryLoading)) {
+  if (isSignedOut) {
+    return (
+      <div className="flex justify-center py-16 md:py-24">
+        <Card
+          wrapperClassName={clsx("w-[90%]", isDesktop && "w-1/2")}
+          className="py-10 px-4 md:px-8"
+        >
+          <div className="flex flex-col gap-5 items-center text-center">
+            <p className="font-h4-bold">{landingCopy("regAuthGateTitle")}</p>
+            <p className="font-p1-regular text-gray-600">
+              {landingCopy("regAuthGateDesc")}
+            </p>
+            <Button className="rounded-full!" onClick={openLoginDrawer}>
+              {landingCopy("regAuthGateCta")}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isAuthReady || (editId && editLoading) || (step === 0 && isCategoryLoading)) {
     return (
       <div className="flex justify-center items-center py-24">
         <Loader2 className="animate-spin text-error-500" size={40} />

@@ -1,6 +1,7 @@
 import {
   IArtistItem,
   IBasePaginateResponse,
+  ESmsEvent,
   IFormSchema,
   IRetriveResponse,
   ISupportItem,
@@ -241,3 +242,19 @@ export type IWalletTransactionListResponse =
  * Null when there was nothing to pay (free category or already settled from the wallet).
  */
 export type IPurchaseResponse = IRetriveResponse<{ redirectUrl: string | null }>;
+
+/**
+ * One message the system sent this user — an automated pipeline SMS or an admin's
+ * note with `channel: SMS`. `body` arrives already rendered.
+ */
+export interface IUserMessage {
+  id: number;
+  body: string;
+  /** null when an admin typed the message rather than a template firing. */
+  event: ESmsEvent | null;
+  artistRequestId: number | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export type IUserMessageListResponse = IBasePaginateResponse<IUserMessage>;

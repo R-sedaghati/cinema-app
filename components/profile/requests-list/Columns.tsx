@@ -34,7 +34,7 @@ export const generateColumns = (
       <div className="flex flex-col gap-1">
         <p className="font-p1-regular">{data.artist?.code ?? "—"}</p>
         <span className="text-xs text-zinc-500">
-          {data.artist?.categories?.map((category) => category.faName).join("، ")}
+          {data.artist?.categories?.map((category) => category.faName).join(copy("listSeparator"))}
         </span>
       </div>
     ),

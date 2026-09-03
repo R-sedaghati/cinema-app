@@ -2,12 +2,14 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { supportCardVisuals } from "@/lib/mock/support";
+import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
 import Button from "../common/Button";
 
 const SupportCenter = () => {
   const { data } = useUserSiteContent();
+  const copy = useLandingCopy();
   const support = data?.result?.support;
   const items = support?.items ?? [];
   const fontSize = support?.fontSize;
@@ -15,7 +17,7 @@ const SupportCenter = () => {
   return (
     <section className="flex flex-col justify-center items-center gap-10">
       <h3 className="text-4xl font-h1-regular">
-        {support?.title ?? "مرکز پشتیبانی"}
+        {support?.title ?? copy("supportDefaultTitle")}
       </h3>
       <p
         className="font-p1-regular whitespace-pre-line"

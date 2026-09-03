@@ -12,6 +12,7 @@ import {
   Plus,
   BookOpen,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -93,6 +94,12 @@ export const useSidebarItems = (): {
         title: "مدیریت آموزش‌ها",
         link: "/admin/tutorials",
         active: pathname.startsWith("/admin/tutorials"),
+      },
+      {
+        icon: <MessageSquare />,
+        title: "پیامک‌های خودکار",
+        link: "/admin/sms",
+        active: pathname.startsWith("/admin/sms"),
       },
       {
         icon: <Settings />,

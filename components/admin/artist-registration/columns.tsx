@@ -4,9 +4,22 @@ import { Badge, Button } from "@dgshahr/ui-kit";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
 import ArtistStatus from "./ArtistStatus";
+import CrmStage from "./CrmStage";
+
+/** A follow-up date at or before today is overdue and gets flagged in the table. */
+const isOverdue = (followUpAt: string | null) => {
+  if (!followUpAt) return false;
+  const due = new Date(followUpAt);
+  if (Number.isNaN(due.getTime())) return false;
+
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+  return due <= endOfToday;
+};
 
 export const generateColumns = (
   onProfileClick: (id: number) => void,
+  onCrmClick: (id: number) => void,
 ): ColumnsType<IArtistItem>[] => {
   return [
     {
@@ -101,19 +114,71 @@ export const generateColumns = (
     },
     {
       align: "center",
+      key: "crmStage",
+      dataIndex: "crmStage",
+      title: "مرحله پیگیری",
+      className: "align-middle",
+      render: (data) => <CrmStage stage={data.crmStage} />,
+    },
+    {
+      align: "center",
+      key: "assignedAdmin",
+      dataIndex: "assignedAdmin",
+      title: "مسئول پیگیری",
+      className: "align-middle",
+      render: (data) => (
+        <p className="font-p1-regular">
+          {data.assignedAdmin
+            ? `${data.assignedAdmin.firstName ?? ""} ${data.assignedAdmin.lastName ?? ""}`.trim() ||
+              data.assignedAdmin.username
+            : "—"}
+        </p>
+      ),
+    },
+    {
+      align: "center",
+      key: "followUpAt",
+      dataIndex: "followUpAt",
+      title: "پیگیری بعدی",
+      className: "align-middle",
+      render: (data) => (
+        <p
+          className={
+            isOverdue(data.followUpAt)
+              ? "font-p1-regular text-error-500"
+              : "font-p1-regular"
+          }
+        >
+          {data.followUpAt
+            ? convertGregorianTimeToShamsiTime(data.followUpAt)
+            : "—"}
+        </p>
+      ),
+    },
+    {
+      align: "center",
       key: "actions",
       dataIndex: "actions",
       title: "عملیات",
       className: "align-middle",
       render: (data) => (
-        <Button
-          onClick={() => onProfileClick(data.id)}
-          color="error"
-          variant="outline"
-          leftIcon={<ChevronLeft />}
-        >
-          مشاهده فرم درخواست
-        </Button>
+        <div className="flex gap-2 justify-center">
+          <Button
+            onClick={() => onCrmClick(data.id)}
+            color="error"
+            variant="outline"
+          >
+            پیگیری
+          </Button>
+          <Button
+            onClick={() => onProfileClick(data.id)}
+            color="error"
+            variant="outline"
+            leftIcon={<ChevronLeft />}
+          >
+            مشاهده فرم درخواست
+          </Button>
+        </div>
       ),
     },
   ];

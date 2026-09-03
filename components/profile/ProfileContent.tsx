@@ -4,6 +4,7 @@ import React from "react";
 import { SectionId } from "./types";
 import Overview from "./Overview";
 import FormsList from "./forms-list/FormsList";
+import MessagesList from "./messages/MessagesList";
 import RequestsList from "./requests-list/RequestsList";
 import PaymentsList from "./payments/PaymentsList";
 import WalletCard from "./wallet/WalletCard";
@@ -18,6 +19,8 @@ export default function ProfileContent({
       return <Overview />;
     case "forms":
       return <FormsList />;
+    case "messages":
+      return <MessagesList />;
     case "requests":
       return <RequestsList />;
     case "payments":

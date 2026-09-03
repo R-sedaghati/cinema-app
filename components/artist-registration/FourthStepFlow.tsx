@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { CopyFn } from "@/lib/utils/formCopy";
+import { landingCopy } from "@/lib/utils/landingCopy";
 import { userPurchase } from "@/lib/services/landing/api";
 
 interface Props {
@@ -152,7 +153,7 @@ const FourthStepFlow: React.FC<Props> = ({
                           ? copy("booleanYes")
                           : copy("booleanNo")
                         : Array.isArray(value)
-                          ? value.join("، ")
+                          ? value.join(landingCopy("listSeparator"))
                           : ((value as string | number | undefined) ??
                             copy("emptyValue"));
 

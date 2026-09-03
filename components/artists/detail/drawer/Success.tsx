@@ -16,7 +16,7 @@ const Success = ({ trackingCode }: { trackingCode: string | null }) => {
       <div className="flex justify-center">
         <img
           src="/check_circle_line.svg"
-          alt="موفق"
+          alt={copy("successIconAlt")}
           width={112}
           height={112}
         />

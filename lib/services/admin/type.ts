@@ -44,6 +44,9 @@ export interface ParamsArtistList {
   createdAt__lte: Date | null;
   updateAt__gte: Date | null;
   updateAt__lte: Date | null;
+  crmStage__in: ECrmStage[];
+  assignedAdminId: number | null;
+  followUpAt__lte: string | null;
 }
 
 interface IArtistCategory {
@@ -66,6 +69,70 @@ export enum EArtistRequestStatus {
   APPROVED = "APPROVED",
   REJECTED = "REJECTED",
   NEED_TO_REVISION = "NEED_TO_REVISION",
+}
+
+/**
+ * CRM pipeline stage. Independent of EArtistRequestStatus: that one drives payment and
+ * publication, this one only tracks how far an admin has got with the applicant.
+ */
+export enum ECrmStage {
+  NEW = "NEW",
+  CONTACTED = "CONTACTED",
+  AWAITING_DOCS = "AWAITING_DOCS",
+  NEGOTIATING = "NEGOTIATING",
+  WON = "WON",
+  LOST = "LOST",
+}
+
+export const CrmStageLabel: Record<ECrmStage, string> = {
+  [ECrmStage.NEW]: "جدید",
+  [ECrmStage.CONTACTED]: "تماس گرفته شده",
+  [ECrmStage.AWAITING_DOCS]: "در انتظار مدارک",
+  [ECrmStage.NEGOTIATING]: "در حال مذاکره",
+  [ECrmStage.WON]: "موفق",
+  [ECrmStage.LOST]: "ناموفق",
+};
+
+export enum ECrmNoteChannel {
+  INTERNAL = "INTERNAL",
+  SMS = "SMS",
+}
+
+export interface IAdminListItem {
+  id: number;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
+  role: string;
+}
+
+export interface ICrmNote {
+  id: number;
+  body: string;
+  channel: ECrmNoteChannel;
+  /** null for internal notes; false when the SMS provider rejected the send. */
+  smsDelivered: boolean | null;
+  admin: IAdminListItem | null;
+  createdAt: string;
+}
+
+/** What `PATCH /admin/artist-requests/:id/crm/` echoes back. */
+export interface IArtistCrmFields {
+  id: number;
+  crmStage: ECrmStage;
+  followUpAt: string | null;
+  assignedAdmin: IAdminListItem | null;
+}
+
+export interface ICrmUpdateRequest {
+  crmStage?: ECrmStage;
+  assignedAdminId?: number | null;
+  followUpAt?: string | null;
+}
+
+export interface ICrmNoteCreateRequest {
+  body: string;
+  channel: ECrmNoteChannel;
 }
 
 export enum EArtistGender {
@@ -93,6 +160,9 @@ export interface IArtistItem {
   status: EArtistRequestStatus;
   user: IArtistUser;
   answers: Record<string, unknown>;
+  crmStage: ECrmStage;
+  followUpAt: string | null;
+  assignedAdmin: IAdminListItem | null;
   [key: string]: unknown;
 }
 
@@ -641,3 +711,47 @@ export interface IAdjustWalletRequest {
   amount: number;
   description: string;
 }
+
+// --- SMS templates -----------------------------------------------------------
+
+/**
+ * Pipeline events that can fire an automated SMS. Closed set: the backend owns the
+ * trigger points, the admin owns only each row's text and on/off switch.
+ */
+export enum ESmsEvent {
+  FORM_SUBMITTED = "FORM_SUBMITTED",
+  NEED_REVISION = "NEED_REVISION",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
+  PAYMENT_FAILED = "PAYMENT_FAILED",
+}
+
+export interface ISmsTemplate {
+  event: ESmsEvent;
+  body: string;
+  isActive: boolean;
+  /** Placeholders the renderer substitutes for this event — served per event, never assumed. */
+  variables: string[];
+  updatedAt: string;
+  updatedBy: IAdminListItem | null;
+  /** The ui-kit Table constrains its row type to an index-signature record. */
+  [key: string]: unknown;
+}
+
+export interface ISmsTemplateUpdateRequest {
+  body?: string;
+  isActive?: boolean;
+}
+
+export interface ISmsTemplateTestRequest {
+  /** The unsaved draft to test; omitted tests the stored body. */
+  body?: string;
+}
+
+export type ISmsTemplateTestResponse = IRetriveResponse<{
+  ok: boolean;
+  /** How many admin numbers were actually texted. */
+  sentTo: number;
+  message: string;
+}>;

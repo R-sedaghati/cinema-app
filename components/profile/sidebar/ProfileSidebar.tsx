@@ -10,11 +10,12 @@ import {
   LogOut,
   ChevronLeft,
   Headset,
+  Mail,
 } from "lucide-react";
 import { SectionId } from "../types";
 import Button from "../../common/Button";
 import MenuSection from "./MenuSection";
-import { useUserProfile } from "@/lib/services/landing/hook";
+import { useUserMessages, useUserProfile } from "@/lib/services/landing/hook";
 import clsx from "clsx";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
@@ -23,6 +24,8 @@ export interface SideBarSections {
   id: SectionId;
   label: string;
   icon: React.ReactNode;
+  /** Unread count shown next to the chevron; falsy hides it. */
+  badge?: number;
 }
 
 // Labels are copy keys; the admin-editable text is resolved at render time.
@@ -31,6 +34,11 @@ const sectionDefs1: { id: SectionId; label: LandingCopyKey; icon: React.ReactNod
     id: "forms",
     label: "profileFormsTitle",
     icon: <FileText className="h-4 w-4" />,
+  },
+  {
+    id: "messages",
+    label: "profileMessagesTitle",
+    icon: <Mail className="h-4 w-4" />,
   },
   {
     id: "requests",
@@ -71,8 +79,18 @@ export default function ProfileSidebar({
 }>) {
   const { data } = useUserProfile();
   const copy = useLandingCopy();
+  // Same params as MessagesList's first page, so the two share one cache entry.
+  const { data: messages } = useUserMessages({ page: 1, count: 20 });
+
+  const unreadCount = (messages?.result ?? []).filter(
+    (message) => !message.readAt,
+  ).length;
   const resolve = (defs: typeof sectionDefs1): SideBarSections[] =>
-    defs.map((s) => ({ ...s, label: copy(s.label) }));
+    defs.map((s) => ({
+      ...s,
+      label: copy(s.label),
+      ...(s.id === "messages" && { badge: unreadCount }),
+    }));
 
   return (
     <aside className="relative flex-2 z-10 w-full space-y-2 text-right">
