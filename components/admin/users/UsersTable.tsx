@@ -46,7 +46,7 @@ function UsersTable() {
         className="w-full"
         header={{
           showTotal: true,
-          extraElement: <Header />,
+          extraElement: <Header queryKey="adminUsersList" />,
         }}
         stickyTableHeader
         columns={columns}

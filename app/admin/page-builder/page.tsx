@@ -135,9 +135,8 @@ function PageBuilder() {
                   setDragging(null);
                   setDropIndex(null);
                 }}
-                className={`rounded-xl border ${
-                  dropIndex === index ? "border-t-2 border-t-primary-500" : ""
-                } ${section.hidden ? "opacity-60" : ""} border-gray-200`}
+                className={`rounded-xl border ${dropIndex === index ? "border-t-2 border-t-primary-500" : ""
+                  } ${section.hidden ? "opacity-60" : ""} border-gray-200`}
               >
                 <div className="flex items-center gap-2 p-2">
                   <button
@@ -183,11 +182,10 @@ function PageBuilder() {
                           {meta.variants.map((v) => (
                             <label
                               key={v.key}
-                              className={`cursor-pointer rounded-lg border px-3 py-1.5 text-sm ${
-                                section.variant === v.key
+                              className={`cursor-pointer rounded-lg border px-3 py-1.5 text-sm ${section.variant === v.key
                                   ? "border-primary-500 bg-primary-50 text-primary-700"
                                   : "border-gray-200 text-gray-600 hover:border-gray-300"
-                              }`}
+                                }`}
                             >
                               <input
                                 type="radio"
@@ -197,7 +195,10 @@ function PageBuilder() {
                                 checked={section.variant === v.key}
                                 onChange={() => setVariant(section.key, v.key)}
                               />
-                              {v.admin}
+                              <span className="flex flex-col items-center gap-1.5">
+                                <VariantGlyph variant={v.key} />
+                                {v.admin}
+                              </span>
                             </label>
                           ))}
                         </div>
@@ -258,7 +259,7 @@ function PageBuilder() {
           <LandingCopyDraftProvider value={landing}>
             <div
               dir="rtl"
-              className="pointer-events-none select-none overflow-hidden rounded-2xl bg-zinc-950 text-zinc-100"
+              className="pointer-events-none select-none max-w-[900px] overflow-hidden rounded-2xl bg-zinc-950 text-zinc-100"
             >
               <PreviewSections sections={visible} />
             </div>
@@ -267,6 +268,107 @@ function PageBuilder() {
       </div>
     </div>
   );
+}
+
+/**
+ * Wireframe thumbnail for a layout variant — CSS boxes, no assets. Keyed by
+ * variant key, which is shared across sections on purpose: `grid` looks the
+ * same whichever section draws it.
+ */
+function VariantGlyph({ variant }: { variant: string }) {
+  const frame =
+    "h-9 w-14 shrink-0 rounded-md border border-current/25 p-1 opacity-70";
+  const fill = "rounded-[2px] bg-current";
+
+  switch (variant) {
+    case "grid":
+    case "cards":
+    case "tiles":
+      return (
+        <span className={`${frame} grid grid-cols-3 grid-rows-2 gap-[3px]`}>
+          {["a", "b", "c", "d", "e", "f"].map((k) => (
+            <span key={k} className={fill} />
+          ))}
+        </span>
+      );
+
+    case "rail":
+    case "posters":
+    case "slider":
+    case "filmstrip":
+      // Last box clipped by the frame — the horizontal-scroll tell.
+      return (
+        <span className={`${frame} flex gap-[3px] overflow-hidden`}>
+          {["a", "b", "c"].map((k) => (
+            <span key={k} className={`${fill} w-3.5 shrink-0`} />
+          ))}
+        </span>
+      );
+
+    case "list":
+    case "rows":
+    case "castlist":
+      return (
+        <span className={`${frame} flex flex-col justify-between`}>
+          {["a", "b", "c"].map((k) => (
+            <span key={k} className={`${fill} h-1.5 w-full`} />
+          ))}
+        </span>
+      );
+
+    case "text":
+    case "columns":
+      return (
+        <span className={`${frame} flex gap-[3px]`}>
+          {["a", "b"].map((col) => (
+            <span key={col} className="flex flex-1 flex-col justify-between">
+              {["a", "b", "c"].map((k) => (
+                <span key={k} className={`${fill} h-1 w-full`} />
+              ))}
+            </span>
+          ))}
+        </span>
+      );
+
+    case "chips":
+      return (
+        <span className={`${frame} flex flex-wrap content-start gap-[3px]`}>
+          {["w-4", "w-5", "w-3", "w-5", "w-3.5"].map((w) => (
+            <span key={w} className={`${fill} h-1.5 rounded-full ${w}`} />
+          ))}
+        </span>
+      );
+
+    case "stacked":
+      return (
+        <span className={`${frame} flex flex-col justify-center gap-[3px]`}>
+          <span className={`${fill} h-1.5 w-2/3`} />
+          <span className={`${fill} h-2.5 w-full opacity-50`} />
+        </span>
+      );
+
+    case "marquee":
+      return (
+        <span className={`${frame} flex items-center justify-center`}>
+          <span className="h-5 w-10 rounded-[2px] border-2 border-current" />
+        </span>
+      );
+
+    case "framed":
+      return (
+        <span className={`${frame} flex items-center justify-center`}>
+          <span className={`${fill} h-5 w-9`} />
+        </span>
+      );
+
+    default:
+      // still, bleed, panel and anything new: one full block.
+      return (
+        <span className={`${frame} flex`}>
+          <span className={`${fill} h-full w-full`} />
+        </span>
+      );
+  }
 }
 
 function PreviewSections({ sections }: { sections: IResolvedHomeSection[] }) {

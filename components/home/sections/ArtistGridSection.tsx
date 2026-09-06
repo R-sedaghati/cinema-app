@@ -40,6 +40,14 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
         <Empty message={copy("homeEmptyArtists")} />
       ) : variant === "castlist" ? (
         <CastList artists={artists} />
+      ) : variant === "tiles" ? (
+        <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 md:gap-y-6 lg:grid-cols-8">
+          {artists.map((artist) => (
+            <ArtistTile key={artist.id} artist={artist} />
+          ))}
+        </div>
+      ) : variant === "text" ? (
+        <TextList artists={artists} />
       ) : isRail ? (
         <div className="overflow-x-auto scrollbar-hidden">
           <div className="flex w-max gap-3 px-4 pb-1 md:gap-5">
@@ -109,7 +117,95 @@ function CastList({ artists }: { artists: IArtistItem[] }) {
   );
 }
 
+/** Chromeless tile: round portrait over a centered name, nothing else. */
+function ArtistTile({ artist }: { artist: IArtistItem }) {
+  const copy = useLandingCopy();
+  const name = [artist.user.firstName, artist.user.lastName]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <Link
+      href={`/artists/${artist.id}`}
+      className="group flex flex-col items-center gap-2 text-center"
+    >
+      <div className="aspect-square w-full overflow-hidden rounded-full bg-zinc-800 transition-opacity group-hover:opacity-80">
+        {artist.user.avatar ? (
+          <img
+            src={artist.user.avatar}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-xl font-bold text-zinc-600 md:text-2xl">
+              {artist.user.firstName?.[0] ?? copy("avatarFallback")}
+            </span>
+          </div>
+        )}
+      </div>
+      <span className="w-full truncate text-xs text-zinc-300 md:text-sm">
+        {name || artist.categories?.[0]?.faName}
+      </span>
+    </Link>
+  );
+}
+
+/** Text-only reading: names in plain columns, no portraits at all. */
+function TextList({ artists }: { artists: IArtistItem[] }) {
+  return (
+    <ul className="columns-2 gap-6 md:columns-3 lg:columns-4">
+      {artists.map((artist) => {
+        const name = [artist.user.firstName, artist.user.lastName]
+          .filter(Boolean)
+          .join(" ");
+        const craft = artist.categories?.[0]?.faName;
+
+        return (
+          <li key={artist.id} className="mb-1.5 break-inside-avoid">
+            <Link
+              href={`/artists/${artist.id}`}
+              className="flex items-baseline gap-2 text-sm text-zinc-200 hover:text-error-400 md:text-base"
+            >
+              <span className="truncate">{name || craft}</span>
+              {name && craft && (
+                <span className="shrink-0 text-xs text-zinc-600">{craft}</span>
+              )}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function Skeleton({ variant }: { variant: string }) {
+  if (variant === "text") {
+    return (
+      <div className="columns-2 gap-6 md:columns-3 lg:columns-4">
+        {SKELETON_KEYS.map((k) => (
+          <div
+            key={k}
+            className="mb-3 h-3 w-2/3 animate-pulse rounded-full bg-zinc-800"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (variant === "tiles") {
+    return (
+      <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+        {SKELETON_KEYS.map((k) => (
+          <div key={k} className="flex flex-col items-center gap-2">
+            <div className="aspect-square w-full animate-pulse rounded-full bg-zinc-800" />
+            <div className="h-2.5 w-3/4 animate-pulse rounded-full bg-zinc-800" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (variant === "castlist") {
     return (
       <div className="divide-y divide-zinc-800 border-y border-zinc-800">

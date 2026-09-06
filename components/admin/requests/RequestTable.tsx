@@ -46,7 +46,7 @@ function RequestTable() {
         className="w-full"
         header={{
           showTotal: true,
-          extraElement: <Header />,
+          extraElement: <Header queryKey="supportList" />,
         }}
         stickyTableHeader
         columns={generateColumns((artist) => {
