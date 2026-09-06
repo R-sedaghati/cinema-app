@@ -15,8 +15,8 @@ export const FORM_COPY = {
   },
   categoryStepTitle: { admin: "عنوان مرحله زمینه فعالیت", value: "زمینه فعالیت" },
   alreadyRegistered: {
-    admin: "برچسب دسته‌بندی ثبت‌شده",
-    value: "قبلاً ثبت‌نام کرده‌اید",
+    admin: "برچسب دسته‌بندی ثبت‌شده (قابل ویرایش)",
+    value: "فرم ثبت‌شده — برای ویرایش کلیک کنید",
   },
   duplicateErrorToast: {
     admin: "پیام خطای فرم تکراری",

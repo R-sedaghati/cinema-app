@@ -181,7 +181,13 @@ export enum EFormFieldType {
   VIDEO = "VIDEO",
 }
 
-export type SyncToUserField = "firstName" | "lastName" | "avatar" | "email";
+export type SyncToUserField =
+  | "firstName"
+  | "lastName"
+  | "avatar"
+  | "email"
+  /** Read-only: prefilled into the form from the account, never written back. */
+  | "phoneNumber";
 
 export interface IFormFieldOption {
   label: string;
@@ -605,6 +611,12 @@ export interface ISiteContent {
   form?: Record<string, string> | null;
   /** Field definition of the support contact form (see `lib/constants/contactForm.ts`). */
   contactForm?: ISiteContentContactForm | null;
+  /**
+   * Home-page section order and visibility, keyed by `lib/constants/homeSections.ts`.
+   * Empty/absent means "use the shipped catalog order" — see
+   * `lib/utils/resolveHomeSections.ts`.
+   */
+  homeSections?: { key: string; hidden: boolean; variant?: string }[] | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;

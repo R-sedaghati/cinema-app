@@ -82,6 +82,7 @@ const SYNC_OPTIONS: { label: string; value: SyncToUserField }[] = [
   { label: "نام خانوادگی", value: "lastName" },
   { label: "تصویر پروفایل", value: "avatar" },
   { label: "ایمیل", value: "email" },
+  { label: "شماره موبایل", value: "phoneNumber" },
 ];
 
 const HAS_OPTIONS = new Set([
@@ -93,6 +94,13 @@ const HAS_OPTIONS = new Set([
 const IMAGE_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
 
 const TEXT_TYPES = new Set([EFormFieldType.TEXT, EFormFieldType.TEXTAREA]);
+
+/** Types with no text to test — a preset would have nothing to run against. */
+const NO_PRESET_TYPES = new Set([
+  EFormFieldType.BOOLEAN,
+  EFormFieldType.IMAGE,
+  EFormFieldType.VIDEO,
+]);
 
 const PRESET_OPTIONS = [
   { label: "بدون اعتبارسنجی", value: "" },
@@ -234,17 +242,20 @@ function FieldRow({
         />
       )}
 
+      {!NO_PRESET_TYPES.has(field.type) && (
+        <Select
+          inputProps={{ labelContent: "اعتبارسنجی آماده" }}
+          value={validation.preset ?? ""}
+          options={PRESET_OPTIONS}
+          onChange={(v) =>
+            patchValidation({ preset: (v as FieldValidationPreset) || undefined })
+          }
+          mode="single"
+        />
+      )}
+
       {TEXT_TYPES.has(field.type) && (
-        <div className="grid md:grid-cols-4 gap-2">
-          <Select
-            inputProps={{ labelContent: "اعتبارسنجی آماده" }}
-            value={validation.preset ?? ""}
-            options={PRESET_OPTIONS}
-            onChange={(v) =>
-              patchValidation({ preset: (v as FieldValidationPreset) || undefined })
-            }
-            mode="single"
-          />
+        <div className="grid md:grid-cols-3 gap-2">
           <Input
             labelContent="حداقل طول"
             type="number"

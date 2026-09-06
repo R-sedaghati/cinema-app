@@ -75,3 +75,19 @@ export const FIELD_VALIDATION_PRESETS: Record<FieldValidationPreset, PresetDefin
 
 export const isValidPreset = (preset: FieldValidationPreset, value: string) =>
   FIELD_VALIDATION_PRESETS[preset].test(toEnglishDigits(value).trim());
+
+/** The strings a preset should be tested against, for whatever shape a field stores. */
+export const presetValues = (value: unknown): string[] => {
+  if (typeof value === "string") return [value];
+  if (typeof value === "number") return [String(value)];
+  if (Array.isArray(value)) return value.flatMap(presetValues);
+  return [];
+};
+
+/**
+ * A preset is a string test, so it applies to every field type whose answer reads as text —
+ * a NUMBER-typed national code and each picked value of a CHECKBOX included. A shape with
+ * no text in it (boolean, object) has nothing to fail.
+ */
+export const failsPreset = (preset: FieldValidationPreset, value: unknown) =>
+  presetValues(value).some((v) => !isValidPreset(preset, v));

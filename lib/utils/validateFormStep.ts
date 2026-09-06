@@ -1,5 +1,5 @@
 import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
-import { FIELD_VALIDATION_PRESETS, isValidPreset } from "./fieldValidationPresets";
+import { FIELD_VALIDATION_PRESETS, failsPreset } from "./fieldValidationPresets";
 import { CopyFn, defaultCopy } from "./formCopy";
 
 export function getStepErrors(
@@ -27,15 +27,18 @@ export function getStepErrors(
 
     const { preset, min, max, minLength, maxLength, pattern } = field.validation;
 
+    // A preset is a string test, so it applies to any field whose answer reads as text —
+    // a NUMBER-typed national code and every picked value of a CHECKBOX included.
+    if (preset && FIELD_VALIDATION_PRESETS[preset] && failsPreset(preset, value)) {
+      errors.push(`${field.label}: ${FIELD_VALIDATION_PRESETS[preset].message}`);
+    }
+
     if (typeof value === "number") {
       if (min !== undefined && value < min) errors.push(copy("minMessage", { label: field.label, min }));
       if (max !== undefined && value > max) errors.push(copy("maxMessage", { label: field.label, max }));
     }
 
     if (typeof value === "string") {
-      if (preset && FIELD_VALIDATION_PRESETS[preset] && !isValidPreset(preset, value)) {
-        errors.push(`${field.label}: ${FIELD_VALIDATION_PRESETS[preset].message}`);
-      }
       if (minLength !== undefined && value.length < minLength) errors.push(copy("minLengthMessage", { label: field.label, n: minLength }));
       if (maxLength !== undefined && value.length > maxLength) errors.push(copy("maxLengthMessage", { label: field.label, n: maxLength }));
       if (pattern) {
