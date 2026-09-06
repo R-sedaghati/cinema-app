@@ -34,12 +34,14 @@ export default function FormsList() {
   const isValidParams = hasValidParams(finalParams);
   const copy = useLandingCopy();
 
-  const handleView = (item: IArtistItem) => {
-    if (item.status === EArtistRequestStatus.NEED_TO_REVISION) {
-      router.push(`/artist-registration/${item.id}`);
-    } else {
-      router.push(`/artists/${item.id}`);
-    }
+  // Every request stays editable, whatever its status — the form is the user's own data.
+  const handleEdit = (item: IArtistItem) => {
+    router.push(`/artist-registration/${item.id}`);
+  };
+
+  // An approved request also has a public showcase page worth linking to.
+  const handleOpenPublic = (item: IArtistItem) => {
+    router.push(`/artists/${item.id}`);
   };
 
   const items = data?.result ?? [];
@@ -96,17 +98,26 @@ export default function FormsList() {
                 )}
               </div>
 
-              <div className="flex justify-start">
+              <div className="flex justify-start gap-4">
                 <Button
                   variant="text"
                   leftIcon={<ChevronLeft size={16} />}
-                  onClick={() => handleView(item)}
+                  onClick={() => handleEdit(item)}
                   className="p-0! text-sm"
                 >
-                  {item.status === EArtistRequestStatus.NEED_TO_REVISION
-                    ? copy("profileFormEdit")
-                    : copy("profileFormView")}
+                  {copy("profileFormEdit")}
                 </Button>
+
+                {item.status === EArtistRequestStatus.APPROVED && (
+                  <Button
+                    variant="text"
+                    leftIcon={<ChevronLeft size={16} />}
+                    onClick={() => handleOpenPublic(item)}
+                    className="p-0! text-sm"
+                  >
+                    {copy("profileFormView")}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -118,7 +129,7 @@ export default function FormsList() {
           rowKey="id"
           className="w-full"
           stickyTableHeader
-          columns={generateColumns(handleView, copy)}
+          columns={generateColumns(handleEdit, handleOpenPublic, copy)}
           data={items}
           {...(isValidParams && isPending && { loading: { size: 45 } })}
           {...(data?.count && {

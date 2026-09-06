@@ -8,7 +8,8 @@ import type { CopyResolver } from "@/lib/utils/copy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
 export const generateColumns = (
-  onView: (item: IArtistItem) => void,
+  onEdit: (item: IArtistItem) => void,
+  onOpenPublic: (item: IArtistItem) => void,
   copy: CopyResolver<LandingCopyKey>,
 ): ColumnsType<IArtistItem>[] => [
   {
@@ -51,15 +52,25 @@ export const generateColumns = (
     title: copy("profileColActions"),
     className: "align-middle",
     render: (data) => (
-      <Button
-        variant="text"
-        leftIcon={<ChevronLeft />}
-        onClick={() => onView(data)}
-      >
-        {data.status === EArtistRequestStatus.NEED_TO_REVISION
-          ? copy("profileFormEdit")
-          : copy("profileFormView")}
-      </Button>
+      <div className="flex justify-center gap-2">
+        <Button
+          variant="text"
+          leftIcon={<ChevronLeft />}
+          onClick={() => onEdit(data)}
+        >
+          {copy("profileFormEdit")}
+        </Button>
+
+        {data.status === EArtistRequestStatus.APPROVED && (
+          <Button
+            variant="text"
+            leftIcon={<ChevronLeft />}
+            onClick={() => onOpenPublic(data)}
+          >
+            {copy("profileFormView")}
+          </Button>
+        )}
+      </div>
     ),
   },
 ];
