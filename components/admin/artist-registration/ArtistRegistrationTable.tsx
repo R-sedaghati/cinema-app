@@ -70,7 +70,7 @@ function ArtistRegistrationTable() {
         className="w-full"
         header={{
           showTotal: true,
-          extraElement: <Header />,
+          extraElement: <Header queryKey="artistList" />,
         }}
         stickyTableHeader
         columns={columns}

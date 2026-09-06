@@ -2,7 +2,12 @@ import { Button } from "@dgshahr/ui-kit";
 import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 
-const Header = () => {
+interface Props {
+  /** Query key prefix of the list this header refreshes — matches every params variant. */
+  queryKey: string;
+}
+
+const Header = ({ queryKey }: Props) => {
   const queryClient = useQueryClient();
   return (
     <Button
@@ -10,7 +15,7 @@ const Header = () => {
       size="large"
       onClick={() => {
         queryClient.resetQueries({
-          queryKey: ["chequeList"],
+          queryKey: [queryKey],
         });
       }}
       className="py-0! m-0 px-2! text-2xl"

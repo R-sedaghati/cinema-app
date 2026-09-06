@@ -57,6 +57,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   }, [data, category]);
 
   const copy = useFormCopy();
+  const store = useArtistRegistrationStore();
 
   const children = selectedCategory?.children || [];
   const hasChildren = children.length > 0;
@@ -113,6 +114,17 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
   const contentIndex = flowStep - 1;
 
+  // Without child categories there is no category sub-step: flowStep 0 auto-advances,
+  // so stepping back into it just bounces forward again and the button looks dead.
+  // Jump straight to the category grid instead (edit mode has no grid to return to).
+  const handlePrevious = () => {
+    if (!hasChildren && flowStep === 1) {
+      if (!store.editId) store.reset();
+      return;
+    }
+    onPrevious();
+  };
+
   const renderStep = () => {
     if (flowStep === 0) {
       return hasChildren ? (
@@ -120,7 +132,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
           childrenList={children}
           copy={copy}
           onNext={onNext}
-          onPrevious={onPrevious}
+          onPrevious={handlePrevious}
         />
       ) : null;
     }
@@ -134,7 +146,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
           lockedKey={profilePhone ? phoneKey : undefined}
           copy={copy}
           onNext={onNext}
-          onPrevious={onPrevious}
+          onPrevious={handlePrevious}
         />
       );
     }
@@ -146,7 +158,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
           copy={copy}
           registrationAmount={schemaData?.result?.registrationAmount}
           onNext={onNext}
-          onPrevious={onPrevious}
+          onPrevious={handlePrevious}
         />
       );
     }

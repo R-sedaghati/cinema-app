@@ -54,4 +54,5 @@ export const SMS_VARIABLE_SAMPLE: Record<string, string> = {
   reason: "تصویر پروفایل کیفیت کافی ندارد",
   amount: "۵۰۰٬۰۰۰ تومان",
   trackingCode: "۱۲۳۴۵۶",
+  nextStep: "درخواست شما در حال بررسی است.",
 };

@@ -75,6 +75,46 @@ export function RegistrationRowSection({
     );
   }
 
+  // Pills: the whole catalog at a glance, no imagery, wraps on any width.
+  if (variant === "chips") {
+    return (
+      <section>
+        {header(false)}
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => onPick(cat.id, cat.faName)}
+              className="rounded-full border border-zinc-800 px-3 py-1.5 text-sm text-zinc-200 transition-colors hover:border-error-500/40 hover:text-error-400 active:scale-[.98] md:px-4 md:py-2"
+            >
+              {cat.faName}
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // Text-only columns: cheapest possible rendering of the same shortcuts.
+  if (variant === "columns") {
+    return (
+      <section>
+        {header(false)}
+        <div className="columns-2 gap-6 md:columns-3 lg:columns-4">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => onPick(cat.id, cat.faName)}
+              className="mb-1.5 block w-full break-inside-avoid truncate text-right text-sm text-zinc-200 transition-colors hover:text-error-400 md:text-base"
+            >
+              {cat.faName}
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   if (variant === "grid") {
     return (
       <section>
