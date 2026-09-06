@@ -15,12 +15,14 @@ import { CopyFn } from "@/lib/utils/formCopy";
 interface Props {
   step: IFormStep;
   provinceKey?: string;
+  /** Key of the account-owned phone field, rendered read-only. */
+  lockedKey?: string;
   copy: CopyFn;
   onNext: () => void;
   onPrevious: () => void;
 }
 
-const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, copy, onNext, onPrevious }) => {
+const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, lockedKey, copy, onNext, onPrevious }) => {
   const store = useArtistRegistrationStore();
 
   const handleNext = () => {
@@ -49,6 +51,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, copy, onNext, onP
             field={field}
             value={store.answers[field.key]}
             provinceKey={provinceKey}
+            disabled={field.key === lockedKey}
             onChange={(value) => store.setAnswer(field.key, value)}
           />
         ))}

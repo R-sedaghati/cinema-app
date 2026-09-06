@@ -5,6 +5,7 @@ import {
   ChartColumnIncreasing,
   CircleDollarSign,
   Handshake,
+  LayoutTemplate,
   TableOfContents,
   ClipboardList,
   GalleryHorizontal,
@@ -76,6 +77,12 @@ export const useSidebarItems = (): {
         title: "لیست تراکنش‌ها",
         link: "/admin/transactions",
         active: pathname.startsWith("/admin/transactions"),
+      },
+      {
+        icon: <LayoutTemplate />,
+        title: "صفحه‌ساز صفحه اصلی",
+        link: "/admin/page-builder",
+        active: pathname.startsWith("/admin/page-builder"),
       },
       {
         icon: <TableOfContents />,

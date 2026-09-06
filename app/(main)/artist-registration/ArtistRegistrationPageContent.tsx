@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@dgshahr/ui-kit";
 import { MoveLeft, MoveRight, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -53,15 +54,16 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     count: 30,
   });
 
-  // Each account fills a given form once, so a category already registered in is shown
-  // but not selectable. The backend enforces the same rule on submit.
+  // Each account fills a given form once, so a category already registered in opens the
+  // existing request for editing instead of starting a second one. The backend enforces
+  // the same one-per-category rule on create.
   const { data: ownRequests } = useUserAtristRequests({ page: 1, count: 100 });
 
-  const registeredCategoryIds = useMemo(
+  const requestIdByCategory = useMemo(
     () =>
-      new Set(
+      new Map(
         (ownRequests?.result ?? []).flatMap((request) =>
-          request.categories.map((c) => c.id),
+          request.categories.map((c) => [c.id, request.id] as const),
         ),
       ),
     [ownRequests],
@@ -73,11 +75,13 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
         id: c.id,
         title: c.faName,
         // A request filed under a child category occupies its parent's form too.
-        isRegistered:
-          registeredCategoryIds.has(c.id) ||
-          (c.children ?? []).some((child) => registeredCategoryIds.has(child.id)),
+        existingRequestId:
+          requestIdByCategory.get(c.id) ??
+          (c.children ?? [])
+            .map((child) => requestIdByCategory.get(child.id))
+            .find((id) => id !== undefined),
       })),
-    [categoryData, registeredCategoryIds],
+    [categoryData, requestIdByCategory],
   );
 
   const rows = isMobile
@@ -138,7 +142,20 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     }
   }, [editData, editId]);
 
-  const handleSelectCategory = (id: number, title: string) => {
+  const router = useRouter();
+
+  const handleSelectCategory = (
+    id: number,
+    title: string,
+    existingRequestId?: number,
+  ) => {
+    // Already filed here: send the user into the edit flow for that request rather
+    // than a create that the server would 409.
+    if (existingRequestId) {
+      router.push(`/artist-registration/${existingRequestId}`);
+      return;
+    }
+
     reset();
     setField("categoryId", [id]);
     setSelectedCategory(id, title);
@@ -216,27 +233,27 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
                   {row.map((item) => (
                     <button
                       key={item.id}
-                      onClick={() => handleSelectCategory(item.id, item.title)}
-                      disabled={item.isRegistered}
-                      className={clsx(
-                        "md:w-60 overflow-hidden w-32.5 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent",
-                        item.isRegistered
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:border-red-900 cursor-pointer",
-                      )}
+                      onClick={() =>
+                        handleSelectCategory(
+                          item.id,
+                          item.title,
+                          item.existingRequestId,
+                        )
+                      }
+                      className="md:w-60 overflow-hidden w-32.5 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
                     >
                       <div className="flex flex-col items-start gap-1 z-10">
                         <p className="text-nowrap text-sm md:text-base">
                           {item.title}
                         </p>
-                        {item.isRegistered && (
+                        {item.existingRequestId && (
                           <span className="text-[10px] md:text-xs text-zinc-400">
                             {copy("alreadyRegistered")}
                           </span>
                         )}
                       </div>
 
-                      {!item.isRegistered && <MoveLeft className="text-error-500 z-10" />}
+                      <MoveLeft className="text-error-500 z-10" />
                     </button>
                   ))}
                 </div>

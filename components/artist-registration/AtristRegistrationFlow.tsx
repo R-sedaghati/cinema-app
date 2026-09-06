@@ -1,4 +1,8 @@
-import { useUserCategoryFormSchema, useUserCategoryList } from "@/lib/services/landing/hook";
+import {
+  useUserCategoryFormSchema,
+  useUserCategoryList,
+  useUserProfile,
+} from "@/lib/services/landing/hook";
 import { IUserCategoryResponse } from "@/lib/services/landing/type";
 import { EFormFieldType } from "@/lib/services/admin/type";
 import { Card, HorizontalStep, HorizontalStepper } from "@dgshahr/ui-kit";
@@ -18,6 +22,7 @@ import DynamicFormStep from "./DynamicFormStep";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
+import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 
 interface ArtistProps {
   category: SelectedCategory | null;
@@ -69,6 +74,26 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     [steps],
   );
 
+  const { data: profileData } = useUserProfile();
+
+  // The phone number belongs to the account, not the form: it is the OTP login identity.
+  // Prefill it from the profile and render it read-only. Running here (rather than in
+  // ArtistRegistrationPageContent) means it also re-syncs after edit-mode hydration.
+  const phoneKey = useMemo(
+    () =>
+      steps
+        .flatMap((step) => step.fields)
+        .find((field) => field.syncToUserField === "phoneNumber")?.key,
+    [steps],
+  );
+
+  const profilePhone = profileData?.phone_number;
+
+  useEffect(() => {
+    if (!phoneKey || !profilePhone) return;
+    useArtistRegistrationStore.getState().setAnswer(phoneKey, profilePhone);
+  }, [phoneKey, profilePhone]);
+
   useEffect(() => {
     if (data && !hasChildren && flowStep === 0) {
       onNext();
@@ -106,6 +131,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
         <DynamicFormStep
           step={step}
           provinceKey={provinceKey}
+          lockedKey={profilePhone ? phoneKey : undefined}
           copy={copy}
           onNext={onNext}
           onPrevious={onPrevious}
