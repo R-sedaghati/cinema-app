@@ -30,7 +30,7 @@ function TransactionTable() {
         className="w-full"
         header={{
           showTotal: true,
-          extraElement: <Header />,
+          extraElement: <Header queryKey="adminTransactionList" />,
         }}
         stickyTableHeader
         columns={generateColumns()}
