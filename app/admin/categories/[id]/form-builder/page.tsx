@@ -28,7 +28,8 @@ import {
 } from "@/lib/utils/fieldValidationPresets";
 import { useQueryClient } from "@tanstack/react-query";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import { Button, Card, Checkbox, Divider, Input, Select } from "@dgshahr/ui-kit";
+import { Button, Card, Checkbox, Divider, Select } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import {
   ChevronDown,
   ChevronRight,
@@ -77,11 +78,17 @@ const ICON_OPTIONS = Object.keys(ICON_COMPONENTS).map((i) => ({
   value: i,
 }));
 
-const SYNC_OPTIONS: { label: string; value: SyncToUserField }[] = [
+const NO_SYNC = "";
+
+// "" is the cleared state: patching `undefined` would be dropped from the request body,
+// leaving an existing link impossible to remove.
+const SYNC_OPTIONS: { label: string; value: SyncToUserField | typeof NO_SYNC }[] = [
+  { label: "بدون همگام‌سازی", value: NO_SYNC },
   { label: "نام", value: "firstName" },
   { label: "نام خانوادگی", value: "lastName" },
   { label: "تصویر پروفایل", value: "avatar" },
   { label: "ایمیل", value: "email" },
+  { label: "کد ملی", value: "nationalCode" },
   { label: "شماره موبایل", value: "phoneNumber" },
 ];
 
@@ -211,9 +218,11 @@ function FieldRow({
         />
         <Select
           inputProps={{ labelContent: "همگام‌سازی با پروفایل کاربر" }}
-          value={field.syncToUserField ?? null}
+          value={field.syncToUserField ?? NO_SYNC}
           options={SYNC_OPTIONS}
-          onChange={(v) => patch({ syncToUserField: (v as SyncToUserField) || undefined })}
+          onChange={(v) =>
+            patch({ syncToUserField: (v as SyncToUserField) || null })
+          }
           mode="single"
         />
       </div>
@@ -258,13 +267,15 @@ function FieldRow({
         <div className="grid md:grid-cols-3 gap-2">
           <Input
             labelContent="حداقل طول"
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={validation.minLength ?? ""}
             onChange={(e) => patchValidation({ minLength: toNumberOrUndefined(e.target.value) })}
           />
           <Input
             labelContent="حداکثر طول"
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={validation.maxLength ?? ""}
             onChange={(e) => patchValidation({ maxLength: toNumberOrUndefined(e.target.value) })}
           />
@@ -280,13 +291,15 @@ function FieldRow({
         <div className="grid md:grid-cols-2 gap-2">
           <Input
             labelContent="حداقل مقدار"
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={validation.min ?? ""}
             onChange={(e) => patchValidation({ min: toNumberOrUndefined(e.target.value) })}
           />
           <Input
             labelContent="حداکثر مقدار"
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={validation.max ?? ""}
             onChange={(e) => patchValidation({ max: toNumberOrUndefined(e.target.value) })}
           />

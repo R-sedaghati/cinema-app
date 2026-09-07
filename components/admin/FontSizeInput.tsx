@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 
 interface Props {
   label?: string;
@@ -24,9 +24,8 @@ function FontSizeInput({
     <Input
       labelContent={label}
       placeholder="پیش‌فرض"
-      type="number"
-      min={8}
-      max={120}
+      type="text"
+      inputMode="numeric"
       wrapperClassName={wrapperClassName}
       isError={isError}
       errorMessage={errorMessage}
@@ -34,7 +33,11 @@ function FontSizeInput({
       value={value ?? ""}
       onChange={(e) => {
         const raw = e.target.value;
-        onChange(raw === "" ? null : Number(raw));
+        if (raw === "") return onChange(null);
+        const size = Number(raw);
+        // ponytail: min/max moved off the element — type="number" rejects Persian digits
+        if (!Number.isFinite(size)) return;
+        onChange(Math.min(120, Math.max(8, size)));
       }}
     />
   );

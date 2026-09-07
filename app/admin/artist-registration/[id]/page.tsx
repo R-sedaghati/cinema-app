@@ -10,14 +10,8 @@ import {
 } from "@/lib/services/admin/hook";
 import { EArtistRequestStatus, EFormFieldType, IFormField } from "@/lib/services/admin/type";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import {
-  Badge,
-  Button,
-  Card,
-  Divider,
-  FileUploader,
-  Input,
-} from "@dgshahr/ui-kit";
+import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";

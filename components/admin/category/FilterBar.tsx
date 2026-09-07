@@ -1,10 +1,10 @@
-import { Button, Input, Select } from "@dgshahr/ui-kit";
+import { Button, Select } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Chip from "@/components/common/CustomChip";
 import { ParamsCategoryList } from "@/lib/services/admin/type";
 import { chevronCn } from "@/lib/utils/chevronCn";
 import ObjectUtils from "@/lib/utils/objectUtils";
-import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
 import { ChevronDown } from "lucide-react";
 
 interface Props {
@@ -22,10 +22,9 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
   ]);
 
   const setSearchParam = () => {
-    if (search.length < 1) return;
     setParams({
       ...params,
-      search: search,
+      search: search.trim() || null,
       page: 1,
     });
   };
@@ -58,7 +57,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
           disabled={loading && !params.search}
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearch(convertFaNumericStringToEnNumericString(e.target.value))
+            setSearch(e.target.value)
           }
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -73,7 +72,6 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
           title="جستجو"
           color="error"
           isLoading={loading}
-          disabled={search.length < 1}
         >
           جستجو
         </Button>

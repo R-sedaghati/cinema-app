@@ -1,11 +1,10 @@
 "use client";
-import Input from "@dgshahr/ui-kit/Form/Input";
+import Input from "@/components/common/Input";
 import { ChangeEvent, FC, KeyboardEvent, useState } from "react";
 import { StepBaseProps } from "./type";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import { formatPhoneNumber } from "@/lib/utils/formatPhoneNumber";
 import { is_phone_number } from "@/lib/validation/regexValidations";
-import convertFaNumberToEnNumber from "@/lib/utils/convertFaNumberToEnNumber";
 import Button from "@/components/common/Button";
 import TermsNotice from "@/components/login/TermsNotice";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
@@ -93,16 +92,10 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         placeholder={copy("loginPhonePlaceholder")}
         className="w-full text-left"
         wrapperClassName="w-full"
-        pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
         inputMode="tel"
         autoComplete="tel"
         maxLength={13}
         showMaxLength={false}
-        onInput={(e) => {
-          e.currentTarget.value = convertFaNumberToEnNumber(
-            e.currentTarget.value,
-          ).replaceAll(/\D/g, "");
-        }}
         type="tel"
         autoFocus
         onKeyDown={handleKeyDown}

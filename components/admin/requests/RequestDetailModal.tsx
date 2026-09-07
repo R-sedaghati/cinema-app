@@ -2,7 +2,8 @@ import { useAdminSupportRetrieve, useAdminSupportUpdate } from "@/lib/services/a
 import { ESupportStatus } from "@/lib/services/admin/type";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
-import { Badge, Button, Drawer, Input } from "@dgshahr/ui-kit";
+import { Badge, Button, Drawer } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";

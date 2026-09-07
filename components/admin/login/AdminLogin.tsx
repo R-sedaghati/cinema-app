@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Card, Input, Button } from "@dgshahr/ui-kit";
+import { Card, Button } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { useAdminLogin } from "@/lib/services/admin/hook";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";

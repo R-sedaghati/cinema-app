@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Card, Divider, Input } from "@dgshahr/ui-kit";
+import { Button, Card, Divider } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";

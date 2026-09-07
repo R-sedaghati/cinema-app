@@ -25,3 +25,23 @@ test("a shape with no text in it has nothing to fail", () => {
   assert.equal(failsPreset("MOBILE", true), false);
   assert.equal(failsPreset("MOBILE", []), false);
 });
+
+test("Persian and Arabic-Indic digits pass every digit preset", () => {
+  assert.equal(failsPreset("NATIONAL_CODE", "۱۲۳۴۵۶۷۸۹۱"), false);
+  assert.equal(failsPreset("POSTAL_CODE", "۱۲۳۴۵۶۷۸۹۰"), false);
+  assert.equal(failsPreset("IBAN", "IR۰۶۰۱۲۰۰۰۰۰۰۰۰۰۰۰۸۵۶۹۰۱۲۳"), false);
+  assert.equal(failsPreset("LANDLINE", "۰۲۱۱۲۳۴۵۶۷۸"), false);
+  assert.equal(failsPreset("MOBILE", "٠٩١٢١٢٣٤٥٦٧"), false);
+});
+
+test("a Persian-digit value that is genuinely invalid still fails", () => {
+  assert.equal(failsPreset("MOBILE", "۰۸۱۲۱۲۳۴۵۶۷"), true);
+  assert.equal(failsPreset("NATIONAL_CODE", "۱۲۳۴۵۶۷۸۹۰"), true);
+});
+
+test("a national code keeps its leading zeros", () => {
+  assert.equal(failsPreset("NATIONAL_CODE", "0012345679"), false);
+  assert.equal(failsPreset("NATIONAL_CODE", "۰۰۱۲۳۴۵۶۷۹"), false);
+  // the old NUMBER coercion produced this — 10-digit test must reject it
+  assert.equal(failsPreset("NATIONAL_CODE", 12345679), true);
+});

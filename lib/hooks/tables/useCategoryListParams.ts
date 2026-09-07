@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { hasValidParams } from "@/lib/utils/hasValidParams";
 import { ParamsCategoryList } from "@/lib/services/admin/type";
 
@@ -15,12 +15,20 @@ const initialParams: Partial<ParamsCategoryList> = {
 };
 
 export default function useCategoryListParams() {
-  const [params, setParams] =
+  const [params, setParamsState] =
     useState<Partial<ParamsCategoryList>>(initialParams);
   const [pagination, setPagination] = useState<Pagination>({
     count: 10,
     page: 1,
   });
+
+  // any filter change goes back to the first page
+  const setParams: Dispatch<SetStateAction<Partial<ParamsCategoryList>>> = (
+    value,
+  ) => {
+    setParamsState(value);
+    setPagination((state) => ({ ...state, page: 1 }));
+  };
 
   const finalParams = {
     ...params,

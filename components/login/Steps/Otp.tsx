@@ -1,8 +1,7 @@
 "use client";
 import { FC, useCallback, useEffect, useState } from "react";
 import { StepBaseProps } from "./type";
-import OtpInput from "@dgshahr/ui-kit/Form/OtpInput";
-import convertFaNumberToEnNumber from "@/lib/utils/convertFaNumberToEnNumber";
+import OtpInput from "@/components/common/OtpInput";
 import useTimer from "@/lib/hooks/useTimer";
 import useWebOtp from "@/lib/hooks/useWebOtp";
 import { Pencil } from "lucide-react";
@@ -129,16 +128,11 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       <OtpInput
         value={code}
         inputMode="numeric"
-        type="tell"
+        type="text"
         className="my-6 tablet:my-8"
         inputsContainerClassName="flex justify-center gap-10"
         inputsNumber={4}
         onChange={handleCodeChange}
-        onInput={(e) => {
-          e.currentTarget.value = convertFaNumberToEnNumber(
-            e.currentTarget.value,
-          ).replace(/\D/g, "");
-        }}
         onEnd={handleSubmit}
         errorMessage={errorMessage}
       />

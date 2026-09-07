@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Card, Divider, Input, Switch } from "@dgshahr/ui-kit";
+import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";

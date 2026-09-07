@@ -1,8 +1,8 @@
-import { Button, Input } from "@dgshahr/ui-kit";
+import { Button } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { ParamsTransactionList } from "@/lib/services/admin/type";
 import ObjectUtils from "@/lib/utils/objectUtils";
-import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
 
 interface Props {
   setParams: Dispatch<SetStateAction<Partial<ParamsTransactionList>>>;
@@ -37,7 +37,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
           disabled={loading && !params.search}
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearch(convertFaNumericStringToEnNumericString(e.target.value))
+            setSearch(e.target.value)
           }
           onKeyDown={(e) => {
             if (e.key === "Enter") {

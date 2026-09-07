@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   IAboutUsResponse,
   IArtistRetriveResponse,
@@ -133,10 +138,11 @@ export const useUserProvinceList = (
 export const useUserProfile = () => {
   const { accessToken } = useAuthStore();
 
+  // No polling: nothing outside this app edits the profile, and a background refetch
+  // landing mid-edit would reset the form the user is typing into.
   return useQuery<IUserProfile>({
     queryKey: ["userProfile"],
     queryFn: () => userProfile(accessToken),
-    refetchInterval: 30 * 1000,
     enabled: Boolean(accessToken),
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
@@ -169,10 +175,15 @@ export const useUserAtristRequests = (params: IPagination) => {
   });
 };
 
-export const useUpdateUserProfile = () =>
-  useMutation<IUserProfile, AxiosError, Partial<UserUpdateProfile>>({
+export const useUpdateUserProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<IUserProfile, AxiosError, Partial<UserUpdateProfile>>({
     mutationFn: userUpdatePofile,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
   });
+};
 
 export const useCreateUserSupport = () =>
   useMutation<ISupportItem, AxiosError, UserCreateSupport>({
@@ -274,14 +285,20 @@ export const useUserCategoryFormSchema = (categoryId?: number | null) =>
     refetchOnWindowFocus: false,
   });
 
-export const useUserCreateArtistRequest = () =>
-  useMutation<
+export const useUserCreateArtistRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
     { result: ArtistRequestResult },
     AxiosError,
     UserCreateArtistRequest
   >({
     mutationFn: userCreateArtistRequest,
+    // The API copies answers of `syncToUserField` fields into the account on submit.
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
   });
+};
 
 export const useUserArtistDetail = (id?: number) =>
   useQuery<IArtistRetriveResponse>({
@@ -294,12 +311,17 @@ export const useUserArtistDetail = (id?: number) =>
 
 export const useUpdateUserArtistRequest = () => {
   const { accessToken } = useAuthStore();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       id,
       ...payload
     }: { id: number } & Partial<UserCreateArtistRequest>) =>
       updateUserArtistRequest(id, payload, accessToken),
+    // The API copies answers of `syncToUserField` fields into the account on submit.
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
   });
 };
 

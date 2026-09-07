@@ -186,6 +186,7 @@ export type SyncToUserField =
   | "lastName"
   | "avatar"
   | "email"
+  | "nationalCode"
   /** Read-only: prefilled into the form from the account, never written back. */
   | "phoneNumber";
 
@@ -270,7 +271,8 @@ export interface ICreateFormFieldRequest {
   order?: number;
   options?: IFormFieldOption[];
   validation?: IFormFieldValidation;
-  syncToUserField?: SyncToUserField;
+  /** `null` clears an existing link; `undefined` leaves it untouched. */
+  syncToUserField?: SyncToUserField | null;
   multiple?: boolean;
 }
 

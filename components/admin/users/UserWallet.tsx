@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Card, Divider, Input } from "@dgshahr/ui-kit";
+import { Button, Card, Divider } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
@@ -77,7 +78,8 @@ const UserWallet = ({ userId }: { userId: number }) => {
               labelContent="مبلغ"
               placeholder="مثلاً 50000 یا 50000-"
               postfix="تومان"
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               hintMessage="عدد مثبت به موجودی اضافه و عدد منفی از آن کم می‌کند."

@@ -1,6 +1,6 @@
 "use client";
 
-import { Textarea } from "@dgshahr/ui-kit";
+import Textarea from "@/components/common/Textarea";
 import { FieldProps } from "./types";
 
 const TextareaField: React.FC<FieldProps> = ({ field, value, onChange }) => (

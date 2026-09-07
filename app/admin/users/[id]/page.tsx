@@ -5,14 +5,8 @@ import UserWallet from "@/components/admin/users/UserWallet";
 import { useAdminUserRequest } from "@/lib/services/admin/hook";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import {
-  Badge,
-  Button,
-  Card,
-  Divider,
-  FileUploader,
-  Input,
-} from "@dgshahr/ui-kit";
+import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 

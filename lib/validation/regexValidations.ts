@@ -1,3 +1,5 @@
+import { toEnglishDigits } from "../utils/toEnglishDigits.ts";
+
 // regex patterns
 const pattern_phone_number = /^09[01239]\d{8}$/;
 const pattern_only_digit = /^\d*$/;
@@ -8,9 +10,12 @@ const pattern_videos_type =
   /\.(mp4|avi|wmv|mov|flv|mkv|webm|vob|ogv|m4v|3gp|3g2|mpeg|mpg|m2v|m4v)$/;
 
 // validations
-export const is_phone_number = (value: string) =>
-  pattern_phone_number.test(value) && value.length < 12;
-export const is_number = (value: string) => pattern_only_digit.test(value);
+export const is_phone_number = (value: string) => {
+  const digits = toEnglishDigits(value);
+  return pattern_phone_number.test(digits) && digits.length < 12;
+};
+export const is_number = (value: string) =>
+  pattern_only_digit.test(toEnglishDigits(value));
 export const is_persian = (value: string) => pattern_persian_word.test(value);
 export const has_web_protocol = (value: string) =>
   pattern_web_protocol.test(value);

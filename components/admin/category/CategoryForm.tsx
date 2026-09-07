@@ -5,11 +5,13 @@ import {
   useAdminCategoryList,
   useAdminUploadBannerImage,
 } from "@/lib/services/admin/hook";
-import { Button, Card, Divider, Input, Select, Switch } from "@dgshahr/ui-kit";
+import { Button, Card, Divider, Select, Switch } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { toPriority } from "@/lib/utils/toEnglishDigits";
 
 function CategoryForm() {
   const router = useRouter();
@@ -145,10 +147,11 @@ function CategoryForm() {
                   placeholder="اولویت"
                   wrapperClassName="w-full"
                   value={priority ?? ""}
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   onChange={(e) =>
                     setPriority(
-                      e.target.value === "" ? null : Number(e.target.value),
+                      e.target.value === "" ? null : toPriority(e.target.value),
                     )
                   }
                 />

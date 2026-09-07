@@ -47,6 +47,19 @@ export const generateColumns = (
     },
     {
       align: "center",
+      key: "type",
+      dataIndex: "type",
+      title: "نوع",
+      className: "align-middle",
+      render: (data) =>
+        data.parent ? (
+          <Badge value="زیردسته" type="twoTone" color="gray" />
+        ) : (
+          <Badge value="دسته اصلی" type="twoTone" color="primary" />
+        ),
+    },
+    {
+      align: "center",
       key: "description",
       dataIndex: "description",
       title: "توضیحات",

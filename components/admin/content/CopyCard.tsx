@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Card, Divider, Input, Textarea } from "@dgshahr/ui-kit";
+import { Button, Card, Divider } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
+import Textarea from "@/components/common/Textarea";
 import { useEffect, useState } from "react";
 
 type CopyRegistry = Record<string, { admin: string; value: string; group?: string }>;

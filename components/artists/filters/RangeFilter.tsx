@@ -5,6 +5,7 @@ import useDebounce from "@/lib/hooks/useDebounce";
 import type { RangeValue } from "@/lib/hooks/useArtistSearchParams";
 import type { IArtistFilterDescriptor } from "@/lib/services/landing/type";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { toEnglishDigits } from "@/lib/utils/toEnglishDigits";
 
 export function RangeFilter({
   descriptor,
@@ -48,26 +49,26 @@ export function RangeFilter({
     <div className="flex items-center gap-2 rounded-full border border-zinc-800 px-3 py-1">
       <span className="text-sm text-zinc-400 text-nowrap">{descriptor.label}</span>
       <input
-        type="number"
+        type="text"
         inputMode="numeric"
         aria-label={copy("ariaRangeFrom", { label: descriptor.label })}
-        min={descriptor.min}
-        max={descriptor.max}
         placeholder={String(descriptor.min)}
         value={draft.min ?? ""}
-        onChange={(e) => setDraft((prev) => ({ ...prev, min: e.target.value }))}
+        onChange={(e) =>
+          setDraft((prev) => ({ ...prev, min: toEnglishDigits(e.target.value) }))
+        }
         className="w-14 bg-transparent text-sm text-zinc-100 outline-none"
       />
       <span className="text-zinc-600">{copy("artistsRangeTo")}</span>
       <input
-        type="number"
+        type="text"
         inputMode="numeric"
         aria-label={copy("ariaRangeTo", { label: descriptor.label })}
-        min={descriptor.min}
-        max={descriptor.max}
         placeholder={String(descriptor.max)}
         value={draft.max ?? ""}
-        onChange={(e) => setDraft((prev) => ({ ...prev, max: e.target.value }))}
+        onChange={(e) =>
+          setDraft((prev) => ({ ...prev, max: toEnglishDigits(e.target.value) }))
+        }
         className="w-14 bg-transparent text-sm text-zinc-100 outline-none"
       />
     </div>

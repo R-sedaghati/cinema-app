@@ -14,7 +14,8 @@ import type {
 } from "@/lib/services/admin/type";
 import { FIELD_VALIDATION_PRESETS } from "@/lib/utils/fieldValidationPresets";
 import type { FieldValidationPreset } from "@/lib/utils/fieldValidationPresets";
-import { Button, Card, Checkbox, Divider, Input, Select } from "@dgshahr/ui-kit";
+import { Button, Card, Checkbox, Divider, Select } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";

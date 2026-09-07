@@ -2,7 +2,7 @@
 
 import Button from "@/components/common/Button";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
-import { Input } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import {
   useUserContactPrice,
   useUserCreateContactRequest,

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Datepicker, Drawer, Select, Textarea } from "@dgshahr/ui-kit";
+import { Button, Datepicker, Drawer, Select } from "@dgshahr/ui-kit";
+import Textarea from "@/components/common/Textarea";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import {
