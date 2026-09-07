@@ -17,18 +17,26 @@ function CategoryTable() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    params,
-    setParams,
-    resetParams,
-    finalParams,
-    pagination,
-    setPagination,
-    isValidParams,
-  } = useCategoryListParams();
+  const { params, setParams, resetParams, pagination, setPagination } =
+    useCategoryListParams();
 
-  const { data, isPending } = useAdminCategoryList(
-    isValidParams ? finalParams : undefined,
+  // ponytail: server-side search on /admin/categories is unreliable, so fetch the
+  // whole list (backend caps count at 100) and search/filter/paginate client-side.
+  // Move back to server params if categories ever exceed 100.
+  const { data, isPending } = useAdminCategoryList({ page: 1, count: 100 });
+
+  const query = (params.search ?? "").trim().toLowerCase();
+  const filtered = (data?.result ?? []).filter((item) => {
+    if (params.isActive != null && item.isActive !== params.isActive)
+      return false;
+    if (!query) return true;
+    return [item.faName, item.enName, item.description].some((field) =>
+      field?.toLowerCase().includes(query),
+    );
+  });
+  const pageRows = filtered.slice(
+    (pagination.page - 1) * pagination.count,
+    pagination.page * pagination.count,
   );
   const { mutate: deleteCategory } = useAdminCategoryDelete();
 
@@ -57,11 +65,12 @@ function CategoryTable() {
       <FilterBar
         setParams={setParams}
         params={params}
-        loading={isValidParams && isPending}
+        loading={isPending}
         resetParams={resetParams}
       />
 
       <Table
+        key={`${query}-${String(params.isActive)}`}
         rowKey="id"
         className="w-full"
         header={{
@@ -70,25 +79,18 @@ function CategoryTable() {
         }}
         stickyTableHeader
         columns={columns}
-        data={data?.result ?? []}
-        {...(isValidParams && isPending && { loading: { size: 45 } })}
-        {...(data?.count && {
+        data={pageRows}
+        {...(isPending && { loading: { size: 45 } })}
+        {...(filtered.length > 0 && {
           pagination: {
             pageSize: pagination.count,
             defaultCurrent: pagination.page,
-            totalCount: data?.count ?? 0,
+            totalCount: filtered.length,
             onPageChange: (p) =>
               setPagination((state) => ({ ...state, page: p })),
           },
         })}
-        emptyContent={
-          <TableEmptyState
-            showImage={!isValidParams}
-            message={
-              tableEmptyMessage[isValidParams ? "notFound" : "emptyParam"]
-            }
-          />
-        }
+        emptyContent={<TableEmptyState message={tableEmptyMessage.notFound} />}
       />
     </div>
   );

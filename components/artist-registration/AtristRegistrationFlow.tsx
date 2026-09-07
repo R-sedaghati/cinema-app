@@ -3,8 +3,8 @@ import {
   useUserCategoryList,
   useUserProfile,
 } from "@/lib/services/landing/hook";
-import { IUserCategoryResponse } from "@/lib/services/landing/type";
-import { EFormFieldType } from "@/lib/services/admin/type";
+import { IUserCategoryResponse, IUserProfile } from "@/lib/services/landing/type";
+import { EFormFieldType, SyncToUserField } from "@/lib/services/admin/type";
 import { Card, HorizontalStep, HorizontalStepper } from "@dgshahr/ui-kit";
 import {
   LayoutGrid,
@@ -36,6 +36,28 @@ const ICON_MAP: Record<string, LucideIcon> = {
   UserRound,
   List,
   CreditCard,
+};
+
+/** Answer shapes that mean "still blank", and so may be filled in from the profile. */
+const isEmptyAnswer = (value: unknown) =>
+  value === undefined ||
+  value === null ||
+  value === "" ||
+  (Array.isArray(value) && value.length === 0);
+
+/**
+ * The profile value a `syncToUserField` target prefills from, or `null` when there is
+ * nothing safe to prefill. `avatar` is deliberately excluded: the profile exposes a
+ * presigned URL while an IMAGE answer holds the storage key, so prefilling one would
+ * write the URL back into `avatar_path` on submit. Avatar sync stays one-way, form → account.
+ */
+const profileValue = (
+  profile: IUserProfile,
+  target: SyncToUserField,
+): string | null => {
+  if (target === "avatar") return null;
+
+  return target === "phoneNumber" ? profile.phone_number : profile[target];
 };
 
 const AtristRegistrationFlow: React.FC<ArtistProps> = ({
@@ -77,23 +99,52 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
   const { data: profileData } = useUserProfile();
 
-  // The phone number belongs to the account, not the form: it is the OTP login identity.
-  // Prefill it from the profile and render it read-only. Running here (rather than in
-  // ArtistRegistrationPageContent) means it also re-syncs after edit-mode hydration.
-  const phoneKey = useMemo(
+  // Fields an admin wired to a profile field in the form-builder. The account is the source
+  // of what it already knows, so those answers start out prefilled from it. Running here
+  // (rather than in ArtistRegistrationPageContent) means it also runs after edit-mode
+  // hydration, so a hydrated answer is already in the store and wins below.
+  const syncedFields = useMemo(
     () =>
       steps
         .flatMap((step) => step.fields)
-        .find((field) => field.syncToUserField === "phoneNumber")?.key,
+        .filter((field) => field.syncToUserField)
+        .map((field) => ({
+          key: field.key,
+          target: field.syncToUserField as SyncToUserField,
+        })),
     [steps],
   );
 
-  const profilePhone = profileData?.phone_number;
+  // The phone number belongs to the account, not the form: it is the OTP login identity,
+  // and only the OTP flow may change it. Its fields render read-only.
+  const lockedKeys = useMemo(
+    () =>
+      new Set(
+        syncedFields
+          .filter(({ target }) => target === "phoneNumber")
+          .map(({ key }) => key),
+      ),
+    [syncedFields],
+  );
 
   useEffect(() => {
-    if (!phoneKey || !profilePhone) return;
-    useArtistRegistrationStore.getState().setAnswer(phoneKey, profilePhone);
-  }, [phoneKey, profilePhone]);
+    if (!profileData) return;
+
+    const { answers, setAnswer } = useArtistRegistrationStore.getState();
+
+    for (const { key, target } of syncedFields) {
+      const value = profileValue(profileData, target);
+
+      if (!value) continue;
+
+      // The phone number is read-only and owned by the account, so it always wins — even
+      // over a hydrated draft carrying an older number. Every other target only fills a
+      // blank: a draft, or anything the user has typed, is the more current statement.
+      if (target !== "phoneNumber" && !isEmptyAnswer(answers[key])) continue;
+
+      setAnswer(key, value);
+    }
+  }, [syncedFields, profileData]);
 
   useEffect(() => {
     if (data && !hasChildren && flowStep === 0) {
@@ -143,7 +194,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
         <DynamicFormStep
           step={step}
           provinceKey={provinceKey}
-          lockedKey={profilePhone ? phoneKey : undefined}
+          lockedKeys={lockedKeys}
           copy={copy}
           onNext={onNext}
           onPrevious={handlePrevious}

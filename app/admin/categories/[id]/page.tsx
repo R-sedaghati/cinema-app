@@ -6,13 +6,8 @@ import {
   useAdminUploadBannerImage,
 } from "@/lib/services/admin/hook";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import {
-  Button,
-  Card,
-  Divider,
-  Input,
-  Switch,
-} from "@dgshahr/ui-kit";
+import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
 import { ChevronRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -181,7 +176,8 @@ function CategoryDetail() {
                   placeholder="اولویت"
                   wrapperClassName="w-full"
                   value={priority ?? ""}
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   onChange={(e) =>
                     setPriority(
                       e.target.value === "" ? null : Number(e.target.value),
@@ -247,7 +243,8 @@ function CategoryDetail() {
                 labelContent="مبلغ پرداختی کاربر"
                 placeholder="مبلغ پرداختی کاربر"
                 postfix="تومان"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={contactAmount}
                 onChange={(e) => setContactAmount(e.target.value)}
                 hintMessage={`مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
@@ -257,7 +254,8 @@ function CategoryDetail() {
                 labelContent="مبلغ ثبت‌نام هنرمند"
                 placeholder="مبلغ ثبت‌نام هنرمند"
                 postfix="تومان"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={registrationAmount}
                 onChange={(e) => setRegistrationAmount(e.target.value)}
                 hintMessage={`مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}

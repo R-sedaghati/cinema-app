@@ -3,6 +3,10 @@
  * The same table exists in `backend/utils/fieldValidation.ts` — keep the ids in sync.
  */
 
+import { toEnglishDigits } from "./toEnglishDigits.ts";
+
+export { toEnglishDigits };
+
 export type FieldValidationPreset =
   | "MOBILE"
   | "LANDLINE"
@@ -11,11 +15,6 @@ export type FieldValidationPreset =
   | "EMAIL"
   | "IBAN"
   | "URL";
-
-export const toEnglishDigits = (value: string) =>
-  value
-    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
-    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660));
 
 /** Iranian national code: 10 digits, last one a mod-11 checksum. */
 const isValidNationalCode = (value: string) => {

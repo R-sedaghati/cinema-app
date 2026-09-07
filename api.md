@@ -122,6 +122,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   email?: string;
+  nationalCode?: string;     // 10 digits, mod-11 checksum. Never in public responses.
   avatar?: string | null;    // presigned URL
   code?: string;             // auto-generated sequential code
   lastLogin?: string;        // ISO datetime
@@ -426,7 +427,9 @@ List all users (no auth required).
 ### `GET /user/profile/`
 Get own profile. **Auth required.**
 
-**Response:** `ApiResponse<Pick<User, "id" | "phone_number" | "avatar" | "lastLogin" | "firstName" | "lastName" | "email">>`
+**Response:** `Pick<User, "id" | "phone_number" | "avatar" | "lastLogin" | "firstName" | "lastName" | "email" | "nationalCode">`
+
+Note: this endpoint returns the object directly, **not** wrapped in `ApiResponse`.
 
 ---
 
@@ -435,8 +438,11 @@ Update own profile. **Auth required.**
 
 **Body:**
 ```json
-{ "firstName": "string", "lastName": "string", "email": "string" }
+{ "firstName": "string", "lastName": "string", "email": "string", "nationalCode": "string" }
 ```
+
+Every key is optional. `nationalCode` must pass the `NATIONAL_CODE` preset (10 digits +
+mod-11 checksum); `""` clears it. An invalid code is a `400` with `"کد ملی معتبر نیست"`.
 
 **Response:** `ApiResponse<User>`
 
@@ -1163,7 +1169,10 @@ Create a field on a step.
   order?: number;
   options?: { label: string; value: string }[];   // SELECT/RADIO/CHECKBOX
   validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string };
-  syncToUserField?: "firstName" | "lastName" | "avatar" | "email";
+  // Links the field to the account: prefilled from the profile, and written back on submit.
+  // `phoneNumber` is read-only (login identity) — prefilled, never written back.
+  // `null` clears an existing link.
+  syncToUserField?: "firstName" | "lastName" | "avatar" | "email" | "nationalCode" | "phoneNumber" | null;
   multiple?: boolean;      // IMAGE/VIDEO: allow more than one upload
 }
 ```

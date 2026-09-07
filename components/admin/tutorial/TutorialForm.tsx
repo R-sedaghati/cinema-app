@@ -6,11 +6,14 @@ import {
   useAdminUploadTutorialThumbnail,
 } from "@/lib/services/admin/hook";
 import { ITutorialItem } from "@/lib/services/admin/type";
-import { Button, Card, Divider, Input, Switch, Textarea } from "@dgshahr/ui-kit";
+import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
+import Textarea from "@/components/common/Textarea";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { toPriority } from "@/lib/utils/toEnglishDigits";
 
 interface Props {
   mode: "create" | "edit";
@@ -151,10 +154,11 @@ function TutorialForm({ mode, id, initialData }: Props) {
               <Input
                 labelContent="اولویت نمایش"
                 placeholder="اولویت نمایش"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 wrapperClassName="w-full"
                 value={priority}
-                onChange={(e) => setPriority(Number(e.target.value))}
+                onChange={(e) => setPriority(toPriority(e.target.value))}
               />
               <Switch
                 label="وضعیت"

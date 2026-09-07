@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { toEnglishDigits } from "@/lib/utils/toEnglishDigits";
 
 export function SearchHeaderSection({ variant = "stacked" }: { variant?: string }) {
   const router = useRouter();
@@ -25,7 +26,7 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
       <input
         type="text"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => setSearch(toEnglishDigits(e.target.value))}
         onKeyDown={(e) => e.key === "Enter" && submit()}
         placeholder={copy("homeSearchPlaceholder")}
         className="w-full rounded-2xl py-3.5 md:py-4 pr-10 pl-4 text-sm md:text-base outline-none focus:ring-1 focus:ring-error-500/60 border border-zinc-700/40 bg-zinc-900/60"

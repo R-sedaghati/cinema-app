@@ -1,6 +1,7 @@
 import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
-import { FIELD_VALIDATION_PRESETS, failsPreset } from "./fieldValidationPresets";
-import { CopyFn, defaultCopy } from "./formCopy";
+import { FIELD_VALIDATION_PRESETS, failsPreset } from "./fieldValidationPresets.ts";
+import { CopyFn, defaultCopy } from "./formCopy.ts";
+import { toEnglishDigits } from "./toEnglishDigits.ts";
 
 export function getStepErrors(
   step: IFormStep,
@@ -33,9 +34,18 @@ export function getStepErrors(
       errors.push(`${field.label}: ${FIELD_VALIDATION_PRESETS[preset].message}`);
     }
 
-    if (typeof value === "number") {
-      if (min !== undefined && value < min) errors.push(copy("minMessage", { label: field.label, min }));
-      if (max !== undefined && value > max) errors.push(copy("maxMessage", { label: field.label, max }));
+    // A NUMBER field can hold a string (restored draft, API payload), so read the
+    // number out of either shape rather than skipping min/max for strings.
+    const numeric =
+      typeof value === "number"
+        ? value
+        : typeof value === "string" && toEnglishDigits(value).trim() !== ""
+          ? Number(toEnglishDigits(value).trim())
+          : NaN;
+
+    if (Number.isFinite(numeric)) {
+      if (min !== undefined && numeric < min) errors.push(copy("minMessage", { label: field.label, min }));
+      if (max !== undefined && numeric > max) errors.push(copy("maxMessage", { label: field.label, max }));
     }
 
     if (typeof value === "string") {
@@ -43,7 +53,7 @@ export function getStepErrors(
       if (maxLength !== undefined && value.length > maxLength) errors.push(copy("maxLengthMessage", { label: field.label, n: maxLength }));
       if (pattern) {
         try {
-          if (!new RegExp(pattern).test(value)) errors.push(copy("invalidMessage", { label: field.label }));
+          if (!new RegExp(pattern).test(toEnglishDigits(value))) errors.push(copy("invalidMessage", { label: field.label }));
         } catch {
           // ponytail: admin-authored regex, ignore invalid patterns rather than crash the form
         }

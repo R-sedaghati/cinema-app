@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Card, Input, Textarea } from "@dgshahr/ui-kit";
+import { Button, Card } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
+import Textarea from "@/components/common/Textarea";
 import { ChevronDown, Eye, EyeOff, GripVertical } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";

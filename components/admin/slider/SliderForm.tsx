@@ -10,11 +10,13 @@ import FontSizeInput from "@/components/admin/FontSizeInput";
 import GuideBlocks from "@/components/admin/guide/GuideBlocks";
 import { SLIDER_FORM_GUIDE } from "@/lib/constants/guide/content";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
-import { Button, Card, Divider, Input, Switch } from "@dgshahr/ui-kit";
+import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { toPriority } from "@/lib/utils/toEnglishDigits";
 
 interface Props {
   mode: "create" | "edit";
@@ -307,11 +309,12 @@ function SliderForm({ mode, id, initialData }: Props) {
                 <Input
                   labelContent="اولویت نمایش"
                   placeholder="اولویت نمایش"
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   wrapperClassName="w-full"
                   value={priority}
                   onChange={(e) => {
-                    setPriority(Number(e.target.value));
+                    setPriority(toPriority(e.target.value));
                     clearError("priority");
                   }}
                   isError={Boolean(errors.priority)}

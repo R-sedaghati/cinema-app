@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
-import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
+import { toEnglishDigits } from "@/lib/utils/toEnglishDigits";
 
 export function SiteFooter() {
   const { data } = useUserSiteContent();
@@ -20,7 +20,7 @@ export function SiteFooter() {
   const copyright = footer?.copyright?.trim() || FOOTER_DEFAULTS.copyright;
 
   // tel: needs latin digits even when the displayed number is Persian.
-  const phoneHref = `tel:${convertFaNumericStringToEnNumericString(phone).replace(/\s/g, "")}`;
+  const phoneHref = `tel:${toEnglishDigits(phone).replace(/\s/g, "")}`;
 
   return (
     <footer className="bg-zinc-950/40 text-white">

@@ -1,20 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ContentCard from "./ContentCard";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
-import { Input } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import Button from "../common/Button";
 import { isMobile } from "react-device-detect";
 import {
   useUpdateUserProfile,
   useUserProfile,
 } from "@/lib/services/landing/hook";
+import {
+  FIELD_VALIDATION_PRESETS,
+  isValidPreset,
+} from "@/lib/utils/fieldValidationPresets";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 
 export default function Overview() {
-  const router = useRouter();
   const { data } = useUserProfile();
   const { mutate, isPending } = useUpdateUserProfile();
   const copy = useLandingCopy();
@@ -23,22 +25,35 @@ export default function Overview() {
     firstName: "",
     lastName: "",
     email: "",
+    nationalCode: "",
     phone_number: "",
   });
+  const [nationalCodeError, setNationalCodeError] = useState<string | null>(
+    null,
+  );
+
+  // Seeding runs again whenever the query refetches (a save, a reconnect). Once the user
+  // has touched the form, their input wins — otherwise a refetch wipes what they typed.
+  const isDirty = useRef(false);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || isDirty.current) return;
 
     setForm({
       firstName: data.firstName ?? "",
       lastName: data.lastName ?? "",
       email: data.email ?? "",
+      nationalCode: data.nationalCode ?? "",
       phone_number: data.phone_number ?? "",
     });
   }, [data]);
 
   const handleChange =
     (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      isDirty.current = true;
+
+      if (field === "nationalCode") setNationalCodeError(null);
+
       setForm((prev) => ({
         ...prev,
         [field]: e.target.value,
@@ -48,16 +63,26 @@ export default function Overview() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // The national code is optional, but a filled-in one has to pass the checksum.
+    const nationalCode = form.nationalCode.trim();
+
+    if (nationalCode && !isValidPreset("NATIONAL_CODE", nationalCode)) {
+      setNationalCodeError(FIELD_VALIDATION_PRESETS.NATIONAL_CODE.message);
+      return;
+    }
+
     mutate(
       {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
+        nationalCode,
       },
       {
         onSuccess: () => {
+          // Let the invalidated query re-seed the form with what the server stored.
+          isDirty.current = false;
           toast.success(copy("saveSuccess"));
-          router.push("/profile");
         },
       },
     );
@@ -96,6 +121,19 @@ export default function Overview() {
             placeholder={copy("fieldEmailPlaceholder")}
             value={form.email}
             onChange={handleChange("email")}
+          />
+
+          <Input
+            id="national-code"
+            labelContent={copy("fieldNationalCode")}
+            dir="ltr"
+            inputMode="numeric"
+            maxLength={10}
+            placeholder={copy("fieldNationalCodePlaceholder")}
+            value={form.nationalCode}
+            onChange={handleChange("nationalCode")}
+            isError={Boolean(nationalCodeError)}
+            errorMessage={nationalCodeError}
           />
 
           <Input
