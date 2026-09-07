@@ -21,6 +21,7 @@ export type UserUpdateProfile = {
   firstName: string;
   lastName: string;
   email: string;
+  nationalCode: string;
   phone_number: string;
 };
 
@@ -48,6 +49,7 @@ export interface IUserProfile {
   id: number;
   lastLogin: string | null;
   lastName: string | null;
+  nationalCode: string | null;
   phone_number: string | null;
 }
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Drawer, Input } from "@dgshahr/ui-kit";
+import { Drawer } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { toast } from "react-toastify";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";

@@ -1,8 +1,11 @@
+import { toEnglishDigits } from "./toEnglishDigits.ts";
+
 export function formatPhoneNumber(phone: string | number) {
   const stringPhoneNumber =
     typeof phone === "number" ? phone.toString() : phone;
 
-  let numericValue = stringPhoneNumber.replace(/\D/g, "");
+  // Persian/Arabic-Indic digits must be converted before the strip, or /\D/ eats them.
+  let numericValue = toEnglishDigits(stringPhoneNumber).replace(/\D/g, "");
   if (numericValue.startsWith("98")) numericValue = "0" + numericValue.slice(2);
 
   if (numericValue.startsWith("0")) {

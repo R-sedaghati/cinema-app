@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import { FieldProps } from "./types";
 
 const TextField: React.FC<FieldProps> = ({ field, value, onChange, disabled }) => (

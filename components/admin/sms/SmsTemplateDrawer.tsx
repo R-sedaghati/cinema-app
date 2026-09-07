@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Button, Drawer, Switch, Textarea } from "@dgshahr/ui-kit";
+import { Button, Drawer, Switch } from "@dgshahr/ui-kit";
+import Textarea from "@/components/common/Textarea";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import { SMS_EVENT, SMS_VARIABLE_SAMPLE } from "@/lib/constants/sms/events";

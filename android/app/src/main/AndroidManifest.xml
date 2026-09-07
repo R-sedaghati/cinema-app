@@ -22,6 +22,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Backup return path: if a payment ever finishes outside the WebView, the
+                 gateway callback redirects to an archivehonar.ir page, and this hands
+                 that link back to the app instead of stranding the buyer in a browser
+                 with no session. autoVerify needs /.well-known/assetlinks.json on the
+                 site; without it Android falls back to an app chooser. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="archivehonar.ir" />
+                <data android:scheme="https" android:host="www.archivehonar.ir" />
+            </intent-filter>
+
         </activity>
 
         <provider

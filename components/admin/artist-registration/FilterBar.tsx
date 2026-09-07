@@ -1,4 +1,5 @@
-import { Button, Input, Select } from "@dgshahr/ui-kit";
+import { Button, Select } from "@dgshahr/ui-kit";
+import Input from "@/components/common/Input";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import Chip from "@/components/common/CustomChip";
 import {
@@ -9,7 +10,6 @@ import {
 } from "@/lib/services/admin/type";
 import { chevronCn } from "@/lib/utils/chevronCn";
 import ObjectUtils from "@/lib/utils/objectUtils";
-import convertFaNumericStringToEnNumericString from "@/lib/utils/convertFaNumericStringToEnNumericString";
 import ExtendedDatePicker from "../../common/ExtendedUiDatePicker";
 import { ChevronDown } from "lucide-react";
 import SelectBeforeOption from "@/components/common/SelectBeforeOption";
@@ -89,7 +89,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
           disabled={loading && !params.search}
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearch(convertFaNumericStringToEnNumericString(e.target.value))
+            setSearch(e.target.value)
           }
           onKeyDown={(e) => {
             if (e.key === "Enter") {

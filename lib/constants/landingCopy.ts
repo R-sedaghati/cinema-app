@@ -226,6 +226,8 @@ export const LANDING_COPY = {
   fieldLastNamePlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای نام خانوادگی", value: "نام خانوادگی خود را وارد کنید" },
   fieldEmail: { group: "فیلدهای مشترک", admin: "برچسب ایمیل", value: "ایمیل" },
   fieldEmailPlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای ایمیل", value: "ایمیل خود را وارد کنید." },
+  fieldNationalCode: { group: "فیلدهای مشترک", admin: "برچسب کد ملی", value: "کد ملی" },
+  fieldNationalCodePlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای کد ملی", value: "کد ملی ۱۰ رقمی خود را وارد کنید" },
   fieldPhone: { group: "فیلدهای مشترک", admin: "برچسب شماره موبایل", value: "شماره موبایل" },
   actionSave: { group: "فیلدهای مشترک", admin: "دکمه ذخیره", value: "ذخیره" },
   actionCancel: { group: "فیلدهای مشترک", admin: "دکمه انصراف", value: "انصراف" },
