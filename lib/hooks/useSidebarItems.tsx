@@ -85,6 +85,12 @@ export const useSidebarItems = (): {
         active: pathname.startsWith("/admin/page-builder"),
       },
       {
+        icon: <LayoutTemplate />,
+        title: "صفحه‌ساز صفحه ثبت‌نام",
+        link: "/admin/registration-builder",
+        active: pathname.startsWith("/admin/registration-builder"),
+      },
+      {
         icon: <TableOfContents />,
         title: "مدیریت محتوای لندینگ",
         link: "/admin/content-management",

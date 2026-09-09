@@ -16,6 +16,7 @@ import TermsNotice from "@/components/login/TermsNotice";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
 const OTP_EXPIRATION_KEY = "otpExpirationDate";
+const OTP_LENGTH = 4;
 
 const OtpStep: FC<StepBaseProps> = (props) => {
   const router = useRouter();
@@ -43,6 +44,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
 
   function handleResetTimer() {
     resetTimer();
+    setIsTimerEnded(false);
     const otpExpirationDate = Date.now() + 120 * 1000;
     localStorage.setItem(OTP_EXPIRATION_KEY, otpExpirationDate.toString());
   }
@@ -58,7 +60,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
   }, []);
 
   function handleCodeChange(value: string) {
-    if (value.length < 6 && errorMessage) setErrorMessage("");
+    if (value.length < OTP_LENGTH && errorMessage) setErrorMessage("");
     setCode(value);
   }
 
@@ -70,6 +72,8 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       {
         onSuccess: () => {
           toast.success(copy("loginOtpSent"));
+          // Without this the countdown stays expired and the resend link is spammable.
+          handleResetTimer();
         },
         onError: () => {
           setErrorMessage(copy("loginOtpWrong"));
@@ -81,7 +85,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
   function handleSubmit(value?: string) {
     const otp = value ?? code;
 
-    if (otp.length < 4) return;
+    if (otp.length < OTP_LENGTH) return;
 
     (document.activeElement as HTMLInputElement)?.blur();
 
@@ -92,8 +96,14 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       },
       {
         onSuccess: (res) => {
-          toast.success(copy("loginSuccess"));
           const { accessToken } = res?.result ?? {};
+          // `login` flips `isLoggedIn` unconditionally, so an empty token would persist a
+          // session that 401s on every request.
+          if (!accessToken) {
+            setErrorMessage(copy("loginOtpWrong"));
+            return;
+          }
+          toast.success(copy("loginSuccess"));
           login(accessToken, "", true);
           close();
           router.push("/");
@@ -131,7 +141,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
         type="text"
         className="my-6 tablet:my-8"
         inputsContainerClassName="flex justify-center gap-10"
-        inputsNumber={4}
+        inputsNumber={OTP_LENGTH}
         onChange={handleCodeChange}
         onEnd={handleSubmit}
         errorMessage={errorMessage}
@@ -158,7 +168,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       <Button
         size="large"
         isFullWidth
-        disabled={code.length < 4 || isPending}
+        disabled={code.length < OTP_LENGTH || isPending}
         isLoading={isPending}
         onClick={() => handleSubmit()}
       >

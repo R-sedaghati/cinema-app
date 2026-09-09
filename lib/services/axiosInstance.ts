@@ -13,6 +13,9 @@ type ErrorResponse = {
 
 const EXCLUDED_TOAST_ENDPOINTS = ["/login"];
 
+/** Gateway timeout: the proxy gave up, not the API. Nothing actionable to say. */
+const EXCLUDED_TOAST_STATUSES = [504];
+
 const api = axios.create({
   // See landingAxiosInstance: same-origin /api, proxied by nginx (prod) or the
   // next.config.ts rewrite (dev).
@@ -46,9 +49,10 @@ function handleAxiosError(error: AxiosError) {
 
   const requestUrl = error.config?.url || "";
 
-  const shouldShowToast = !EXCLUDED_TOAST_ENDPOINTS.some((endpoint) =>
-    requestUrl.includes(endpoint),
-  );
+  const shouldShowToast =
+    !EXCLUDED_TOAST_ENDPOINTS.some((endpoint) =>
+      requestUrl.includes(endpoint),
+    ) && !EXCLUDED_TOAST_STATUSES.includes(error.response?.status ?? 0);
 
   if (shouldShowToast) {
     toast.error(message, { toastId: message });

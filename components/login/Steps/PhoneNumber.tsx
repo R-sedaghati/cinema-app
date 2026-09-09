@@ -23,8 +23,14 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
 
   const { mutate, isPending } = useUserLogin();
 
+  const canSubmit = is_phone_number(phoneNumber);
+
   function handleSubmit() {
-    if (!isValid) return;
+    // `isValid` starts out true, so it alone would let an empty field send an OTP.
+    if (!canSubmit) {
+      setIsValid(false);
+      return;
+    }
 
     const cleanedPhone = phoneNumber;
 
@@ -79,7 +85,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         setPhoneNumber(newValue);
       }
     }
-    if (e.key === "Enter" && isValid && phoneNumber.length === 11)
+    if (e.key === "Enter" && canSubmit)
       handleSubmit();
   }
 
@@ -100,7 +106,10 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         autoFocus
         onKeyDown={handleKeyDown}
         onChange={handleChangePhoneNumber}
-        onClear={() => setPhoneNumber("")}
+        onClear={() => {
+          setPhoneNumber("");
+          setIsValid(true);
+        }}
         errorMessage={isValid ? "" : copy("loginPhoneError")}
       />
       <Button
@@ -108,7 +117,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         size="large"
         isFullWidth
         isLoading={isPending}
-        disabled={isPending}
+        disabled={isPending || !canSubmit}
         onClick={handleSubmit}
       >
         {copy("loginPhoneCta")}

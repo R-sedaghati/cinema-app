@@ -1,7 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import ArtistRegistrationPageContent from "./ArtistRegistrationPageContent";
 
 export default function ArtistRegistrationPage() {
-  return <ArtistRegistrationPageContent editId={null} />;
+  return (
+    <Suspense>
+      <ArtistRegistrationPageContent editId={null} />
+    </Suspense>
+  );
 }

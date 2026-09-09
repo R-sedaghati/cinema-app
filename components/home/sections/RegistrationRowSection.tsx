@@ -28,7 +28,7 @@ export function RegistrationRowSection({
     setField("categoryId", [id]);
     setSelectedCategory(id, title);
     setStep(1);
-    router.push("/artist-registration");
+    router.push(`/artist-registration?category=${id}&step=1`);
   };
 
   const onPick = (id: number, title: string) =>
