@@ -1,25 +1,34 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { Card } from "@dgshahr/ui-kit";
-import { MoveLeft, MoveRight, Loader2 } from "lucide-react";
-import Link from "next/link";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
-import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
+import { groupPortfolios } from "@/lib/utils/portfolioAnswers";
+import { sortByPriority } from "@/lib/utils/sortByPriority";
+import { CATEGORY_PAGE_SIZE, MAX_PAGE_SIZE } from "@/lib/constants/pagination";
 import {
-  useUserArtistDetail,
+  useOwnArtistRequest,
   useUserAtristRequests,
   useUserCategoryList,
+  useUserSiteContent,
 } from "@/lib/services/landing/hook";
+import {
+  onScreen,
+  resolveRegistrationSections,
+} from "@/lib/utils/resolveRegistrationSections";
+import SelectScreen from "@/components/artist-registration/sections/SelectScreen";
+import BackLinkSection from "@/components/artist-registration/sections/BackLinkSection";
 import clsx from "clsx";
-import { isDesktop, isMobile } from "react-device-detect";
+import { isDesktop } from "react-device-detect";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import Button from "@/components/common/Button";
+import { toast } from "react-toastify";
 
 export interface SelectedCategory {
   id: number;
@@ -29,6 +38,12 @@ export interface SelectedCategory {
 export default function ArtistRegistrationPageContent({ editId }: { editId: number | null }) {
   const copy = useFormCopy();
   const landingCopy = useLandingCopy();
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const urlStep = Number(searchParams.get("step")) || 0;
+  const urlCategoryId = Number(searchParams.get("category")) || 0;
 
   // The form is only worth filling once there is an account to attach it to: submitting
   // it signed out 401s, and the interceptor's logout redirect throws every answer away.
@@ -51,13 +66,13 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
   const { data: categoryData, isLoading: isCategoryLoading } = useUserCategoryList({
     page: 1,
-    count: 30,
+    count: CATEGORY_PAGE_SIZE,
   });
 
   // Each account fills a given form once, so a category already registered in opens the
   // existing request for editing instead of starting a second one. The backend enforces
   // the same one-per-category rule on create.
-  const { data: ownRequests } = useUserAtristRequests({ page: 1, count: 100 });
+  const { data: ownRequests } = useUserAtristRequests({ page: 1, count: MAX_PAGE_SIZE });
 
   const requestIdByCategory = useMemo(
     () =>
@@ -71,7 +86,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
   const topLevelCategories = useMemo(
     () =>
-      (categoryData?.result ?? []).map((c) => ({
+      sortByPriority(categoryData?.result ?? []).map((c) => ({
         id: c.id,
         title: c.faName,
         // A request filed under a child category occupies its parent's form too.
@@ -84,9 +99,16 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     [categoryData, requestIdByCategory],
   );
 
-  const rows = isMobile
-    ? mobileSplitPattern(topLevelCategories)
-    : splitPattern(topLevelCategories);
+  const { data: siteContent } = useUserSiteContent();
+
+  const selectSections = useMemo(
+    () =>
+      onScreen(
+        resolveRegistrationSections(siteContent?.result?.registrationSections),
+        "select",
+      ),
+    [siteContent],
+  );
 
   const {
     step,
@@ -104,10 +126,23 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
       ? null
       : { id: selectedCategoryId, title: selectedCategoryTitle };
 
-  const { data: editData, isLoading: editLoading } = useUserArtistDetail(editId ?? undefined);
+  const { data: editData, isLoading: editLoading } = useOwnArtistRequest(editId ?? undefined);
+
+  // The URL is the durable copy of "which category, which step": state is a transient
+  // mirror of it, so a refresh, a back button, or a shared link lands on the same screen
+  // instead of dropping the user back on the category grid.
+  const [isUrlHydrated, setIsUrlHydrated] = useState(false);
+  const [editError, setEditError] = useState(false);
+
+  // Hydration resets the store, so it must happen once per request — not once per
+  // response object. Re-running it over a refetch would throw away everything typed since.
+  const hydratedIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!editId || !editData?.result) return;
+    if (hydratedIdRef.current === editId) return;
+    hydratedIdRef.current = editId;
+
     const r = editData.result;
 
     reset();
@@ -117,32 +152,84 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
       r.categories.map((c) => c.id),
     );
 
-    // Merge legacy portfolio rows (grouped by the schema field they were
-    // submitted under) back into answers so IMAGE/VIDEO fields hydrate
-    // like any other dynamic field.
-    const portfolioAnswers: Record<string, string | string[]> = {};
-    for (const p of r.portfolios ?? []) {
-      if (!p.fieldKey) continue;
-      const existing = portfolioAnswers[p.fieldKey];
-      if (existing === undefined) {
-        portfolioAnswers[p.fieldKey] = p.filePath;
-      } else if (Array.isArray(existing)) {
-        existing.push(p.filePath);
-      } else {
-        portfolioAnswers[p.fieldKey] = [existing, p.filePath];
-      }
-    }
+    // Merge portfolio rows (grouped by the schema field they were submitted under) back
+    // into answers so IMAGE/VIDEO fields hydrate like any other dynamic field.
+    const { answers: portfolioAnswers, urlByPath } = groupPortfolios(r.portfolios);
 
-    setField("answers", { ...portfolioAnswers, ...(r.answers ?? {}) });
+    setField("portfolioUrls", urlByPath);
+    // Portfolio rows are the authoritative record of what was uploaded, so they win:
+    // a stale or empty file key in `answers` would otherwise blank the hydrated images.
+    setField("answers", { ...(r.answers ?? {}), ...portfolioAnswers });
 
     const cat = r.categories[0];
     if (cat) {
       setSelectedCategory(cat.id, cat.faName);
       setStep(1);
+    } else {
+      // No category means no form schema to render — say so instead of leaving the
+      // page on step 0 with an editId, which renders nothing at all.
+      setEditError(true);
     }
+    setIsUrlHydrated(true);
   }, [editData, editId]);
 
-  const router = useRouter();
+  useEffect(() => {
+    if (isUrlHydrated || editId) return;
+
+    // The store outlives a client-side navigation, so a form edited earlier would still
+    // be sitting in it when the category grid mounts.
+    if (useArtistRegistrationStore.getState().editId) reset();
+
+    // Titles come from the category list, so hydrating a deep-linked step has to wait
+    // for it — without a title the form header renders blank.
+    if (!urlStep || !urlCategoryId) {
+      setIsUrlHydrated(true);
+      return;
+    }
+    if (!topLevelCategories.length) return;
+
+    const cat = topLevelCategories.find((c) => c.id === urlCategoryId);
+    if (cat) {
+      setField("categoryId", [cat.id]);
+      setSelectedCategory(cat.id, cat.title);
+      // The flow clamps the step to what the schema actually has; keep the obvious
+      // nonsense out of the store in the first place.
+      setStep(Math.max(urlStep, 1));
+    } else {
+      // The category list is paginated, so a link to a category outside the first page
+      // resolves to nothing. Falling through to the grid without a word looks broken.
+      toast.error(landingCopy("deepLinkCategoryMissing"));
+    }
+    setIsUrlHydrated(true);
+  }, [isUrlHydrated, editId, urlStep, urlCategoryId, topLevelCategories]);
+
+  useEffect(() => {
+    if (!isUrlHydrated) return;
+
+    // Only the create flow is resumable. An edit is addressed by its request id alone,
+    // so its progress stays out of the URL and reopening one starts at the first step.
+    const params = new URLSearchParams();
+    if (!editId && selectedCategoryId) {
+      params.set("category", String(selectedCategoryId));
+      if (step > 0) params.set("step", String(step));
+    }
+
+    const query = params.toString();
+    const next = query ? `${pathname}?${query}` : pathname;
+    const current = searchParams.toString();
+    if (query === current) return;
+
+    router.replace(next, { scroll: false });
+  }, [isUrlHydrated, editId, selectedCategoryId, step, pathname, router, searchParams]);
+
+  // Back/Forward rewrites the query without remounting, and the hydration effect above
+  // only runs once — so the step has to be re-read from the URL here or the address bar
+  // and the rendered step drift apart permanently.
+  useEffect(() => {
+    if (!isUrlHydrated || editId) return;
+    if (!urlCategoryId || urlCategoryId !== selectedCategoryId) return;
+    if (urlStep && urlStep !== step) setStep(urlStep);
+  }, [urlStep, urlCategoryId, isUrlHydrated, editId, selectedCategoryId, step, setStep]);
 
   const handleSelectCategory = (
     id: number,
@@ -163,11 +250,15 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
   };
 
   const handlePrevious = () => {
-    if (step === 1 && !editId) {
+    // Nothing sits behind the first step of the flow, so back leaves it for the grid of
+    // all forms instead of leaving the user on a button that does nothing.
+    if (step <= 1) {
       reset();
-    } else {
-      setStep(step - 1);
+      router.push("/artist-registration");
+      return;
     }
+
+    setStep(step - 1);
   };
 
   if (isSignedOut) {
@@ -191,6 +282,27 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     );
   }
 
+  if (editError) {
+    return (
+      <div className="flex justify-center py-16 md:py-24">
+        <Card
+          wrapperClassName={clsx("w-[90%]", isDesktop && "w-1/2")}
+          className="py-10 px-4 md:px-8"
+        >
+          <div className="flex flex-col gap-5 items-center text-center">
+            <p className="font-h4-bold">{landingCopy("regEditUnavailable")}</p>
+            <Button
+              className="rounded-full!"
+              onClick={() => router.push("/artist-registration")}
+            >
+              {landingCopy("regEditUnavailableCta")}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   if (!isAuthReady || (editId && editLoading) || (step === 0 && isCategoryLoading)) {
     return (
       <div className="flex justify-center items-center py-24">
@@ -199,69 +311,23 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     );
   }
 
+  const showBackLink = selectSections.some((s) => s.key === "backLink");
+
   return (
-    <div className='mt-4'>
-      <div className={clsx("mx-auto mb-3 w-[90%]", isDesktop && "w-4/5")}>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
-        >
-          <MoveRight size={18} />
-          {copy("backHome")}
-        </Link>
-      </div>
-
+    <div className="mt-4">
       {step === 0 && !editId && (
-        <Card
-          wrapperClassName={clsx(
-            "w-[90%] mx-auto mt-4",
-            isDesktop && "w-4/5 mt-0",
-          )}
-          className={clsx("p-4", isDesktop && "p-6!")}
-        >
-          <div className="flex flex-col gap-3 items-center">
-            <p className={clsx("font-h4-bold", isDesktop && "font-h3-bold")}>
-              {copy("categoryPrompt")}
-            </p>
-
-            <div className="flex flex-col gap-4">
-              {rows.map((row) => (
-                <div
-                  key={row.map((r) => r.id).join("-")}
-                  className="flex flex-wrap justify-center gap-4"
-                >
-                  {row.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() =>
-                        handleSelectCategory(
-                          item.id,
-                          item.title,
-                          item.existingRequestId,
-                        )
-                      }
-                      className="md:w-60 overflow-hidden w-32.5 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
-                    >
-                      <div className="flex flex-col items-start gap-1 z-10">
-                        <p className="text-nowrap text-sm md:text-base">
-                          {item.title}
-                        </p>
-                        {item.existingRequestId && (
-                          <span className="text-[10px] md:text-xs text-zinc-400">
-                            {copy("alreadyRegistered")}
-                          </span>
-                        )}
-                      </div>
-
-                      <MoveLeft className="text-error-500 z-10" />
-                    </button>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
+        <SelectScreen
+          sections={selectSections}
+          items={topLevelCategories}
+          copy={copy}
+          onSelect={handleSelectCategory}
+        />
       )}
+
+      {/* The link back home belongs to both screens, but it is only orderable on
+          the select one — inside the flow it always sits at the top. Hiding it
+          in the builder hides it everywhere. */}
+      {step >= 1 && showBackLink && <BackLinkSection copy={copy} />}
 
       {step >= 1 && selectedCategory && (
         <AtristRegistrationFlow
@@ -269,6 +335,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           flowStep={step - 1}
           onNext={handleNext}
           onPrevious={handlePrevious}
+          onGoToStep={(flowStep) => setStep(flowStep + 1)}
         />
       )}
     </div>

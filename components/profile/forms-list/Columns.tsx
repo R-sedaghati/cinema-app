@@ -9,6 +9,7 @@ import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
 export const generateColumns = (
   onEdit: (item: IArtistItem) => void,
+  onView: (item: IArtistItem) => void,
   onOpenPublic: (item: IArtistItem) => void,
   copy: CopyResolver<LandingCopyKey>,
 ): ColumnsType<IArtistItem>[] => [
@@ -61,13 +62,21 @@ export const generateColumns = (
           {copy("profileFormEdit")}
         </Button>
 
+        <Button
+          variant="text"
+          leftIcon={<ChevronLeft />}
+          onClick={() => onView(data)}
+        >
+          {copy("profileFormView")}
+        </Button>
+
         {data.status === EArtistRequestStatus.APPROVED && (
           <Button
             variant="text"
             leftIcon={<ChevronLeft />}
             onClick={() => onOpenPublic(data)}
           >
-            {copy("profileFormView")}
+            {copy("profileFormPublicPage")}
           </Button>
         )}
       </div>

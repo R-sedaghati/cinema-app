@@ -238,6 +238,19 @@ export const getUserArtistDetail = async (id: number) => {
   return data;
 };
 
+/**
+ * The owner's own copy of a request. Unlike `getUserArtistDetail` above — a public route
+ * that strips identity answers — this returns every answer, which is what an edit form
+ * needs: the PATCH below overwrites `answers` wholesale.
+ */
+export const getOwnArtistRequest = async (id: number, accessToken: string) => {
+  const { data } = await landingApi.get<IArtistRetriveResponse>(
+    `/user/artist-requests/${id}/`,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
 export const updateUserArtistRequest = async (
   id: number,
   payload: Partial<UserCreateArtistRequest>,

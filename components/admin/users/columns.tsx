@@ -2,10 +2,16 @@ import { IUsersItem } from "@/lib/services/admin/type";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { Button } from "@dgshahr/ui-kit";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Trash2 } from "lucide-react";
 
 export const generateColumns = (
   onProfileClick: (id: number) => void,
+  onDeleteClick: (id: number) => void,
+  /** Deleting a user is SUPER_ADMIN-only server-side; hide the button for everyone else
+   *  rather than offering an irreversible-sounding confirm that ends in a 403. */
+  canDelete: boolean,
+  /** Id of the row whose delete is in flight, so a double-click cannot fire twice. */
+  deletingId: number | null,
 ): ColumnsType<IUsersItem>[] => {
   return [
     {
@@ -83,14 +89,28 @@ export const generateColumns = (
       title: "عملیات",
       className: "align-middle",
       render: (data) => (
-        <Button
-          onClick={() => onProfileClick(data.id)}
-          color="error"
-          variant="text"
-          leftIcon={<ChevronLeft />}
-        >
-          پروفایل
-        </Button>
+        <div className="flex gap-3 items-center justify-center">
+          <Button
+            onClick={() => onProfileClick(data.id)}
+            color="error"
+            variant="text"
+            leftIcon={<ChevronLeft />}
+          >
+            پروفایل
+          </Button>
+          {canDelete && (
+            <Button
+              onClick={() => onDeleteClick(data.id)}
+              disabled={deletingId !== null}
+              isLoading={deletingId === data.id}
+              variant="text"
+              leftIcon={<Trash2 />}
+              color="error"
+            >
+              حذف
+            </Button>
+          )}
+        </div>
       ),
     },
   ];

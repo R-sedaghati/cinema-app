@@ -52,6 +52,9 @@ function handleError(error: AxiosError) {
     return Promise.reject(error);
   }
 
+  // Gateway timeout: the proxy gave up, not the API. Nothing actionable to say.
+  if (status === 504) return Promise.reject(error);
+
   const data = error.response?.data as ErrorResponse | undefined;
 
   const message = apiErrorFa(data?.error || data?.message);

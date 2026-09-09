@@ -490,6 +490,15 @@ export const adminUserRequest = async (
   return data;
 };
 
+export const adminUserDelete = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<null>>(
+    `/admin/users/${id}/`,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
 export const adminUsersList = async (
   params: Partial<ParamsUsersList> | undefined,
   accessToken: string,

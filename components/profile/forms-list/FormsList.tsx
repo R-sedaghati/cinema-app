@@ -39,6 +39,12 @@ export default function FormsList() {
     router.push(`/artist-registration/${item.id}`);
   };
 
+  // Read-only view of the submitted answers — available at every status, unlike the
+  // public showcase page below.
+  const handleView = (item: IArtistItem) => {
+    router.push(`/artist-registration/${item.id}/view`);
+  };
+
   // An approved request also has a public showcase page worth linking to.
   const handleOpenPublic = (item: IArtistItem) => {
     router.push(`/artists/${item.id}`);
@@ -108,6 +114,15 @@ export default function FormsList() {
                   {copy("profileFormEdit")}
                 </Button>
 
+                <Button
+                  variant="text"
+                  leftIcon={<ChevronLeft size={16} />}
+                  onClick={() => handleView(item)}
+                  className="p-0! text-sm"
+                >
+                  {copy("profileFormView")}
+                </Button>
+
                 {item.status === EArtistRequestStatus.APPROVED && (
                   <Button
                     variant="text"
@@ -115,7 +130,7 @@ export default function FormsList() {
                     onClick={() => handleOpenPublic(item)}
                     className="p-0! text-sm"
                   >
-                    {copy("profileFormView")}
+                    {copy("profileFormPublicPage")}
                   </Button>
                 )}
               </div>
@@ -129,7 +144,7 @@ export default function FormsList() {
           rowKey="id"
           className="w-full"
           stickyTableHeader
-          columns={generateColumns(handleEdit, handleOpenPublic, copy)}
+          columns={generateColumns(handleEdit, handleView, handleOpenPublic, copy)}
           data={items}
           {...(isValidParams && isPending && { loading: { size: 45 } })}
           {...(data?.count && {
