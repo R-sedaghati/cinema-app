@@ -11,7 +11,8 @@ import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
 const AdminLogin = () => {
   const router = useRouter();
   const { mutate: login, isPending } = useAdminLogin();
-  const { setUserName, setAdminId, login: loginStore } = useAdminAuthStore();
+  const { setUserName, setAdminId, setRole, login: loginStore } =
+    useAdminAuthStore();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -29,6 +30,7 @@ const AdminLogin = () => {
           const data = response.result;
           setUserName(data.username);
           setAdminId(data.id);
+          setRole(data.role);
           loginStore(data.accessToken);
           router.push("/admin/users/");
           if (data?.accessToken) {

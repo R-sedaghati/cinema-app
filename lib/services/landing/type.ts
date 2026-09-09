@@ -151,7 +151,8 @@ export type ArtistRequestStatus =
   | "PENDING_PAYMENT"
   | "PENDING"
   | "APPROVED"
-  | "REJECTED";
+  | "REJECTED"
+  | "NEED_TO_REVISION";
 
 export type PortfolioType = "IMAGE" | "VIDEO";
 
@@ -164,12 +165,12 @@ export type UserCreateArtistRequest = {
 export type ArtistRequestResult = {
   artistRequestId: number;
   status: ArtistRequestStatus;
-  portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey?: string | null }[];
+  portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey: string | null }[];
   /**
    * Set when editing a request the admin sent back for revision: its fee was refunded to
    * the wallet, so resubmitting charges again (usually covered by that same refund).
    */
-  requiresPayment?: boolean;
+  requiresPayment: boolean;
 };
 
 /** Contact details are paid content — served only after a COMPLETED contact request. */

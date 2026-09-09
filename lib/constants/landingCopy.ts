@@ -317,6 +317,8 @@ export const LANDING_COPY = {
   profileFormsTracking: { group: "پروفایل کاربر", admin: "برچسب کد پیگیری فرم", value: "کد پیگیری:" },
   profileFormEdit: { group: "پروفایل کاربر", admin: "دکمه ویرایش فرم", value: "ویرایش فرم" },
   profileFormView: { group: "پروفایل کاربر", admin: "دکمه مشاهده فرم", value: "مشاهده فرم" },
+  profileFormPublicPage: { group: "پروفایل کاربر", admin: "دکمه صفحه عمومی هنرمند", value: "صفحه عمومی" },
+  profileFormViewTitle: { group: "پروفایل کاربر", admin: "عنوان صفحه مشاهده فرم", value: "مشاهده فرم ثبت‌شده" },
   profileFormsColName: { group: "پروفایل کاربر", admin: "ستون نام فرم", value: "نام فرم" },
   profileFormsColDate: { group: "پروفایل کاربر", admin: "ستون تاریخ ارسال", value: "تاریخ ارسال" },
   profileColStatus: { group: "پروفایل کاربر", admin: "ستون وضعیت", value: "وضعیت" },
@@ -352,6 +354,15 @@ export const LANDING_COPY = {
   },
   profileLogoutTitle: { group: "پروفایل کاربر", admin: "عنوان خروج از حساب", value: "خروج از حساب" },
   profileLogoutSuccess: { group: "پروفایل کاربر", admin: "پیام خروج موفق", value: "با موفقیت خارج شدید" },
+
+  // --- ثبت‌نام: خطاها ---
+  regEditUnavailable: { group: "ثبت‌نام هنرمند", admin: "پیام نبودن دسته‌بندی فرم", value: "این درخواست دسته‌بندی معتبری ندارد و قابل ویرایش نیست." },
+  regEditUnavailableCta: { group: "ثبت‌نام هنرمند", admin: "دکمه بازگشت به فهرست فرم‌ها", value: "بازگشت به فهرست فرم‌ها" },
+  deepLinkCategoryMissing: { group: "ثبت‌نام هنرمند", admin: "پیام پیدا نشدن دسته‌بندی لینک", value: "این دسته‌بندی پیدا نشد. از فهرست زیر انتخاب کنید." },
+
+  // --- بارگذاری فایل ---
+  imageUploadFailed: { group: "بارگذاری فایل", admin: "خطای بارگذاری تصویر", value: "بارگذاری تصویر ناموفق بود. دوباره تلاش کنید." },
+  videoUploadFailed: { group: "بارگذاری فایل", admin: "خطای بارگذاری ویدیو", value: "بارگذاری ویدیو ناموفق بود. دوباره تلاش کنید." },
 
   // --- وضعیت پرداخت ---
   paymentPending: { group: "وضعیت پرداخت", admin: "در انتظار پرداخت", value: "در انتظار پرداخت" },

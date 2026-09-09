@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IAdjustWalletRequest,
   IAdminWalletResponse,
@@ -116,6 +116,7 @@ import {
   adminUploadTutorialThumbnail,
   adminUserRequest,
   adminUsersList,
+  adminUserDelete,
 } from "./api";
 import { AxiosError } from "axios";
 import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
@@ -492,6 +493,19 @@ export const useAdminUsersList = (
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminUserDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation<unknown, AxiosError, number>({
+    mutationFn: (id: number) => adminUserDelete(id, accessToken),
+    // Owned here rather than at the call site, so a second caller cannot leave a deleted
+    // user on screen.
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["adminUsersList"] }),
   });
 };
 

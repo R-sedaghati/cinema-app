@@ -2,41 +2,35 @@ import {
   useUserCategoryFormSchema,
   useUserCategoryList,
   useUserProfile,
+  useUserSiteContent,
 } from "@/lib/services/landing/hook";
 import { IUserCategoryResponse, IUserProfile } from "@/lib/services/landing/type";
 import { EFormFieldType, SyncToUserField } from "@/lib/services/admin/type";
-import { Card, HorizontalStep, HorizontalStepper } from "@dgshahr/ui-kit";
-import {
-  LayoutGrid,
-  UserRound,
-  List,
-  CreditCard,
-  Loader2,
-  LucideIcon,
-} from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { SelectedCategory } from "@/app/(main)/artist-registration/ArtistRegistrationPageContent";
 import FirstStepFlow from "./FIrstStepFlow";
 import FourthStepFlow from "./FourthStepFlow";
 import DynamicFormStep from "./DynamicFormStep";
-import { isDesktop, isMobile } from "react-device-detect";
-import clsx from "clsx";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
+import {
+  onScreen,
+  resolveRegistrationSections,
+} from "@/lib/utils/resolveRegistrationSections";
+import type { IResolvedRegistrationSection } from "@/lib/utils/resolveRegistrationSections";
+import { CATEGORY_PAGE_SIZE } from "@/lib/constants/pagination";
+import FormTitleSection from "./sections/FormTitleSection";
+import StepperSection from "./sections/StepperSection";
 
 interface ArtistProps {
   category: SelectedCategory | null;
   flowStep: number;
   onNext: () => void;
   onPrevious: () => void;
+  onGoToStep: (step: number) => void;
 }
-
-const ICON_MAP: Record<string, LucideIcon> = {
-  LayoutGrid,
-  UserRound,
-  List,
-  CreditCard,
-};
 
 /** Answer shapes that mean "still blank", and so may be filled in from the profile. */
 const isEmptyAnswer = (value: unknown) =>
@@ -65,10 +59,21 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   flowStep,
   onNext,
   onPrevious,
+  onGoToStep,
 }) => {
-  const { data, isLoading } = useUserCategoryList({ page: 1, count: 30 });
+  const { data, isLoading } = useUserCategoryList({ page: 1, count: CATEGORY_PAGE_SIZE });
   const { data: schemaData, isLoading: isSchemaLoading } =
     useUserCategoryFormSchema(category?.id);
+  const { data: siteContent } = useUserSiteContent();
+
+  const flowSections = useMemo(
+    () =>
+      onScreen(
+        resolveRegistrationSections(siteContent?.result?.registrationSections),
+        "flow",
+      ),
+    [siteContent],
+  );
 
   const selectedCategory = useMemo(() => {
     if (!data?.result || !category?.id) return null;
@@ -80,6 +85,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
   const copy = useFormCopy();
   const store = useArtistRegistrationStore();
+  const router = useRouter();
 
   const children = selectedCategory?.children || [];
   const hasChildren = children.length > 0;
@@ -127,8 +133,15 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     [syncedFields],
   );
 
+  // The schema query refetches on an interval, so `syncedFields` gets a new identity
+  // every 30s. Without this guard the effect re-fires and silently refills fields the
+  // user deliberately cleared.
+  const prefilledForRef = useRef<number | null>(null);
+
   useEffect(() => {
-    if (!profileData) return;
+    if (!profileData || !syncedFields.length) return;
+    if (prefilledForRef.current === (category?.id ?? null)) return;
+    prefilledForRef.current = category?.id ?? null;
 
     const { answers, setAnswer } = useArtistRegistrationStore.getState();
 
@@ -144,16 +157,19 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
 
       setAnswer(key, value);
     }
-  }, [syncedFields, profileData]);
+  }, [syncedFields, profileData, category?.id]);
 
   useEffect(() => {
     if (data && !hasChildren && flowStep === 0) {
       onNext();
     }
-  }, [data, hasChildren, flowStep]);
+  }, [data, hasChildren, flowStep, onNext]);
 
-  const stepperActiveStep = hasChildren ? flowStep : flowStep - 1;
+  // Before the auto-advance effect fires, a childless category is still on step 0, and
+  // a negative active step renders as "0 of N".
+  const stepperActiveStep = Math.max(hasChildren ? flowStep : flowStep - 1, 0);
   const totalFixedTailSteps = 1; // payment step
+  const totalSteps = steps.length + totalFixedTailSteps + (hasChildren ? 1 : 0);
 
   if (isLoading || isSchemaLoading) {
     return (
@@ -163,21 +179,27 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     );
   }
 
-  const contentIndex = flowStep - 1;
+  // A deep link can carry any number; anything past the review step has nothing to
+  // render, and clamping here beats a blank page.
+  const maxStep = steps.length + 1;
+  const clampedStep = Math.min(Math.max(flowStep, 0), maxStep);
+  const contentIndex = clampedStep - 1;
 
   // Without child categories there is no category sub-step: flowStep 0 auto-advances,
   // so stepping back into it just bounces forward again and the button looks dead.
-  // Jump straight to the category grid instead (edit mode has no grid to return to).
+  // Leave for the grid of all forms instead — from an edit too, which has no earlier
+  // step of its own to fall back to.
   const handlePrevious = () => {
-    if (!hasChildren && flowStep === 1) {
-      if (!store.editId) store.reset();
+    if (!hasChildren && clampedStep === 1) {
+      store.reset();
+      router.push("/artist-registration");
       return;
     }
     onPrevious();
   };
 
   const renderStep = () => {
-    if (flowStep === 0) {
+    if (clampedStep === 0) {
       return hasChildren ? (
         <FirstStepFlow
           childrenList={children}
@@ -210,6 +232,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
           registrationAmount={schemaData?.result?.registrationAmount}
           onNext={onNext}
           onPrevious={handlePrevious}
+          onGoToStep={onGoToStep}
         />
       );
     }
@@ -217,53 +240,36 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     return null;
   };
 
-  const totalSteps = steps.length + totalFixedTailSteps + (hasChildren ? 1 : 0);
+  const renderSection = (section: IResolvedRegistrationSection) => {
+    switch (section.key) {
+      case "formTitle":
+        return (
+          <FormTitleSection
+            key={section.key}
+            copy={copy}
+            categoryTitle={category?.title ?? ""}
+          />
+        );
+      case "stepper":
+        return (
+          <StepperSection
+            key={section.key}
+            steps={steps}
+            copy={copy}
+            hasChildren={hasChildren}
+            activeStep={stepperActiveStep}
+            totalSteps={totalSteps}
+            variant={section.variant}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3 items-center">
-      <p className="font-h2-bold mt-5 mb-1 md:mb-7 md:mt-0">
-        {copy("formTitle", { category: category?.title ?? "" })}
-      </p>
-
-      <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} className="py-4">
-        <HorizontalStepper
-          activeStep={stepperActiveStep}
-          size="medium"
-          stepOrientation="horizontal"
-          classname={clsx(
-            "w-[95%] mx-auto scrollbar-hidden",
-            isDesktop && "w-3/4",
-          )}
-        >
-          {hasChildren && (
-            <HorizontalStep
-              activeIcon={<LayoutGrid />}
-              icon={<LayoutGrid />}
-              subTitle={copy("stepCounter", { n: 1, total: totalSteps })}
-              title={copy("categoryStepTitle")}
-            />
-          )}
-          {steps.map((step, index) => {
-            const Icon = (step.icon && ICON_MAP[step.icon]) || UserRound;
-            const stepNumber = index + 1 + (hasChildren ? 1 : 0);
-            return (
-              <HorizontalStep
-                key={step.id}
-                activeIcon={<Icon />}
-                icon={<Icon />}
-                subTitle={copy("stepCounter", { n: stepNumber, total: totalSteps })}
-                title={step.title}
-              />
-            );
-          })}
-          <HorizontalStep
-            activeIcon={<CreditCard />}
-            icon={<CreditCard />}
-            subTitle={copy("finalStepLabel")}
-            title={copy("paymentStepTitle")}
-          />
-        </HorizontalStepper>
-      </Card>
+      {flowSections.map(renderSection)}
 
       {renderStep()}
     </div>

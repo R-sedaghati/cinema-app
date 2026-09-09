@@ -19,6 +19,12 @@ interface ArtistRegistrationState {
   categoryId: number[];
   answers: Record<string, unknown>;
 
+  /**
+   * Storage path -> presigned url, for the already-uploaded files of a request being
+   * edited. Answers hold paths (that is what the API takes back); previews need urls.
+   */
+  portfolioUrls: Record<string, string>;
+
   // Step Actions
   handleNext: () => void;
   handlePrevious: () => void;
@@ -32,12 +38,13 @@ interface ArtistRegistrationState {
   ) => void;
 
   setAnswer: (key: string, value: unknown) => void;
+  addPortfolioUrl: (path: string, url: string) => void;
   setAnswers: (answers: Record<string, unknown>) => void;
 
   reset: () => void;
 }
 
-const initialState = {
+const initialState = () => ({
   step: 0,
   editId: null as number | null,
 
@@ -47,11 +54,13 @@ const initialState = {
   categoryId: [],
 
   answers: {} as Record<string, unknown>,
-};
+
+  portfolioUrls: {} as Record<string, string>,
+});
 
 export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
   (set) => ({
-    ...initialState,
+    ...initialState(),
 
       setStep: (step) => set({ step }),
 
@@ -89,11 +98,16 @@ export const useArtistRegistrationStore = create<ArtistRegistrationState>()(
         answers: { ...state.answers, [key]: value },
       })),
 
+    addPortfolioUrl: (path, url) =>
+      set((state) => ({
+        portfolioUrls: { ...state.portfolioUrls, [path]: url },
+      })),
+
     setAnswers: (answers) => set({ answers }),
 
     reset: () =>
       set({
-        ...initialState,
+        ...initialState(),
       }),
   }),
 );

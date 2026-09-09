@@ -16,8 +16,9 @@ import { toast } from "react-toastify";
 import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { CopyFn } from "@/lib/utils/formCopy";
-import { landingCopy } from "@/lib/utils/landingCopy";
+import { getStepErrors } from "@/lib/utils/validateFormStep";
 import { userPurchase } from "@/lib/services/landing/api";
+import FormAnswersSummary from "./FormAnswersSummary";
 
 interface Props {
   steps: IFormStep[];
@@ -26,6 +27,8 @@ interface Props {
   registrationAmount?: number;
   onNext: () => void;
   onPrevious: () => void;
+  /** Jump back to the first step that failed validation. */
+  onGoToStep: (step: number) => void;
 }
 
 const FourthStepFlow: React.FC<Props> = ({
@@ -33,6 +36,7 @@ const FourthStepFlow: React.FC<Props> = ({
   copy,
   registrationAmount,
   onPrevious,
+  onGoToStep,
 }) => {
   const store = useArtistRegistrationStore();
   // Resolved server-side from the category. 0 is a real answer — the category is free —
@@ -72,35 +76,56 @@ const FourthStepFlow: React.FC<Props> = ({
   // XHR (the axios instance injects the token) and navigate to whatever comes back.
   const startPayment = (requestId: number) => {
     setIsRedirecting(true);
+    // Read before the reset below, so the fallback URL does not depend on when the
+    // store is cleared.
+    const categoryId = store.categoryId[0] ?? "";
 
     return userPurchase(requestId)
       .then(({ result }) => {
         // No redirectUrl means the server already settled it — a free category, or the
         // wallet covered the fee — so there is no gateway stop to make.
-        window.location.href =
+        const href =
           result?.redirectUrl ??
-          `/artist-registration/result?status=success&categoryId=${store.categoryId[0] ?? ""}`;
+          `/artist-registration/result?status=success&categoryId=${categoryId}`;
+
+        // Only safe once the navigation is certain: resetting earlier unmounts the flow
+        // while this call is still in flight.
+        store.reset();
+        window.location.href = href;
       })
       // landingApi's interceptor already toasts the failure.
       .catch(() => setIsRedirecting(false));
   };
 
   const handleSubmit = () => {
+    // Per-step validation only runs on Next, so a deep link that lands straight on this
+    // screen would otherwise submit — and charge for — an empty form.
+    const firstInvalid = steps.findIndex(
+      (step) => getStepErrors(step, store.answers, copy).length > 0,
+    );
+
+    if (firstInvalid !== -1) {
+      toast.error(getStepErrors(steps[firstInvalid], store.answers, copy)[0]);
+      onGoToStep(firstInvalid + 1);
+      return;
+    }
+
     if (store.editId) {
       update(
         { id: store.editId, ...formPayload },
         {
           onSuccess: (res) => {
-            store.reset();
-
             // A request sent back for revision had its fee refunded to the wallet, so it
             // goes through payment again. The wallet normally covers it in full, in which
             // case the server settles it and redirects without a gateway stop.
+            // Resetting the store here would unmount the flow mid-purchase, so it waits
+            // until the navigation is actually under way.
             if (res.result.requiresPayment) {
               startPayment(res.result.artistRequestId);
               return;
             }
 
+            store.reset();
             toast.success(copy("editSuccessToast"));
             router.push("/profile");
           },
@@ -138,36 +163,12 @@ const FourthStepFlow: React.FC<Props> = ({
       className={clsx("pt-16 px-4", isDesktop && "px-6")}
     >
       <div className="flex flex-col gap-10">
-        <div className="flex flex-col gap-4">
-          {steps.map((step) => (
-            <div key={step.id} className="flex flex-col gap-2">
-              <p className="font-h6-bold">{step.title}</p>
-              <div className="grid md:grid-cols-2 gap-2">
-                {[...step.fields]
-                  .sort((a, b) => a.order - b.order)
-                  .map((field) => {
-                    const value = store.answers[field.key];
-                    const display =
-                      typeof value === "boolean"
-                        ? value
-                          ? copy("booleanYes")
-                          : copy("booleanNo")
-                        : Array.isArray(value)
-                          ? value.join(landingCopy("listSeparator"))
-                          : ((value as string | number | undefined) ??
-                            copy("emptyValue"));
-
-                    return (
-                      <div key={field.id} className="flex gap-1">
-                        <p className="font-p2-medium text-gray-500">{field.label}:</p>
-                        <p className="font-p2-regular">{String(display)}</p>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          ))}
-        </div>
+        <FormAnswersSummary
+          steps={steps}
+          answers={store.answers}
+          copy={copy}
+          portfolioUrls={store.portfolioUrls}
+        />
 
         {!store.editId && (
           <div className="flex flex-col gap-3 md:gap-0 md:flex-row justify-between items-center">

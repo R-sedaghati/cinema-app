@@ -355,6 +355,13 @@ interface SiteContent {
   // registry in `lib/constants/landingCopy.ts`. Missing keys fall back to the
   // defaults, so this may be `{}` or absent.
   landing?: Record<string, string> | null;
+  // home-page section order, visibility and layout variant, set in the admin
+  // page-builder. Keyed by the frontend catalog in `lib/constants/homeSections.ts`;
+  // empty/absent = the shipped catalog order.
+  homeSections?: { key: string; hidden: boolean; variant?: string }[] | null;
+  // same, for the artist-registration page, keyed by
+  // `lib/constants/registrationSections.ts` and set in `/admin/registration-builder`.
+  registrationSections?: { key: string; hidden: boolean; variant?: string }[] | null;
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -517,10 +524,38 @@ List own artist requests. **Auth required.**
 
 ---
 
+### `GET /user/artist-requests/:id/`
+Retrieve one of the caller's own artist requests, whatever its status. **Auth required.**
+
+Same payload shape as the public `GET /artists-requests/:id/`, but nothing is stripped:
+identity answers (`fullName`, `email`, `nationalCode`, `postalCode`, ...) and the full
+`user` object are all present, because the caller owns them. Someone else's request answers
+`404`, not `403`. This — not the public route — is what an edit form hydrates from: `PATCH`
+below overwrites `answers` wholesale, so hydrating from a stripped payload would delete the
+missing keys.
+
+**Response (200):** `ApiResponse<ArtistRequest>` (`answers` complete, `portfolios[]` carry
+both `filePath` and a presigned `url`)
+
+---
+
 ### `PATCH /user/artist-requests/:id/`
 Update own artist request. **Auth required.**
 
 **Body:** same shape as create (all optional). `answers` overwrites wholesale if provided. `portfolios` array replaces existing if provided.
+
+**Response (200):**
+```ts
+ApiResponse<{
+  artistRequestId: number;
+  status: ArtistRequestStatus;
+  portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey: string | null }[];
+  // true when the edited request was NEED_TO_REVISION: the fee was refunded to the
+  // wallet when the admin asked for changes, so it is charged again. The client sends
+  // the artist to `GET /user/purchase/` when this is set.
+  requiresPayment: boolean;
+}>
+```
 
 ---
 
@@ -563,15 +598,6 @@ ApiResponse<{
   // block, validation messages ...), keyed by the frontend FORM_COPY registry
   // in `lib/constants/formCopy.ts`. Missing keys fall back to the defaults.
   formCopy: Record<string, string>;
-}>
-```
-
-**Response (200):**
-```ts
-ApiResponse<{
-  artistRequestId: number;
-  status: ArtistRequestStatus;
-  portfolios: { id: number; filePath: string; type: PortfolioType }[];
 }>
 ```
 
@@ -1234,6 +1260,42 @@ List all users.
 Get all artist requests for a specific user (admin view).
 
 **Response:** `ApiResponse<ArtistRequest[]>`
+
+---
+
+### `DELETE /admin/users/:id/`
+Delete a user and everything they own. **SUPER_ADMIN only** — an ordinary `ADMIN` token
+gets `403`. Irreversible.
+
+Three things happen, none of which the FKs' `ON DELETE CASCADE` would do on its own (it
+only fires on a hard delete, and TypeORM's `softRemove` does not cascade):
+
+1. **Soft-delete cascade** (`deleted_at = NOW()`, `is_active = false`), children first:
+   `artist_portfolios`, `artist_requests_rejected_reasons`, `crm_notes`,
+   `contact_requests` (both as buyer and as target), `wallet_transactions`,
+   `user_messages`, `artist_requests`, and the user row. `supports` is included too,
+   matched on phone/email — support tickets have no user FK, they copy the name, email
+   and phone in as plain columns.
+2. **PII scrub.** `first_name`, `last_name`, `email`, `national_code` and `avatar_path`
+   are set to `NULL`; `artist_requests.answers` is emptied to `{}` (it holds the name,
+   email, national code and address the form collected);
+   `contact_requests.requester_name` and the matched support tickets' name/email/phone
+   are cleared. `users.code` is kept — a public artist number, not personal data.
+3. **The phone number is released.** `phone_number` becomes `deleted:{id}:{original}`.
+   The unique index still covers soft-deleted rows, so without this the person's number
+   could never log in again (`POST /user/login/` does `findOneBy({ phone_number })`,
+   which skips deleted rows, then `save`). After deletion the same number registers as a
+   fresh, empty account.
+
+Uploaded objects (avatar, portfolio files, and any `users/{id}/…` path stored as a form
+answer) are deleted from object storage after the transaction commits, best-effort: a
+missing object is logged, not surfaced as a failure.
+
+`payments` and `gateway_receipts` are deliberately left untouched — they carry no personal
+data and they are the money audit trail.
+
+**Response:** `ApiResponse<null>` — `400` if there is no such live user, `403` if the
+caller is not a super admin.
 
 ---
 

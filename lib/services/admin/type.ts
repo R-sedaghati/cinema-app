@@ -619,6 +619,12 @@ export interface ISiteContent {
    * `lib/utils/resolveHomeSections.ts`.
    */
   homeSections?: { key: string; hidden: boolean; variant?: string }[] | null;
+  /**
+   * Artist-registration page section order and visibility, keyed by
+   * `lib/constants/registrationSections.ts`. Empty/absent means "use the
+   * shipped catalog order" — see `lib/utils/resolveRegistrationSections.ts`.
+   */
+  registrationSections?: { key: string; hidden: boolean; variant?: string }[] | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;

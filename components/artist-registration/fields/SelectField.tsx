@@ -1,7 +1,7 @@
 "use client";
 
 import { Select } from "@dgshahr/ui-kit";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { EFormFieldType } from "@/lib/services/admin/type";
 import { useUserCityList, useUserProvinceList } from "@/lib/services/landing/hook";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
@@ -15,18 +15,31 @@ const SelectField: React.FC<FieldProps> = ({ field, value, onChange, provinceKey
     provinceKey ? (s.answers[provinceKey] as string | undefined) : undefined,
   );
 
-  const { data: provinces } = useUserProvinceList(undefined, isProvince || isCity);
+  const { data: provinces, isFetching: provincesFetching } = useUserProvinceList(
+    undefined,
+    isProvince || isCity,
+  );
   const provinceId =
     provinces?.result?.find((p) => p.name === selectedProvince)?.id ?? 0;
-  const { data: cities } = useUserCityList(isCity ? provinceId : 0);
+  // A city field is only genuinely unusable once the province list has arrived and still
+  // does not name the answer's province — before that it is merely not loaded yet.
+  const isProvinceUnresolved = isCity && !provinceId && !provincesFetching;
+  const { data: cities, isFetching: citiesFetching } = useUserCityList(
+    isCity ? provinceId : 0,
+  );
 
-  const cityNames = cities?.result ?? [];
+  const cityNames = useMemo(() => cities?.result ?? [], [cities]);
 
   // province changed under it: the previously picked city belongs to another province
   useEffect(() => {
-    if (!isCity || !value || !cityNames.length) return;
+    // While the list is in flight it still holds the previous province's cities — clearing
+    // against it would wipe a city that was just hydrated into an edit.
+    // Same for the province list: clearing while it is in flight wipes a city that was
+    // just hydrated into an edit.
+    if (!isCity || !value || !cityNames.length || citiesFetching) return;
+    if (provincesFetching || !provinceId) return;
     if (!cityNames.some((c) => c.name === value)) onChange("");
-  }, [isCity, value, cityNames]);
+  }, [isCity, value, cityNames, citiesFetching, provincesFetching, provinceId, onChange]);
 
   const options = isProvince
     ? (provinces?.result ?? []).map((p) => ({ label: p.name, value: p.name }))
@@ -41,13 +54,16 @@ const SelectField: React.FC<FieldProps> = ({ field, value, onChange, provinceKey
         placeholder: field.placeholder ?? field.label,
         required: field.required,
       }}
-      disabled={isCity && !provinceId}
+      disabled={isProvinceUnresolved}
       searchable={isProvince || isCity}
       value={(value as string) || null}
       options={options}
       wrapperClassName="w-full"
-      // ponytail: single mode fires onChange even for the already-selected option, so toggle it off
-      onChange={(selected) => onChange(selected === value ? "" : (selected ?? ""))}
+      // Single mode fires onChange even for the already-selected option. Toggling it off
+      // there would silently blank a required answer, so a re-pick is a no-op instead.
+      onChange={(selected) =>
+        selected === value ? undefined : onChange(selected ?? "")
+      }
       mode="single"
     />
   );

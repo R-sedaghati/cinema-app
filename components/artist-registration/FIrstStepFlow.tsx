@@ -8,6 +8,7 @@ import Button from "../common/Button";
 import clsx from "clsx";
 import { isDesktop, isMobile } from "react-device-detect";
 import { CopyFn } from "@/lib/utils/formCopy";
+import { sortByPriority } from "@/lib/utils/sortByPriority";
 
 interface Props {
   childrenList: IUserCaategoryItem[];
@@ -41,7 +42,7 @@ const FirstStepFlow: React.FC<Props> = ({
         <p className="font-p2-medium">{copy("categoryPrompt")}</p>
 
         <div className="flex flex-col gap-2">
-          {childrenList?.map((child) => (
+          {sortByPriority(childrenList ?? []).map((child) => (
             <Checkbox
               key={child.id}
               label={child?.faName ?? ""}

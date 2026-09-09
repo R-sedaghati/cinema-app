@@ -43,6 +43,7 @@ import {
 } from "./type";
 import {
   getUserArtistDetail,
+  getOwnArtistRequest,
   updateUserArtistRequest,
   userMessages,
   userMessageRead,
@@ -281,7 +282,9 @@ export const useUserCategoryFormSchema = (categoryId?: number | null) =>
     queryKey: ["userCategoryFormSchema", categoryId],
     queryFn: () => userGetCategoryFormSchema(categoryId!),
     enabled: !!categoryId,
-    refetchInterval: 30 * 1000,
+    // A form schema is not live data, and polling it swapped fields out from under a
+    // user who was mid-way through filling them in.
+    refetchInterval: false,
     refetchOnWindowFocus: false,
   });
 
@@ -309,6 +312,27 @@ export const useUserArtistDetail = (id?: number) =>
     refetchOnWindowFocus: false,
   });
 
+/**
+ * Edit-mode source of truth. No polling and no staleness: the hydration effect wipes the
+ * form store when a new response lands, so a background refetch would eat what the user
+ * just typed.
+ */
+export const useOwnArtistRequest = (id?: number) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IArtistRetriveResponse>({
+    queryKey: ["ownArtistRequest", id],
+    queryFn: () => getOwnArtistRequest(id!, accessToken),
+    enabled: Boolean(id && accessToken),
+    refetchInterval: false,
+    staleTime: Infinity,
+    // `staleTime: Infinity` alone would leave a failed save serving the pre-edit answers
+    // with no path back to the server; remounting the page is the user's retry.
+    refetchOnMount: "always",
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useUpdateUserArtistRequest = () => {
   const { accessToken } = useAuthStore();
   const queryClient = useQueryClient();
@@ -320,8 +344,17 @@ export const useUpdateUserArtistRequest = () => {
     }: { id: number } & Partial<UserCreateArtistRequest>) =>
       updateUserArtistRequest(id, payload, accessToken),
     // The API copies answers of `syncToUserField` fields into the account on submit.
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+    onSuccess: (_res, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["ownArtistRequest", id] });
+      // The approved request also backs the public artist page, which otherwise serves
+      // the pre-edit answers until its next poll.
+      queryClient.invalidateQueries({ queryKey: ["userArtistDetail", id] });
+      // the profile forms list, so its status/date are fresh on the way back
+      queryClient.invalidateQueries({
+        queryKey: ["userSuserArtistRequestsupport"],
+      });
+    },
   });
 };
 
