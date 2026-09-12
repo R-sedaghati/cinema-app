@@ -24,11 +24,11 @@ test("an empty config renders the shipped page unchanged", () => {
   }
 });
 
-test("the category grid defaults to the staggered layout", () => {
+test("the category grid defaults to the covers layout", () => {
   const [cards] = resolveRegistrationSections([]).filter(
     (s) => s.key === "categoryCards",
   );
-  assert.equal(cards.variant, "staggered");
+  assert.equal(cards.variant, "covers");
 });
 
 test("stored order and variant win, hidden sections drop out", () => {
