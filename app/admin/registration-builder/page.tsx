@@ -48,7 +48,7 @@ function RegistrationBuilder() {
   // Real categories, so the preview shows the admin their own forms.
   const categories = useHomeCategories();
   const items = useMemo(
-    () => categories.map((c) => ({ id: c.id, title: c.faName })),
+    () => categories.map((c) => ({ id: c.id, title: c.faName, image: c.image })),
     [categories],
   );
 

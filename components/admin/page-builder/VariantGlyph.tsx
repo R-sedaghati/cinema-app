@@ -77,6 +77,16 @@ export function VariantGlyph({ variant }: { variant: string }) {
         </span>
       );
 
+    case "covers":
+      // Bigger 2x2 tiles — reads as picture tiles next to `grid`'s 3x2.
+      return (
+        <span className={`${frame} grid grid-cols-2 gap-[3px]`}>
+          {["a", "b", "c", "d"].map((k) => (
+            <span key={k} className={fill} />
+          ))}
+        </span>
+      );
+
     case "chips":
       return (
         <span className={`${frame} flex flex-wrap content-start gap-[3px]`}>

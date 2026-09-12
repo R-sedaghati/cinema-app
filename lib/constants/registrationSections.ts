@@ -60,6 +60,7 @@ const CATALOG = {
       { key: "list", admin: "فهرست" },
       { key: "chips", admin: "برچسب" },
       { key: "posters", admin: "ریل پوستر" },
+      { key: "covers", admin: "کاشی تصویری" },
     ],
     manageLink: "/admin/categories",
     manageLabel: "مدیریت دسته‌بندی‌ها و ترتیب آن‌ها",

@@ -11,6 +11,8 @@ export interface RegistrationCategory {
   title: string;
   /** Set when this account already filed here — the card opens that request instead. */
   existingRequestId?: number;
+  /** Category image; only the `covers` variant uses it. */
+  image?: string | null;
 }
 
 interface Props {
@@ -102,6 +104,42 @@ const CategoryCardsSection: React.FC<Props> = ({
         {items.map((item) =>
           card(item, "rounded-full px-4 py-2 flex items-center gap-2"),
         )}
+      </div>
+    );
+  }
+
+  if (variant === "covers") {
+    // Image-backed tiles: the category picture fills the card, text sits on a
+    // bottom gradient so it stays readable over any photo.
+    return (
+      <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => onSelect(item.id, item.title, item.existingRequestId)}
+            className="group relative h-40 w-full overflow-hidden rounded-2xl border border-transparent hover:border-red-900 cursor-pointer md:h-52"
+          >
+            <img
+              src={item.image ?? "/cat-1.svg"}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-right">
+              <div className="flex flex-col items-start gap-0.5">
+                <p className="text-sm font-semibold leading-tight text-white md:text-base">
+                  {item.title}
+                </p>
+                {item.existingRequestId && (
+                  <span className="text-[10px] text-zinc-300 md:text-xs">
+                    {copy("alreadyRegistered")}
+                  </span>
+                )}
+              </div>
+              <MoveLeft className="shrink-0 text-error-500" />
+            </div>
+          </button>
+        ))}
       </div>
     );
   }
