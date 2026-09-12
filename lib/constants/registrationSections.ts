@@ -55,12 +55,12 @@ const CATALOG = {
     admin: "کارت‌های فرم‌ها",
     screen: "select",
     variants: [
+      { key: "covers", admin: "کاشی تصویری" },
       { key: "staggered", admin: "ردیف نامتقارن" },
       { key: "grid", admin: "گرید" },
       { key: "list", admin: "فهرست" },
       { key: "chips", admin: "برچسب" },
       { key: "posters", admin: "ریل پوستر" },
-      { key: "covers", admin: "کاشی تصویری" },
     ],
     manageLink: "/admin/categories",
     manageLabel: "مدیریت دسته‌بندی‌ها و ترتیب آن‌ها",
