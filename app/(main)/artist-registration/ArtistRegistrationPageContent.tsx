@@ -89,6 +89,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
       sortByPriority(categoryData?.result ?? []).map((c) => ({
         id: c.id,
         title: c.faName,
+        image: c.image,
         // A request filed under a child category occupies its parent's form too.
         existingRequestId:
           requestIdByCategory.get(c.id) ??
