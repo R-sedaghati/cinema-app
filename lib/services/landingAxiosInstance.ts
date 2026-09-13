@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import qs from "qs";
 import { toast } from "react-toastify";
 import { apiErrorFa } from "../utils/apiErrorFa";
+import { unstackStorageUrls } from "../utils/toStoragePath";
 import useAuthStore from "../stores/useAuthStore";
 import useLoginDrawerStore from "../stores/useLoginDrawerStore";
 
@@ -66,6 +67,9 @@ function handleError(error: AxiosError) {
   return Promise.reject(error);
 }
 
-landingApi.interceptors.response.use((response) => response, handleError);
+landingApi.interceptors.response.use((response) => {
+  response.data = unstackStorageUrls(response.data);
+  return response;
+}, handleError);
 
 export default landingApi;

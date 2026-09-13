@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import qs from "qs";
 import { toast } from "react-toastify";
 import { apiErrorFa } from "../utils/apiErrorFa";
+import { unstackStorageUrls } from "../utils/toStoragePath";
 import useAdminAuthStore from "../stores/useAdminAuthStore";
 
 type ErrorResponse = {
@@ -77,6 +78,9 @@ function handleAxiosError(error: AxiosError) {
   return Promise.reject(error);
 }
 
-api.interceptors.response.use((response) => response, handleAxiosError);
+api.interceptors.response.use((response) => {
+  response.data = unstackStorageUrls(response.data);
+  return response;
+}, handleAxiosError);
 
 export default api;
