@@ -356,10 +356,13 @@ interface IProvinceItem {
 }
 
 export interface IUpdateCategoryRequest {
-  faName: string;
-  isActive: boolean;
-  description: string;
-  priority: number | null;
+  faName?: string;
+  enName?: string;
+  isActive?: boolean;
+  description?: string;
+  priority?: number | null;
+  /** null promotes to a main category. */
+  parentId?: number | null;
   image?: string | null;
   /** Price in Toman a viewer pays to unlock contact details in this category. 0 means free. */
   contactAmount?: number | null;
@@ -587,6 +590,9 @@ export interface ISiteContentFooter {
   phone: string;
   instagramUrl: string;
   copyright: string;
+  /** Enamad trust seal; rendered only when both are set. */
+  enamadId?: string;
+  enamadCode?: string;
 }
 
 export interface ISiteContent {

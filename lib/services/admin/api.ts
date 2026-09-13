@@ -77,14 +77,27 @@ export const adminCategoryList = async (
   params: Partial<ParamsCategoryList> | undefined,
   accessToken: string,
 ) => {
-  const { data } = await api.get<ICatrgotyListResponse>("/admin/categories", {
-    params: { count: 30, ...params },
-    headers: {
-      Authorization: accessToken,
-    },
-  });
+  // Every caller needs the whole list, but the backend caps `count` at 100 —
+  // walk the pages so categories past the first 100 aren't silently dropped.
+  const fetchPage = async (page: number) => {
+    const { data } = await api.get<ICatrgotyListResponse>("/admin/categories", {
+      params: { ...params, count: 100, page },
+      headers: {
+        Authorization: accessToken,
+      },
+    });
+    return data;
+  };
 
-  return data;
+  const first = await fetchPage(1);
+  const result = [...first.result];
+  for (let page = 2; result.length < first.count; page++) {
+    const next = await fetchPage(page);
+    if (next.result.length === 0) break;
+    result.push(...next.result);
+  }
+
+  return { ...first, next: null, result };
 };
 
 export const adminCategoryUpdate = async (

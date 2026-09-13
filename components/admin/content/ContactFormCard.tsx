@@ -12,7 +12,7 @@ import type {
   IContactFormField,
   ISiteContentContactForm,
 } from "@/lib/services/admin/type";
-import { FIELD_VALIDATION_PRESETS } from "@/lib/utils/fieldValidationPresets";
+import { FIELD_VALIDATION_PRESETS, toEnglishDigits } from "@/lib/utils/fieldValidationPresets";
 import type { FieldValidationPreset } from "@/lib/utils/fieldValidationPresets";
 import { Button, Card, Checkbox, Divider, Select } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
@@ -189,13 +189,33 @@ export default function ContactFormCard({ ready, stored, isPending, onSave }: Pr
                 value={field.validation?.preset ?? ""}
                 onChange={(value) =>
                   patchField(index, {
-                    validation: value
-                      ? { ...field.validation, preset: value as FieldValidationPreset }
-                      : null,
+                    validation: {
+                      ...field.validation,
+                      preset: (value as FieldValidationPreset) || undefined,
+                    },
                   })
                 }
                 options={PRESET_OPTIONS}
               />
+
+              {(field.type === EFormFieldType.TEXT || field.type === EFormFieldType.TEXTAREA) && (
+                <Input
+                  labelContent="حداقل طول"
+                  type="text"
+                  inputMode="numeric"
+                  value={field.validation?.minLength ?? ""}
+                  onChange={(e) => {
+                    const raw = toEnglishDigits(e.target.value).trim();
+                    const n = Number(raw);
+                    patchField(index, {
+                      validation: {
+                        ...field.validation,
+                        minLength: raw && Number.isFinite(n) ? n : undefined,
+                      },
+                    });
+                  }}
+                />
+              )}
             </div>
 
             {HAS_OPTIONS.has(field.type) && !isBuiltinContactKey(field.key) && (

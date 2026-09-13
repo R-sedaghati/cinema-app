@@ -12,9 +12,10 @@ interface Props {
   loading: boolean;
   params: Partial<ParamsCategoryList>;
   resetParams?: () => void;
+  expandAll?: { expanded: boolean; onToggle: () => void };
 }
 
-const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
+const FilterBar = ({ setParams, params, loading, resetParams, expandAll }: Props) => {
   const [search, setSearch] = useState<string>("");
   const showCleanFilters = ObjectUtils.hasMeaningfulValues(params, [
     "page",
@@ -99,6 +100,16 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
             />
           )}
         />
+
+        {expandAll && (
+          <button
+            type="button"
+            className="text-gray-600 font-p2-medium hover:text-error-500"
+            onClick={expandAll.onToggle}
+          >
+            {expandAll.expanded ? "بستن همه زیردسته‌ها" : "نمایش همه زیردسته‌ها"}
+          </button>
+        )}
 
         {showCleanFilters && (
           <button

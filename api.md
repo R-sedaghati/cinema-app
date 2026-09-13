@@ -349,6 +349,8 @@ interface SiteContent {
     phone: string;         // support number, displayed as typed (Persian digits ok)
     instagramUrl: string;  // href of the Instagram icon
     copyright: string;     // bottom line of the footer
+    enamadId?: string;     // Enamad trust seal id; seal shown only when both id and code are set
+    enamadCode?: string;   // Enamad trust seal Code
   } | null;
   // overrides for the public-site copy (hero, statistics, "why", homepage
   // sections, artists search, page titles), keyed by the frontend LANDING_COPY
@@ -1032,6 +1034,20 @@ means "not set here"** (inherit the top-level category, then the env fallback):
 | registrationAmount | an artist registering in this category | `REGISTRATION_AMOUNT` |
 
 **Response:** `ApiResponse<Category>`
+
+`parentId` (`number | null`) moves the category; `null` makes it top-level. `400` if the
+target is itself a subcategory, is the category itself, or the category has subcategories
+(two levels only).
+
+---
+
+### `DELETE /admin/categories/:id/`
+Soft-delete a category **and all its subcategories** in one statement
+(`deleted_at = NOW()`, `is_active = false`).
+
+`409` if the category or any subcategory has artist requests — deactivate it instead.
+
+**Response:** `ApiResponse<{ deletedIds: number[] }>`
 
 ---
 

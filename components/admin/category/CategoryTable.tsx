@@ -6,12 +6,16 @@ import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
-import { useAdminCategoryDelete, useAdminCategoryList } from "@/lib/services/admin/hook";
+import { useAdminCategoryList, useAdminCategoryUpdate } from "@/lib/services/admin/hook";
+import { ICategoryItem } from "@/lib/services/admin/type";
+import DeleteCategoryDrawer from "./DeleteCategoryDrawer";
 import Header from "./Header";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import useCategoryListParams from "@/lib/hooks/tables/useCategoryListParams";
+import { buildCategoryGroups, flattenCategoryGroups } from "@/lib/utils/categoryTree";
+import { useState } from "react";
 
 function CategoryTable() {
   const router = useRouter();
@@ -21,44 +25,73 @@ function CategoryTable() {
     useCategoryListParams();
 
   // ponytail: server-side search on /admin/categories is unreliable, so fetch the
-  // whole list (backend caps count at 100) and search/filter/paginate client-side.
-  // Move back to server params if categories ever exceed 100.
-  const { data, isPending } = useAdminCategoryList({ page: 1, count: 100 });
+  // whole list (all pages) and search/filter/paginate client-side.
+  const { data, isPending } = useAdminCategoryList();
 
-  const query = (params.search ?? "").trim().toLowerCase();
-  const filtered = (data?.result ?? []).filter((item) => {
-    if (params.isActive != null && item.isActive !== params.isActive)
-      return false;
-    if (!query) return true;
-    return [item.faName, item.enName, item.description].some((field) =>
-      field?.toLowerCase().includes(query),
-    );
+  const query = (params.search ?? "").trim();
+  const groups = buildCategoryGroups(data?.result ?? [], {
+    query,
+    isActive: params.isActive,
   });
-  const pageRows = filtered.slice(
-    (pagination.page - 1) * pagination.count,
-    pagination.page * pagination.count,
+
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  // While filtering, show every matching subcategory without a click.
+  const filtering = Boolean(query) || params.isActive != null;
+  const isExpanded = (id: number) => filtering || expanded.has(id);
+  const toggleExpand = (id: number) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  const expandableIds = groups.filter((g) => g.children.length).map((g) => g.parent.id);
+  const allExpanded =
+    expandableIds.length > 0 && expandableIds.every((id) => isExpanded(id));
+
+  // Paginate by main category so a parent is never split from its subcategories.
+  const rows = flattenCategoryGroups(
+    groups.slice(
+      (pagination.page - 1) * pagination.count,
+      pagination.page * pagination.count,
+    ),
+    isExpanded,
   );
-  const { mutate: deleteCategory } = useAdminCategoryDelete();
 
-  const columns = generateColumns(
-    (id) => {
-      router.push(`/admin/categories/${id}`);
-    },
-    (id) => {
-      router.push(`/admin/artist-registration?categoryId=${id}`);
-    },
-    (id) => {
-      if (!window.confirm("آیا از حذف این دسته‌بندی مطمئن هستید؟")) return;
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["categoryList"] });
+    queryClient.invalidateQueries({ queryKey: ["categoryRetrive"] });
+  };
 
-      deleteCategory(id, {
-        onSuccess: () => {
-          toast.success("با موفقیت حذف شد");
-          queryClient.invalidateQueries({ queryKey: ["categoryList"] });
+  const allCategories = data?.result ?? [];
+  const [deleteTarget, setDeleteTarget] = useState<ICategoryItem | null>(null);
+  const { mutate: updateCategory } = useAdminCategoryUpdate();
+  const [togglingId, setTogglingId] = useState<number | null>(null);
+
+  const columns = generateColumns({
+    isExpanded,
+    onToggleExpand: toggleExpand,
+    togglingId,
+    onToggleActive: (row) => {
+      setTogglingId(row.id);
+      updateCategory(
+        { id: row.id, payload: { isActive: !row.isActive } },
+        {
+          onSuccess: () => {
+            toast.success(row.isActive ? "دسته‌بندی غیرفعال شد" : "دسته‌بندی فعال شد");
+            invalidate();
+          },
+          onError: () => toast.error("خطا در تغییر وضعیت"),
+          onSettled: () => setTogglingId(null),
         },
-        onError: () => toast.error("خطا در حذف دسته‌بندی"),
-      });
+      );
     },
-  );
+    onEditClick: (id) => router.push(`/admin/categories/${id}`),
+    onAddChildClick: (id) => router.push(`/admin/categories/new?parentId=${id}`),
+    onRequestClick: (id) =>
+      router.push(`/admin/artist-registration?categoryId=${id}`),
+    onDeleteClick: (id) =>
+      setDeleteTarget(allCategories.find((c) => c.id === id) ?? null),
+  });
 
   return (
     <div className="ss02 mb-5">
@@ -67,6 +100,15 @@ function CategoryTable() {
         params={params}
         loading={isPending}
         resetParams={resetParams}
+        expandAll={
+          !filtering && expandableIds.length > 0
+            ? {
+                expanded: allExpanded,
+                onToggle: () =>
+                  setExpanded(allExpanded ? new Set() : new Set(expandableIds)),
+              }
+            : undefined
+        }
       />
 
       <Table
@@ -79,18 +121,25 @@ function CategoryTable() {
         }}
         stickyTableHeader
         columns={columns}
-        data={pageRows}
+        data={rows}
+        getRowClassName={(row) => (row.depth ? "bg-gray-50" : undefined)}
         {...(isPending && { loading: { size: 45 } })}
-        {...(filtered.length > 0 && {
+        {...(groups.length > 0 && {
           pagination: {
             pageSize: pagination.count,
             defaultCurrent: pagination.page,
-            totalCount: filtered.length,
+            totalCount: groups.length,
             onPageChange: (p) =>
               setPagination((state) => ({ ...state, page: p })),
           },
         })}
         emptyContent={<TableEmptyState message={tableEmptyMessage.notFound} />}
+      />
+
+      <DeleteCategoryDrawer
+        category={deleteTarget}
+        subcategories={allCategories.filter((c) => c.parent === deleteTarget?.id)}
+        onClose={() => setDeleteTarget(null)}
       />
     </div>
   );

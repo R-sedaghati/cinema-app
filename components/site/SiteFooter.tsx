@@ -18,6 +18,12 @@ export function SiteFooter() {
   const instagramUrl =
     footer?.instagramUrl?.trim() || FOOTER_DEFAULTS.instagramUrl;
   const copyright = footer?.copyright?.trim() || FOOTER_DEFAULTS.copyright;
+  const enamadId = footer?.enamadId?.trim();
+  const enamadCode = footer?.enamadCode?.trim();
+  const enamadQuery =
+    enamadId && enamadCode
+      ? `id=${encodeURIComponent(enamadId)}&Code=${encodeURIComponent(enamadCode)}`
+      : null;
 
   // tel: needs latin digits even when the displayed number is Persian.
   const phoneHref = `tel:${toEnglishDigits(phone).replace(/\s/g, "")}`;
@@ -110,10 +116,24 @@ export function SiteFooter() {
               />
             </div>
           </div>
-          <div className="flex items-center gap-10 opacity-70">
-            <div className="h-24 w-24 rounded-xl bg-zinc-800" />
-            <div className="h-24 w-24 rounded-xl bg-zinc-800" />
-          </div>
+          {enamadQuery && (
+            // referrerPolicy="origin" is required: Enamad validates the seal by referrer domain.
+            <a
+              referrerPolicy="origin"
+              target="_blank"
+              href={`https://trustseal.enamad.ir/?${enamadQuery}`}
+              className="rounded-xl bg-white p-1"
+            >
+              <img
+                referrerPolicy="origin"
+                src={`https://trustseal.enamad.ir/logo.aspx?${enamadQuery}`}
+                alt="enamad"
+                width={96}
+                height={96}
+                className="cursor-pointer"
+              />
+            </a>
+          )}
         </div>
 
         <p className="border-t border-zinc-800 pt-6 text-center text-xs text-zinc-500">
