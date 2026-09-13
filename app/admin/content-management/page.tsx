@@ -75,6 +75,8 @@ function ContentManagement() {
   const [footerPhone, setFooterPhone] = useState("");
   const [footerInstagram, setFooterInstagram] = useState("");
   const [footerCopyright, setFooterCopyright] = useState("");
+  const [footerEnamadId, setFooterEnamadId] = useState("");
+  const [footerEnamadCode, setFooterEnamadCode] = useState("");
   const [termsTitle, setTermsTitle] = useState("");
   const [termsContent, setTermsContent] = useState("");
   const [aboutFontSize, setAboutFontSize] = useState<number | null>(null);
@@ -93,6 +95,8 @@ function ContentManagement() {
     setFooterPhone(content.footer?.phone ?? "");
     setFooterInstagram(content.footer?.instagramUrl ?? "");
     setFooterCopyright(content.footer?.copyright ?? "");
+    setFooterEnamadId(content.footer?.enamadId ?? "");
+    setFooterEnamadCode(content.footer?.enamadCode ?? "");
     setTermsTitle(content.terms?.title ?? "");
     setTermsContent(content.terms?.content ?? "");
     setBenefitsFontSize(content.benefits?.fontSize ?? null);
@@ -235,6 +239,8 @@ function ContentManagement() {
           phone: footerPhone,
           instagramUrl: footerInstagram,
           copyright: footerCopyright,
+          enamadId: footerEnamadId.trim(),
+          enamadCode: footerEnamadCode.trim(),
         },
       },
       {
@@ -645,6 +651,30 @@ function ContentManagement() {
               value={footerCopyright}
               onChange={(e) => setFooterCopyright(e.target.value)}
             />
+
+            <p className="text-xs text-gray-500">
+              نماد اینماد: مقدار id و Code را از کدی که اینماد می‌دهد
+              (trustseal.enamad.ir/?id=...&Code=...) وارد کنید. خالی بودن هرکدام
+              یعنی نماد نمایش داده نمی‌شود.
+            </p>
+
+            <div className="flex justify-between gap-3">
+              <Input
+                labelContent="شناسه اینماد (id)"
+                wrapperClassName="w-1/2"
+                dir="ltr"
+                value={footerEnamadId}
+                onChange={(e) => setFooterEnamadId(e.target.value)}
+              />
+
+              <Input
+                labelContent="کد اینماد (Code)"
+                wrapperClassName="w-1/2"
+                dir="ltr"
+                value={footerEnamadCode}
+                onChange={(e) => setFooterEnamadCode(e.target.value)}
+              />
+            </div>
 
             <div className="flex justify-end gap-3">
               <Button

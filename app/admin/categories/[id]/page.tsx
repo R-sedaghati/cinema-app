@@ -1,16 +1,22 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
 import {
+  useAdminCategoryList,
   useAdminCategoryRetrieve,
   useAdminCategoryUpdate,
   useAdminUploadBannerImage,
 } from "@/lib/services/admin/hook";
 import withNoSSR from "@/lib/utils/withNoSSR";
-import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
+import { toStoragePath } from "@/lib/utils/toStoragePath";
+import { Badge, Button, Card, Divider, Select, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import DeleteCategoryDrawer from "@/components/admin/category/DeleteCategoryDrawer";
+import { ICategoryItem } from "@/lib/services/admin/type";
 import { useParams, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -18,17 +24,25 @@ function CategoryDetail() {
   const params = useParams();
   const id = Number(params.id);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { data: retriveDate } = useAdminCategoryRetrieve(id);
   const data = retriveDate?.result;
 
-  // A subcategory borrows its parent's form and price fallbacks, so the parent is
-  // named wherever we explain that inheritance.
-  const { data: parentData } = useAdminCategoryRetrieve(data?.parent ?? undefined);
-  const parentName = parentData?.result?.faName;
+  const { data: listData } = useAdminCategoryList();
+  const categories = listData?.result ?? [];
+  const subcategories = categories.filter((c) => c.parent === id);
+  const parentOptions = categories
+    .filter((c) => c.parent === null && c.id !== id)
+    .map((c) => ({ label: c.faName, value: c.id }));
+  const nameOf = (categoryId: number | null | undefined) =>
+    categories.find((c) => c.id === categoryId)?.faName;
 
   const { mutate, isPending } = useAdminCategoryUpdate();
 
+  const [deleteTarget, setDeleteTarget] = useState<ICategoryItem | null>(null);
+  const [parentId, setParentId] = useState<number | null>(null);
+  const [enName, setEnName] = useState("");
   const [faName, setFaName] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<number | null>(null);
@@ -44,10 +58,12 @@ function CategoryDetail() {
     if (!data) return;
 
     setFaName(data.faName);
+    setEnName(data.enName ?? "");
+    setParentId(data.parent);
     setDescription(data.description ?? "");
     setIsActive(data.isActive);
     setPriority(data.priority);
-    setImagePath(data.image ?? "");
+    setImagePath(toStoragePath(data.image ?? ""));
     setImageFile(data.image ? { src: data.image } : null);
     setContactAmount(
       data.contactAmount === null || data.contactAmount === undefined
@@ -83,7 +99,15 @@ function CategoryDetail() {
     });
   };
 
-  const amountFallbackHint = data?.parent
+  // A subcategory borrows its parent's form and price fallbacks, so the parent is
+  // named wherever we explain that inheritance. `parentName` follows the unsaved
+  // selection; the form card still points at the saved parent.
+  const parentName = nameOf(parentId);
+  const savedParentName = nameOf(data?.parent);
+  const parentChanged = data !== undefined && parentId !== data.parent;
+  const hasSubcategories = subcategories.length > 0;
+
+  const amountFallbackHint = parentId
     ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
     : "استفاده از مبلغ پیش‌فرض.";
 
@@ -93,9 +117,11 @@ function CategoryDetail() {
         id,
         payload: {
           faName,
+          enName,
           isActive,
           description,
-          priority,
+          ...(parentChanged && { parentId }),
+          ...(parentId === null && { priority }),
           image: imagePath || null,
           // An empty field means "not set" (inherit / fall back); a typed 0 means free.
           contactAmount: contactAmount === "" ? null : Number(contactAmount),
@@ -106,7 +132,14 @@ function CategoryDetail() {
       {
         onSuccess: () => {
           toast.success("با موفقیت انجام شد");
+          queryClient.invalidateQueries({ queryKey: ["categoryList"] });
+          queryClient.invalidateQueries({ queryKey: ["categoryRetrive"] });
           router.push("/admin/categories");
+        },
+        onError: (error) => {
+          const message = (error as { response?: { data?: { message?: string } } })
+            .response?.data?.message;
+          toast.error(message ?? "خطا در ذخیره‌سازی");
         },
       },
     );
@@ -114,7 +147,7 @@ function CategoryDetail() {
 
   return (
     <>
-      <div className="flex justify-start">
+      <div className="flex justify-between items-center">
         <Button
           onClick={() => router.push("/admin/categories")}
           variant="text"
@@ -123,6 +156,16 @@ function CategoryDetail() {
         >
           {`دسته‌بندی ${data?.faName}`}
         </Button>
+        {data && (
+          <Button
+            onClick={() => setDeleteTarget(data)}
+            variant="text"
+            leftIcon={<Trash2 />}
+            color="error"
+          >
+            {data.parent === null ? "حذف دسته‌بندی" : "حذف زیردسته"}
+          </Button>
+        )}
       </div>
       <Divider className="mb-5" color="gray" size="thin" type="horizontal" />
       <div className="flex flex-col gap-5 pt-6 px-4 h-full bg-gray-100">
@@ -157,20 +200,43 @@ function CategoryDetail() {
                 wrapperClassName: "w-fit",
               }}
             />
-            {data?.parent ? (
+            {parentId ? (
               <p className="font-p2-regular text-gray-500">
                 {`زیر‌دسته${parentName ? ` «${parentName}»` : " یک دسته‌بندی اصلی"} است؛ ترتیب نمایش آن از دسته‌بندی اصلی پیروی می‌کند و اولویت جداگانه‌ای ندارد.`}
               </p>
             ) : null}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <Input
-                labelContent="نام دسته ‌بندی"
+                labelContent="نام دسته ‌بندی (فارسی)"
                 placeholder="نام دسته ‌بندی"
                 wrapperClassName="w-full"
                 value={faName}
                 onChange={(e) => setFaName(e.target.value)}
               />
-              {!data?.parent && (
+              <Input
+                labelContent="نام دسته ‌بندی (انگلیسی)"
+                placeholder="Category name"
+                wrapperClassName="w-full"
+                value={enName}
+                onChange={(e) => setEnName(e.target.value)}
+              />
+              <Select
+                mode="single"
+                value={parentId}
+                // Clicking the selected option again clears it → main category.
+                onChange={(value) => setParentId(value === parentId ? null : value)}
+                options={parentOptions}
+                disabled={hasSubcategories}
+                inputProps={{
+                  labelContent: "دسته‌بندی والد",
+                  placeholder: "بدون والد (دسته اصلی)",
+                  hintMessage: hasSubcategories
+                    ? "این دسته‌بندی زیردسته دارد و نمی‌تواند زیردسته دسته‌ای دیگر شود."
+                    : undefined,
+                }}
+                wrapperClassName="w-full"
+              />
+              {parentId === null && (
                 <Input
                   labelContent="اولویت"
                   placeholder="اولویت"
@@ -206,8 +272,80 @@ function CategoryDetail() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
+            {parentChanged && (
+              <p className="p-3 rounded-xl font-p2-regular text-warning-700 bg-warning-50">
+                {parentId === null
+                  ? "با ذخیره، این زیردسته به دسته‌بندی اصلی تبدیل می‌شود و تا تعریف فرم ثبت‌نام اختصاصی، فرمی نخواهد داشت. مبالغ خالی از مبلغ پیش‌فرض استفاده می‌کنند."
+                  : `با ذخیره، این دسته‌بندی زیردسته «${parentName ?? ""}» می‌شود و از فرم ثبت‌نام و مبالغ پیش‌فرض آن استفاده می‌کند.`}
+              </p>
+            )}
           </div>
         </Card>
+        {data && data.parent === null && (
+          <Card>
+            <div className="flex flex-col gap-4">
+              <div className="flex justify-between items-center">
+                <p className="font-h3-bold text-error-500">
+                  {`زیردسته‌ها (${subcategories.length})`}
+                </p>
+                <Button
+                  color="error"
+                  variant="outline"
+                  leftIcon={<Plus />}
+                  onClick={() => router.push(`/admin/categories/new?parentId=${id}`)}
+                >
+                  افزودن زیردسته
+                </Button>
+              </div>
+              <Divider color="gray" size="thin" type="horizontal" />
+              {hasSubcategories ? (
+                <ul className="flex flex-col divide-y divide-gray-200">
+                  {subcategories.map((sub) => (
+                    <li key={sub.id} className="flex gap-2 items-center">
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/admin/categories/${sub.id}`)}
+                        className="flex gap-3 items-center py-3 w-full text-right rounded-md hover:bg-gray-50"
+                      >
+                        {sub.image ? (
+                          <img
+                            src={sub.image}
+                            alt={sub.faName}
+                            className="object-cover w-10 h-10 rounded-md shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-100 rounded-md shrink-0" />
+                        )}
+                        <p className="flex-1 font-p1-medium">{sub.faName}</p>
+                        <p className="text-gray-500 font-p2-regular">
+                          {`${sub.artistRequestsCount} درخواست`}
+                        </p>
+                        <Badge
+                          type="twoTone"
+                          color={sub.isActive ? "success" : "error"}
+                          value={sub.isActive ? "فعال" : "غیرفعال"}
+                        />
+                        <ChevronLeft className="w-4 h-4 text-gray-400" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(sub)}
+                        aria-label={`حذف زیردسته ${sub.faName}`}
+                        className="flex justify-center items-center w-9 h-9 rounded-md text-error-500 shrink-0 hover:bg-error-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="font-p2-regular text-gray-500">
+                  این دسته‌بندی هنوز زیردسته‌ای ندارد.
+                </p>
+              )}
+            </div>
+          </Card>
+        )}
         <Card>
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
@@ -228,7 +366,7 @@ function CategoryDetail() {
             <p className="font-p2-regular text-gray-500">
               {data?.parent
                 ? `این زیر‌دسته فرم اختصاصی ندارد و از فرم دسته‌بندی اصلی${
-                    parentName ? ` «${parentName}»` : ""
+                    savedParentName ? ` «${savedParentName}»` : ""
                   } استفاده می‌کند. تغییر مراحل و فیلدها از همان‌جا انجام می‌شود و روی همه زیر‌دسته‌ها اثر می‌گذارد.`
                 : "مراحل و فیلدهای فرم ثبت‌نام این دسته‌بندی از صفحه مدیریت فرم قابل تعریف است."}
             </p>
@@ -275,6 +413,15 @@ function CategoryDetail() {
           </div>
         </Card>
       </div>
+      <DeleteCategoryDrawer
+        category={deleteTarget}
+        subcategories={categories.filter((c) => c.parent === deleteTarget?.id)}
+        onClose={() => setDeleteTarget(null)}
+        onDeleted={() => {
+          // Deleting the page's own category leaves nothing to edit here.
+          if (deleteTarget?.id === id) router.push("/admin/categories");
+        }}
+      />
     </>
   );
 }

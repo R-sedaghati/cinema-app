@@ -8,27 +8,40 @@ import {
 import { Button, Card, Divider, Select, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { toPriority } from "@/lib/utils/toEnglishDigits";
 
 function CategoryForm() {
   const router = useRouter();
+  // "افزودن زیردسته" links here with ?parentId= so the parent comes preselected.
+  const presetParentId = Number(useSearchParams().get("parentId")) || null;
 
   const [faName, setFaName] = useState("");
   const [enName, setEnName] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<number | null>(null);
   const [isActive, setIsActive] = useState(true);
-  const [parentId, setParentId] = useState<number | null>(null);
+  const [parentId, setParentId] = useState<number | null>(presetParentId);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
+  const [contactAmount, setContactAmount] = useState("");
+  const [registrationAmount, setRegistrationAmount] = useState("");
 
-  const { data: parentOptionsData } = useAdminCategoryList({ count: 100 });
-  const parentOptions = (parentOptionsData?.result ?? [])
-    .filter((category) => category.parent === null)
-    .map((category) => ({ label: category.faName, value: category.id }));
+  const { data: parentOptionsData } = useAdminCategoryList();
+  const mainCategories = (parentOptionsData?.result ?? []).filter(
+    (category) => category.parent === null,
+  );
+  const parentOptions = mainCategories.map((category) => ({
+    label: category.faName,
+    value: category.id,
+  }));
+  const parentName = mainCategories.find((c) => c.id === parentId)?.faName;
+  const presetParentName = mainCategories.find((c) => c.id === presetParentId)?.faName;
+  const amountFallbackHint = parentId
+    ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
+    : "استفاده از مبلغ پیش‌فرض.";
 
   const { mutate: createCategory, isPending } = useAdminCategoryCreate();
   const uploadImage = useAdminUploadBannerImage();
@@ -65,11 +78,15 @@ function CategoryForm() {
         priority: parentId === null ? priority : null,
         isActive,
         image: imagePath || null,
+        // An empty field means "not set" (inherit / fall back); a typed 0 means free.
+        contactAmount: contactAmount === "" ? null : Number(contactAmount),
+        registrationAmount:
+          registrationAmount === "" ? null : Number(registrationAmount),
       },
       {
         onSuccess: () => {
           toast.success("با موفقیت انجام شد");
-          router.push("/admin/categories");
+          router.push(presetParentId ? `/admin/categories/${presetParentId}` : "/admin/categories");
         },
         onError: () => toast.error("خطا در ذخیره‌سازی"),
       },
@@ -80,11 +97,15 @@ function CategoryForm() {
     <>
       <div className="flex justify-start">
         <Button
-          onClick={() => router.push("/admin/categories")}
+          onClick={() =>
+            router.push(presetParentId ? `/admin/categories/${presetParentId}` : "/admin/categories")
+          }
           variant="text"
           color="gray"
         >
-          افزودن دسته‌بندی
+          {presetParentId
+            ? `افزودن زیردسته${presetParentName ? ` «${presetParentName}»` : ""}`
+            : "افزودن دسته‌بندی"}
         </Button>
       </div>
       <Divider className="mb-5" color="gray" size="thin" type="horizontal" />
@@ -167,6 +188,37 @@ function CategoryForm() {
                 wrapperClassName="w-full md:col-span-3"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            {parentId !== null && (
+              <p className="font-p2-regular text-gray-500">
+                {`زیردسته از فرم ثبت‌نام دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} استفاده می‌کند و ترتیب نمایش آن از دسته‌بندی اصلی پیروی می‌کند.`}
+              </p>
+            )}
+            <p className="font-h3-bold text-error-500">پرداخت</p>
+            <Divider color="gray" size="thin" type="horizontal" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                labelContent="مبلغ پرداختی کاربر"
+                placeholder="مبلغ پرداختی کاربر"
+                postfix="تومان"
+                type="text"
+                inputMode="numeric"
+                value={contactAmount}
+                onChange={(e) => setContactAmount(e.target.value)}
+                hintMessage={`مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
+                wrapperClassName="w-full"
+              />
+              <Input
+                labelContent="مبلغ ثبت‌نام هنرمند"
+                placeholder="مبلغ ثبت‌نام هنرمند"
+                postfix="تومان"
+                type="text"
+                inputMode="numeric"
+                value={registrationAmount}
+                onChange={(e) => setRegistrationAmount(e.target.value)}
+                hintMessage={`مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
+                wrapperClassName="w-full"
               />
             </div>
             <div className="flex justify-end">

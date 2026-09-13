@@ -6,6 +6,7 @@ import {
   useAdminUploadTutorialThumbnail,
 } from "@/lib/services/admin/hook";
 import { ITutorialItem } from "@/lib/services/admin/type";
+import { toStoragePath } from "@/lib/utils/toStoragePath";
 import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import Textarea from "@/components/common/Textarea";
@@ -47,7 +48,7 @@ function TutorialForm({ mode, id, initialData }: Props) {
     setPriority(initialData.priority);
     setIsActive(initialData.isActive);
     setIsMain(initialData.isMain);
-    setThumbnailPath(initialData.thumbnail);
+    setThumbnailPath(initialData.thumbnail && toStoragePath(initialData.thumbnail));
     setThumbnailFile(initialData.thumbnail ? { src: initialData.thumbnail } : null);
   }, [initialData]);
 

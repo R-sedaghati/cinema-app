@@ -10,6 +10,7 @@ import FontSizeInput from "@/components/admin/FontSizeInput";
 import GuideBlocks from "@/components/admin/guide/GuideBlocks";
 import { SLIDER_FORM_GUIDE } from "@/lib/constants/guide/content";
 import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { toStoragePath } from "@/lib/utils/toStoragePath";
 import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
@@ -76,7 +77,7 @@ function SliderForm({ mode, id, initialData }: Props) {
     setCtaLink(initialData.ctaLink);
     setPriority(initialData.priority);
     setIsActive(initialData.isActive);
-    setImagePath(initialData.image);
+    setImagePath(toStoragePath(initialData.image));
     setImageFile(initialData.image ? { src: initialData.image } : null);
     setTitleFontSize(initialData.titleFontSize ?? null);
     setSubtitleFontSize(initialData.subtitleFontSize ?? null);
