@@ -3,6 +3,7 @@
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
+import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { Home, LogIn, PenLine, Search, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -55,6 +56,14 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              // The forms tab always opens the category grid: the store outlives client
+              // navigation, and on the registration page itself the URL sync would write
+              // the old step straight back into the address bar.
+              onClick={
+                item.href === "/artist-registration"
+                  ? () => useArtistRegistrationStore.getState().reset()
+                  : undefined
+              }
               className={[
                 "flex flex-col items-center gap-1 rounded-full px-4 py-2 transition-colors",
                 active ? "text-error-500" : "text-zinc-400 hover:text-zinc-300",
