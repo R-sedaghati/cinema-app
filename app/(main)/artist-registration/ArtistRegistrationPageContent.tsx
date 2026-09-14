@@ -7,6 +7,8 @@ import { Card } from "@dgshahr/ui-kit";
 import AtristRegistrationFlow from "@/components/artist-registration/AtristRegistrationFlow";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { groupPortfolios } from "@/lib/utils/portfolioAnswers";
+import { parseAnswers, parseIds } from "@/lib/utils/formUrlState";
+import useDebounce from "@/lib/hooks/useDebounce";
 import { sortByPriority } from "@/lib/utils/sortByPriority";
 import { CATEGORY_PAGE_SIZE, MAX_PAGE_SIZE } from "@/lib/constants/pagination";
 import {
@@ -44,6 +46,8 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
   const searchParams = useSearchParams();
   const urlStep = Number(searchParams.get("step")) || 0;
   const urlCategoryId = Number(searchParams.get("category")) || 0;
+  const urlIds = parseIds(searchParams.get("ids"));
+  const urlAnswers = parseAnswers(searchParams.get("answers"));
 
   // The form is only worth filling once there is an account to attach it to: submitting
   // it signed out 401s, and the interceptor's logout redirect throws every answer away.
@@ -120,7 +124,13 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     handleNext,
     setField,
     reset,
+    answers,
+    categoryId,
   } = useArtistRegistrationStore();
+
+  // Typing writes the URL, and Safari throws once history.replaceState is called more
+  // than 100 times in 10s — so answers reach the URL debounced.
+  const debouncedAnswers = useDebounce(answers);
 
   const selectedCategory: SelectedCategory | null =
     selectedCategoryId === null
@@ -129,9 +139,9 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
   const { data: editData, isLoading: editLoading } = useOwnArtistRequest(editId ?? undefined);
 
-  // The URL is the durable copy of "which category, which step": state is a transient
-  // mirror of it, so a refresh, a back button, or a shared link lands on the same screen
-  // instead of dropping the user back on the category grid.
+  // The URL is the only durable copy of the form — category, sub-categories, step and
+  // answers: state is a transient mirror of it, so a refresh, a back button, or a shared
+  // link lands on the same screen with the same answers filled in.
   const [isUrlHydrated, setIsUrlHydrated] = useState(false);
   const [editError, setEditError] = useState(false);
 
@@ -150,7 +160,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     setField("editId", editId);
     setField(
       "categoryId",
-      r.categories.map((c) => c.id),
+      urlIds.length ? urlIds : r.categories.map((c) => c.id),
     );
 
     // Merge portfolio rows (grouped by the schema field they were submitted under) back
@@ -158,14 +168,15 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     const { answers: portfolioAnswers, urlByPath } = groupPortfolios(r.portfolios);
 
     setField("portfolioUrls", urlByPath);
-    // Portfolio rows are the authoritative record of what was uploaded, so they win:
-    // a stale or empty file key in `answers` would otherwise blank the hydrated images.
-    setField("answers", { ...(r.answers ?? {}), ...portfolioAnswers });
+    // Portfolio rows are the authoritative record of what was uploaded, so they win over
+    // saved answers: a stale or empty file key would otherwise blank the hydrated images.
+    // Unsaved edits carried in the URL are newer than either, so they win over both.
+    setField("answers", { ...(r.answers ?? {}), ...portfolioAnswers, ...urlAnswers });
 
     const cat = r.categories[0];
     if (cat) {
       setSelectedCategory(cat.id, cat.faName);
-      setStep(1);
+      setStep(Math.max(urlStep, 1));
     } else {
       // No category means no form schema to render — say so instead of leaving the
       // page on step 0 with an editId, which renders nothing at all.
@@ -191,7 +202,8 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
     const cat = topLevelCategories.find((c) => c.id === urlCategoryId);
     if (cat) {
-      setField("categoryId", [cat.id]);
+      setField("categoryId", urlIds.length ? urlIds : [cat.id]);
+      setField("answers", urlAnswers);
       setSelectedCategory(cat.id, cat.title);
       // The flow clamps the step to what the schema actually has; keep the obvious
       // nonsense out of the store in the first place.
@@ -206,31 +218,56 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
   useEffect(() => {
     if (!isUrlHydrated) return;
+    // Right after hydration the debounced copy still holds the pre-hydration answers;
+    // writing now would strip them from the URL until the debounce catches up.
+    if (debouncedAnswers !== answers) return;
 
-    // Only the create flow is resumable. An edit is addressed by its request id alone,
-    // so its progress stays out of the URL and reopening one starts at the first step.
+    // An edit is addressed by its request id in the path, so it needs no category param.
     const params = new URLSearchParams();
-    if (!editId && selectedCategoryId) {
-      params.set("category", String(selectedCategoryId));
+    if (editId || selectedCategoryId) {
+      if (!editId) params.set("category", String(selectedCategoryId));
       if (step > 0) params.set("step", String(step));
+      if (categoryId.length) params.set("ids", categoryId.join(","));
+      if (Object.keys(answers).length) params.set("answers", JSON.stringify(answers));
     }
 
     const query = params.toString();
-    const next = query ? `${pathname}?${query}` : pathname;
-    const current = searchParams.toString();
-    if (query === current) return;
+    if (query === searchParams.toString()) return;
 
-    router.replace(next, { scroll: false });
-  }, [isUrlHydrated, editId, selectedCategoryId, step, pathname, router, searchParams]);
+    // ponytail: native replaceState, not router.replace — Next syncs useSearchParams with
+    // it, and it skips a server round trip per debounced keystroke.
+    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
+  }, [
+    isUrlHydrated,
+    editId,
+    selectedCategoryId,
+    step,
+    categoryId,
+    answers,
+    debouncedAnswers,
+    pathname,
+    searchParams,
+  ]);
 
   // Back/Forward rewrites the query without remounting, and the hydration effect above
   // only runs once — so the step has to be re-read from the URL here or the address bar
   // and the rendered step drift apart permanently.
+  // Only on popstate: comparing on every render races the sync effect above, whose
+  // replaceState reaches useSearchParams a transition late — the stale step gets written
+  // back, the flow auto-advances past it, and the two ping-pong forever.
   useEffect(() => {
-    if (!isUrlHydrated || editId) return;
-    if (!urlCategoryId || urlCategoryId !== selectedCategoryId) return;
-    if (urlStep && urlStep !== step) setStep(urlStep);
-  }, [urlStep, urlCategoryId, isUrlHydrated, editId, selectedCategoryId, step, setStep]);
+    const onPopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const poppedStep = Number(params.get("step")) || 0;
+      const poppedCategoryId = Number(params.get("category")) || 0;
+      const { selectedCategoryId: currentCategoryId, step: currentStep } =
+        useArtistRegistrationStore.getState();
+      if (!editId && (!poppedCategoryId || poppedCategoryId !== currentCategoryId)) return;
+      if (poppedStep && poppedStep !== currentStep) setStep(poppedStep);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [editId, setStep]);
 
   const handleSelectCategory = (
     id: number,
