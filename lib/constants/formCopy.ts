@@ -22,7 +22,7 @@ export const FORM_COPY = {
     admin: "پیام خطای فرم تکراری",
     value: "شما قبلاً در این دسته‌بندی فرم ثبت کرده‌اید.",
   },
-  formTitle: { admin: "عنوان فرم ({category})", value: "فرم حوزه {category}" },
+  formTitle: { admin: "عنوان فرم ({category})", value: "{category}" },
   stepCounter: { admin: "شمارنده مرحله ({n} و {total})", value: "مرحله {n} از {total}" },
   finalStepLabel: { admin: "زیرعنوان مرحله پایانی", value: "مرحله پایانی" },
   paymentStepTitle: { admin: "عنوان مرحله پرداخت", value: "پرداخت" },

@@ -66,8 +66,10 @@ export default function ArtistRequestViewPage() {
     [request],
   );
 
+  // Portfolio rows win, as on the edit page: a stale or empty file key in answers would
+  // otherwise blank the uploaded images.
   const answers = useMemo(
-    () => ({ ...portfolioAnswers, ...(request?.answers ?? {}) }),
+    () => ({ ...(request?.answers ?? {}), ...portfolioAnswers }),
     [portfolioAnswers, request],
   );
 

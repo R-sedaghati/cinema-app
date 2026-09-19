@@ -219,6 +219,8 @@ export interface IFormField {
   validation: IFormFieldValidation | null;
   syncToUserField?: SyncToUserField | null;
   multiple?: boolean;
+  /** Paid content: hidden publicly, served only after a contact purchase. */
+  isPrivate?: boolean;
 }
 
 export interface IFormStep {
@@ -274,6 +276,8 @@ export interface ICreateFormFieldRequest {
   /** `null` clears an existing link; `undefined` leaves it untouched. */
   syncToUserField?: SyncToUserField | null;
   multiple?: boolean;
+  /** Paid content: hidden publicly, served only after a contact purchase. */
+  isPrivate?: boolean;
 }
 
 export type IUpdateFormFieldRequest = Partial<ICreateFormFieldRequest> & {

@@ -1,5 +1,6 @@
 import {
   IArtistItem,
+  IFormField,
   IBasePaginateResponse,
   ESmsEvent,
   IFormSchema,
@@ -181,6 +182,8 @@ export interface IArtistContact {
   email: string | null;
   address: string | null;
   postalCode: string | null;
+  /** Every answer the admin marked private; file fields carry their URLs. */
+  fields: (Pick<IFormField, "key" | "label" | "type" | "options"> & { value: unknown })[];
 }
 
 export type IArtistContactResponse = IRetriveResponse<IArtistContact>;

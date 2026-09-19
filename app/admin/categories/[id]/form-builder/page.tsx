@@ -313,6 +313,11 @@ function FieldRow({
             checked={field.required}
             onChange={(e) => patch({ required: e.target.checked })}
           />
+          <Checkbox
+            label="خصوصی (نمایش پس از پرداخت)"
+            checked={Boolean(field.isPrivate)}
+            onChange={(e) => patch({ isPrivate: e.target.checked })}
+          />
           {IMAGE_TYPES.has(field.type) && (
             <Checkbox
               label="چند فایلی"
@@ -368,6 +373,7 @@ function StepCard({
   const [newType, setNewType] = useState<EFormFieldType>(EFormFieldType.TEXT);
   const [newRequired, setNewRequired] = useState(false);
   const [newMultiple, setNewMultiple] = useState(false);
+  const [newPrivate, setNewPrivate] = useState(false);
   const [newOptionsText, setNewOptionsText] = useState("");
 
   const sortedFields = [...step.fields].sort((a, b) => a.order - b.order);
@@ -396,6 +402,7 @@ function StepCard({
           label: newLabel.trim(),
           type: newType,
           required: newRequired,
+          isPrivate: newPrivate,
           options: HAS_OPTIONS.has(newType) ? parseNewOptions() : undefined,
           multiple: IMAGE_TYPES.has(newType) ? newMultiple : undefined,
           order: step.fields.length,
@@ -408,6 +415,7 @@ function StepCard({
           setNewType(EFormFieldType.TEXT);
           setNewRequired(false);
           setNewMultiple(false);
+          setNewPrivate(false);
           setNewOptionsText("");
           onChanged();
         },
@@ -526,6 +534,11 @@ function StepCard({
                 label="اجباری"
                 checked={newRequired}
                 onChange={(e) => setNewRequired(e.target.checked)}
+              />
+              <Checkbox
+                label="خصوصی"
+                checked={newPrivate}
+                onChange={(e) => setNewPrivate(e.target.checked)}
               />
               {IMAGE_TYPES.has(newType) && (
                 <Checkbox

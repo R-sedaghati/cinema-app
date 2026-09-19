@@ -147,6 +147,7 @@ interface FormField {
   order: number;
   options?: { label: string; value: string }[] | null;
   validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+  isPrivate: boolean;        // paid content: stripped publicly, served by the contact endpoint
 }
 
 interface FormStep {
@@ -589,6 +590,7 @@ ApiResponse<{
       order: number;
       options: { label: string; value: string }[] | null;
       validation: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
+      isPrivate: boolean;
     }[];
   }[];
   // copy for the post-payment result pages, set in the admin form builder
@@ -726,7 +728,10 @@ charged.
 
 An artist's contact fields are the paid product. They are served only by
 `GET /user/artists-requests/:id/contact/`, and only to a caller who owns a `COMPLETED`
-`ContactRequest` for that artist (or is the artist). Every other endpoint strips them.
+`ContactRequest` for that artist (or is the artist). Every other endpoint strips them:
+answers to fields marked `isPrivate` in the form builder, portfolios uploaded through
+those fields, and the user's name/phone/email/national code. Private fields are also
+never filters or search targets.
 
 ### `GET /artists-requests/:id/contact-price/`
 Price, in Toman, to unlock this artist's contact details. No auth.
@@ -762,7 +767,9 @@ token). Verifies the payment, then redirects to
 
 ### `GET /user/artists-requests/:id/contact/`
 The paid payload: `firstName`, `lastName`, `phoneNumber`, `email`, `address`,
-`postalCode`. **Auth required.**
+`postalCode`, plus `fields: { key, label, type, options, value }[]` — every non-empty
+answer to a field marked `isPrivate` in the artist's form (IMAGE/VIDEO `value` is a list
+of file URLs). **Auth required.**
 
 **403** unless the caller owns a `COMPLETED` `ContactRequest` for this artist or is the
 artist themselves.
@@ -1216,6 +1223,7 @@ Create a field on a step.
   // `null` clears an existing link.
   syncToUserField?: "firstName" | "lastName" | "avatar" | "email" | "nationalCode" | "phoneNumber" | null;
   multiple?: boolean;      // IMAGE/VIDEO: allow more than one upload
+  isPrivate?: boolean;     // default false; true = shown only after a contact purchase
 }
 ```
 

@@ -20,6 +20,7 @@ const isOverdue = (followUpAt: string | null) => {
 export const generateColumns = (
   onProfileClick: (id: number) => void,
   onCrmClick: (id: number) => void,
+  formNameOf: (categoryId?: number) => string | undefined,
 ): ColumnsType<IArtistItem>[] => {
   return [
     {
@@ -48,6 +49,18 @@ export const generateColumns = (
       className: "align-middle",
       render: (data) => (
         <p className="font-p1-regular">{data?.user?.phoneNumber}</p>
+      ),
+    },
+    {
+      align: "center",
+      key: "formName",
+      dataIndex: "formName",
+      title: "نام فرم",
+      className: "align-middle",
+      render: (data) => (
+        <p className="font-p1-regular">
+          {formNameOf(data?.categories?.at(0)?.id) ?? "—"}
+        </p>
       ),
     },
     {

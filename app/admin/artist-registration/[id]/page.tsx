@@ -8,7 +8,8 @@ import {
   useAdminArtistStatusUpdate,
   useAdminFormSchema,
 } from "@/lib/services/admin/hook";
-import { EArtistRequestStatus, EFormFieldType, IFormField } from "@/lib/services/admin/type";
+import { EArtistRequestStatus, EFormFieldType } from "@/lib/services/admin/type";
+import { formatAnswer } from "@/lib/utils/formatAnswer";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
@@ -17,14 +18,23 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-const resolveOptionLabels = (field: IFormField, value: unknown): string => {
-  const values = Array.isArray(value) ? value : value !== undefined && value !== null ? [value] : [];
-  const options = field.options ?? [];
+const ANSWER_TEXT = { yes: "بله", no: "خیر", empty: "", sep: "، " };
 
-  return values
-    .map((v) => options.find((o) => o.value === String(v))?.label ?? String(v))
-    .join("، ");
+// No registration-payment endpoint exists; the request status is the payment record.
+// Rejecting or sending back for revision refunds the fee to the user's wallet (api.md).
+const PAYMENT_STATUS: Record<
+  EArtistRequestStatus,
+  { label: string; color: "success" | "warning" | "gray" }
+> = {
+  [EArtistRequestStatus.PENDING_PAYMENT]: { label: "پرداخت نشده", color: "warning" },
+  [EArtistRequestStatus.PENDING]: { label: "پرداخت شده", color: "success" },
+  [EArtistRequestStatus.APPROVED]: { label: "پرداخت شده", color: "success" },
+  [EArtistRequestStatus.REJECTED]: { label: "بازگشت به کیف پول", color: "gray" },
+  [EArtistRequestStatus.NEED_TO_REVISION]: { label: "بازگشت به کیف پول", color: "gray" },
 };
+
+const isFileField = (type: EFormFieldType) =>
+  type === EFormFieldType.IMAGE || type === EFormFieldType.VIDEO;
 
 function ArtistDetail() {
   const router = useRouter();
@@ -41,19 +51,29 @@ function ArtistDetail() {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  const payment = data?.status ? PAYMENT_STATUS[data.status] : undefined;
+
+  const fullName = [data?.user?.firstName, data?.user?.lastName].filter(Boolean).join(" ");
+
+  // `id` is the only stable order the API gives a gallery.
+  const portfolios = [...(data?.portfolios ?? [])].sort((a, b) => a.id - b.id);
+
   const portfoliosFor = (fieldKey: string) =>
-    data?.portfolios.filter((p) => p.fieldKey === fieldKey) ?? [];
+    portfolios.filter((p) => p.fieldKey === fieldKey);
 
-  // Legacy portfolios saved before fieldKey existed — shown ungrouped.
-  const legacyPhotoWorks =
-    data?.portfolios
-      .filter((p) => p.type === "IMAGE" && !p.fieldKey)
-      .map((p) => ({ id: String(p.id), url: p.url })) ?? [];
+  // Rows no current schema field claims: saved before fieldKey existed, or under a field
+  // since renamed/removed. Shown ungrouped so they are never silently hidden.
+  const fileFieldKeys = new Set(
+    steps.flatMap((s) => s.fields).filter((f) => isFileField(f.type)).map((f) => f.key),
+  );
+  const orphanWorks = (type: "IMAGE" | "VIDEO") =>
+    portfolios
+      .filter((p) => p.type === type && !(p.fieldKey && fileFieldKeys.has(p.fieldKey)))
+      .map((p) => ({ id: String(p.id), url: p.url }));
 
-  const legacyVideoWorks =
-    data?.portfolios
-      .filter((p) => p.type === "VIDEO" && !p.fieldKey)
-      .map((p) => ({ id: String(p.id), url: p.url })) ?? [];
+  // Wait for the schema, or every row looks orphaned for a moment.
+  const legacyPhotoWorks = schemaData ? orphanWorks("IMAGE") : [];
+  const legacyVideoWorks = schemaData ? orphanWorks("VIDEO") : [];
 
   return (
     <div className="flex flex-col gap-3">
@@ -64,7 +84,7 @@ function ArtistDetail() {
           variant="text"
           color="gray"
         >
-          {`فرم درخواست ${data?.user?.firstName}  ${data?.user?.lastName}`}
+          {`فرم درخواست ${fullName}`}
         </Button>
         <div className="flex gap-3 pe-3">
           <Button
@@ -149,7 +169,7 @@ function ArtistDetail() {
               <Input
                 placeholder="نام و نام خانوادگی"
                 labelContent="نام و نام خانوادگی"
-                value={`${data?.user?.firstName}  ${data?.user?.lastName}`}
+                value={fullName}
               />
               <Input
                 placeholder="شماره تماس"
@@ -164,31 +184,15 @@ function ArtistDetail() {
               {steps.map((step) =>
                 [...step.fields]
                   .sort((a, b) => a.order - b.order)
-                  .filter((field) => field.type !== EFormFieldType.IMAGE && field.type !== EFormFieldType.VIDEO)
-                  .map((field) => {
-                    const value = data?.answers?.[field.key];
-                    const display =
-                      field.type === EFormFieldType.SELECT ||
-                      field.type === EFormFieldType.RADIO ||
-                      field.type === EFormFieldType.CHECKBOX
-                        ? resolveOptionLabels(field, value)
-                        : typeof value === "boolean"
-                          ? value
-                            ? "بله"
-                            : "خیر"
-                          : Array.isArray(value)
-                            ? value.join("، ")
-                            : ((value as string | number | undefined) ?? "");
-
-                    return (
-                      <Input
-                        key={field.id}
-                        placeholder={field.label}
-                        labelContent={field.label}
-                        value={display}
-                      />
-                    );
-                  }),
+                  .filter((field) => !isFileField(field.type))
+                  .map((field) => (
+                    <Input
+                      key={field.id}
+                      placeholder={field.label}
+                      labelContent={field.label}
+                      value={formatAnswer(field, data?.answers?.[field.key], ANSWER_TEXT)}
+                    />
+                  )),
               )}
             </div>
           </div>
@@ -201,16 +205,25 @@ function ArtistDetail() {
             <div className="flex flex-col gap-3">
               <p className="font-p1-regular">وضعیت پرداخت</p>
               <div className="flex gap-3 items-center">
-                <Badge
-                  className="h-fit w-fit"
-                  value={"پرداخت شده"}
-                  type="twoTone"
-                  color="success"
-                  size="medium"
-                />
-                <Button variant="text" leftIcon={<ChevronLeft />} color="error">
-                  مشاهده تراکنش
-                </Button>
+                {payment && (
+                  <Badge
+                    className="h-fit w-fit"
+                    value={payment.label}
+                    type="twoTone"
+                    color={payment.color}
+                    size="medium"
+                  />
+                )}
+                {data?.user?.id && (
+                  <Button
+                    variant="text"
+                    leftIcon={<ChevronLeft />}
+                    color="error"
+                    onClick={() => router.push(`/admin/users/${data.user.id}`)}
+                  >
+                    مشاهده کیف پول
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -235,7 +248,7 @@ function ArtistDetail() {
             {steps.map((step) =>
               [...step.fields]
                 .sort((a, b) => a.order - b.order)
-                .filter((field) => field.type === EFormFieldType.IMAGE || field.type === EFormFieldType.VIDEO)
+                .filter((field) => isFileField(field.type))
                 .map((field) => (
                   <div key={field.id} className="flex flex-col gap-4">
                     <p className="font-h5-bold">{field.label}</p>

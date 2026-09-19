@@ -266,6 +266,8 @@ export const LANDING_COPY = {
   artistContactEmail: { group: "صفحه هنرمند", admin: "برچسب ایمیل", value: "ایمیل" },
   artistContactAddress: { group: "صفحه هنرمند", admin: "برچسب آدرس", value: "آدرس" },
   artistContactPostalCode: { group: "صفحه هنرمند", admin: "برچسب کد پستی", value: "کد پستی" },
+  artistContactYes: { group: "صفحه هنرمند", admin: "مقدار «بله» در اطلاعات خصوصی", value: "بله" },
+  artistContactNo: { group: "صفحه هنرمند", admin: "مقدار «خیر» در اطلاعات خصوصی", value: "خیر" },
   artistContactCta: { group: "صفحه هنرمند", admin: "دکمه مشاهده اطلاعات تماس", value: "مشاهده اطلاعات تماس" },
   artistShareCta: { group: "صفحه هنرمند", admin: "دکمه اشتراک گذاری", value: "اشتراک گذاری" },
   artistLoginFirst: {

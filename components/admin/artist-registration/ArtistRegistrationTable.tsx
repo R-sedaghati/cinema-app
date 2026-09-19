@@ -6,7 +6,7 @@ import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import FilterBar from "./FilterBar";
 import { generateColumns } from "./columns";
-import { useAdminArtistList } from "@/lib/services/admin/hook";
+import { useAdminArtistList, useAdminCategoryList } from "@/lib/services/admin/hook";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "../users/Header";
 import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
@@ -49,11 +49,22 @@ function ArtistRegistrationTable() {
     }));
   }, [categoryId, setParams]);
 
+  // Forms belong to top-level categories, so a request filed under a subcategory
+  // shows its parent's name.
+  const { data: categoryData } = useAdminCategoryList();
+  const categories = categoryData?.result ?? [];
+  const formNameOf = (categoryId?: number) => {
+    const category = categories.find((c) => c.id === categoryId);
+    const parentId = category?.parent ?? category?.id;
+    return categories.find((c) => c.id === parentId)?.faName;
+  };
+
   const columns = generateColumns(
     (id) => {
       router.push(`/admin/artist-registration/${id}`);
     },
     (id) => setCrmArtistId(id),
+    formNameOf,
   );
 
   return (

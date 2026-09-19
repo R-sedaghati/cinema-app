@@ -3,6 +3,7 @@
 import { EFormFieldType, IFormStep } from "@/lib/services/admin/type";
 import { CopyFn } from "@/lib/utils/formCopy";
 import { landingCopy } from "@/lib/utils/landingCopy";
+import { formatAnswer } from "@/lib/utils/formatAnswer";
 
 interface Props {
   steps: IFormStep[];
@@ -72,20 +73,17 @@ const FormAnswersSummary: React.FC<Props> = ({
                 );
               }
 
-              const display =
-                typeof value === "boolean"
-                  ? value
-                    ? copy("booleanYes")
-                    : copy("booleanNo")
-                  : Array.isArray(value)
-                    ? value.join(landingCopy("listSeparator"))
-                    : ((value as string | number | undefined) ??
-                      copy("emptyValue"));
+              const display = formatAnswer(field, value, {
+                yes: copy("booleanYes"),
+                no: copy("booleanNo"),
+                empty: copy("emptyValue"),
+                sep: landingCopy("listSeparator"),
+              });
 
               return (
                 <div key={field.id} className="flex gap-1">
                   <p className="font-p2-medium text-gray-500">{field.label}:</p>
-                  <p className="font-p2-regular">{String(display)}</p>
+                  <p className="font-p2-regular">{display}</p>
                 </div>
               );
             })}
