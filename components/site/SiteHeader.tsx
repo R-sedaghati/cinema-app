@@ -19,6 +19,7 @@ import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import useAuthStore from "@/lib/stores/useAuthStore";
+import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { isMobile } from "react-device-detect";
 
 // Labels are copy keys; the admin-editable text is resolved at render time.
@@ -37,6 +38,12 @@ const sidebarItems: { href: string; label: LandingCopyKey; icon: typeof PenLine 
   { href: "/faq", label: "navFaq", icon: HelpCircle },
   { href: "/support", label: "navSupport", icon: Headphones },
 ];
+
+// The forms link always opens the category grid: the store outlives client navigation,
+// and on the registration page itself the URL sync would write the old step straight back.
+function resetRegistrationIfForms(href: string) {
+  if (href === "/artist-registration") useArtistRegistrationStore.getState().reset();
+}
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -112,6 +119,7 @@ export function SiteHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => resetRegistrationIfForms(item.href)}
                     className={[
                       "rounded-full px-3 py-1.5 text-sm transition-colors text-nowrap border border-transparent",
                       active
@@ -200,7 +208,10 @@ export function SiteHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={handleClose}
+                    onClick={() => {
+                      resetRegistrationIfForms(item.href);
+                      handleClose();
+                    }}
                     className={[
                       "flex items-center justify-between rounded-xl px-4 py-3 text-zinc-300 transition-colors",
                       active

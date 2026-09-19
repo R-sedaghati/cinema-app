@@ -1,6 +1,6 @@
 "use client";
 
-import { IArtistItem } from "@/lib/services/admin/type";
+import { EFormFieldType, IArtistItem } from "@/lib/services/admin/type";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
@@ -15,6 +15,11 @@ import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { toast } from "react-toastify";
+import { formatAnswer } from "@/lib/utils/formatAnswer";
+
+/** Private answers the fixed contact rows below already show. */
+const FIXED_CONTACT_KEYS = new Set(["email", "address", "postalCode"]);
+const FILE_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
 
 const Aside = ({ artist }: { artist: IArtistItem }) => {
   const [openCallDetail, setOpenCallDetail] = useState<boolean>(false);
@@ -154,6 +159,31 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
                 </span>
               </div>
             )}
+            {contact.fields
+              ?.filter((f) => !FIXED_CONTACT_KEYS.has(f.key))
+              .map((f) => (
+                <div key={f.key} className="flex justify-between gap-2">
+                  <span className="text-zinc-500">{f.label}</span>
+                  {FILE_TYPES.has(f.type) ? (
+                    <span className="flex flex-wrap gap-2 justify-end">
+                      {(f.value as string[]).map((url, i) => (
+                        <a key={url} href={url} target="_blank" rel="noreferrer" className="text-emerald-400 underline">
+                          {i + 1}
+                        </a>
+                      ))}
+                    </span>
+                  ) : (
+                    <span className="text-zinc-100 text-left">
+                      {formatAnswer(f, f.value, {
+                        yes: copy("artistContactYes"),
+                        no: copy("artistContactNo"),
+                        empty: "—",
+                        sep: copy("listSeparator"),
+                      })}
+                    </span>
+                  )}
+                </div>
+              ))}
           </div>
         )}
 
