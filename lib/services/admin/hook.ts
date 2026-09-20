@@ -66,6 +66,7 @@ import {
   adminSmsTemplateUpdate,
   adminSmsTemplateTest,
   adminArtistCrmUpdate,
+  adminArtistHiddenUpdate,
   adminArtistRetrieve,
   adminArtistStatusUpdate,
   adminCrmNoteCreate,
@@ -663,6 +664,18 @@ export const useAdminArtistCrmUpdate = (id: number) => {
   return useMutation({
     mutationFn: (body: ICrmUpdateRequest) =>
       adminArtistCrmUpdate(id, body, accessToken),
+  });
+};
+
+export const useAdminArtistHiddenUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, hidden }: { id: number; hidden: boolean }) =>
+      adminArtistHiddenUpdate(id, hidden, accessToken),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["artistList"] }),
   });
 };
 

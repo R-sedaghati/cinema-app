@@ -741,6 +741,25 @@ export const adminArtistCrmUpdate = async (
   return data;
 };
 
+/** Soft delete / restore: hides the request from this list and from the public site. */
+export const adminArtistHiddenUpdate = async (
+  id: number,
+  hidden: boolean,
+  accessToken: string,
+) => {
+  const { data } = await api.patch(
+    `/admin/artist-requests/${id}/hidden/`,
+    { hidden },
+    {
+      headers: {
+        Authorization: accessToken,
+      },
+    },
+  );
+
+  return data;
+};
+
 export const adminCrmNoteList = async (id: number, accessToken: string) => {
   const { data } = await api.get<IRetriveResponse<ICrmNote[]>>(
     `/admin/artist-requests/${id}/notes/`,

@@ -324,6 +324,18 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
           />
         </button>
 
+        <button
+          onClick={() =>
+            setParams((prev) => ({
+              ...prev,
+              hidden: prev.hidden ? null : true,
+              page: 1,
+            }))
+          }
+        >
+          <Chip label="حذف‌شده‌ها" filled={!!params.hidden} />
+        </button>
+
         <ExtendedDatePicker
           dateParamName="createdAt"
           label="تاریخ ایجاد"

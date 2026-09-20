@@ -47,6 +47,10 @@ export interface ParamsArtistList {
   crmStage__in: ECrmStage[];
   assignedAdminId: number | null;
   followUpAt__lte: string | null;
+  sort: string | null;
+  order: "ASC" | "DESC" | null;
+  /** true lists only the hidden (soft-deleted) requests — the admin's trash bin. */
+  hidden: boolean | null;
 }
 
 interface IArtistCategory {
@@ -163,6 +167,7 @@ export interface IArtistItem {
   crmStage: ECrmStage;
   followUpAt: string | null;
   assignedAdmin: IAdminListItem | null;
+  hiddenAt: string | null;
   [key: string]: unknown;
 }
 

@@ -21,6 +21,9 @@ const initialParams: Partial<ParamsArtistList> = {
   crmStage__in: [],
   assignedAdminId: null,
   followUpAt__lte: null,
+  sort: null,
+  order: null,
+  hidden: null,
 };
 
 export default function useArtistListParams() {
