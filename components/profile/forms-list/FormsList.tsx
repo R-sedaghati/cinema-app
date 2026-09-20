@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ContentCard from "../ContentCard";
 import { Table } from "@dgshahr/ui-kit";
-import { generateColumns } from "./Columns";
+import { formName, generateColumns } from "./Columns";
 import { useUserAtristRequests } from "@/lib/services/landing/hook";
 import TableEmptyState from "@/components/common/TableEmptyState";
 import { tableEmptyMessage } from "@/lib/mock/messages";
@@ -85,7 +85,8 @@ export default function FormsList() {
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="font-medium text-zinc-100 leading-snug">
-                  {item.user.firstName} {item.user.lastName}
+                  {formName(item) ||
+                    `${item.user.firstName} ${item.user.lastName}`}
                 </span>
                 <ArtistStatus status={item.status} isSolid />
               </div>

@@ -850,15 +850,17 @@ List all artist requests with full detail.
 | weight | number | Filter by `answers.weight` (convention key, category-dependent) |
 | dialect | string | Filter by `answers.dialect` (convention key, category-dependent) |
 | search | string | Search by name or phone |
-| sort | string | Sort by `category` |
+| sort | string | Sort by `id`, `userName`, `category`, `status`, `crmStage`, `createdAt`, `updatedAt`, `followUpAt` |
+| order | `ASC` \| `DESC` | Sort direction (default `DESC`) |
+| hidden | boolean | `true` lists only hidden (soft-deleted) requests; omitted lists only visible ones |
 | createdAt | string | Filter by created date |
 | updatedAt | string | Filter by updated date |
 | crmStage__in | CrmStage[] | Filter by CRM pipeline stage (comma-separated) |
 | assignedAdminId | number | Filter by assigned admin |
 | followUpAt__lte | string | Follow-ups due on or before this date |
 
-**Response:** `ApiResponse<ArtistRequest[]>` (includes `rejectedReasons`, and the CRM fields
-`crmStage`, `followUpAt`, `assignedAdmin`) + pagination
+**Response:** `ApiResponse<ArtistRequest[]>` (includes `rejectedReasons`, `hiddenAt`, and the
+CRM fields `crmStage`, `followUpAt`, `assignedAdmin`) + pagination
 
 ---
 
@@ -884,6 +886,21 @@ and no inbox row are produced — the status change itself still applies.
 ```
 
 **Response:** `ApiResponse<ArtistRequest>`
+
+---
+
+### `PATCH /admin/artist-requests/:id/hidden/`
+Soft delete. A hidden request drops out of the admin list (unless `?hidden=true`), out of
+the public artist listing, detail page and filter facets. Nothing is erased: the owner keeps
+the form in their profile and payments are untouched. Reversible with `hidden: false`.
+
+**Body:**
+```ts
+{ hidden: boolean }
+```
+
+**Response:** `ApiResponse<{ id: number; hiddenAt: string | null }>`
+400 when `hidden` is not a boolean, 404 on an unknown request.
 
 ---
 

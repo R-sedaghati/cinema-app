@@ -7,6 +7,11 @@ import { ChevronLeft } from "lucide-react";
 import type { CopyResolver } from "@/lib/utils/copy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
+// The form a request belongs to is its categories; the user's own name is the same on
+// every row, so it only serves as a fallback for a request with no category.
+export const formName = (item: IArtistItem) =>
+  item.categories?.map((c) => c.faName).join("، ") ?? "";
+
 export const generateColumns = (
   onEdit: (item: IArtistItem) => void,
   onView: (item: IArtistItem) => void,
@@ -21,7 +26,9 @@ export const generateColumns = (
     className: "align-middle min-w-48",
     render: (data) =>
       data.id && (
-        <p className="font-p1-regular">{`${data.user.firstName}  ${data.user.lastName}`}</p>
+        <p className="font-p1-regular">
+          {formName(data) || `${data.user.firstName}  ${data.user.lastName}`}
+        </p>
       ),
   },
   {

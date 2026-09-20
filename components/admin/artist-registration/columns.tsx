@@ -17,15 +17,21 @@ const isOverdue = (followUpAt: string | null) => {
   return due <= endOfToday;
 };
 
+export type SortProps = ColumnsType<IArtistItem>["sort"];
+
 export const generateColumns = (
   onProfileClick: (id: number) => void,
   onCrmClick: (id: number) => void,
   formNameOf: (categoryId?: number) => string | undefined,
+  /** Server-side sorting: returns the header's sort handle for a sortable column key. */
+  sortOf: (key: string) => SortProps,
+  onHideClick: (item: IArtistItem) => void,
 ): ColumnsType<IArtistItem>[] => {
   return [
     {
       align: "start",
       key: "id",
+      sort: sortOf("id"),
       dataIndex: "id",
       title: "ردیف",
       className: "align-middle",
@@ -34,6 +40,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "userName",
+      sort: sortOf("userName"),
       dataIndex: "userName",
       title: "نام و نام‌ خانوادگی",
       className: "align-middle",
@@ -54,6 +61,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "formName",
+      sort: sortOf("category"),
       dataIndex: "formName",
       title: "نام فرم",
       className: "align-middle",
@@ -94,6 +102,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "createAt",
+      sort: sortOf("createdAt"),
       dataIndex: "createAt",
       title: "تاریخ ایجاد",
       className: "align-middle",
@@ -108,6 +117,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "latesDate",
+      sort: sortOf("updatedAt"),
       dataIndex: "latesDate",
       title: "تاریخ آخرین تغییر",
       className: "align-middle",
@@ -120,6 +130,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "status",
+      sort: sortOf("status"),
       dataIndex: "status",
       title: "وضعیت",
       className: "align-middle",
@@ -128,6 +139,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "crmStage",
+      sort: sortOf("crmStage"),
       dataIndex: "crmStage",
       title: "مرحله پیگیری",
       className: "align-middle",
@@ -151,6 +163,7 @@ export const generateColumns = (
     {
       align: "center",
       key: "followUpAt",
+      sort: sortOf("followUpAt"),
       dataIndex: "followUpAt",
       title: "پیگیری بعدی",
       className: "align-middle",
@@ -190,6 +203,13 @@ export const generateColumns = (
             leftIcon={<ChevronLeft />}
           >
             مشاهده فرم درخواست
+          </Button>
+          <Button
+            onClick={() => onHideClick(data)}
+            color="gray"
+            variant="outline"
+          >
+            {data.hiddenAt ? "بازگردانی" : "حذف"}
           </Button>
         </div>
       ),

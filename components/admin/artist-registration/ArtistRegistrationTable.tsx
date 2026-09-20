@@ -5,8 +5,14 @@ import TableEmptyState from "@/components/common/TableEmptyState";
 import { tableEmptyMessage } from "@/lib/mock/messages";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import FilterBar from "./FilterBar";
-import { generateColumns } from "./columns";
-import { useAdminArtistList, useAdminCategoryList } from "@/lib/services/admin/hook";
+import { generateColumns, type SortProps } from "./columns";
+import {
+  useAdminArtistHiddenUpdate,
+  useAdminArtistList,
+  useAdminCategoryList,
+} from "@/lib/services/admin/hook";
+import { IArtistItem } from "@/lib/services/admin/type";
+import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "../users/Header";
 import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
@@ -59,12 +65,47 @@ function ArtistRegistrationTable() {
     return categories.find((c) => c.id === parentId)?.faName;
   };
 
+  // Sorting is server-side: the header only moves `sort`/`order` in the query params.
+  const sortOf = (key: string): SortProps => ({
+    active:
+      params.sort === key
+        ? params.order === "ASC"
+          ? "ascend"
+          : "descend"
+        : undefined,
+    onSort: (value: "ascend" | "descend") =>
+      setParams((prev) => ({
+        ...prev,
+        sort: key,
+        order: value === "ascend" ? "ASC" : "DESC",
+        page: 1,
+      })),
+  });
+
+  const { mutate: setHidden, isPending: isHiding } = useAdminArtistHiddenUpdate();
+
+  const handleHideClick = (item: IArtistItem) => {
+    if (isHiding) return;
+    const hidden = !item.hiddenAt;
+
+    setHidden(
+      { id: item.id, hidden },
+      {
+        onSuccess: () =>
+          toast.success(hidden ? "فرم حذف شد" : "فرم بازگردانده شد"),
+        onError: () => toast.error("عملیات انجام نشد"),
+      },
+    );
+  };
+
   const columns = generateColumns(
     (id) => {
       router.push(`/admin/artist-registration/${id}`);
     },
     (id) => setCrmArtistId(id),
     formNameOf,
+    sortOf,
+    handleHideClick,
   );
 
   return (

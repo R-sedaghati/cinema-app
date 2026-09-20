@@ -1,5 +1,6 @@
 import type { GuideBlock } from "@/lib/constants/guide/content";
 import { AlertTriangle, Info } from "lucide-react";
+import GuideFieldDemo from "./GuideFieldDemo";
 
 const GuideBlocks = ({ blocks }: { blocks: GuideBlock[] }) => (
   <div className="flex flex-col gap-4">
@@ -85,6 +86,18 @@ const GuideBlocks = ({ blocks }: { blocks: GuideBlock[] }) => (
             >
               <Info size={18} className="mt-0.5 shrink-0 text-gray-500" />
               <p className="text-sm leading-7 text-gray-700">{block.text}</p>
+            </div>
+          );
+
+        case "demo":
+          return (
+            <div key={index} className="flex flex-col gap-2">
+              {block.caption && (
+                <p className="text-sm leading-7 text-gray-700">
+                  {block.caption}
+                </p>
+              )}
+              <GuideFieldDemo fields={block.fields} />
             </div>
           );
 

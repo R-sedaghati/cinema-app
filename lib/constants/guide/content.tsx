@@ -1,5 +1,8 @@
+import type { IFormField } from "@/lib/services/admin/type";
+import { EFormFieldType } from "@/lib/services/admin/type";
 import {
   BookOpen,
+  TextCursorInput,
   Search,
   ClipboardList,
   ChartColumnIncreasing,
@@ -25,7 +28,8 @@ export type GuideBlock =
   | { kind: "steps"; items: string[] }
   | { kind: "table"; head: string[]; rows: string[][] }
   | { kind: "note"; text: string }
-  | { kind: "warn"; text: string };
+  | { kind: "warn"; text: string }
+  | { kind: "demo"; fields: IFormField[]; caption?: string };
 
 export type GuideTopic = {
   slug: string;
@@ -35,6 +39,24 @@ export type GuideTopic = {
   adminLink?: string;
   blocks: GuideBlock[];
 };
+
+/**
+ * A demo field for the «نمونه هر نوع فیلد» guide. Ids are negative and keys are
+ * `demo_`-prefixed so a demo answer can never be mistaken for a real one.
+ */
+let demoFieldId = 0;
+const demoField = (
+  field: Partial<IFormField> & Pick<IFormField, "key" | "label" | "type">,
+): IFormField => ({
+  id: (demoFieldId -= 1),
+  placeholder: null,
+  required: false,
+  order: 0,
+  options: null,
+  validation: null,
+  ...field,
+  key: `demo_${field.key}`,
+});
 
 export const GUIDE_TOPICS: GuideTopic[] = [
   {
@@ -528,6 +550,11 @@ export const GUIDE_TOPICS: GuideTopic[] = [
         ],
       },
 
+      {
+        kind: "note",
+        text: "برای دیدن زنده هر کدام از این نوع‌ها — اینکه کاربر چه می‌بیند و چه چیزی ذخیره می‌شود — راهنمای «نمونه هر نوع فیلد» را باز کنید.",
+      },
+
       { kind: "h", text: "کنترل مقدار ورودی کاربر" },
       {
         kind: "p",
@@ -606,6 +633,279 @@ export const GUIDE_TOPICS: GuideTopic[] = [
       {
         kind: "note",
         text: "پیش از ساختن فیلد تازه، راهنمای «از فیلد فرم تا سایت» را ببینید: کلید، نوع و گزینه‌های هر فیلد تعیین می‌کند پاسخ آن کجای سایت دیده شود، فیلتر بسازد یا جستجو شود. برای ده فیلد پرکاربرد مثال آماده دارد.",
+      },
+    ],
+  },
+
+  {
+    slug: "field-samples",
+    title: "نمونه هر نوع فیلد",
+    summary:
+      "هر نوع فیلد را همین‌جا امتحان کنید: ببینید کاربر چه می‌بیند و چه چیزی ذخیره می‌شود.",
+    icon: <TextCursorInput />,
+    adminLink: "/admin/categories",
+    blocks: [
+      {
+        kind: "p",
+        text: "این صفحه نمونه زنده همه نوع فیلدهای فرم‌ساز است. فیلدهای اینجا دقیقاً همان چیزی هستند که کاربر در سایت می‌بیند؛ با آن‌ها کار کنید، مقدار وارد کنید و زیر هر فیلد ببینید چه چیزی ذخیره می‌شود. هیچ‌کدام از مقادیر این صفحه جایی ثبت نمی‌شود.",
+      },
+      {
+        kind: "note",
+        text: "دکمه «بررسی مقدار» زیر هر نمونه، همان بررسی‌ای را انجام می‌دهد که سایت هنگام زدن «مرحله بعد» انجام می‌دهد؛ برای دیدن پیام خطای فیلدهای اجباری یا اعتبارسنجی آماده از آن استفاده کنید.",
+      },
+
+      { kind: "h", text: "متن کوتاه" },
+      {
+        kind: "p",
+        text: "یک خط متن. برای نام، عنوان، نام هنری و هر پاسخ کوتاه. ذخیره‌شده همان متنی است که کاربر تایپ می‌کند.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "text",
+            label: "نام هنری",
+            type: EFormFieldType.TEXT,
+            placeholder: "مثلاً: آرمین",
+            required: true,
+          }),
+        ],
+      },
+
+      { kind: "h", text: "متن بلند" },
+      {
+        kind: "p",
+        text: "چند خط متن، با امکان بزرگ‌تر شدن کادر. برای «درباره من»، رزومه و توضیحات.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "textarea",
+            label: "درباره من",
+            type: EFormFieldType.TEXTAREA,
+            placeholder: "چند خط درباره سابقه کاری‌تان بنویسید",
+            helpText: "حداکثر ۵۰۰ کاراکتر",
+          }),
+        ],
+      },
+
+      { kind: "h", text: "عدد" },
+      {
+        kind: "p",
+        text: "فقط رقم می‌پذیرد و ارقام فارسی را خودکار به انگلیسی تبدیل می‌کند. برای قد، وزن و سن. این نوع در صفحه «جستجوی هنرمندان» فیلتر بازه‌ای (کمینه/بیشینه) می‌سازد.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "number",
+            label: "قد (سانتی‌متر)",
+            type: EFormFieldType.NUMBER,
+            placeholder: "۱۷۵",
+            validation: { min: 100, max: 230 },
+            helpText: "بین ۱۰۰ تا ۲۳۰",
+          }),
+        ],
+      },
+      {
+        kind: "note",
+        text: "عدد وارد‌شده به‌صورت رشته ذخیره می‌شود تا صفر ابتدای کدهایی مثل کد ملی یا کد پستی از بین نرود.",
+      },
+
+      { kind: "h", text: "شماره موبایل" },
+      {
+        kind: "p",
+        text: "موبایل نوع جدایی نیست: یک فیلد «متن کوتاه» است که در فرم‌ساز برای آن «اعتبارسنجی آماده: شماره موبایل» را انتخاب می‌کنید. همین کار برای کد ملی، ایمیل، کد پستی، تلفن ثابت، شبا و آدرس اینترنتی هم انجام می‌شود.",
+      },
+      {
+        kind: "demo",
+        caption: "یک شماره اشتباه وارد کنید و «بررسی مقدار» را بزنید.",
+        fields: [
+          demoField({
+            key: "mobile",
+            label: "شماره موبایل",
+            type: EFormFieldType.TEXT,
+            placeholder: "۰۹۱۲۳۴۵۶۷۸۹",
+            required: true,
+            validation: { preset: "MOBILE" },
+          }),
+        ],
+      },
+
+      { kind: "h", text: "لیست کشویی" },
+      {
+        kind: "p",
+        text: "انتخاب یکی از گزینه‌های زیاد. گزینه‌ها را در فرم‌ساز به شکل «برچسب:مقدار» و جدا با کاما می‌نویسید. در صفحه جستجو به فیلتر تبدیل می‌شود.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "select",
+            label: "سابقه فعالیت",
+            type: EFormFieldType.SELECT,
+            placeholder: "یک مورد را انتخاب کنید",
+            options: [
+              { label: "کمتر از ۱ سال", value: "0-1" },
+              { label: "۱ تا ۳ سال", value: "1-3" },
+              { label: "۳ تا ۱۰ سال", value: "3-10" },
+              { label: "بیش از ۱۰ سال", value: "10+" },
+            ],
+          }),
+        ],
+      },
+      {
+        kind: "note",
+        text: "چیزی که ذخیره می‌شود «مقدار» گزینه است، نه برچسب آن؛ برچسب را بعداً می‌توانید عوض کنید بدون اینکه پاسخ‌های قبلی خراب شوند.",
+      },
+
+      { kind: "h", text: "تک‌انتخابی" },
+      {
+        kind: "p",
+        text: "وقتی گزینه‌ها کم هستند و می‌خواهید همه هم‌زمان دیده شوند (مثل جنسیت). کاربر فقط یکی را می‌تواند انتخاب کند.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "radio",
+            label: "جنسیت",
+            type: EFormFieldType.RADIO,
+            required: true,
+            options: [
+              { label: "زن", value: "female" },
+              { label: "مرد", value: "male" },
+            ],
+          }),
+        ],
+      },
+
+      { kind: "h", text: "چندانتخابی" },
+      {
+        kind: "p",
+        text: "کاربر می‌تواند چند گزینه را هم‌زمان انتخاب کند (مثل مهارت‌ها). پاسخ به شکل فهرستی از مقادیر ذخیره می‌شود.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "checkbox",
+            label: "مهارت‌ها",
+            type: EFormFieldType.CHECKBOX,
+            options: [
+              { label: "بازیگری", value: "acting" },
+              { label: "صداپیشگی", value: "dubbing" },
+              { label: "کارگردانی", value: "directing" },
+              { label: "فیلم‌برداری", value: "filming" },
+            ],
+          }),
+        ],
+      },
+
+      { kind: "h", text: "بله / خیر" },
+      {
+        kind: "p",
+        text: "یک تیک ساده برای پذیرش قوانین یا سوال‌های بله‌وخیری. اگر «اجباری» باشد، کاربر تا وقتی تیک نزند نمی‌تواند جلو برود.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "boolean",
+            label: "قوانین و شرایط را می‌پذیرم",
+            type: EFormFieldType.BOOLEAN,
+            required: true,
+          }),
+        ],
+      },
+
+      { kind: "h", text: "تاریخ" },
+      {
+        kind: "p",
+        text: "تقویم شمسی که با کلیک روی کادر باز می‌شود. برای تاریخ تولد و تاریخ شروع فعالیت.",
+      },
+      {
+        kind: "demo",
+        fields: [
+          demoField({
+            key: "date",
+            label: "تاریخ تولد",
+            type: EFormFieldType.DATE,
+            placeholder: "انتخاب تاریخ",
+          }),
+        ],
+      },
+
+      { kind: "h", text: "استان و شهر" },
+      {
+        kind: "p",
+        text: "دو نوع جدا که با هم کار می‌کنند: لیست استان‌ها و شهرها آماده است و لازم نیست گزینه‌ای بنویسید. با عوض شدن استان، شهرِ انتخاب‌شده پاک می‌شود. اگر فیلد شهر بگذارید ولی فیلد استان نداشته باشید، شهر غیرفعال می‌ماند.",
+      },
+      {
+        kind: "demo",
+        caption: "اول استان را انتخاب کنید تا لیست شهرها پر شود.",
+        fields: [
+          demoField({
+            key: "province",
+            label: "استان",
+            type: EFormFieldType.SELECT_PROVINCE,
+            placeholder: "انتخاب استان",
+          }),
+          demoField({
+            key: "city",
+            label: "شهر",
+            type: EFormFieldType.SELECT_CITY,
+            placeholder: "انتخاب شهر",
+          }),
+        ],
+      },
+      {
+        kind: "warn",
+        text: "برای اینکه استان و شهر در کارت هنرمند و صفحه پروفایل سایت نمایش داده شوند، کلید این دو فیلد باید دقیقاً province و city باشد.",
+      },
+
+      { kind: "h", text: "تصویر" },
+      {
+        kind: "p",
+        text: "آپلود نمونه‌کار تصویری. با تیک «چند فایلی» کاربر می‌تواند چند تصویر بفرستد؛ بدون آن فقط یکی.",
+      },
+      {
+        kind: "demo",
+        caption:
+          "این نمونه فایل را جایی آپلود نمی‌کند؛ فقط پیش‌نمایش را نشان می‌دهد.",
+        fields: [
+          demoField({
+            key: "image",
+            label: "نمونه‌کار تصویری",
+            type: EFormFieldType.IMAGE,
+            multiple: true,
+          }),
+        ],
+      },
+
+      { kind: "h", text: "ویدئو" },
+      {
+        kind: "p",
+        text: "آپلود نمونه‌کار ویدیویی. حجم و قالب فایل پیش از ارسال بررسی می‌شود و فایل‌های بزرگ‌تر از حد مجاز رد می‌شوند.",
+      },
+      {
+        kind: "demo",
+        caption:
+          "این نمونه فایل را جایی آپلود نمی‌کند؛ فقط پیش‌نمایش را نشان می‌دهد.",
+        fields: [
+          demoField({
+            key: "video",
+            label: "نمونه‌کار ویدیویی",
+            type: EFormFieldType.VIDEO,
+          }),
+        ],
+      },
+
+      { kind: "h", text: "قدم بعدی" },
+      {
+        kind: "note",
+        text: "برای ساختن واقعی این فیلدها راهنمای «فرم‌ساز دسته‌بندی» را ببینید، و برای اینکه پاسخ هر فیلد کجای سایت دیده می‌شود راهنمای «از فیلد فرم تا سایت».",
       },
     ],
   },
@@ -1222,6 +1522,34 @@ export const GUIDE_TOPICS: GuideTopic[] = [
         kind: "warn",
         text: "لینک‌های میانی پابرگ (جستجوی هنرمندان، درباره ما، تماس با ما، سوالات متداول، پشتیبانی، قوانین) و تصاویر دریافت اپلیکیشن هنوز در کد ثابت‌اند و از پنل قابل تغییر نیستند.",
       },
+      { kind: "h", text: "۶.۱ نماد اعتماد (اینماد) در پابرگ" },
+      {
+        kind: "p",
+        text: "لوگوی اینماد در پابرگ سایت، سمت چپ بخش دریافت اپلیکیشن، نمایش داده می‌شود و با کلیک روی آن صفحه تاییدیه در سایت اینماد باز می‌شود. برای نمایش آن فقط دو مقدار لازم است: «شناسه (id)» و «کد (Code)».",
+      },
+      {
+        kind: "steps",
+        items: [
+          "وارد پنل خود در سایت enamad.ir شوید و از بخش «مدیریت کسب‌وکار» ← «دریافت کد نماد» کد نماد را بگیرید.",
+          "اینماد یک قطعه کد HTML می‌دهد که داخل آن آدرسی شبیه «trustseal.enamad.ir/?id=۱۲۳۴۵۶&Code=abcd1234» دیده می‌شود.",
+          "عدد بعد از id= را کپی کنید و در پنل، «مدیریت محتوا» ← کارت «پابرگ سایت» ← کادر «شناسه اینماد (id)» بگذارید.",
+          "مقدار بعد از Code= را کپی کنید و در کادر «کد اینماد (Code)» بگذارید.",
+          "دکمه «ثبت تغییرات» همان کارت را بزنید و سپس صفحه اصلی سایت را باز کنید و تا پایین اسکرول کنید تا لوگو را ببینید.",
+        ],
+      },
+      {
+        kind: "note",
+        text: "هر دو کادر باید پر باشند. اگر یکی از آن‌ها خالی بماند، هیچ لوگویی در پابرگ نمایش داده نمی‌شود — این راه حذف نماد هم هست: کادرها را خالی کنید و ثبت بزنید.",
+      },
+      {
+        kind: "warn",
+        text: "این دو مقدار را دست‌کاری نکنید و از فارسی‌نویسی یا اضافه‌کردن فاصله پرهیز کنید؛ عیناً همان چیزی را بگذارید که اینماد داده است. اگر مقدار اشتباه باشد، به‌جای لوگو یک تصویر خراب در پابرگ دیده می‌شود.",
+      },
+      {
+        kind: "warn",
+        text: "اینماد لوگو را بر اساس دامنه‌ای که درخواست از آن می‌آید تایید می‌کند. پس لوگو فقط روی دامنه‌ای که نماد برای آن صادر شده (archivehonar.ir) درست نمایش داده می‌شود؛ روی محیط تست یا localhost ممکن است خالی یا خراب دیده شود. این ایراد سایت نیست.",
+      },
+
       { kind: "h", text: "۷. متن‌های صفحات سایت" },
       {
         kind: "p",
