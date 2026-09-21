@@ -4,8 +4,8 @@ import { Metadata, Viewport } from "next";
 import "./admin.css";
 
 export const metadata: Metadata = {
-  title: "آرشیو هنرمندان سینما",
-  description: "آرشیو هنرمندان حوزه سینما (نسخه توسعه با داده‌های ساختگی)",
+  title: "آرشیو هنر",
+  description: "آرشیو هنر",
 };
 
 export const viewport: Viewport = {

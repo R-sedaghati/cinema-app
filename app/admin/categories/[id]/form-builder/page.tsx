@@ -12,6 +12,7 @@ import {
   useAdminUpdateFormStep,
 } from "@/lib/services/admin/hook";
 import {
+  EArtistGender,
   EFormFieldType,
   IFormField,
   IFormFieldOption,
@@ -98,6 +99,18 @@ const HAS_OPTIONS = new Set([
   EFormFieldType.CHECKBOX,
 ]);
 
+/** The site reads `answers.gender` as MAN/WOMAN (components/artists/Card.tsx,
+ *  components/artists/detail/Aside.tsx). One click beats an admin retyping the key. */
+const GENDER_FIELD = {
+  key: "gender",
+  label: "جنسیت",
+  type: EFormFieldType.RADIO,
+  options: [
+    { label: "مرد", value: EArtistGender.MAN },
+    { label: "زن", value: EArtistGender.WOMAN },
+  ],
+};
+
 const IMAGE_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
 
 const TEXT_TYPES = new Set([EFormFieldType.TEXT, EFormFieldType.TEXTAREA]);
@@ -119,6 +132,10 @@ const PRESET_OPTIONS = [
 
 const toNumberOrUndefined = (raw: string) =>
   raw.trim() === "" ? undefined : Number(raw);
+
+const fieldErrorMessage = (err: unknown) =>
+  (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+  "خطا در ایجاد فیلد";
 
 function FieldRow({
   field,
@@ -341,6 +358,7 @@ function FieldRow({
 
 function StepCard({
   step,
+  hasGender,
   isFirst,
   isLast,
   draggingFieldId,
@@ -353,6 +371,7 @@ function StepCard({
   onFieldDrop,
 }: {
   step: IFormStep;
+  hasGender: boolean;
   isFirst: boolean;
   isLast: boolean;
   draggingFieldId: number | null;
@@ -388,6 +407,15 @@ function StepCard({
         return { label: (label ?? "").trim(), value: (value ?? label ?? "").trim() };
       });
 
+  const handleAddGender = () =>
+    createField(
+      {
+        stepId: step.id,
+        payload: { ...GENDER_FIELD, required: false, order: step.fields.length },
+      },
+      { onSuccess: onChanged, onError: (err: unknown) => toast.error(fieldErrorMessage(err)) },
+    );
+
   const handleAddField = () => {
     if (!newKey.trim() || !newLabel.trim()) {
       toast.error("کلید و برچسب فیلد الزامی است");
@@ -419,12 +447,7 @@ function StepCard({
           setNewOptionsText("");
           onChanged();
         },
-        onError: (err: unknown) => {
-          const message =
-            (err as { response?: { data?: { message?: string } } })?.response?.data
-              ?.message ?? "خطا در ایجاد فیلد";
-          toast.error(message);
-        },
+        onError: (err: unknown) => toast.error(fieldErrorMessage(err)),
       },
     );
   };
@@ -558,7 +581,15 @@ function StepCard({
             />
           )}
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              leftIcon={<Plus size={16} />}
+              onClick={handleAddGender}
+              disabled={hasGender}
+            >
+              افزودن فیلد جنسیت
+            </Button>
             <Button leftIcon={<Plus size={16} />} onClick={handleAddField}>
               افزودن فیلد
             </Button>
@@ -686,6 +717,8 @@ function FormBuilder() {
   if (category?.parent) return null;
 
   const steps = [...(schemaData?.result?.steps ?? [])].sort((a, b) => a.order - b.order);
+  // `key` is form-wide, so the prebuilt gender field is offered only while no step holds one.
+  const hasGender = steps.some((s) => s.fields.some((f) => f.key === GENDER_FIELD.key));
 
   const handleAddStep = () => {
     if (!newStepTitle.trim()) {
@@ -797,6 +830,7 @@ function FormBuilder() {
           <StepCard
             key={step.id}
             step={step}
+            hasGender={hasGender}
             isFirst={index === 0}
             isLast={index === steps.length - 1}
             draggingFieldId={dragging?.fieldId ?? null}

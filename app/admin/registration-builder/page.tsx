@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  useAdminCategoryUpdate,
   useAdminSiteContent,
   useAdminSiteContentUpdate,
 } from "@/lib/services/admin/hook";
@@ -22,6 +23,7 @@ import {
 import { useHomeCategories } from "@/components/home/sections/useHomeCategories";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
+import { CategoryOrderList } from "@/components/admin/page-builder/CategoryOrderList";
 import SelectScreen from "@/components/artist-registration/sections/SelectScreen";
 import withNoSSR from "@/lib/utils/withNoSSR";
 
@@ -34,6 +36,7 @@ function RegistrationBuilder() {
   const queryClient = useQueryClient();
   const { data } = useAdminSiteContent();
   const { mutate: save, isPending } = useAdminSiteContentUpdate();
+  const { mutateAsync: updateCategory } = useAdminCategoryUpdate();
   const copy = useFormCopy();
 
   const [sections, setSections] = useState<IResolvedRegistrationSection[]>([]);
@@ -47,10 +50,59 @@ function RegistrationBuilder() {
 
   // Real categories, so the preview shows the admin their own forms.
   const categories = useHomeCategories();
+
+  /** Ids in the order the admin just dragged them into; `null` = trust the server. */
+  const [order, setOrder] = useState<number[] | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+
+  const orderedCategories = useMemo(() => {
+    if (!order) return categories;
+    const byId = new Map(categories.map((c) => [c.id, c]));
+    const dragged = order
+      .map((id) => byId.get(id))
+      .filter((c) => c !== undefined);
+    // A category created elsewhere mid-drag isn't in `order` — keep it, at the end.
+    const rest = categories.filter((c) => !order.includes(c.id));
+    return [...dragged, ...rest];
+  }, [categories, order]);
+
   const items = useMemo(
-    () => categories.map((c) => ({ id: c.id, title: c.faName, image: c.image })),
-    [categories],
+    () =>
+      orderedCategories.map((c) => ({
+        id: c.id,
+        title: c.faName,
+        image: c.image,
+      })),
+    [orderedCategories],
   );
+
+  /** Writes `priority = index` back to every row whose position actually changed.
+   *  Comparing against `priority` (not the old index) also normalizes null/duplicate
+   *  priorities the per-category input may have left behind. */
+  const handleReorder = async (nextIds: number[]) => {
+    setOrder(nextIds);
+    setSavingOrder(true);
+    const byId = new Map(categories.map((c) => [c.id, c]));
+
+    try {
+      await Promise.all(
+        nextIds.flatMap((id, index) =>
+          byId.get(id)?.priority === index
+            ? []
+            : [updateCategory({ id, payload: { priority: index } })],
+        ),
+      );
+      await queryClient.invalidateQueries({ queryKey: ["applicationCategories"] });
+      queryClient.invalidateQueries({ queryKey: ["categoryList"] });
+      setOrder(null);
+      toast.success("ترتیب زمینه فعالیت ذخیره شد");
+    } catch {
+      // The admin axios interceptor already toasted — just fall back to the server order.
+      setOrder(null);
+    } finally {
+      setSavingOrder(false);
+    }
+  };
 
   const selectSections = useMemo(() => onScreen(sections, "select"), [sections]);
   const flowSections = useMemo(() => onScreen(sections, "flow"), [sections]);
@@ -103,7 +155,8 @@ function RegistrationBuilder() {
           <h1 className="text-lg font-bold">صفحه‌ساز صفحه ثبت‌نام</h1>
           <p className="text-sm text-gray-500 mt-1">
             ترتیب و چیدمان بخش‌های صفحه ثبت‌نام هنرمند را تغییر دهید. ترتیب
-            کارت‌ها از «اولویت» دسته‌بندی‌ها خوانده می‌شود.
+            کارت‌ها را در «ترتیب زمینه فعالیت» جابه‌جا کنید؛ همان‌جا در «اولویت»
+            دسته‌بندی‌ها ذخیره می‌شود.
           </p>
         </div>
         <Button onClick={handleSave} disabled={!dirty || isPending}>
@@ -132,6 +185,26 @@ function RegistrationBuilder() {
               sections={flowSections}
               onChange={(next) => replaceScreen("flow", next)}
               renderExtra={renderExtra}
+            />
+          </Card>
+
+          <Card className="flex flex-col gap-2 p-3">
+            <p className="text-sm font-medium text-gray-700">
+              ترتیب زمینه فعالیت
+            </p>
+            {/* Saves on drop, unlike the sections above — those ride the «ذخیره»
+                button and go to a different endpoint. */}
+            <p className="mb-1 text-xs text-gray-500">
+              ترتیب کارت‌های مرحله اول. با جابه‌جایی، خودکار ذخیره می‌شود.
+            </p>
+            <CategoryOrderList
+              items={orderedCategories.map((c) => ({
+                id: c.id,
+                faName: c.faName,
+                image: c.image,
+              }))}
+              onReorder={handleReorder}
+              isSaving={savingOrder}
             />
           </Card>
         </div>
