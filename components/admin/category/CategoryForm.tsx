@@ -75,7 +75,7 @@ function CategoryForm() {
         enName,
         parentId,
         description,
-        priority: parentId === null ? priority : null,
+        priority,
         isActive,
         image: imagePath || null,
         // An empty field means "not set" (inherit / fall back); a typed 0 means free.
@@ -162,21 +162,19 @@ function CategoryForm() {
                 }}
                 wrapperClassName="w-full"
               />
-              {parentId === null && (
-                <Input
-                  labelContent="اولویت"
-                  placeholder="اولویت"
-                  wrapperClassName="w-full"
-                  value={priority ?? ""}
-                  type="text"
-                  inputMode="numeric"
-                  onChange={(e) =>
-                    setPriority(
-                      e.target.value === "" ? null : toPriority(e.target.value),
-                    )
-                  }
-                />
-              )}
+              <Input
+                labelContent="اولویت"
+                placeholder="اولویت"
+                wrapperClassName="w-full"
+                value={priority ?? ""}
+                type="text"
+                inputMode="numeric"
+                onChange={(e) =>
+                  setPriority(
+                    e.target.value === "" ? null : toPriority(e.target.value),
+                  )
+                }
+              />
               <Switch
                 label="وضعیت"
                 checked={isActive}

@@ -9,10 +9,20 @@ import {
 } from "@/lib/services/admin/hook";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { toStoragePath } from "@/lib/utils/toStoragePath";
+import { sortByPriority } from "@/lib/utils/sortByPriority";
+import { moved } from "@/components/admin/page-builder/CategoryOrderList";
 import { Badge, Button, Card, Divider, Select, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import FileUploader, { FileType } from "@dgshahr/ui-kit/Form/FileUploader";
-import { ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  GripVertical,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import DeleteCategoryDrawer from "@/components/admin/category/DeleteCategoryDrawer";
 import { ICategoryItem } from "@/lib/services/admin/type";
 import { useParams, useRouter } from "next/navigation";
@@ -31,7 +41,23 @@ function CategoryDetail() {
 
   const { data: listData } = useAdminCategoryList();
   const categories = listData?.result ?? [];
-  const subcategories = categories.filter((c) => c.parent === id);
+  const siblings = sortByPriority(categories.filter((c) => c.parent === id));
+
+  /** Ids in the order just dragged into; `null` = trust the server. */
+  const [subOrder, setSubOrder] = useState<number[] | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
+
+  const subcategories = subOrder
+    ? [
+        ...subOrder
+          .map((subId) => siblings.find((c) => c.id === subId))
+          .filter((c) => c !== undefined),
+        // A subcategory added elsewhere mid-drag isn't in `subOrder` — keep it, at the end.
+        ...siblings.filter((c) => !subOrder.includes(c.id)),
+      ]
+    : siblings;
   const parentOptions = categories
     .filter((c) => c.parent === null && c.id !== id)
     .map((c) => ({ label: c.faName, value: c.id }));
@@ -111,6 +137,53 @@ function CategoryDetail() {
     ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
     : "استفاده از مبلغ پیش‌فرض.";
 
+  const { mutateAsync: updateSubcategory } = useAdminCategoryUpdate();
+
+  /** Writes `priority = index` back to every subcategory whose position changed.
+   *  Comparing against `priority` (not the old index) also normalizes the nulls rows
+   *  carry from before subcategories became orderable. */
+  const reorderSubcategories = async (nextIds: number[]) => {
+    setSubOrder(nextIds);
+    setSavingOrder(true);
+    const byId = new Map(siblings.map((c) => [c.id, c]));
+
+    try {
+      await Promise.all(
+        nextIds.flatMap((subId, index) =>
+          byId.get(subId)?.priority === index
+            ? []
+            : [updateSubcategory({ id: subId, payload: { priority: index } })],
+        ),
+      );
+      await queryClient.invalidateQueries({ queryKey: ["categoryList"] });
+      queryClient.invalidateQueries({ queryKey: ["applicationCategories"] });
+      setSubOrder(null);
+      toast.success("ترتیب زیردسته‌ها ذخیره شد");
+    } catch {
+      // The admin axios interceptor already toasted — fall back to the server order.
+      setSubOrder(null);
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
+  const moveSub = (fromId: number, to: number) => {
+    const from = subcategories.findIndex((c) => c.id === fromId);
+    if (from === -1 || from === to || from + 1 === to) return;
+    reorderSubcategories(moved(subcategories, from, to).map((c) => c.id));
+  };
+
+  // Arrow buttons are the keyboard path to the same action; `to` follows the drop-index
+  // convention in `moved`, hence the +2 when moving down.
+  const nudgeSub = (index: number, direction: "up" | "down") =>
+    reorderSubcategories(
+      moved(
+        subcategories,
+        index,
+        direction === "up" ? index - 1 : index + 2,
+      ).map((c) => c.id),
+    );
+
   const handleSubmit = () => {
     mutate(
       {
@@ -121,7 +194,7 @@ function CategoryDetail() {
           isActive,
           description,
           ...(parentChanged && { parentId }),
-          ...(parentId === null && { priority }),
+          priority,
           image: imagePath || null,
           // An empty field means "not set" (inherit / fall back); a typed 0 means free.
           contactAmount: contactAmount === "" ? null : Number(contactAmount),
@@ -202,7 +275,7 @@ function CategoryDetail() {
             />
             {parentId ? (
               <p className="font-p2-regular text-gray-500">
-                {`زیر‌دسته${parentName ? ` «${parentName}»` : " یک دسته‌بندی اصلی"} است؛ ترتیب نمایش آن از دسته‌بندی اصلی پیروی می‌کند و اولویت جداگانه‌ای ندارد.`}
+                {`زیر‌دسته${parentName ? ` «${parentName}»` : " یک دسته‌بندی اصلی"} است؛ «اولویت» آن فقط ترتیبش میان زیردسته‌های همان دسته‌بندی اصلی را تعیین می‌کند.`}
               </p>
             ) : null}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
@@ -236,21 +309,19 @@ function CategoryDetail() {
                 }}
                 wrapperClassName="w-full"
               />
-              {parentId === null && (
-                <Input
-                  labelContent="اولویت"
-                  placeholder="اولویت"
-                  wrapperClassName="w-full"
-                  value={priority ?? ""}
-                  type="text"
-                  inputMode="numeric"
-                  onChange={(e) =>
-                    setPriority(
-                      e.target.value === "" ? null : Number(e.target.value),
-                    )
-                  }
-                />
-              )}
+              <Input
+                labelContent="اولویت"
+                placeholder="اولویت"
+                wrapperClassName="w-full"
+                value={priority ?? ""}
+                type="text"
+                inputMode="numeric"
+                onChange={(e) =>
+                  setPriority(
+                    e.target.value === "" ? null : Number(e.target.value),
+                  )
+                }
+              />
               <div className="flex flex-col gap-3">
                 <p className="font-p1-regular text-gray-500">
                   تعداد درخواست‌‌ها
@@ -285,9 +356,17 @@ function CategoryDetail() {
           <Card>
             <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
-                <p className="font-h3-bold text-error-500">
-                  {`زیردسته‌ها (${subcategories.length})`}
-                </p>
+                <div className="flex flex-col gap-1">
+                  <p className="font-h3-bold text-error-500">
+                    {`زیردسته‌ها (${subcategories.length})`}
+                  </p>
+                  {subcategories.length > 1 && (
+                    <p className="font-p3-regular text-gray-500">
+                      ترتیب نمایش زیردسته‌ها در فرم ثبت‌نام. با جابه‌جایی، خودکار
+                      ذخیره می‌شود.
+                    </p>
+                  )}
+                </div>
                 <Button
                   color="error"
                   variant="outline"
@@ -300,8 +379,42 @@ function CategoryDetail() {
               <Divider color="gray" size="thin" type="horizontal" />
               {hasSubcategories ? (
                 <ul className="flex flex-col divide-y divide-gray-200">
-                  {subcategories.map((sub) => (
-                    <li key={sub.id} className="flex gap-2 items-center">
+                  {subcategories.map((sub, index) => (
+                    <li
+                      key={sub.id}
+                      draggable={dragging === sub.id}
+                      onDragOver={(e) => {
+                        if (dragging === null) return;
+                        e.preventDefault();
+                        const box = e.currentTarget.getBoundingClientRect();
+                        setDropIndex(
+                          e.clientY < box.top + box.height / 2 ? index : index + 1,
+                        );
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        if (dragging !== null && dropIndex !== null)
+                          moveSub(dragging, dropIndex);
+                        setDragging(null);
+                        setDropIndex(null);
+                      }}
+                      onDragEnd={() => {
+                        setDragging(null);
+                        setDropIndex(null);
+                      }}
+                      className={`flex gap-2 items-center ${
+                        dropIndex === index ? "border-t-2 border-t-error-500" : ""
+                      } ${savingOrder ? "opacity-60" : ""}`}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`جابه‌جایی ${sub.faName}`}
+                        className="text-gray-400 cursor-grab shrink-0"
+                        onMouseDown={() => setDragging(sub.id)}
+                        onMouseUp={() => setDragging(null)}
+                      >
+                        <GripVertical className="w-4 h-4" />
+                      </button>
                       <button
                         type="button"
                         onClick={() => router.push(`/admin/categories/${sub.id}`)}
@@ -326,6 +439,24 @@ function CategoryDetail() {
                           value={sub.isActive ? "فعال" : "غیرفعال"}
                         />
                         <ChevronLeft className="w-4 h-4 text-gray-400" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`جابه‌جایی ${sub.faName} به بالا`}
+                        disabled={index === 0 || savingOrder}
+                        onClick={() => nudgeSub(index, "up")}
+                        className="flex justify-center items-center w-9 h-9 text-gray-500 rounded-md shrink-0 hover:bg-gray-50 disabled:opacity-30"
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`جابه‌جایی ${sub.faName} به پایین`}
+                        disabled={index === subcategories.length - 1 || savingOrder}
+                        onClick={() => nudgeSub(index, "down")}
+                        className="flex justify-center items-center w-9 h-9 text-gray-500 rounded-md shrink-0 hover:bg-gray-50 disabled:opacity-30"
+                      >
+                        <ChevronDown className="w-4 h-4" />
                       </button>
                       <button
                         type="button"
