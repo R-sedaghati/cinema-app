@@ -30,14 +30,14 @@ export function BannerSliderSection({ variant = "slider" }: { variant?: string }
   );
 
   if (isLoading) {
-    return <div className="h-52 md:h-96 bg-zinc-900 animate-pulse" />;
+    return <div className="h-60 md:h-[27.6rem] bg-zinc-900 animate-pulse" />;
   }
 
   if (banners.length === 0) return null;
 
   if (variant === "still") {
     return (
-      <div className="h-52 md:h-96">
+      <div className="h-60 md:h-[27.6rem]">
         <BannerFrame slide={banners[0]} index={0} />
       </div>
     );
@@ -79,7 +79,7 @@ export function BannerSliderSection({ variant = "slider" }: { variant?: string }
         autoplay={{ delay: 3500, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         loop
-        className="application-banner h-52 md:h-96 overflow-hidden"
+        className="application-banner h-60 md:h-[27.6rem] overflow-hidden"
       >
         {banners.map((slide, index) => (
           <SwiperSlide key={slide.id}>

@@ -2,7 +2,7 @@
 
 import { Button, Card } from "@dgshahr/ui-kit";
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -22,6 +22,7 @@ import {
 } from "@/lib/utils/resolveRegistrationSections";
 import { useHomeCategories } from "@/components/home/sections/useHomeCategories";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
+import { sortByPriority } from "@/lib/utils/sortByPriority";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
 import { CategoryOrderList } from "@/components/admin/page-builder/CategoryOrderList";
 import SelectScreen from "@/components/artist-registration/sections/SelectScreen";
@@ -51,20 +52,28 @@ function RegistrationBuilder() {
   // Real categories, so the preview shows the admin their own forms.
   const categories = useHomeCategories();
 
-  /** Ids in the order the admin just dragged them into; `null` = trust the server. */
-  const [order, setOrder] = useState<number[] | null>(null);
+  /** Ids in the order the admin just dragged them into, per list: `"root"` for the
+   *  top-level categories, the parent's id for a subcategory list. A missing key means
+   *  "trust the server". */
+  const [orders, setOrders] = useState<Record<string, number[]>>({});
   const [savingOrder, setSavingOrder] = useState(false);
 
-  const orderedCategories = useMemo(() => {
-    if (!order) return categories;
-    const byId = new Map(categories.map((c) => [c.id, c]));
-    const dragged = order
-      .map((id) => byId.get(id))
-      .filter((c) => c !== undefined);
-    // A category created elsewhere mid-drag isn't in `order` — keep it, at the end.
-    const rest = categories.filter((c) => !order.includes(c.id));
-    return [...dragged, ...rest];
-  }, [categories, order]);
+  const applyOrder = useCallback(
+    <T extends { id: number }>(list: T[], parentId: number | null): T[] => {
+      const ids = orders[parentId === null ? "root" : String(parentId)];
+      if (!ids) return list;
+      const byId = new Map(list.map((c) => [c.id, c]));
+      const dragged = ids.map((id) => byId.get(id)).filter((c) => c !== undefined);
+      // A category created elsewhere mid-drag isn't in `ids` — keep it, at the end.
+      return [...dragged, ...list.filter((c) => !ids.includes(c.id))];
+    },
+    [orders],
+  );
+
+  const orderedCategories = useMemo(
+    () => applyOrder(categories, null),
+    [categories, applyOrder],
+  );
 
   const items = useMemo(
     () =>
@@ -76,13 +85,37 @@ function RegistrationBuilder() {
     [orderedCategories],
   );
 
-  /** Writes `priority = index` back to every row whose position actually changed.
-   *  Comparing against `priority` (not the old index) also normalizes null/duplicate
-   *  priorities the per-category input may have left behind. */
-  const handleReorder = async (nextIds: number[]) => {
-    setOrder(nextIds);
+  const orderItems = useMemo(
+    () =>
+      orderedCategories.map((c) => ({
+        id: c.id,
+        faName: c.faName,
+        image: c.image,
+        children: applyOrder(sortByPriority(c.children ?? []), c.id).map((child) => ({
+          id: child.id,
+          faName: child.faName,
+          image: child.image,
+        })),
+      })),
+    [orderedCategories, applyOrder],
+  );
+
+  /** Writes `priority = index` back to every row of one list whose position actually
+   *  changed. Comparing against `priority` (not the old index) also normalizes the
+   *  null/duplicate priorities older rows carry — subcategories were all saved as null
+   *  before they became orderable. */
+  const handleReorder = async (nextIds: number[], parentId: number | null) => {
+    setOrders((prev) => ({
+      ...prev,
+      [parentId === null ? "root" : String(parentId)]: nextIds,
+    }));
     setSavingOrder(true);
-    const byId = new Map(categories.map((c) => [c.id, c]));
+
+    const siblings =
+      parentId === null
+        ? categories
+        : (categories.find((c) => c.id === parentId)?.children ?? []);
+    const byId = new Map(siblings.map((c) => [c.id, c]));
 
     try {
       await Promise.all(
@@ -94,11 +127,11 @@ function RegistrationBuilder() {
       );
       await queryClient.invalidateQueries({ queryKey: ["applicationCategories"] });
       queryClient.invalidateQueries({ queryKey: ["categoryList"] });
-      setOrder(null);
+      setOrders({});
       toast.success("ترتیب زمینه فعالیت ذخیره شد");
     } catch {
       // The admin axios interceptor already toasted — just fall back to the server order.
-      setOrder(null);
+      setOrders({});
     } finally {
       setSavingOrder(false);
     }
@@ -195,14 +228,11 @@ function RegistrationBuilder() {
             {/* Saves on drop, unlike the sections above — those ride the «ذخیره»
                 button and go to a different endpoint. */}
             <p className="mb-1 text-xs text-gray-500">
-              ترتیب کارت‌های مرحله اول. با جابه‌جایی، خودکار ذخیره می‌شود.
+              ترتیب کارت‌های مرحله اول، و زیر هر کارت ترتیب زیردسته‌های آن. با
+              جابه‌جایی، خودکار ذخیره می‌شود.
             </p>
             <CategoryOrderList
-              items={orderedCategories.map((c) => ({
-                id: c.id,
-                faName: c.faName,
-                image: c.image,
-              }))}
+              items={orderItems}
               onReorder={handleReorder}
               isSaving={savingOrder}
             />
