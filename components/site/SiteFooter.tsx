@@ -18,8 +18,8 @@ export function SiteFooter() {
   const instagramUrl =
     footer?.instagramUrl?.trim() || FOOTER_DEFAULTS.instagramUrl;
   const copyright = footer?.copyright?.trim() || FOOTER_DEFAULTS.copyright;
-  const enamadId = footer?.enamadId?.trim();
-  const enamadCode = footer?.enamadCode?.trim();
+  const enamadId = footer?.enamadId?.trim() || FOOTER_DEFAULTS.enamadId;
+  const enamadCode = footer?.enamadCode?.trim() || FOOTER_DEFAULTS.enamadCode;
   const enamadQuery =
     enamadId && enamadCode
       ? `id=${encodeURIComponent(enamadId)}&Code=${encodeURIComponent(enamadCode)}`
