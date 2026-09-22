@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import {
   useAdminCategoryList,
+  useAdminCategoryReorder,
   useAdminCategoryRetrieve,
   useAdminCategoryUpdate,
   useAdminUploadBannerImage,
@@ -137,24 +138,17 @@ function CategoryDetail() {
     ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
     : "استفاده از مبلغ پیش‌فرض.";
 
-  const { mutateAsync: updateSubcategory } = useAdminCategoryUpdate();
+  const { mutateAsync: reorderCategories } = useAdminCategoryReorder();
 
-  /** Writes `priority = index` back to every subcategory whose position changed.
-   *  Comparing against `priority` (not the old index) also normalizes the nulls rows
-   *  carry from before subcategories became orderable. */
+  /** Sends the whole subcategory list in one call — the server sets `priority` to each
+   *  id's index. One request per drag, never one per row: the single-category PATCH
+   *  shifts the siblings around the moved row, which only lands right for one move. */
   const reorderSubcategories = async (nextIds: number[]) => {
     setSubOrder(nextIds);
     setSavingOrder(true);
-    const byId = new Map(siblings.map((c) => [c.id, c]));
 
     try {
-      await Promise.all(
-        nextIds.flatMap((subId, index) =>
-          byId.get(subId)?.priority === index
-            ? []
-            : [updateSubcategory({ id: subId, payload: { priority: index } })],
-        ),
-      );
+      await reorderCategories({ parentId: id, ids: nextIds });
       await queryClient.invalidateQueries({ queryKey: ["categoryList"] });
       queryClient.invalidateQueries({ queryKey: ["applicationCategories"] });
       setSubOrder(null);

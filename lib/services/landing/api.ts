@@ -13,6 +13,7 @@ import {
   ParamsArtistList,
 } from "../admin/type";
 import landingApi from "../landingAxiosInstance";
+import { fetchAllCategoryPages } from "../categoryPages";
 import {
   ArtistRequestResult,
   ICityListResponse,
@@ -128,14 +129,27 @@ export const userCreateSupport = async (
 };
 
 export const userCategoryList = async (params: IPagination) => {
-  const { data } = await landingApi.get<IUserCategoryListResponse>(
-    "/categories",
-    {
-      params: { ...params },
-    },
-  );
+  // `count` and `next` don't describe the whole list here (see fetchAllCategoryPages) —
+  // page 1 alone answers with 7 of the 17 forms, so walk the pages.
+  let last: IUserCategoryListResponse | undefined;
 
-  return data;
+  const result = await fetchAllCategoryPages(async (page) => {
+    const { data } = await landingApi.get<IUserCategoryListResponse>(
+      "/categories",
+      {
+        params: { ...params, page },
+      },
+    );
+    last = data;
+    return data.result ?? [];
+  });
+
+  return {
+    ...(last as IUserCategoryListResponse),
+    count: result.length,
+    next: null,
+    result,
+  };
 };
 
 export const userFaqList = async () => {

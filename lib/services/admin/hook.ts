@@ -44,6 +44,7 @@ import {
   ITutorialListResponse,
   ITutorialRetrieveResponse,
   ITutorialUpsertRequest,
+  IReorderCategoriesRequest,
   IUpdateCategoryRequest,
   IUpdateFormFieldRequest,
   IUpdateFormStepRequest,
@@ -79,6 +80,7 @@ import {
   adminCategoryCreate,
   adminCategoryDelete,
   adminCategoryList,
+  adminCategoryReorder,
   adminCategoryRetrieve,
   adminCategoryUpdate,
   adminCreateFaq,
@@ -298,6 +300,15 @@ export const useAdminCategoryUpdate = () => {
   return useMutation({
     mutationFn: (data: { id: number; payload: IUpdateCategoryRequest }) =>
       adminCategoryUpdate(data.id, data.payload, accessToken),
+  });
+};
+
+export const useAdminCategoryReorder = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: IReorderCategoriesRequest) =>
+      adminCategoryReorder(payload, accessToken),
   });
 };
 

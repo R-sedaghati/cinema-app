@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  useAdminCategoryUpdate,
+  useAdminCategoryReorder,
   useAdminSiteContent,
   useAdminSiteContentUpdate,
 } from "@/lib/services/admin/hook";
@@ -37,7 +37,7 @@ function RegistrationBuilder() {
   const queryClient = useQueryClient();
   const { data } = useAdminSiteContent();
   const { mutate: save, isPending } = useAdminSiteContentUpdate();
-  const { mutateAsync: updateCategory } = useAdminCategoryUpdate();
+  const { mutateAsync: reorderCategories } = useAdminCategoryReorder();
   const copy = useFormCopy();
 
   const [sections, setSections] = useState<IResolvedRegistrationSection[]>([]);
@@ -100,10 +100,9 @@ function RegistrationBuilder() {
     [orderedCategories, applyOrder],
   );
 
-  /** Writes `priority = index` back to every row of one list whose position actually
-   *  changed. Comparing against `priority` (not the old index) also normalizes the
-   *  null/duplicate priorities older rows carry — subcategories were all saved as null
-   *  before they became orderable. */
+  /** Sends the whole sibling list in one call — the server sets `priority` to each id's
+   *  index. One request per drag, never one per row: the single-category PATCH shifts
+   *  the siblings around the moved row, which only lands right for one move at a time. */
   const handleReorder = async (nextIds: number[], parentId: number | null) => {
     setOrders((prev) => ({
       ...prev,
@@ -111,20 +110,8 @@ function RegistrationBuilder() {
     }));
     setSavingOrder(true);
 
-    const siblings =
-      parentId === null
-        ? categories
-        : (categories.find((c) => c.id === parentId)?.children ?? []);
-    const byId = new Map(siblings.map((c) => [c.id, c]));
-
     try {
-      await Promise.all(
-        nextIds.flatMap((id, index) =>
-          byId.get(id)?.priority === index
-            ? []
-            : [updateCategory({ id, payload: { priority: index } })],
-        ),
-      );
+      await reorderCategories({ parentId, ids: nextIds });
       await queryClient.invalidateQueries({ queryKey: ["applicationCategories"] });
       queryClient.invalidateQueries({ queryKey: ["categoryList"] });
       setOrders({});

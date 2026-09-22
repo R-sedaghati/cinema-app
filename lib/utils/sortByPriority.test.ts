@@ -2,16 +2,29 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { sortByPriority } from "./sortByPriority.ts";
 
-test("sorts ascending and treats a missing priority as 0", () => {
+test("sorts ascending and puts never-ordered rows last", () => {
   const sorted = sortByPriority([
     { id: "b", priority: 2 },
     { id: "a", priority: null },
-    { id: "c", priority: 5 },
+    { id: "c", priority: 0 },
   ]);
 
   assert.deepEqual(
     sorted.map((it) => it.id),
-    ["a", "b", "c"],
+    ["c", "b", "a"],
+  );
+});
+
+test("keeps the server order among never-ordered rows", () => {
+  const sorted = sortByPriority([
+    { id: "x", priority: null },
+    { id: "y", priority: undefined },
+    { id: "z", priority: null },
+  ]);
+
+  assert.deepEqual(
+    sorted.map((it) => it.id),
+    ["x", "y", "z"],
   );
 });
 
