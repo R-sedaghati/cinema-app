@@ -379,6 +379,13 @@ export interface IUpdateCategoryRequest {
   registrationAmount?: number | null;
 }
 
+/** One whole sibling list's new order: `priority` becomes each id's index. */
+export interface IReorderCategoriesRequest {
+  /** null reorders the main categories; an id reorders that parent's subcategories. */
+  parentId: number | null;
+  ids: number[];
+}
+
 export interface ICreateCategoryRequest {
   faName: string;
   enName: string;

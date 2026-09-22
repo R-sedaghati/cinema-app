@@ -254,9 +254,18 @@ interface Tutorial {
 ## Common Endpoints (no auth)
 
 ### `GET /categories/`
-List all categories.
+List the main categories with their subcategories, both sorted by `priority` ascending
+(never-ordered rows, whose `priority` is null, come last). Admins set that order in
+«صفحه‌ساز صفحه ثبت‌نام» or on a category's own page.
 
 **Response:** `ApiResponse<Category[]>`
+
+**Paginated, and not the way the envelope suggests:** the server pages over the flat
+category rows (main + sub) but answers with only the main categories inside that slice,
+so `count` is not the total, `next` is always `null`, and a main category whose
+subcategories straddle a page boundary comes back on both pages. `count=100` currently
+spreads the 17 forms over pages 1–3. Clients must read until a page adds nothing new and
+merge repeats by id — `fetchAllCategoryPages` in `lib/services/categoryPages.ts`.
 
 ---
 
@@ -1062,6 +1071,31 @@ means "not set here"** (inherit the top-level category, then the env fallback):
 `parentId` (`number | null`) moves the category; `null` makes it top-level. `400` if the
 target is itself a subcategory, is the category itself, or the category has subcategories
 (two levels only).
+
+`priority` orders a category among its siblings — the main categories among themselves, or
+one parent's subcategories among themselves. Setting it to a taken slot shifts the rows
+between the old and the new position, so the list stays a gap-free sequence. To reorder a
+whole list at once, use `PATCH /admin/categories/reorder/` instead.
+
+---
+
+### `PATCH /admin/categories/reorder/`
+Set a whole sibling list's display order in one statement. Use this for drag-to-reorder —
+the per-category `PATCH` above shifts the rows around the one it moves, which is right for
+a single move but scrambles a list sent as one request per row.
+
+**Body:**
+```ts
+{
+  parentId: number | null; // null reorders the main categories; an id, that parent's subcategories
+  ids: number[];           // the sibling ids in their new order; priority becomes each id's index
+}
+```
+
+`400` if `ids` is empty, holds a non-integer or a duplicate, or contains an id that is not
+a child of `parentId`.
+
+**Response:** `ApiResponse<{ ids: number[] }>`
 
 ---
 
