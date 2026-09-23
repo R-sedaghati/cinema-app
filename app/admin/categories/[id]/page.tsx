@@ -11,6 +11,7 @@ import {
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { toStoragePath } from "@/lib/utils/toStoragePath";
 import { sortByPriority } from "@/lib/utils/sortByPriority";
+import { toPriority } from "@/lib/utils/toEnglishDigits";
 import { moved } from "@/components/admin/page-builder/CategoryOrderList";
 import { Badge, Button, Card, Divider, Select, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
@@ -141,7 +142,7 @@ function CategoryDetail() {
   const { mutateAsync: reorderCategories } = useAdminCategoryReorder();
 
   /** Sends the whole subcategory list in one call — the server sets `priority` to each
-   *  id's index. One request per drag, never one per row: the single-category PATCH
+   *  id's 1-based position. One request per drag, never one per row: the single-category PATCH
    *  shifts the siblings around the moved row, which only lands right for one move. */
   const reorderSubcategories = async (nextIds: number[]) => {
     setSubOrder(nextIds);
@@ -188,7 +189,8 @@ function CategoryDetail() {
           isActive,
           description,
           ...(parentChanged && { parentId }),
-          priority,
+          // Only a changed priority moves the row; saving other fields leaves the order alone.
+          ...(priority !== data?.priority && { priority }),
           image: imagePath || null,
           // An empty field means "not set" (inherit / fall back); a typed 0 means free.
           contactAmount: contactAmount === "" ? null : Number(contactAmount),
@@ -310,11 +312,8 @@ function CategoryDetail() {
                 value={priority ?? ""}
                 type="text"
                 inputMode="numeric"
-                onChange={(e) =>
-                  setPriority(
-                    e.target.value === "" ? null : Number(e.target.value),
-                  )
-                }
+                // Category positions are 1-based; 0 / invalid input clears the field.
+                onChange={(e) => setPriority(toPriority(e.target.value) || null)}
               />
               <div className="flex flex-col gap-3">
                 <p className="font-p1-regular text-gray-500">
