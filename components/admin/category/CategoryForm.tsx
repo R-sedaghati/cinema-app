@@ -171,7 +171,7 @@ function CategoryForm() {
                 inputMode="numeric"
                 onChange={(e) =>
                   setPriority(
-                    e.target.value === "" ? null : toPriority(e.target.value),
+                    toPriority(e.target.value) || null,
                   )
                 }
               />

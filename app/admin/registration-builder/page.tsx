@@ -101,7 +101,7 @@ function RegistrationBuilder() {
   );
 
   /** Sends the whole sibling list in one call — the server sets `priority` to each id's
-   *  index. One request per drag, never one per row: the single-category PATCH shifts
+   *  1-based position. One request per drag, never one per row: the single-category PATCH shifts
    *  the siblings around the moved row, which only lands right for one move at a time. */
   const handleReorder = async (nextIds: number[], parentId: number | null) => {
     setOrders((prev) => ({
