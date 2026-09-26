@@ -14,9 +14,9 @@ const MainHeader = () => {
   return (
     <div className="flex items-center flex-col mt-10 space-y-4">
       <h1 className="text-5xl text-center leading-16 font-h1-regular whitespace-pre-line bg-linear-to-r from-white from-30%  to-zinc-700 bg-clip-text text-transparent">
-        {copy("heroTitle")}
+        <span style={copy.style("heroTitle")}>{copy("heroTitle")}</span>
       </h1>
-      <p className="text-center whitespace-pre-line">{copy("heroSubtitle")}</p>
+      <p className="text-center whitespace-pre-line"><span style={copy.style("heroSubtitle")}>{copy("heroSubtitle")}</span></p>
       <div className="flex gap-2">
         <Button
           onClick={open}
@@ -24,7 +24,7 @@ const MainHeader = () => {
           size="small"
           className="rounded-full!"
         >
-          {copy("heroPrimaryCta")}
+          <span style={copy.style("heroPrimaryCta")}>{copy("heroPrimaryCta")}</span>
         </Button>
         <Button
           onClick={() => router.push("/artists")}
@@ -32,7 +32,7 @@ const MainHeader = () => {
           size="small"
           className="bg-error-500 rounded-full!"
         >
-          {copy("heroSecondaryCta")}
+          <span style={copy.style("heroSecondaryCta")}>{copy("heroSecondaryCta")}</span>
         </Button>
       </div>
     </div>

@@ -20,12 +20,12 @@ export function MobileBottomNav() {
   const copy = useLandingCopy();
 
   const bottomNavItems = [
-    { href: "/", label: copy("navHome"), icon: Home },
-    { href: "/artists", label: copy("navMobileSearch"), icon: Search },
-    { href: "/artist-registration", label: copy("navMobileForms"), icon: PenLine },
+    { href: "/", label: <span style={copy.style("navHome")}>{copy("navHome")}</span>, icon: Home },
+    { href: "/artists", label: <span style={copy.style("navMobileSearch")}>{copy("navMobileSearch")}</span>, icon: Search },
+    { href: "/artist-registration", label: <span style={copy.style("navMobileForms")}>{copy("navMobileForms")}</span>, icon: PenLine },
     isLoggedIn
-      ? { href: "/profile", label: copy("navProfile"), icon: User }
-      : { href: "#", label: copy("navMobileLogin"), icon: LogIn },
+      ? { href: "/profile", label: <span style={copy.style("navProfile")}>{copy("navProfile")}</span>, icon: User }
+      : { href: "#", label: <span style={copy.style("navMobileLogin")}>{copy("navMobileLogin")}</span>, icon: LogIn },
   ];
 
   return (
@@ -41,7 +41,7 @@ export function MobileBottomNav() {
           if (!isLoggedIn && item.href === "#") {
             return (
               <button
-                key={item.label}
+                key={item.href}
                 type="button"
                 onClick={open}
                 className="flex flex-col items-center gap-1 rounded-full px-4 py-2 text-zinc-400 transition-colors hover:text-zinc-300"

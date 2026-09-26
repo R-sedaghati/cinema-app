@@ -22,7 +22,7 @@ const Reasons = () => {
 
   return (
     <div className="flex flex-col justify-center items-center gap-10">
-      <h3 className="font-h1-bold">{copy("reasonsTitle")}</h3>
+      <h3 className="font-h1-bold"><span style={copy.style("reasonsTitle")}>{copy("reasonsTitle")}</span></h3>
       <div className="flex flex-wrap justify-center items-center gap-10">
         {cards.map((item) => (
           <div

@@ -60,11 +60,12 @@ export function CtaCardsSection({ variant = "cards" }: { variant?: string }) {
   }
 
   return (
-    <div className="md:grid md:grid-cols-3 md:gap-5 space-y-4 md:space-y-0">
+    <div data-card-grid className="md:grid md:grid-cols-3 md:gap-5 space-y-4 md:space-y-0">
       {CTA_CARDS.map((card) => (
         <Link
           key={card.href}
           href={card.href}
+          data-card
           className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-4 md:px-6 md:py-6 hover:border-error-500/40 transition-colors group active:scale-[.99]"
         >
           <div>

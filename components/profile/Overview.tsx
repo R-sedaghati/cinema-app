@@ -156,7 +156,7 @@ export default function Overview() {
             isLoading={isPending}
             disabled={isPending}
           >
-            {copy("profileOverviewCta")}
+            <span style={copy.style("profileOverviewCta")}>{copy("profileOverviewCta")}</span>
           </Button>
         </div>
       </form>

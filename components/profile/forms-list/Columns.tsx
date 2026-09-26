@@ -66,7 +66,7 @@ export const generateColumns = (
           leftIcon={<ChevronLeft />}
           onClick={() => onEdit(data)}
         >
-          {copy("profileFormEdit")}
+          <span style={copy.style("profileFormEdit")}>{copy("profileFormEdit")}</span>
         </Button>
 
         <Button
@@ -74,7 +74,7 @@ export const generateColumns = (
           leftIcon={<ChevronLeft />}
           onClick={() => onView(data)}
         >
-          {copy("profileFormView")}
+          <span style={copy.style("profileFormView")}>{copy("profileFormView")}</span>
         </Button>
 
         {data.status === EArtistRequestStatus.APPROVED && (
@@ -83,7 +83,7 @@ export const generateColumns = (
             leftIcon={<ChevronLeft />}
             onClick={() => onOpenPublic(data)}
           >
-            {copy("profileFormPublicPage")}
+            <span style={copy.style("profileFormPublicPage")}>{copy("profileFormPublicPage")}</span>
           </Button>
         )}
       </div>

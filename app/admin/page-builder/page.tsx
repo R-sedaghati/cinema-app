@@ -19,6 +19,7 @@ import {
   orderedHomeSections,
   type IResolvedHomeSection,
 } from "@/lib/utils/resolveHomeSections";
+import { sectionBoxProps } from "@/lib/utils/resolveSections";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
 import { LandingCopyDraftProvider } from "@/lib/hooks/useLandingCopy";
 import withNoSSR from "@/lib/utils/withNoSSR";
@@ -52,7 +53,8 @@ function PageBuilder() {
 
   const handleSave = () => {
     save(
-      { homeSections: sections, landing },
+      // Re-resolve so half-typed sizes (<40px) are dropped, not sent.
+      { homeSections: orderedHomeSections(sections), landing },
       {
         onSuccess: () => {
           setDirty(false);
@@ -157,7 +159,11 @@ function PageBuilder() {
 function PreviewSections({ sections }: { sections: IResolvedHomeSection[] }) {
   const render = (section: IResolvedHomeSection) => {
     const Section = HOME_SECTION_COMPONENTS[section.key];
-    return <Section key={section.key} variant={section.variant} />;
+    return (
+      <div key={section.key} {...sectionBoxProps(section)}>
+        <Section variant={section.variant} />
+      </div>
+    );
   };
 
   return (

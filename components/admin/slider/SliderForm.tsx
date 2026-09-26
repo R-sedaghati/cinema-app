@@ -6,10 +6,11 @@ import {
   useAdminUploadBannerImage,
 } from "@/lib/services/admin/hook";
 import { IBannerItem } from "@/lib/services/admin/type";
+import ColorInput from "@/components/admin/ColorInput";
 import FontSizeInput from "@/components/admin/FontSizeInput";
 import GuideBlocks from "@/components/admin/guide/GuideBlocks";
 import { SLIDER_FORM_GUIDE } from "@/lib/constants/guide/content";
-import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { textStyle } from "@/lib/utils/fontSize";
 import { toStoragePath } from "@/lib/utils/toStoragePath";
 import { Button, Card, Divider, Switch } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
@@ -61,6 +62,9 @@ function SliderForm({ mode, id, initialData }: Props) {
   const [titleFontSize, setTitleFontSize] = useState<number | null>(null);
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
   const [ctaLabelFontSize, setCtaLabelFontSize] = useState<number | null>(null);
+  const [titleColor, setTitleColor] = useState<string | null>(null);
+  const [subtitleColor, setSubtitleColor] = useState<string | null>(null);
+  const [ctaLabelColor, setCtaLabelColor] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const uploadImage = useAdminUploadBannerImage();
@@ -82,6 +86,9 @@ function SliderForm({ mode, id, initialData }: Props) {
     setTitleFontSize(initialData.titleFontSize ?? null);
     setSubtitleFontSize(initialData.subtitleFontSize ?? null);
     setCtaLabelFontSize(initialData.ctaLabelFontSize ?? null);
+    setTitleColor(initialData.titleColor ?? null);
+    setSubtitleColor(initialData.subtitleColor ?? null);
+    setCtaLabelColor(initialData.ctaLabelColor ?? null);
   }, [initialData]);
 
   const clearError = (field: keyof FieldErrors) =>
@@ -180,6 +187,9 @@ function SliderForm({ mode, id, initialData }: Props) {
       titleFontSize,
       subtitleFontSize,
       ctaLabelFontSize,
+      titleColor,
+      subtitleColor,
+      ctaLabelColor,
     };
 
     const onSuccess = () => {
@@ -263,6 +273,11 @@ function SliderForm({ mode, id, initialData }: Props) {
                   isError={Boolean(errors.titleFontSize)}
                   errorMessage={errors.titleFontSize}
                 />
+                <ColorInput
+                  label="رنگ عنوان"
+                  value={titleColor}
+                  onChange={setTitleColor}
+                />
                 <FontSizeInput
                   label="اندازه فونت زیرعنوان"
                   value={subtitleFontSize}
@@ -272,6 +287,11 @@ function SliderForm({ mode, id, initialData }: Props) {
                   }}
                   isError={Boolean(errors.subtitleFontSize)}
                   errorMessage={errors.subtitleFontSize}
+                />
+                <ColorInput
+                  label="رنگ زیرعنوان"
+                  value={subtitleColor}
+                  onChange={setSubtitleColor}
                 />
                 <Input
                   labelContent="عنوان دکمه (اختیاری)"
@@ -307,6 +327,11 @@ function SliderForm({ mode, id, initialData }: Props) {
                   isError={Boolean(errors.ctaLabelFontSize)}
                   errorMessage={errors.ctaLabelFontSize}
                 />
+                <ColorInput
+                  label="رنگ دکمه"
+                  value={ctaLabelColor}
+                  onChange={setCtaLabelColor}
+                />
                 <Input
                   labelContent="اولویت نمایش"
                   placeholder="اولویت نمایش"
@@ -333,19 +358,19 @@ function SliderForm({ mode, id, initialData }: Props) {
                 <div className="rounded-xl bg-linear-to-bl from-zinc-900 to-zinc-700 p-6">
                   <p
                     className="text-error-400 text-sm md:text-base font-medium mb-1 md:mb-2"
-                    style={fontSizeStyle(subtitleFontSize)}
+                    style={textStyle(subtitleFontSize, subtitleColor)}
                   >
                     {subtitle || "زیرعنوان اسلایدر"}
                   </p>
                   <h2
                     className="text-white text-2xl md:text-5xl font-bold mb-4 md:mb-6"
-                    style={fontSizeStyle(titleFontSize)}
+                    style={textStyle(titleFontSize, titleColor)}
                   >
                     {title || "عنوان اسلایدر"}
                   </h2>
                   <span
                     className="inline-flex items-center gap-1.5 rounded-full bg-error-500 px-4 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold text-zinc-950"
-                    style={fontSizeStyle(ctaLabelFontSize)}
+                    style={textStyle(ctaLabelFontSize, ctaLabelColor)}
                   >
                     {ctaLabel || "عنوان دکمه"}
                   </span>

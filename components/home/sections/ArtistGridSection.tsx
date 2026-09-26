@@ -27,10 +27,10 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
         className={`mb-3 flex items-center justify-between md:mb-4 ${isRail ? "px-4" : ""}`}
       >
         <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
-          {copy("homeArtistsTitle")}
+          <span style={copy.style("homeArtistsTitle")}>{copy("homeArtistsTitle")}</span>
         </h2>
         <Link href="/artists" className="text-xs text-error-500 md:text-sm">
-          {copy("homeArtistsCta")}
+          <span style={copy.style("homeArtistsCta")}>{copy("homeArtistsCta")}</span>
         </Link>
       </div>
 
@@ -41,7 +41,7 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
       ) : variant === "castlist" ? (
         <CastList artists={artists} />
       ) : variant === "tiles" ? (
-        <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 md:gap-y-6 lg:grid-cols-8">
+        <div data-card-grid className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 md:gap-y-6 lg:grid-cols-8">
           {artists.map((artist) => (
             <ArtistTile key={artist.id} artist={artist} />
           ))}
@@ -52,16 +52,18 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
         <div className="overflow-x-auto scrollbar-hidden">
           <div className="flex w-max gap-3 px-4 pb-1 md:gap-5">
             {artists.map((artist) => (
-              <div key={artist.id} className="w-36 shrink-0 md:w-44">
+              <div key={artist.id} data-card className="w-36 shrink-0 md:w-44">
                 <ArtistCard artist={artist} />
               </div>
             ))}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-5 lg:grid-cols-5">
+        <div data-card-grid className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-5 lg:grid-cols-5">
           {artists.map((artist) => (
-            <ArtistCard key={artist.id} artist={artist} />
+            <div key={artist.id} data-card>
+              <ArtistCard artist={artist} />
+            </div>
           ))}
         </div>
       )}
@@ -127,6 +129,7 @@ function ArtistTile({ artist }: { artist: IArtistItem }) {
   return (
     <Link
       href={`/artists/${artist.id}`}
+      data-card
       className="group flex flex-col items-center gap-2 text-center"
     >
       <div className="aspect-square w-full overflow-hidden rounded-full bg-zinc-800 transition-opacity group-hover:opacity-80">

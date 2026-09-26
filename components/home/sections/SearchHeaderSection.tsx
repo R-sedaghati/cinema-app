@@ -38,10 +38,10 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
     return (
       <div className="py-8 text-center md:py-14">
         <h1 className="mx-auto max-w-2xl text-3xl font-bold leading-tight text-zinc-100 md:text-5xl">
-          {copy("homeExploreKicker")}
+          <span style={copy.style("homeExploreKicker")}>{copy("homeExploreKicker")}</span>
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-500 md:text-base">
-          {copy("homeExploreTitle")}
+          <span style={copy.style("homeExploreTitle")}>{copy("homeExploreTitle")}</span>
         </p>
         <div className="mx-auto mt-6 max-w-xl md:mt-8">{input}</div>
       </div>
@@ -52,10 +52,10 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
     <div className="pt-5 md:pt-8 pb-3 md:pb-5 space-y-3 md:space-y-4">
       <div>
         <h1 className="text-xl md:text-3xl font-bold text-zinc-100">
-          {copy("homeExploreKicker")}
+          <span style={copy.style("homeExploreKicker")}>{copy("homeExploreKicker")}</span>
         </h1>
         <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
-          {copy("homeExploreTitle")}
+          <span style={copy.style("homeExploreTitle")}>{copy("homeExploreTitle")}</span>
         </p>
       </div>
       <div className="md:w-131.5">{input}</div>

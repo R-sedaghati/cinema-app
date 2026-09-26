@@ -77,7 +77,7 @@ const CallDetail = ({
         {...(error && { status: "error", hintMessage: error })}
       />
       <div className="border border-zinc-600 rounded-2xl p-6 flex justify-between items-center">
-        <span className="text-zinc-400 text-sm">{copy("callAmountLabel")}</span>
+        <span className="text-zinc-400 text-sm"><span style={copy.style("callAmountLabel")}>{copy("callAmountLabel")}</span></span>
         <span className="text-zinc-100 text-lg font-semibold">
           {isPriceLoading || amountToman === undefined
             ? "—"
@@ -93,7 +93,7 @@ const CallDetail = ({
           variant="outline"
           onClick={() => setOpen(false)}
         >
-          {copy("actionCancel")}
+          <span style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
         </Button>
         <Button
           onClick={submit}

@@ -4,6 +4,7 @@ import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { HOME_SECTIONS } from "@/lib/constants/homeSections";
 import { HOME_SECTION_COMPONENTS } from "@/components/home/sections/registry";
 import { resolveHomeSections } from "@/lib/utils/resolveHomeSections";
+import { sectionBoxProps } from "@/lib/utils/resolveSections";
 
 export default function ApplicationPage() {
   const { data } = useUserSiteContent();
@@ -13,7 +14,11 @@ export default function ApplicationPage() {
 
   const render = (section: (typeof sections)[number]) => {
     const Section = HOME_SECTION_COMPONENTS[section.key];
-    return <Section key={section.key} variant={section.variant} />;
+    return (
+      <div key={section.key} {...sectionBoxProps(section)}>
+        <Section variant={section.variant} />
+      </div>
+    );
   };
 
   return (

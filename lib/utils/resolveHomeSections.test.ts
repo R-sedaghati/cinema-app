@@ -53,3 +53,25 @@ test("an unknown or missing variant falls back to the catalog default", () => {
   ]);
   assert.equal(stored.variant, "castlist");
 });
+
+test("valid size overrides pass through, junk is dropped", () => {
+  const [first] = orderedHomeSections([
+    // Stored JSON is untrusted — the casts stand in for whatever the DB holds.
+    {
+      key: "artistGrid",
+      hidden: false,
+      maxWidth: 700.4,
+      minHeight: -5,
+      cardWidth: "abc" as unknown as number,
+      cardHeight: 99999,
+    },
+  ]);
+  assert.equal(first.maxWidth, 700);
+  assert.equal(first.minHeight, undefined);
+  assert.equal(first.cardWidth, undefined);
+  assert.equal(first.cardHeight, undefined);
+
+  const [bare] = orderedHomeSections([{ key: "artistGrid", hidden: false }]);
+  assert.equal(bare.maxWidth, undefined);
+  assert.equal(bare.cardWidth, undefined);
+});

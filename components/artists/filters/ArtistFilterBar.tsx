@@ -34,7 +34,7 @@ export function ArtistFilterBar({
   if (descriptors.length === 0) {
     return (
       <p className="text-sm text-zinc-500">
-        {copy("artistsNoFilters")}
+        <span style={copy.style("artistsNoFilters")}>{copy("artistsNoFilters")}</span>
       </p>
     );
   }

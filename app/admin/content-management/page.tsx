@@ -19,6 +19,7 @@ import CopyCard from "@/components/admin/content/CopyCard";
 import { LANDING_COPY, LANDING_COPY_GROUPS } from "@/lib/constants/landingCopy";
 import { FORM_COPY } from "@/lib/constants/formCopy";
 import ContactFormCard from "@/components/admin/content/ContactFormCard";
+import ColorInput from "@/components/admin/ColorInput";
 import FontSizeInput from "@/components/admin/FontSizeInput";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Button, Card, Divider } from "@dgshahr/ui-kit";
@@ -83,6 +84,10 @@ function ContentManagement() {
   const [benefitsFontSize, setBenefitsFontSize] = useState<number | null>(null);
   const [supportFontSize, setSupportFontSize] = useState<number | null>(null);
   const [termsFontSize, setTermsFontSize] = useState<number | null>(null);
+  const [aboutColor, setAboutColor] = useState<string | null>(null);
+  const [benefitsColor, setBenefitsColor] = useState<string | null>(null);
+  const [supportColor, setSupportColor] = useState<string | null>(null);
+  const [termsColor, setTermsColor] = useState<string | null>(null);
 
   useEffect(() => {
     const content = siteContentData?.result;
@@ -100,14 +105,18 @@ function ContentManagement() {
     setTermsTitle(content.terms?.title ?? "");
     setTermsContent(content.terms?.content ?? "");
     setBenefitsFontSize(content.benefits?.fontSize ?? null);
+    setBenefitsColor(content.benefits?.color ?? null);
     setSupportFontSize(content.support?.fontSize ?? null);
+    setSupportColor(content.support?.color ?? null);
     setTermsFontSize(content.terms?.fontSize ?? null);
+    setTermsColor(content.terms?.color ?? null);
   }, [siteContentData]);
 
   useEffect(() => {
     if (aboutData?.result?.length) {
       setAboutText(aboutData.result[0].text ?? "");
       setAboutFontSize(aboutData.result[0].fontSize ?? null);
+      setAboutColor(aboutData.result[0].color ?? null);
     }
   }, [aboutData]);
 
@@ -173,7 +182,7 @@ function ContentManagement() {
   const handleBenefitsSubmit = () => {
     updateSiteContent(
       {
-        benefits: { items: benefits, fontSize: benefitsFontSize },
+        benefits: { items: benefits, fontSize: benefitsFontSize, color: benefitsColor },
       },
       {
         onSuccess: () => {
@@ -193,6 +202,7 @@ function ContentManagement() {
           description: supportDescription,
           items: supportItems,
           fontSize: supportFontSize,
+          color: supportColor,
         },
       },
       {
@@ -212,6 +222,7 @@ function ContentManagement() {
           title: termsTitle,
           content: termsContent,
           fontSize: termsFontSize,
+          color: termsColor,
         },
       },
       {
@@ -255,7 +266,7 @@ function ContentManagement() {
 
   const handleAboutSubmit = () => {
     updateAbout(
-      { text: aboutText, fontSize: aboutFontSize },
+      { text: aboutText, fontSize: aboutFontSize, color: aboutColor },
       {
         onSuccess: () => {
           toast.success("با موفقیت تغییر کرد");
@@ -403,12 +414,15 @@ function ContentManagement() {
               onChange={(e) => setAboutText(e.target.value)}
             />
 
-            <FontSizeInput
-              label="اندازه فونت متن درباره ما"
-              wrapperClassName="w-1/3"
-              value={aboutFontSize}
-              onChange={setAboutFontSize}
-            />
+            <div className="flex items-start gap-4">
+              <FontSizeInput
+                label="اندازه فونت متن درباره ما"
+                wrapperClassName="w-1/3"
+                value={aboutFontSize}
+                onChange={setAboutFontSize}
+              />
+              <ColorInput value={aboutColor} onChange={setAboutColor} />
+            </div>
 
             <div className="flex justify-end gap-3">
               <Button
@@ -418,6 +432,8 @@ function ContentManagement() {
                   if (aboutData?.result?.length) {
                     setAboutText(aboutData.result[0].text ?? "");
                     setAboutFontSize(aboutData.result[0].fontSize ?? null);
+                    setAboutColor(aboutData.result[0].color ?? null);
+      setAboutColor(aboutData.result[0].color ?? null);
                   }
                 }}
               >
@@ -444,12 +460,15 @@ function ContentManagement() {
 
             <Divider color="gray" size="thin" type="horizontal" />
 
-            <FontSizeInput
-              label="اندازه فونت متن کارت‌ها"
-              wrapperClassName="w-1/3"
-              value={benefitsFontSize}
-              onChange={setBenefitsFontSize}
-            />
+            <div className="flex items-start gap-4">
+              <FontSizeInput
+                label="اندازه فونت متن کارت‌ها"
+                wrapperClassName="w-1/3"
+                value={benefitsFontSize}
+                onChange={setBenefitsFontSize}
+              />
+              <ColorInput value={benefitsColor} onChange={setBenefitsColor} />
+            </div>
 
             {benefits.map((item, index) => (
               <div key={index} className="flex justify-between gap-3">
@@ -506,12 +525,15 @@ function ContentManagement() {
               onChange={(e) => setSupportDescription(e.target.value)}
             />
 
-            <FontSizeInput
-              label="اندازه فونت توضیحات و متن کارت‌ها"
-              wrapperClassName="w-1/3"
-              value={supportFontSize}
-              onChange={setSupportFontSize}
-            />
+            <div className="flex items-start gap-4">
+              <FontSizeInput
+                label="اندازه فونت توضیحات و متن کارت‌ها"
+                wrapperClassName="w-1/3"
+                value={supportFontSize}
+                onChange={setSupportFontSize}
+              />
+              <ColorInput value={supportColor} onChange={setSupportColor} />
+            </div>
 
             {supportItems.map((item, index) => (
               <div key={index} className="flex flex-col gap-3">
@@ -597,12 +619,15 @@ function ContentManagement() {
               onChange={(e) => setTermsContent(e.target.value)}
             />
 
-            <FontSizeInput
-              label="اندازه فونت متن قوانین"
-              wrapperClassName="w-1/3"
-              value={termsFontSize}
-              onChange={setTermsFontSize}
-            />
+            <div className="flex items-start gap-4">
+              <FontSizeInput
+                label="اندازه فونت متن قوانین"
+                wrapperClassName="w-1/3"
+                value={termsFontSize}
+                onChange={setTermsFontSize}
+              />
+              <ColorInput value={termsColor} onChange={setTermsColor} />
+            </div>
 
             <div className="flex justify-end gap-3">
               <Button

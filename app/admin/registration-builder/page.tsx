@@ -23,6 +23,8 @@ import {
 import { useHomeCategories } from "@/components/home/sections/useHomeCategories";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { sortByPriority } from "@/lib/utils/sortByPriority";
+import { FORM_CARD_PADDING } from "@/lib/utils/formCopy";
+import Input from "@/components/common/Input";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
 import { CategoryOrderList } from "@/components/admin/page-builder/CategoryOrderList";
 import SelectScreen from "@/components/artist-registration/sections/SelectScreen";
@@ -41,12 +43,19 @@ function RegistrationBuilder() {
   const copy = useFormCopy();
 
   const [sections, setSections] = useState<IResolvedRegistrationSection[]>([]);
+  /** Form-card padding in px, as typed; `""` = shipped default. Keyed by device. */
+  const [padding, setPadding] = useState({ mobile: "", desktop: "" });
   const [dirty, setDirty] = useState(false);
 
   // Seed from the server once it arrives; later refetches must not stomp edits.
   useEffect(() => {
     if (!data?.result || dirty) return;
     setSections(orderedRegistrationSections(data.result.registrationSections));
+    const form = data.result.form;
+    setPadding({
+      mobile: form?.[FORM_CARD_PADDING.mobile.key] ?? "",
+      desktop: form?.[FORM_CARD_PADDING.desktop.key] ?? "",
+    });
   }, [data, dirty]);
 
   // Real categories, so the preview shows the admin their own forms.
@@ -142,7 +151,16 @@ function RegistrationBuilder() {
 
   const handleSave = () => {
     save(
-      { registrationSections: sections },
+      // Re-resolve so half-typed sizes (<40px) are dropped, not sent.
+      {
+        registrationSections: orderedRegistrationSections(sections),
+        // `form` is saved whole, so merge onto the stored copy rather than replace it.
+        form: {
+          ...data?.result?.form,
+          [FORM_CARD_PADDING.mobile.key]: padding.mobile,
+          [FORM_CARD_PADDING.desktop.key]: padding.desktop,
+        },
+      },
       {
         onSuccess: () => {
           setDirty(false);
@@ -206,6 +224,34 @@ function RegistrationBuilder() {
               onChange={(next) => replaceScreen("flow", next)}
               renderExtra={renderExtra}
             />
+          </Card>
+
+          <Card className="flex flex-col gap-2 p-3">
+            <p className="text-sm font-medium text-gray-700">
+              فاصله داخلی کارت‌های فرم
+            </p>
+            <p className="mb-1 text-xs text-gray-500">
+              پیکسل، ۰ تا ۶۴. خالی = پیش‌فرض (موبایل{" "}
+              {FORM_CARD_PADDING.mobile.fallback}، دسکتاپ{" "}
+              {FORM_CARD_PADDING.desktop.fallback}).
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {(["mobile", "desktop"] as const).map((device) => (
+                <Input
+                  key={device}
+                  type="number"
+                  min={0}
+                  max={64}
+                  labelContent={device === "mobile" ? "موبایل" : "دسکتاپ"}
+                  placeholder={String(FORM_CARD_PADDING[device].fallback)}
+                  value={padding[device]}
+                  onChange={(e) => {
+                    setPadding((prev) => ({ ...prev, [device]: e.target.value }));
+                    setDirty(true);
+                  }}
+                />
+              ))}
+            </div>
           </Card>
 
           <Card className="flex flex-col gap-2 p-3">

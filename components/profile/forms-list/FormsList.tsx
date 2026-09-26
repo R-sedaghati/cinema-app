@@ -73,7 +73,7 @@ export default function FormsList() {
 
         {!isPending && items.length === 0 && (
           <p className="py-8 text-center text-sm text-zinc-500">
-            {copy("profileFormsEmpty")}
+            <span style={copy.style("profileFormsEmpty")}>{copy("profileFormsEmpty")}</span>
           </p>
         )}
 
@@ -95,7 +95,7 @@ export default function FormsList() {
                 {item.trackingCode && (
                   <>
                     <span>
-                      {copy("profileFormsTracking")} {item.trackingCode}
+                      <span style={copy.style("profileFormsTracking")}>{copy("profileFormsTracking")}</span> {item.trackingCode}
                     </span>
                     {item.createdAt && <span>•</span>}
                   </>
@@ -112,7 +112,7 @@ export default function FormsList() {
                   onClick={() => handleEdit(item)}
                   className="p-0! text-sm"
                 >
-                  {copy("profileFormEdit")}
+                  <span style={copy.style("profileFormEdit")}>{copy("profileFormEdit")}</span>
                 </Button>
 
                 <Button
@@ -121,7 +121,7 @@ export default function FormsList() {
                   onClick={() => handleView(item)}
                   className="p-0! text-sm"
                 >
-                  {copy("profileFormView")}
+                  <span style={copy.style("profileFormView")}>{copy("profileFormView")}</span>
                 </Button>
 
                 {item.status === EArtistRequestStatus.APPROVED && (
@@ -131,7 +131,7 @@ export default function FormsList() {
                     onClick={() => handleOpenPublic(item)}
                     className="p-0! text-sm"
                   >
-                    {copy("profileFormPublicPage")}
+                    <span style={copy.style("profileFormPublicPage")}>{copy("profileFormPublicPage")}</span>
                   </Button>
                 )}
               </div>

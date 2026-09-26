@@ -81,12 +81,12 @@ export default function ArtistRequestViewPage() {
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h4-bold">{landingCopy("regAuthGateTitle")}</p>
+            <p className="font-h4-bold"><span style={landingCopy.style("regAuthGateTitle")}>{landingCopy("regAuthGateTitle")}</span></p>
             <p className="font-p1-regular text-gray-600">
-              {landingCopy("regAuthGateDesc")}
+              <span style={landingCopy.style("regAuthGateDesc")}>{landingCopy("regAuthGateDesc")}</span>
             </p>
             <Button className="rounded-full!" onClick={openLoginDrawer}>
-              {landingCopy("regAuthGateCta")}
+              <span style={landingCopy.style("regAuthGateCta")}>{landingCopy("regAuthGateCta")}</span>
             </Button>
           </div>
         </Card>
@@ -110,9 +110,9 @@ export default function ArtistRequestViewPage() {
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h5-bold">{landingCopy("profileFormsEmpty")}</p>
+            <p className="font-h5-bold"><span style={landingCopy.style("profileFormsEmpty")}>{landingCopy("profileFormsEmpty")}</span></p>
             <Button className="rounded-full!" onClick={() => router.push("/profile")}>
-              {landingCopy("callSuccessCta")}
+              <span style={landingCopy.style("callSuccessCta")}>{landingCopy("callSuccessCta")}</span>
             </Button>
           </div>
         </Card>
@@ -128,25 +128,25 @@ export default function ArtistRequestViewPage() {
           className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
         >
           <MoveRight size={18} />
-          {landingCopy("callSuccessCta")}
+          <span style={landingCopy.style("callSuccessCta")}>{landingCopy("callSuccessCta")}</span>
         </Link>
       </div>
 
       <div className="flex justify-center">
         <Card
           wrapperClassName={clsx("w-[95%]", isDesktop && "w-3/4")}
-          className="pt-10 px-4 md:px-6"
+          className="pt-6 px-4 md:pt-10 md:px-6"
         >
           <div className="flex flex-col gap-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-col gap-1">
                 <p className="font-h5-bold">
-                  {landingCopy("profileFormViewTitle")}
+                  <span style={landingCopy.style("profileFormViewTitle")}>{landingCopy("profileFormViewTitle")}</span>
                 </p>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                   {request.trackingCode && (
                     <span>
-                      {landingCopy("profileFormsTracking")} {request.trackingCode}
+                      <span style={landingCopy.style("profileFormsTracking")}>{landingCopy("profileFormsTracking")}</span> {request.trackingCode}
                     </span>
                   )}
                   {request.createdAt && (
@@ -172,7 +172,7 @@ export default function ArtistRequestViewPage() {
                 className="rounded-full!"
                 onClick={() => router.push(`/artist-registration/${id}`)}
               >
-                {landingCopy("profileFormEdit")}
+                <span style={landingCopy.style("profileFormEdit")}>{landingCopy("profileFormEdit")}</span>
               </Button>
             </div>
           </div>

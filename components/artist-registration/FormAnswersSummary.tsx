@@ -46,7 +46,7 @@ const FormAnswersSummary: React.FC<Props> = ({
                   <div key={field.id} className="flex flex-col gap-1">
                     <p className="font-p2-medium text-gray-500">{field.label}:</p>
                     {paths.length === 0 ? (
-                      <p className="font-p2-regular">{copy("emptyValue")}</p>
+                      <p className="font-p2-regular"><span style={copy.style("emptyValue")}>{copy("emptyValue")}</span></p>
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         {paths.map((path) =>

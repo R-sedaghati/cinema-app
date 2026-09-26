@@ -119,11 +119,11 @@ const OtpStep: FC<StepBaseProps> = (props) => {
     <>
       <div className="flex flex-col items-start gap-2">
         <h6 className="ss02 font-h6-bold flex flex-wrap gap-1.5 text-gray-600">
-          {copy("loginOtpPrefix")}{" "}
+          <span style={copy.style("loginOtpPrefix")}>{copy("loginOtpPrefix")}</span>{" "}
           <span dir="ltr" className="inline-block text-left">
             {formatPhoneNumber(phoneNumber)}
           </span>{" "}
-          {copy("loginOtpSuffix")}
+          <span style={copy.style("loginOtpSuffix")}>{copy("loginOtpSuffix")}</span>
         </h6>
         <Button
           className="p-0!"
@@ -132,7 +132,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
           rightIcon={<Pencil />}
           onClick={() => setStep("phoneNumber")}
         >
-          {copy("loginOtpChangeNumber")}
+          <span style={copy.style("loginOtpChangeNumber")}>{copy("loginOtpChangeNumber")}</span>
         </Button>
       </div>
       <OtpInput
@@ -154,13 +154,13 @@ const OtpStep: FC<StepBaseProps> = (props) => {
             size="small"
             onClick={resendOtp}
           >
-            {copy("loginOtpResend")}
+            <span style={copy.style("loginOtpResend")}>{copy("loginOtpResend")}</span>
           </Button>
         ) : (
           <>
             <h6 className="text-gray-700 ss02 font-h6-bold">{remainingTime}</h6>
             <span className="font-button-small text-primary-600/40">
-              {copy("loginOtpCountdown")}
+              <span style={copy.style("loginOtpCountdown")}>{copy("loginOtpCountdown")}</span>
             </span>
           </>
         )}
@@ -172,7 +172,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
         isLoading={isPending}
         onClick={() => handleSubmit()}
       >
-        {copy("loginOtpSubmit")}
+        <span style={copy.style("loginOtpSubmit")}>{copy("loginOtpSubmit")}</span>
       </Button>
       <TermsNotice />
     </>

@@ -117,7 +117,7 @@ export default function ProfileSidebar({
           className="text-sm text-zinc-400! transition hover:text-zinc-200 p-0!"
           onClick={() => setActive("overview")}
         >
-          {copy("actionEdit")}
+          <span style={copy.style("actionEdit")}>{copy("actionEdit")}</span>
         </Button>
       </div>
 

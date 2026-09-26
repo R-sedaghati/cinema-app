@@ -348,7 +348,7 @@ export const adminAboutUs = async (accessToken: string) => {
 };
 
 export const adminAboutUsUpdate = async (
-  payload: { text: string; fontSize: number | null },
+  payload: { text: string; fontSize: number | null; color: string | null },
   accessToken: string,
 ) => {
   const { data } = await api.patch(

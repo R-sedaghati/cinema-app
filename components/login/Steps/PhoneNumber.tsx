@@ -120,7 +120,7 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
         disabled={isPending || !canSubmit}
         onClick={handleSubmit}
       >
-        {copy("loginPhoneCta")}
+        <span style={copy.style("loginPhoneCta")}>{copy("loginPhoneCta")}</span>
       </Button>
       <TermsNotice />
     </div>

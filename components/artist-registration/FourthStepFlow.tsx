@@ -160,9 +160,10 @@ const FourthStepFlow: React.FC<Props> = ({
   return (
     <Card
       wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}
-      className={clsx("pt-16 px-4", isDesktop && "px-6")}
+      size={isMobile ? "small" : "medium"}
+      className={clsx("pt-8 px-(--form-pad)! pb-(--form-pad)!", isDesktop && "pt-16")}
     >
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-6 md:gap-10">
         <FormAnswersSummary
           steps={steps}
           answers={store.answers}
@@ -179,13 +180,13 @@ const FourthStepFlow: React.FC<Props> = ({
                   {isFree ? copy("paymentFreeTitle") : copy("paymentTitle")}
                 </p>
               </div>
-              {!isFree && <p className="font-p2-regular">{copy("paymentNote")}</p>}
+              {!isFree && <p className="font-p2-regular"><span style={copy.style("paymentNote")}>{copy("paymentNote")}</span></p>}
             </div>
-            <Card wrapperClassName="w-full md:w-1/3">
+            <Card wrapperClassName="w-full md:w-1/3" size={isMobile ? "small" : "medium"}>
               <div className="flex justify-between items-center">
-                <p className="font-p2-medium">{copy("amountLabel")}</p>
+                <p className="font-p2-medium"><span style={copy.style("amountLabel")}>{copy("amountLabel")}</span></p>
                 {isFree ? (
-                  <p className="font-p2-medium">{copy("labelFree")}</p>
+                  <p className="font-p2-medium"><span style={copy.style("labelFree")}>{copy("labelFree")}</span></p>
                 ) : (
                   <div className="flex gap-1">
                     <p className="font-p2-medium">
@@ -195,7 +196,7 @@ const FourthStepFlow: React.FC<Props> = ({
                             registrationAmount,
                           )}
                     </p>
-                    <p className="font-p2-medium">{copy("currency")}</p>
+                    <p className="font-p2-medium"><span style={copy.style("currency")}>{copy("currency")}</span></p>
                   </div>
                 )}
               </div>
@@ -206,7 +207,7 @@ const FourthStepFlow: React.FC<Props> = ({
         {store.editId && (
           <div className="flex gap-2 items-center">
             <div className="w-1 h-6 bg-error-500" />
-            <p className="font-h5-bold">{copy("reviewTitle")}</p>
+            <p className="font-h5-bold"><span style={copy.style("reviewTitle")}>{copy("reviewTitle")}</span></p>
           </div>
         )}
 
@@ -219,7 +220,7 @@ const FourthStepFlow: React.FC<Props> = ({
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            {copy("prevLabel")}
+            <span style={copy.style("prevLabel")}>{copy("prevLabel")}</span>
           </Button>
 
           <Button

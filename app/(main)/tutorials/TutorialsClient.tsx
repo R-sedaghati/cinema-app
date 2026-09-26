@@ -11,11 +11,11 @@ export function TutorialsClient() {
 
   return (
     <div className="flex flex-col gap-10 md:pb-28">
-      <h3 className="font-h1-regular text-4xl text-center">{copy("tutorialsTitle")}</h3>
+      <h3 className="font-h1-regular text-4xl text-center"><span style={copy.style("tutorialsTitle")}>{copy("tutorialsTitle")}</span></h3>
 
       {tutorials.length === 0 && (
         <p className="text-center text-zinc-500">
-          {copy("tutorialsEmpty")}
+          <span style={copy.style("tutorialsEmpty")}>{copy("tutorialsEmpty")}</span>
         </p>
       )}
 

@@ -93,7 +93,7 @@ export function SiteHeader() {
                 height={44}
               />
               <span className="text-base font-semibold text-error-500 text-nowrap">
-                {copy("brandName")}
+                <span style={copy.style("brandName")}>{copy("brandName")}</span>
               </span>
             </Link>
           )}
@@ -108,7 +108,7 @@ export function SiteHeader() {
                   height={60}
                 />
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
-                  {copy("brandName")}
+                  <span style={copy.style("brandName")}>{copy("brandName")}</span>
                 </span>
               </Link>
             )}
@@ -188,7 +188,7 @@ export function SiteHeader() {
                   height={40}
                 />
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
-                  {copy("brandName")}
+                  <span style={copy.style("brandName")}>{copy("brandName")}</span>
                 </span>
               </div>
               <button

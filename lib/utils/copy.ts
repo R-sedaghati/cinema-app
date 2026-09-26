@@ -1,7 +1,11 @@
-export type CopyResolver<K extends string> = (
-  key: K,
-  vars?: Record<string, string | number>,
-) => string;
+import type { CSSProperties } from "react";
+import { textStyle } from "./fontSize.ts";
+
+export type CopyResolver<K extends string> = {
+  (key: K, vars?: Record<string, string | number>): string;
+  /** Admin font-size/color for the key, stored as `key@size` / `key@color`. */
+  style: (key: K) => CSSProperties | undefined;
+};
 
 type Registry<K extends string> = Record<K, { value: string }>;
 
@@ -12,9 +16,11 @@ type Registry<K extends string> = Record<K, { value: string }>;
  * Shared by the registration-form copy (`formCopy.ts`) and the landing copy
  * (`landingCopy.ts`); both are "flat key → Persian string" registries.
  */
-export const makeResolver =
-  <K extends string>(defaults: Registry<K>, overrides?: Record<string, string | null> | null): CopyResolver<K> =>
-  (key, vars) => {
+export const makeResolver = <K extends string>(
+  defaults: Registry<K>,
+  overrides?: Record<string, string | null> | null,
+): CopyResolver<K> => {
+  const resolve = (key: K, vars?: Record<string, string | number>) => {
     const raw = overrides?.[key]?.trim() || defaults[key].value;
 
     return vars
@@ -23,3 +29,8 @@ export const makeResolver =
         )
       : raw;
   };
+
+  return Object.assign(resolve, {
+    style: (key: K) => textStyle(overrides?.[`${key}@size`], overrides?.[`${key}@color`]),
+  });
+};

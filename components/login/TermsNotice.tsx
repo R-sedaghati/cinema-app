@@ -10,11 +10,11 @@ const TermsNotice = () => {
 
   return (
     <p className="mt-4 text-center font-button-small text-gray-700">
-      {copy("loginTermsPrefix")}{" "}
+      <span style={copy.style("loginTermsPrefix")}>{copy("loginTermsPrefix")}</span>{" "}
       <Link href="/terms" onClick={close} className="text-primary-600 underline">
-        {copy("loginTermsLink")}
+        <span style={copy.style("loginTermsLink")}>{copy("loginTermsLink")}</span>
       </Link>{" "}
-      {copy("loginTermsSuffix")}
+      <span style={copy.style("loginTermsSuffix")}>{copy("loginTermsSuffix")}</span>
     </p>
   );
 };

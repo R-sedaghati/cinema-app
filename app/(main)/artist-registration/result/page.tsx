@@ -21,12 +21,12 @@ function ResultContent() {
   // ponytail: fallbacks, so a category with no copy set still shows a sane page
   const DEFAULTS = {
     success: {
-      title: landingCopy("regResultSuccessTitle"),
-      description: landingCopy("regResultSuccessDesc"),
+      title: <span style={landingCopy.style("regResultSuccessTitle")}>{landingCopy("regResultSuccessTitle")}</span>,
+      description: <span style={landingCopy.style("regResultSuccessDesc")}>{landingCopy("regResultSuccessDesc")}</span>,
     },
     failed: {
-      title: landingCopy("regResultFailTitle"),
-      description: landingCopy("regResultFailDesc"),
+      title: <span style={landingCopy.style("regResultFailTitle")}>{landingCopy("regResultFailTitle")}</span>,
+      description: <span style={landingCopy.style("regResultFailDesc")}>{landingCopy("regResultFailDesc")}</span>,
     },
   };
 
@@ -84,7 +84,7 @@ function ResultContent() {
               isFullWidth={isMobile}
               onClick={() => router.push("/")}
             >
-              {copy("homeCta")}
+              <span style={copy.style("homeCta")}>{copy("homeCta")}</span>
             </Button>
           </div>
         </div>

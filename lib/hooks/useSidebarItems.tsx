@@ -14,6 +14,7 @@ import {
   BookOpen,
   Settings,
   MessageSquare,
+  Wallpaper,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -89,6 +90,12 @@ export const useSidebarItems = (): {
         title: "صفحه‌ساز صفحه ثبت‌نام",
         link: "/admin/registration-builder",
         active: pathname.startsWith("/admin/registration-builder"),
+      },
+      {
+        icon: <Wallpaper />,
+        title: "پس‌زمینه صفحات",
+        link: "/admin/page-backgrounds",
+        active: pathname.startsWith("/admin/page-backgrounds"),
       },
       {
         icon: <TableOfContents />,

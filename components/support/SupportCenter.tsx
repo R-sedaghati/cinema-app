@@ -4,7 +4,7 @@
 import { supportCardVisuals } from "@/lib/mock/support";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
-import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { textStyle } from "@/lib/utils/fontSize";
 import Button from "../common/Button";
 
 const SupportCenter = () => {
@@ -13,6 +13,7 @@ const SupportCenter = () => {
   const support = data?.result?.support;
   const items = support?.items ?? [];
   const fontSize = support?.fontSize;
+  const color = support?.color;
 
   return (
     <section className="flex flex-col justify-center items-center gap-10">
@@ -21,7 +22,7 @@ const SupportCenter = () => {
       </h3>
       <p
         className="font-p1-regular whitespace-pre-line"
-        style={fontSizeStyle(fontSize)}
+        style={textStyle(fontSize, color)}
       >
         {support?.description}
       </p>
@@ -43,7 +44,7 @@ const SupportCenter = () => {
               <h5 className="font-h3-bold h-7.5">{item.title}</h5>
               <p
                 className="font-p1-regular flex-1 text-zinc-400 text-center"
-                style={fontSizeStyle(fontSize)}
+                style={textStyle(fontSize, color)}
               >
                 {item.detail}
               </p>

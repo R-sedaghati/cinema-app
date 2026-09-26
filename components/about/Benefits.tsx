@@ -3,12 +3,13 @@
 
 import { benefitImages } from "@/lib/mock/about";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
-import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { textStyle } from "@/lib/utils/fontSize";
 
 const Benefits = () => {
   const { data } = useUserSiteContent();
   const items = data?.result?.benefits?.items ?? [];
   const fontSize = data?.result?.benefits?.fontSize;
+  const color = data?.result?.benefits?.color;
 
   return (
     <section className="w-full flex flex-col md:flex-row justify-center gap-8 items-center">
@@ -35,7 +36,7 @@ const Benefits = () => {
 
           <div
             className="font-p1-regular text-zinc-400 text-base whitespace-pre-line"
-            style={fontSizeStyle(fontSize)}
+            style={textStyle(fontSize, color)}
           >
             {item.desc}
           </div>

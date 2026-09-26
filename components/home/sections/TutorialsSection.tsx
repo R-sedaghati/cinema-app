@@ -26,6 +26,7 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
     <Link
       key={tutorial.id}
       href="/tutorials"
+      data-card
       className={`flex flex-col gap-2 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 transition-colors hover:border-error-500/40 ${
         isRail ? "w-56 shrink-0 md:w-72" : ""
       }`}
@@ -51,10 +52,10 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
         className={`mb-3 flex items-center justify-between md:mb-4 ${isRail ? "px-4" : ""}`}
       >
         <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
-          {copy("tutorialsSectionTitle")}
+          <span style={copy.style("tutorialsSectionTitle")}>{copy("tutorialsSectionTitle")}</span>
         </h2>
         <Link href="/tutorials" className="text-xs text-error-500 md:text-sm">
-          {copy("tutorialsSectionCta")}
+          <span style={copy.style("tutorialsSectionCta")}>{copy("tutorialsSectionCta")}</span>
         </Link>
       </div>
 
@@ -99,7 +100,7 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
           <div className="flex w-max gap-3 px-4 pb-1 md:gap-4">{cards}</div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{cards}</div>
+        <div data-card-grid className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{cards}</div>
       )}
     </section>
   );

@@ -15,7 +15,7 @@ const NotFoundSearch = () => {
         alt={copy("searchEmptyAlt")}
       />
       <div className="font-h3-bold font-semibold text-zinc-500">
-        {copy("searchEmptyTitle")}
+        <span style={copy.style("searchEmptyTitle")}>{copy("searchEmptyTitle")}</span>
       </div>
     </div>
   );

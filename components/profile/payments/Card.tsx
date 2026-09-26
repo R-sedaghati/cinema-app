@@ -43,7 +43,7 @@ const Card = ({ payment }: { payment: IContactRequestItem }) => {
         </div>
         <div className="flex flex-col md:flex-row items-start justify-between md:items-center">
           <p className="line-clamp-1">
-            {copy("profilePaymentItemLabel", { artist: artistLabel })}
+            <span style={copy.style("profilePaymentItemLabel")}>{copy("profilePaymentItemLabel", { artist: artistLabel })}</span>
           </p>
           <p className="text-nowrap">
             {payment.amount === 0
