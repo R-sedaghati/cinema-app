@@ -1,9 +1,15 @@
 "use client";
 
 import { Button, Card, Divider } from "@dgshahr/ui-kit";
+import ColorInput from "@/components/admin/ColorInput";
 import Input from "@/components/common/Input";
 import Textarea from "@/components/common/Textarea";
+import { textStyle } from "@/lib/utils/fontSize";
 import { useEffect, useState } from "react";
+
+// ponytail: server-error strings only surface in toasts, so no size/color for them.
+// Swap for a registry flag if more non-visual groups appear.
+const UNSTYLED_GROUPS = new Set(["خطاهای سرور"]);
 
 type CopyRegistry = Record<string, { admin: string; value: string; group?: string }>;
 
@@ -59,25 +65,46 @@ export default function CopyCard({
   const isLong = (key: string) =>
     registry[key].value.includes("\n") || registry[key].value.length > 60;
 
-  const renderField = (key: string) =>
-    isLong(key) ? (
-      <Textarea
-        key={key}
-        labelContent={registry[key].admin}
-        placeholder={registry[key].value}
-        rows={3}
-        value={values[key] ?? ""}
-        onChange={(e) => set(key, e.target.value)}
-      />
-    ) : (
+  /** Size/color stored beside the text as `key@size` / `key@color`; "" = default. */
+  const renderStyle = (key: string) => (
+    <div className="flex items-end gap-3">
       <Input
-        key={key}
-        labelContent={registry[key].admin}
-        placeholder={registry[key].value}
-        value={values[key] ?? ""}
-        onChange={(e) => set(key, e.target.value)}
+        labelContent="اندازه (px)"
+        placeholder="پیش‌فرض"
+        inputMode="numeric"
+        wrapperClassName="w-24"
+        value={values[`${key}@size`] ?? ""}
+        onChange={(e) =>
+          set(`${key}@size`, e.target.value.replace(/\D/g, "").slice(0, 3))
+        }
       />
+      <ColorInput
+        value={values[`${key}@color`] || null}
+        onChange={(color) => set(`${key}@color`, color ?? "")}
+      />
+    </div>
+  );
+
+  const renderField = (key: string) => {
+    const style = textStyle(values[`${key}@size`], values[`${key}@color`]);
+    const common = {
+      labelContent: registry[key].admin,
+      placeholder: registry[key].value,
+      value: values[key] ?? "",
+      style,
+    };
+
+    return (
+      <div key={key} className="flex flex-col gap-1">
+        {isLong(key) ? (
+          <Textarea {...common} rows={3} onChange={(e) => set(key, e.target.value)} />
+        ) : (
+          <Input {...common} onChange={(e) => set(key, e.target.value)} />
+        )}
+        {!UNSTYLED_GROUPS.has(registry[key].group ?? "") && renderStyle(key)}
+      </div>
     );
+  };
 
   return (
     <Card>
@@ -86,7 +113,8 @@ export default function CopyCard({
 
         <p className="text-xs text-gray-500">
           خالی گذاشتن هر فیلد یعنی استفاده از متن پیش‌فرض (همان متنی که به عنوان
-          راهنما داخل کادر می‌بینید).
+          راهنما داخل کادر می‌بینید). اندازه (۸ تا ۱۲۰ پیکسل) و رنگ خالی هم یعنی
+          ظاهر پیش‌فرض.
         </p>
 
         <Input

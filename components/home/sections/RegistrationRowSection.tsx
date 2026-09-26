@@ -39,10 +39,10 @@ export function RegistrationRowSection({
       className={`mb-3 flex items-center justify-between md:mb-4 ${padded ? "px-4" : ""}`}
     >
       <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
-        {copy("homeRegistrationTitle")}
+        <span style={copy.style("homeRegistrationTitle")}>{copy("homeRegistrationTitle")}</span>
       </h2>
       <Link href="/profile" className="text-xs text-error-500 md:text-sm">
-        {copy("homeRegistrationCta")}
+        <span style={copy.style("homeRegistrationCta")}>{copy("homeRegistrationCta")}</span>
       </Link>
     </div>
   );
@@ -119,11 +119,12 @@ export function RegistrationRowSection({
     return (
       <section>
         {header(false)}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+        <div data-card-grid className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => onPick(cat.id, cat.faName)}
+              data-card
               className="group relative h-40 overflow-hidden rounded-2xl transition-transform active:scale-[.98] md:h-52"
             >
               <img
@@ -153,6 +154,7 @@ export function RegistrationRowSection({
             <button
               key={cat.id}
               onClick={() => onPick(cat.id, cat.faName)}
+              data-card
               className="relative overflow-hidden w-40 h-52 md:w-56 md:h-72 shrink-0 rounded-2xl group active:scale-[.98] transition-transform"
             >
               <img
@@ -166,7 +168,7 @@ export function RegistrationRowSection({
                   {cat.faName}
                 </p>
                 <span className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
-                  {copy("homeRegistrationCta")}
+                  <span style={copy.style("homeRegistrationCta")}>{copy("homeRegistrationCta")}</span>
                   <ArrowLeft size={12} />
                 </span>
               </div>

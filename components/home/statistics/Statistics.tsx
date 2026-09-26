@@ -19,10 +19,10 @@ const StatisticsSection = () => {
     <div className="flex relative flex-col md:flex-row gap-10 justify-between items-center">
       <div className="flex flex-1 flex-col gap-8 text-zinc-100">
         <h5 className="font-h1-bold text-[32px] whitespace-pre-line">
-          {copy("statsTitle")}
+          <span style={copy.style("statsTitle")}>{copy("statsTitle")}</span>
         </h5>
         <h6 className="font-medium text-xl whitespace-pre-line">
-          {copy("statsSubtitle")}
+          <span style={copy.style("statsSubtitle")}>{copy("statsSubtitle")}</span>
         </h6>
         <Button
           onClick={() => router.push("/artists")}
@@ -30,7 +30,7 @@ const StatisticsSection = () => {
           size="small"
           className="bg-error-500 rounded-full!"
         >
-          {copy("statsCta")}
+          <span style={copy.style("statsCta")}>{copy("statsCta")}</span>
         </Button>
       </div>
       <div className="flex-1 place-items-center gap-16 grid grid-cols-2 grid-rows-2">

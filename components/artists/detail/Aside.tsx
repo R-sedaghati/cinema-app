@@ -104,23 +104,23 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
         <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:text-base text-zinc-300 lg:grid-cols-1 lg:gap-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-            <span className="text-zinc-500">{copy("artistProvince")}</span>
+            <span className="text-zinc-500"><span style={copy.style("artistProvince")}>{copy("artistProvince")}</span></span>
             <span>{(artist.answers?.province as string | undefined) ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-            <span className="text-zinc-500">{copy("artistCategory")}</span>
+            <span className="text-zinc-500"><span style={copy.style("artistCategory")}>{copy("artistCategory")}</span></span>
             <span>{artist.categories[0]?.faName ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-            <span className="text-zinc-500">{copy("artistGender")}</span>
+            <span className="text-zinc-500"><span style={copy.style("artistGender")}>{copy("artistGender")}</span></span>
             <span>{genderMap[artist.answers?.gender as string] ?? "—"}</span>
           </div>
 
           {typeof artist.answers?.dialect === "string" && artist.answers.dialect && (
             <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
-              <span className="text-zinc-500">{copy("artistAccent")}</span>
+              <span className="text-zinc-500"><span style={copy.style("artistAccent")}>{copy("artistAccent")}</span></span>
               <span>{artist.answers.dialect as string}</span>
             </div>
           )}
@@ -128,10 +128,10 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
         {isUnlocked && contact && (
           <div className="mt-6 sm:mt-10 space-y-3 rounded-2xl border border-emerald-800/60 bg-emerald-950/20 p-4 text-sm">
-            <p className="text-emerald-500">{copy("artistContactTitle")}</p>
+            <p className="text-emerald-500"><span style={copy.style("artistContactTitle")}>{copy("artistContactTitle")}</span></p>
             {contact.phoneNumber && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">{copy("artistContactPhone")}</span>
+                <span className="text-zinc-500"><span style={copy.style("artistContactPhone")}>{copy("artistContactPhone")}</span></span>
                 <a href={`tel:${contact.phoneNumber}`} className="text-zinc-100" dir="ltr">
                   {contact.phoneNumber}
                 </a>
@@ -139,7 +139,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
             )}
             {contact.email && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">{copy("artistContactEmail")}</span>
+                <span className="text-zinc-500"><span style={copy.style("artistContactEmail")}>{copy("artistContactEmail")}</span></span>
                 <a href={`mailto:${contact.email}`} className="text-zinc-100" dir="ltr">
                   {contact.email}
                 </a>
@@ -147,13 +147,13 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
             )}
             {contact.address && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">{copy("artistContactAddress")}</span>
+                <span className="text-zinc-500"><span style={copy.style("artistContactAddress")}>{copy("artistContactAddress")}</span></span>
                 <span className="text-zinc-100 text-left">{contact.address}</span>
               </div>
             )}
             {contact.postalCode && (
               <div className="flex justify-between gap-2">
-                <span className="text-zinc-500">{copy("artistContactPostalCode")}</span>
+                <span className="text-zinc-500"><span style={copy.style("artistContactPostalCode")}>{copy("artistContactPostalCode")}</span></span>
                 <span className="text-zinc-100" dir="ltr">
                   {contact.postalCode}
                 </span>
@@ -200,7 +200,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
               className="rounded-full!"
               leftIcon={<Lock size={16} />}
             >
-              {copy("artistContactCta")}
+              <span style={copy.style("artistContactCta")}>{copy("artistContactCta")}</span>
             </Button>
           )}
           <Button
@@ -217,13 +217,13 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
               }
             }}
           >
-            {copy("artistShareCta")}
+            <span style={copy.style("artistShareCta")}>{copy("artistShareCta")}</span>
           </Button>
         </div>
 
         {!accessToken && (
           <p className="mt-4 text-center text-xs text-zinc-500">
-            {copy("artistLoginFirst")}
+            <span style={copy.style("artistLoginFirst")}>{copy("artistLoginFirst")}</span>
           </p>
         )}
       </aside>

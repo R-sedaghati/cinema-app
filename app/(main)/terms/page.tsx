@@ -2,7 +2,7 @@
 
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
-import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { textStyle } from "@/lib/utils/fontSize";
 
 export default function TermsPage() {
   const { data } = useUserSiteContent();
@@ -17,7 +17,7 @@ export default function TermsPage() {
 
       <div
         className="relative backdrop-blur-sm border-2 border-error-500/30 shadow-card text-xl rounded-4xl p-5 md:p-20 bg-zinc-900/40 w-full whitespace-pre-line"
-        style={fontSizeStyle(terms?.fontSize)}
+        style={textStyle(terms?.fontSize, terms?.color)}
       >
         {terms?.content}
       </div>

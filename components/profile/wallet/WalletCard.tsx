@@ -63,22 +63,22 @@ export default function WalletCard() {
   return (
     <ContentCard title={copy("profileWalletTitle")}>
       <div className="rounded-xl bg-gray-100/60 border-2 border-zinc-700/60 backdrop-blur-sm p-6 flex flex-col gap-2">
-        <span className="text-zinc-400 text-sm">{copy("profileWalletBalance")}</span>
+        <span className="text-zinc-400 text-sm"><span style={copy.style("profileWalletBalance")}>{copy("profileWalletBalance")}</span></span>
         <span className="text-zinc-50 text-2xl font-semibold">
           {isBalancePending
             ? "—"
             : `${convertEnNumberToFaNumberWithSeparation(balance)} ${copy("labelCurrency")}`}
         </span>
         <p className="text-zinc-400 text-sm leading-7">
-          {copy("profileWalletNote")}
+          <span style={copy.style("profileWalletNote")}>{copy("profileWalletNote")}</span>
         </p>
       </div>
 
       <div className="flex flex-col rounded-xl bg-gray-100/60 border-2 border-zinc-700/60 backdrop-blur-sm">
         {isPending ? (
-          <p className="p-4 text-zinc-400">{copy("labelLoading")}</p>
+          <p className="p-4 text-zinc-400"><span style={copy.style("labelLoading")}>{copy("labelLoading")}</span></p>
         ) : transactions.length === 0 ? (
-          <p className="p-4 text-zinc-400">{copy("profileWalletEmpty")}</p>
+          <p className="p-4 text-zinc-400"><span style={copy.style("profileWalletEmpty")}>{copy("profileWalletEmpty")}</span></p>
         ) : (
           transactions.map((transaction) => (
             <Row

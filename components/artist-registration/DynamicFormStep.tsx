@@ -39,7 +39,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, lockedKeys, copy,
   const sortedFields = [...step.fields].sort((a, b) => a.order - b.order);
 
   return (
-    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
+    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} className="p-(--form-pad)!">
       <div className="flex flex-col gap-5">
         {step.description && (
           <p className="font-p2-medium text-gray-700">{step.description}</p>
@@ -65,7 +65,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, lockedKeys, copy,
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            {copy("prevLabel")}
+            <span style={copy.style("prevLabel")}>{copy("prevLabel")}</span>
           </Button>
 
           <Button
@@ -75,7 +75,7 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, lockedKeys, copy,
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            {copy("nextLabel")}
+            <span style={copy.style("nextLabel")}>{copy("nextLabel")}</span>
           </Button>
         </div>
       </div>

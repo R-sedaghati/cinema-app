@@ -2,14 +2,25 @@
 
 import React, { useState } from "react";
 import { ChevronDown, Eye, EyeOff, GripVertical } from "lucide-react";
-import type { IResolvedSection } from "@/lib/utils/resolveSections";
+import Input from "@/components/common/Input";
+import type { IResolvedSection, SizeKey } from "@/lib/utils/resolveSections";
 import { VariantGlyph } from "./VariantGlyph";
 
 /** The slice of a page's section catalog this list renders. */
 export interface ISectionListEntry {
   admin: string;
   variants: { key: string; admin: string }[];
+  hasCards?: boolean;
 }
+
+const SECTION_SIZES: { key: SizeKey; label: string }[] = [
+  { key: "maxWidth", label: "عرض بیشینه بخش" },
+  { key: "minHeight", label: "حداقل ارتفاع بخش" },
+];
+const CARD_SIZES: { key: SizeKey; label: string }[] = [
+  { key: "cardWidth", label: "عرض کارت" },
+  { key: "cardHeight", label: "ارتفاع کارت" },
+];
 
 interface Props<K extends string> {
   catalog: Record<K, ISectionListEntry>;
@@ -144,6 +155,32 @@ export function SectionList<K extends string>({
                     </div>
                   </fieldset>
                 )}
+
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="text-sm text-gray-600">
+                    اندازه (پیکسل، خالی = پیش‌فرض)
+                  </legend>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[...SECTION_SIZES, ...(meta.hasCards ? CARD_SIZES : [])].map(
+                      ({ key, label }) => (
+                        <Input
+                          key={key}
+                          type="number"
+                          min={40}
+                          max={2000}
+                          labelContent={label}
+                          placeholder="پیش‌فرض"
+                          value={section[key] ?? ""}
+                          onChange={(e) =>
+                            patch(section.key, {
+                              [key]: e.target.value === "" ? undefined : Number(e.target.value),
+                            })
+                          }
+                        />
+                      ),
+                    )}
+                  </div>
+                </fieldset>
 
                 {renderExtra?.(section.key)}
               </div>

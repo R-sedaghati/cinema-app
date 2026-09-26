@@ -84,7 +84,7 @@ export const generateColumns = (
     render: (data) => (
       <Link href={`/artists/${data.artist?.id}`}>
         <Button variant="text" leftIcon={<ChevronLeft />}>
-          {copy("profileRequestsViewArtist")}
+          <span style={copy.style("profileRequestsViewArtist")}>{copy("profileRequestsViewArtist")}</span>
         </Button>
       </Link>
     ),

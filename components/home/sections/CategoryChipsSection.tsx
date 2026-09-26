@@ -14,17 +14,19 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
 
   if (variant === "tiles") {
     return (
-      <div className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
+      <div data-card-grid className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
         <button
           onClick={() => router.push("/artists")}
+          data-card
           className="flex aspect-square flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/60 text-xs font-medium text-zinc-300 transition-colors hover:border-error-500/40 md:text-sm"
         >
-          {copy("homeAllLabel")}
+          <span style={copy.style("homeAllLabel")}>{copy("homeAllLabel")}</span>
         </button>
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => router.push(`/artists?category=${cat.id}`)}
+            data-card
             className="group relative aspect-square overflow-hidden rounded-2xl"
           >
             <img
@@ -49,7 +51,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
           onClick={() => router.push("/artists")}
           className="rounded-full px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
         >
-          {copy("homeAllLabel")}
+          <span style={copy.style("homeAllLabel")}>{copy("homeAllLabel")}</span>
         </button>
         {categories.map((cat) => (
           <button

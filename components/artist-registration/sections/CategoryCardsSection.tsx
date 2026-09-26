@@ -37,6 +37,7 @@ function CategoryCard({
   return (
     <button
       onClick={() => onSelect(item.id, item.title, item.existingRequestId)}
+      data-card
       className={clsx(
         "relative overflow-hidden bg-zinc-900 border border-transparent hover:border-red-900 cursor-pointer",
         className,
@@ -46,7 +47,7 @@ function CategoryCard({
         <p className="text-nowrap text-sm md:text-base">{item.title}</p>
         {item.existingRequestId && (
           <span className="text-[10px] md:text-xs text-zinc-400">
-            {copy("alreadyRegistered")}
+            <span style={copy.style("alreadyRegistered")}>{copy("alreadyRegistered")}</span>
           </span>
         )}
       </div>
@@ -74,7 +75,7 @@ const CategoryCardsSection: React.FC<Props> = ({
 
   if (variant === "grid") {
     return (
-      <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+      <div data-card-grid className="grid w-full grid-cols-2 gap-4 md:grid-cols-4">
         {items.map((item) =>
           card(
             item,
@@ -112,11 +113,12 @@ const CategoryCardsSection: React.FC<Props> = ({
     // Image-backed tiles: the category picture fills the card, text sits on a
     // bottom gradient so it stays readable over any photo.
     return (
-      <div className="grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+      <div data-card-grid className="grid w-full grid-cols-2 gap-4 md:grid-cols-4">
         {items.map((item) => (
           <button
             key={item.id}
             onClick={() => onSelect(item.id, item.title, item.existingRequestId)}
+            data-card
             className="group relative h-40 w-full overflow-hidden rounded-2xl border border-transparent hover:border-red-900 cursor-pointer md:h-52"
           >
             <img
@@ -132,7 +134,7 @@ const CategoryCardsSection: React.FC<Props> = ({
                 </p>
                 {item.existingRequestId && (
                   <span className="text-[10px] text-zinc-300 md:text-xs">
-                    {copy("alreadyRegistered")}
+                    <span style={copy.style("alreadyRegistered")}>{copy("alreadyRegistered")}</span>
                   </span>
                 )}
               </div>

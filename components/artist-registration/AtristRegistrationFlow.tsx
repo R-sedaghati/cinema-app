@@ -7,7 +7,7 @@ import {
 import { IUserCategoryResponse, IUserProfile } from "@/lib/services/landing/type";
 import { EFormFieldType, SyncToUserField } from "@/lib/services/admin/type";
 import { Loader2 } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { SelectedCategory } from "@/app/(main)/artist-registration/ArtistRegistrationPageContent";
 import FirstStepFlow from "./FIrstStepFlow";
@@ -23,6 +23,9 @@ import type { IResolvedRegistrationSection } from "@/lib/utils/resolveRegistrati
 import { CATEGORY_PAGE_SIZE } from "@/lib/constants/pagination";
 import FormTitleSection from "./sections/FormTitleSection";
 import StepperSection from "./sections/StepperSection";
+import { sectionBoxProps } from "@/lib/utils/resolveSections";
+import { formCardPadding } from "@/lib/utils/formCopy";
+import { isMobile } from "react-device-detect";
 
 interface ArtistProps {
   category: SelectedCategory | null;
@@ -268,8 +271,20 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-3 items-center">
-      {flowSections.map(renderSection)}
+    <div
+      className="flex flex-col gap-3 items-center"
+      // Admin card padding, read by the step cards as `p-(--form-pad)`.
+      style={
+        {
+          "--form-pad": `${formCardPadding(siteContent?.result?.form, isMobile ? "mobile" : "desktop")}px`,
+        } as CSSProperties
+      }
+    >
+      {flowSections.map((s) => (
+        <div key={s.key} className="flex w-full flex-col items-center" {...sectionBoxProps(s)}>
+          {renderSection(s)}
+        </div>
+      ))}
 
       {renderStep()}
     </div>

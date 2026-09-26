@@ -16,7 +16,7 @@ const PromptSection: React.FC<{ copy: CopyFn; variant?: string }> = ({
       variant === "start" ? "w-full text-start" : "text-center",
     )}
   >
-    {copy("categoryPrompt")}
+    <span style={copy.style("categoryPrompt")}>{copy("categoryPrompt")}</span>
   </p>
 );
 

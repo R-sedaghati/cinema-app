@@ -43,3 +43,19 @@ test("custom answers are appended to the message, built-in ones are not", () => 
   assert.equal(message, "سلام\n\nشهر: تهران\nعلاقه: فیلم، تئاتر");
   assert.equal(appendCustomAnswers("سلام", fields, { custom_1: "" }), "سلام");
 });
+
+test("copy style reads key@size / key@color and drops unsafe values", () => {
+  const copy = makeResolver(LANDING_COPY, {
+    reasonsTitle: "چرا ما؟",
+    "reasonsTitle@size": "18",
+    "reasonsTitle@color": "#e11d48",
+    "heroTitle@size": "3",
+    "heroTitle@color": "red;background:url(x)",
+    "statsTitle@size": "",
+  });
+  assert.deepEqual(copy.style("reasonsTitle"), { fontSize: "18px", color: "#e11d48" });
+  assert.equal(copy("reasonsTitle"), "چرا ما؟");
+  assert.equal(copy.style("heroTitle"), undefined);
+  assert.equal(copy.style("statsTitle"), undefined);
+  assert.equal(makeResolver(LANDING_COPY, null).style("reasonsTitle"), undefined);
+});

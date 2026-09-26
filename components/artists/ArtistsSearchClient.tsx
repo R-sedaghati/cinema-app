@@ -109,7 +109,7 @@ export function ArtistsSearchClient() {
         className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
       >
         <ArrowRight size={20} />
-        {copy("actionBack")}
+        <span style={copy.style("actionBack")}>{copy("actionBack")}</span>
       </button>
 
       <div className="flex flex-col items-center justify-center gap-5">
@@ -188,7 +188,7 @@ export function ArtistsSearchClient() {
         <div className="space-y-6">
           {!isPending && artists.length > 0 && (
             <p className="text-sm text-zinc-500">
-              {copy("artistsCount", { count: total })}
+              <span style={copy.style("artistsCount")}>{copy("artistsCount", { count: total })}</span>
             </p>
           )}
 

@@ -207,6 +207,7 @@ interface AboutUs {
   id: number;
   text: string;
   fontSize: number | null; // px override for the about text; null = use the default size
+  color: string | null;    // #rrggbb text color; null = use the default color
 }
 
 interface Payment {
@@ -224,6 +225,9 @@ interface Banner {
   titleFontSize: number | null; // px override for the title; null = use the default size
   subtitleFontSize: number | null; // px override for the subtitle; null = use the default size
   ctaLabelFontSize: number | null; // px override for the CTA label; null = use the default size
+  titleColor: string | null;       // #rrggbb; null = default color (same for the two below)
+  subtitleColor: string | null;
+  ctaLabelColor: string | null;
   image: string; // full public URL on read; storage path on write (see POST /admin/upload/image)
   ctaLabel: string;
   ctaLink: string;
@@ -346,14 +350,16 @@ Get site-wide editable copy (about-page benefit cards, support-page copy, terms/
 interface SiteContent {
   id: 1;
   // every `fontSize` is a px override; null/absent = use the default size
-  benefits: { items: { title: string; desc: string }[]; fontSize?: number | null }; // exactly 3, fixed order (mission, vision, responsibility)
+  // every `color` is a `#rrggbb` text color; null/absent = use the default color
+  benefits: { items: { title: string; desc: string }[]; fontSize?: number | null; color?: string | null }; // exactly 3, fixed order (mission, vision, responsibility)
   support: {
     title: string;
     description: string;
     items: { title: string; detail: string; footerText: string; buttonValue: string }[]; // exactly 3, fixed order (phone, email, telegram)
     fontSize?: number | null;
+    color?: string | null;
   };
-  terms: { title: string; content: string; fontSize?: number | null };
+  terms: { title: string; content: string; fontSize?: number | null; color?: string | null };
   // site-wide footer; null/absent = the frontend defaults in `lib/constants/footer.ts`
   footer?: {
     phone: string;         // support number, displayed as typed (Persian digits ok)
@@ -365,15 +371,25 @@ interface SiteContent {
   // overrides for the public-site copy (hero, statistics, "why", homepage
   // sections, artists search, page titles), keyed by the frontend LANDING_COPY
   // registry in `lib/constants/landingCopy.ts`. Missing keys fall back to the
-  // defaults, so this may be `{}` or absent.
+  // defaults, so this may be `{}` or absent. Per-key style overrides ride in the
+  // same map as suffixed keys: `"<key>@size": "18"` (px, 8–120) and
+  // `"<key>@color": "#rrggbb"`; empty/absent = default styling. Same for `form`.
   landing?: Record<string, string> | null;
   // home-page section order, visibility and layout variant, set in the admin
   // page-builder. Keyed by the frontend catalog in `lib/constants/homeSections.ts`;
-  // empty/absent = the shipped catalog order.
-  homeSections?: { key: string; hidden: boolean; variant?: string }[] | null;
+  // empty/absent = the shipped catalog order. Optional size overrides, all
+  // integers in px (40–2000), absent = default: `maxWidth`/`minHeight` of the
+  // section, `cardWidth`/`cardHeight` of its cards. Must be stored as sent.
+  homeSections?: { key: string; hidden: boolean; variant?: string; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number }[] | null;
   // same, for the artist-registration page, keyed by
   // `lib/constants/registrationSections.ts` and set in `/admin/registration-builder`.
-  registrationSections?: { key: string; hidden: boolean; variant?: string }[] | null;
+  registrationSections?: { key: string; hidden: boolean; variant?: string; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number }[] | null;
+  // per-page backgrounds, set in `/admin/page-backgrounds`. Keyed by the frontend
+  // catalog `lib/constants/pageBackgrounds.ts` (first path segment, `home` for `/`,
+  // `default` for every page without its own entry). `color` is `#rrggbb`; `image`
+  // is a storage path on write (from `/admin/upload/image`), full URL on read;
+  // `overlay` is 0–90 (% black over the image). Entries with neither are dropped.
+  pageBackgrounds?: Record<string, { color?: string; image?: string; overlay?: number }> | null;
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -1435,7 +1451,7 @@ Update about-us text.
 
 **Body:**
 ```json
-{ "text": "string", "fontSize": null }
+{ "text": "string", "fontSize": null, "color": null }
 ```
 
 **Response:** `ApiResponse<AboutUs>`
@@ -1489,7 +1505,10 @@ Create a banner slide.
   "isActive": true,
   "titleFontSize": null,
   "subtitleFontSize": null,
-  "ctaLabelFontSize": null
+  "ctaLabelFontSize": null,
+  "titleColor": null,
+  "subtitleColor": null,
+  "ctaLabelColor": null
 }
 ```
 

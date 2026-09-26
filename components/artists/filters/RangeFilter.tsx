@@ -59,7 +59,7 @@ export function RangeFilter({
         }
         className="w-14 bg-transparent text-sm text-zinc-100 outline-none"
       />
-      <span className="text-zinc-600">{copy("artistsRangeTo")}</span>
+      <span className="text-zinc-600"><span style={copy.style("artistsRangeTo")}>{copy("artistsRangeTo")}</span></span>
       <input
         type="text"
         inputMode="numeric"

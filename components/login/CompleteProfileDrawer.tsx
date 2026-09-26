@@ -49,7 +49,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
         <p className="text-sm text-zinc-400">
-          {copy("completeProfileDesc")}
+          <span style={copy.style("completeProfileDesc")}>{copy("completeProfileDesc")}</span>
         </p>
 
         <Input
@@ -77,7 +77,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
           className="w-full rounded-full!"
           isFullWidth
         >
-          {copy("actionSave")}
+          <span style={copy.style("actionSave")}>{copy("actionSave")}</span>
         </Button>
       </form>
     </Drawer>

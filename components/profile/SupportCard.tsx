@@ -10,7 +10,7 @@ export default function SupportCard() {
   return (
     <ContentCard title={copy("profileSupportTitle")}>
       <p className="text-sm leading-8 text-zinc-300">
-        {copy("profileSupportDesc")}
+        <span style={copy.style("profileSupportDesc")}>{copy("profileSupportDesc")}</span>
       </p>
     </ContentCard>
   );

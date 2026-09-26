@@ -41,13 +41,13 @@ const StepperSection: React.FC<Props> = ({
   if (variant === "compact") {
     return (
       <p className="font-p2-medium text-zinc-400">
-        {copy("stepCounter", { n: activeStep + 1, total: totalSteps })}
+        <span style={copy.style("stepCounter")}>{copy("stepCounter", { n: activeStep + 1, total: totalSteps })}</span>
       </p>
     );
   }
 
   return (
-    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} className="py-4">
+    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} size={isMobile ? "small" : "medium"} className="py-4 px-(--form-pad)!">
       <HorizontalStepper
         activeStep={activeStep}
         size="medium"

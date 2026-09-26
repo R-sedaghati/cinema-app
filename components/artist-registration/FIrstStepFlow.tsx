@@ -37,9 +37,9 @@ const FirstStepFlow: React.FC<Props> = ({
   };
 
   return (
-    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"}>
+    <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} className="p-(--form-pad)!">
       <div className={clsx("flex flex-col gap-6", isDesktop && "gap-4!")}>
-        <p className="font-p2-medium">{copy("categoryPrompt")}</p>
+        <p className="font-p2-medium"><span style={copy.style("categoryPrompt")}>{copy("categoryPrompt")}</span></p>
 
         <div className="flex flex-col gap-2">
           {sortByPriority(childrenList ?? []).map((child) => (
@@ -62,7 +62,7 @@ const FirstStepFlow: React.FC<Props> = ({
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            {copy("prevLabel")}
+            <span style={copy.style("prevLabel")}>{copy("prevLabel")}</span>
           </Button>
 
           <Button
@@ -72,7 +72,7 @@ const FirstStepFlow: React.FC<Props> = ({
             isFullWidth={isMobile}
             size={isMobile ? "small" : "medium"}
           >
-            {copy("nextLabel")}
+            <span style={copy.style("nextLabel")}>{copy("nextLabel")}</span>
           </Button>
         </div>
       </div>

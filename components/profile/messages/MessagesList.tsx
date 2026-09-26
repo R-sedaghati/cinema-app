@@ -69,7 +69,7 @@ export default function MessagesList() {
 
         {!isPending && items.length === 0 && (
           <p className="py-8 text-center text-sm text-zinc-500">
-            {copy("profileMessagesEmpty")}
+            <span style={copy.style("profileMessagesEmpty")}>{copy("profileMessagesEmpty")}</span>
           </p>
         )}
 
@@ -101,7 +101,7 @@ export default function MessagesList() {
                       onClick={() => router.push(`/artist-registration/${requestId}`)}
                       className="p-0! text-sm"
                     >
-                      {copy("profileFormEdit")}
+                      <span style={copy.style("profileFormEdit")}>{copy("profileFormEdit")}</span>
                     </Button>
                   </div>
                 )}
@@ -117,7 +117,7 @@ export default function MessagesList() {
               setPagination((state) => ({ ...state, count: state.count + 20 }))
             }
           >
-            {copy("actionMore")}
+            <span style={copy.style("actionMore")}>{copy("actionMore")}</span>
           </Button>
         )}
       </div>

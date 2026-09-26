@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useUserBannerList } from "@/lib/services/landing/hook";
 import type { IBannerItem } from "@/lib/services/admin/type";
-import { fontSizeStyle } from "@/lib/utils/fontSize";
+import { textStyle } from "@/lib/utils/fontSize";
 
 const BANNER_GRADIENTS = [
   "from-zinc-950 via-amber-950/50 to-zinc-900",
@@ -56,6 +56,7 @@ export function BannerSliderSection({ variant = "slider" }: { variant?: string }
             {banners.map((slide, index) => (
               <div
                 key={slide.id}
+                data-card
                 className="h-40 w-72 shrink-0 overflow-hidden md:h-64 md:w-[28rem]"
               >
                 <BannerFrame slide={slide} index={index} compact />
@@ -110,7 +111,7 @@ function BannerFrame({
         {slide.subtitle && (
           <p
             className={`text-error-400 font-medium mb-1 md:mb-2 ${compact ? "text-xs" : "text-sm md:text-base"}`}
-            style={fontSizeStyle(slide.subtitleFontSize)}
+            style={textStyle(slide.subtitleFontSize, slide.subtitleColor)}
           >
             {slide.subtitle}
           </p>
@@ -118,7 +119,7 @@ function BannerFrame({
         {slide.title && (
           <h2
             className={`text-white font-bold ${compact ? "mb-2 text-lg md:text-2xl" : "mb-4 text-2xl md:mb-6 md:text-5xl"}`}
-            style={fontSizeStyle(slide.titleFontSize)}
+            style={textStyle(slide.titleFontSize, slide.titleColor)}
           >
             {slide.title}
           </h2>
@@ -129,7 +130,7 @@ function BannerFrame({
             className={`inline-flex items-center gap-1.5 rounded-full bg-error-500 font-semibold text-zinc-950 ${
               compact ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm md:px-6 md:py-3 md:text-base"
             }`}
-            style={fontSizeStyle(slide.ctaLabelFontSize)}
+            style={textStyle(slide.ctaLabelFontSize, slide.ctaLabelColor)}
           >
             {slide.ctaLabel}
             <ArrowLeft size={compact ? 12 : 14} />

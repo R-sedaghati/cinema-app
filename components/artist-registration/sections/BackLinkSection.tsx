@@ -13,7 +13,7 @@ const BackLinkSection: React.FC<{ copy: CopyFn }> = ({ copy }) => (
       className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
     >
       <MoveRight size={18} />
-      {copy("backHome")}
+      <span style={copy.style("backHome")}>{copy("backHome")}</span>
     </Link>
   </div>
 );

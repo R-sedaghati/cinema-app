@@ -54,7 +54,7 @@ export default function ArtistDetailsPage() {
         className="relative mx-auto mb-6 flex w-full max-w-7xl cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
       >
         <ArrowRight size={20} />
-        {copy("actionBack")}
+        <span style={copy.style("actionBack")}>{copy("actionBack")}</span>
       </button>
 
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-4 lg:grid-cols-3">
@@ -63,19 +63,19 @@ export default function ArtistDetailsPage() {
         </div>
         <div className="space-y-3 sm:space-y-4 lg:col-span-2">
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">{copy("artistAboutTitle")}</h2>
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500"><span style={copy.style("artistAboutTitle")}>{copy("artistAboutTitle")}</span></h2>
             <p className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
               {(artist.answers?.aboutMe as string | undefined) ?? "—"}
             </p>
           </section>
 
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">{copy("artistPhotosTitle")}</h2>
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500"><span style={copy.style("artistPhotosTitle")}>{copy("artistPhotosTitle")}</span></h2>
             <WorksSlider title="" items={photoWorks} variant="photo" />
           </section>
 
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">{copy("artistVideosTitle")}</h2>
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500"><span style={copy.style("artistVideosTitle")}>{copy("artistVideosTitle")}</span></h2>
             <WorksSlider title="" items={videoWorks} variant="video" />
           </section>
         </div>

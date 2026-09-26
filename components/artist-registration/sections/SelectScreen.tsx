@@ -5,6 +5,7 @@ import { Card } from "@dgshahr/ui-kit";
 import { isDesktop } from "react-device-detect";
 import { REGISTRATION_SECTIONS } from "@/lib/constants/registrationSections";
 import type { IResolvedRegistrationSection } from "@/lib/utils/resolveRegistrationSections";
+import { sectionBoxProps } from "@/lib/utils/resolveSections";
 import type { CopyFn } from "@/lib/utils/formCopy";
 import BackLinkSection from "./BackLinkSection";
 import PromptSection from "./PromptSection";
@@ -25,7 +26,13 @@ interface Props {
  * Shared with the admin builder's preview, so both render the same thing.
  */
 const SelectScreen: React.FC<Props> = ({ sections, items, copy, onSelect }) => {
-  const render = (section: IResolvedRegistrationSection) => {
+  const render = (s: IResolvedRegistrationSection) => (
+    <div key={s.key} className="flex w-full flex-col items-center" {...sectionBoxProps(s)}>
+          {renderBody(s)}
+        </div>
+  );
+
+  const renderBody = (section: IResolvedRegistrationSection) => {
     switch (section.key) {
       case "backLink":
         return <BackLinkSection key={section.key} copy={copy} />;

@@ -1,3 +1,5 @@
+import type { ISectionConfig } from "@/lib/utils/resolveSections";
+import type { IPageBackground } from "@/lib/utils/pageBackground";
 
 export interface IRetriveResponse<T> {
   errors: string | null;
@@ -415,6 +417,7 @@ export interface IAdminAboutUs {
   isActive: boolean;
   text: string;
   fontSize: number | null;
+  color?: string | null;
   updatedAt: string;
 }
 
@@ -509,6 +512,9 @@ export interface IBannerItem {
   titleFontSize: number | null;
   subtitleFontSize: number | null;
   ctaLabelFontSize: number | null;
+  titleColor?: string | null;
+  subtitleColor?: string | null;
+  ctaLabelColor?: string | null;
   title: string;
   updatedAt: string | null;
   [key: string]: unknown;
@@ -525,6 +531,9 @@ export interface IBannerUpsertRequest {
   titleFontSize: number | null;
   subtitleFontSize: number | null;
   ctaLabelFontSize: number | null;
+  titleColor: string | null;
+  subtitleColor: string | null;
+  ctaLabelColor: string | null;
 }
 
 export interface ParamsBannerList {
@@ -616,17 +625,20 @@ export interface ISiteContent {
   benefits: {
     items: ISiteContentBenefitItem[];
     fontSize?: number | null;
+    color?: string | null;
   };
   support: {
     title: string;
     description: string;
     items: ISiteContentSupportItem[];
     fontSize?: number | null;
+    color?: string | null;
   };
   terms: {
     title: string;
     content: string;
     fontSize?: number | null;
+    color?: string | null;
   };
   footer?: ISiteContentFooter | null;
   /** Overrides for the public-site copy, keyed by `lib/constants/landingCopy.ts`. */
@@ -640,13 +652,18 @@ export interface ISiteContent {
    * Empty/absent means "use the shipped catalog order" — see
    * `lib/utils/resolveHomeSections.ts`.
    */
-  homeSections?: { key: string; hidden: boolean; variant?: string }[] | null;
+  homeSections?: ISectionConfig[] | null;
   /**
    * Artist-registration page section order and visibility, keyed by
    * `lib/constants/registrationSections.ts`. Empty/absent means "use the
    * shipped catalog order" — see `lib/utils/resolveRegistrationSections.ts`.
    */
-  registrationSections?: { key: string; hidden: boolean; variant?: string }[] | null;
+  registrationSections?: ISectionConfig[] | null;
+  /**
+   * Per-page backgrounds, keyed by `lib/constants/pageBackgrounds.ts`; `default`
+   * covers pages without their own entry. Empty/absent = the stock gradient.
+   */
+  pageBackgrounds?: Record<string, IPageBackground> | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;

@@ -5,7 +5,9 @@
  *
  * Overrides live in `SiteContent.landing` and are resolved by `useLandingCopy`
  * (`lib/hooks/useLandingCopy.ts`). Adding a new editable string = adding a key
- * here. `{name}` placeholders are substituted at call time.
+ * here. `{name}` placeholders are substituted at call time. Admin font size /
+ * color live beside the text as `key@size` / `key@color`; render with
+ * `copy.style(key)`.
  *
  * Counts are fixed on purpose: the four statistics and the three "why" cards
  * have images/positions bound to their order, exactly like the about-page

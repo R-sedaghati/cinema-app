@@ -47,7 +47,7 @@ export default function ArtistCard({
         {artist?.answers?.aboutMe as string | undefined}
       </p>
       <div className="flex items-center justify-end">
-        <p className="text-error-500 font-p2-medium">{copy("artistsCardCta")}</p>
+        <p className="text-error-500 font-p2-medium"><span style={copy.style("artistsCardCta")}>{copy("artistsCardCta")}</span></p>
         <ArrowLeft className="text-error-500 self-start mx-1.5" />
       </div>
     </Link>

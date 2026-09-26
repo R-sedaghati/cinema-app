@@ -14,4 +14,7 @@ export const setLandingCopy = (next: CopyResolver<LandingCopyKey>) => {
  * Landing copy for code that cannot call a hook (axios interceptors, upload
  * helpers). Serves the defaults until the site-content request lands once.
  */
-export const landingCopy: CopyResolver<LandingCopyKey> = (key, vars) => resolve(key, vars);
+export const landingCopy: CopyResolver<LandingCopyKey> = Object.assign(
+  (key: LandingCopyKey, vars?: Record<string, string | number>) => resolve(key, vars),
+  { style: (key: LandingCopyKey) => resolve.style(key) },
+);

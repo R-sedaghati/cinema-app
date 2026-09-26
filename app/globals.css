@@ -184,3 +184,10 @@ img {
 .dgsuikit\:overflow-y-auto {
   min-height: 0;
 }
+
+/* Page-builder size overrides (see `sectionBoxProps` in lib/utils/resolveSections.ts).
+   Unlayered so they beat Tailwind utilities, but only when the admin set a size. */
+[data-card-w] [data-card] { width: min(var(--card-w), 100%); flex-shrink: 0; }
+[data-card-h] [data-card] { height: var(--card-h); overflow: hidden; }
+[data-card-w] [data-card-grid] { grid-template-columns: repeat(auto-fill, minmax(min(var(--card-w), 100%), 1fr)); }
+[data-card-w] [data-card-grid] > [data-card] { width: auto; }

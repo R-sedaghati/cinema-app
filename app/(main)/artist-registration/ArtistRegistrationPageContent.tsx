@@ -307,12 +307,12 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h4-bold">{landingCopy("regAuthGateTitle")}</p>
+            <p className="font-h4-bold"><span style={landingCopy.style("regAuthGateTitle")}>{landingCopy("regAuthGateTitle")}</span></p>
             <p className="font-p1-regular text-gray-600">
-              {landingCopy("regAuthGateDesc")}
+              <span style={landingCopy.style("regAuthGateDesc")}>{landingCopy("regAuthGateDesc")}</span>
             </p>
             <Button className="rounded-full!" onClick={openLoginDrawer}>
-              {landingCopy("regAuthGateCta")}
+              <span style={landingCopy.style("regAuthGateCta")}>{landingCopy("regAuthGateCta")}</span>
             </Button>
           </div>
         </Card>
@@ -328,12 +328,12 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h4-bold">{landingCopy("regEditUnavailable")}</p>
+            <p className="font-h4-bold"><span style={landingCopy.style("regEditUnavailable")}>{landingCopy("regEditUnavailable")}</span></p>
             <Button
               className="rounded-full!"
               onClick={() => router.push("/artist-registration")}
             >
-              {landingCopy("regEditUnavailableCta")}
+              <span style={landingCopy.style("regEditUnavailableCta")}>{landingCopy("regEditUnavailableCta")}</span>
             </Button>
           </div>
         </Card>

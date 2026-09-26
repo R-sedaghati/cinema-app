@@ -22,7 +22,7 @@ export default function LogoutCard() {
           router.push("/");
         }}
       >
-        {copy("profileLogoutTitle")}
+        <span style={copy.style("profileLogoutTitle")}>{copy("profileLogoutTitle")}</span>
       </Button>
     </ContentCard>
   );

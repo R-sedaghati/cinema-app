@@ -20,12 +20,15 @@ export interface HomeSectionMeta {
   /** Where its structured content is edited, if not plain copy. */
   manageLink?: string;
   manageLabel?: string;
+  /** Renders cards — the admin gets card width/height controls. */
+  hasCards?: boolean;
   /** Layout variants; the first is the default. Empty = one fixed layout. */
   variants: { key: string; admin: string }[];
 }
 
 const CATALOG = {
   bannerSlider: {
+    hasCards: true,
     variants: [
       { key: "slider", admin: "اسلاید خودکار" },
       { key: "still", admin: "تک‌تصویر ثابت" },
@@ -51,6 +54,7 @@ const CATALOG = {
     ],
   },
   categoryChips: {
+    hasCards: true,
     variants: [
       { key: "chips", admin: "برچسب" },
       { key: "tiles", admin: "کاشی تصویری" },
@@ -73,6 +77,7 @@ const CATALOG = {
     manageLabel: "مدیریت آموزش‌ها",
   },
   registrationRow: {
+    hasCards: true,
     variants: [
       { key: "posters", admin: "ریل پوستر" },
       { key: "grid", admin: "گرید" },
@@ -85,6 +90,7 @@ const CATALOG = {
     copyKeys: ["homeRegistrationTitle", "homeRegistrationCta"],
   },
   artistGrid: {
+    hasCards: true,
     variants: [
       { key: "grid", admin: "گرید" },
       { key: "rail", admin: "ریل افقی" },
@@ -97,6 +103,7 @@ const CATALOG = {
     copyKeys: ["homeArtistsTitle", "homeArtistsCta", "homeEmptyArtists"],
   },
   tutorials: {
+    hasCards: true,
     variants: [
       { key: "grid", admin: "گرید" },
       { key: "rail", admin: "ریل افقی" },
@@ -110,6 +117,7 @@ const CATALOG = {
     manageLabel: "مدیریت آموزش‌ها",
   },
   ctaCards: {
+    hasCards: true,
     variants: [
       { key: "cards", admin: "کارت" },
       { key: "rows", admin: "سطری" },

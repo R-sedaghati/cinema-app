@@ -106,7 +106,7 @@ export function WorksSlider({
             )}
 
             {item.year && (
-              <div className="mt-2 text-xs text-zinc-500">{copy("artistWorkYear", { year: item.year })}</div>
+              <div className="mt-2 text-xs text-zinc-500"><span style={copy.style("artistWorkYear")}>{copy("artistWorkYear", { year: item.year })}</span></div>
             )}
           </div>
         ))}

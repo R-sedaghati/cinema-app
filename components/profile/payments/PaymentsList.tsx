@@ -14,9 +14,9 @@ export default function PaymentsList() {
     <ContentCard title={copy("profilePaymentsTitle")}>
       <div className="flex flex-col rounded-xl bg-gray-100/60 border-2 border-zinc-700/60 backdrop-blur-sm">
         {isPending ? (
-          <p className="p-4 text-zinc-400">{copy("labelLoading")}</p>
+          <p className="p-4 text-zinc-400"><span style={copy.style("labelLoading")}>{copy("labelLoading")}</span></p>
         ) : payments.length === 0 ? (
-          <p className="p-4 text-zinc-400">{copy("profilePaymentsEmpty")}</p>
+          <p className="p-4 text-zinc-400"><span style={copy.style("profilePaymentsEmpty")}>{copy("profilePaymentsEmpty")}</span></p>
         ) : (
           payments.map((payment) => (
             <Card key={payment.id} payment={payment} />

@@ -27,6 +27,8 @@ export interface RegistrationSectionMeta {
   /** Renders inside the screen's shared `Card`. Consecutive `inCard` sections
    *  share one card, so reordering never splits the panel oddly. */
   inCard: boolean;
+  /** Renders cards — the admin gets card width/height controls. */
+  hasCards?: boolean;
   /** Layout variants; the first is the default. Empty = one fixed layout. */
   variants: { key: string; admin: string }[];
   /** Where its structured content is edited, if any. */
@@ -51,6 +53,7 @@ const CATALOG = {
     ],
   },
   categoryCards: {
+    hasCards: true,
     inCard: true,
     admin: "کارت‌های فرم‌ها",
     screen: "select",
