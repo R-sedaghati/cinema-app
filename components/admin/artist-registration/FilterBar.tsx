@@ -25,6 +25,7 @@ interface Props {
   loading: boolean;
   params: Partial<ParamsArtistList>;
   resetParams?: () => void;
+  /** The page fixes the status itself, so the status filter would do nothing. */
 }
 
 const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {

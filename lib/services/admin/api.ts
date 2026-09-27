@@ -56,6 +56,7 @@ import {
   IUpdateNotificationSettingRequest,
   IUpdateFormStepRequest,
   IUserRetrive,
+  IUserDetailResponse,
   IUsersListResponse,
   LoginRequest,
   LoginResponse,
@@ -528,6 +529,19 @@ export const adminUserRequest = async (
       },
     },
   );
+
+  return data;
+};
+
+export const adminUserDetail = async (
+  id: number | undefined,
+  accessToken: string,
+) => {
+  const { data } = await api.get<IUserDetailResponse>(`/admin/users/${id}/`, {
+    headers: {
+      Authorization: accessToken,
+    },
+  });
 
   return data;
 };

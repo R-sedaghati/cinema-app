@@ -13,17 +13,14 @@ import {
 } from "@/lib/services/admin/hook";
 import { IArtistItem } from "@/lib/services/admin/type";
 import { toast } from "react-toastify";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Header from "../users/Header";
 import useArtistListParams from "@/lib/hooks/tables/useArtistListParams";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CrmDrawer from "./CrmDrawer";
 
 function ArtistRegistrationTable() {
   const router = useRouter();
-
-  const searchParams = useSearchParams();
-  const categoryId = searchParams.get("categoryId");
 
   const {
     params,
@@ -45,15 +42,6 @@ function ArtistRegistrationTable() {
   const crmArtist =
     data?.result?.find((item) => item.id === crmArtistId) ?? null;
 
-  useEffect(() => {
-    if (!categoryId) return;
-
-    setParams((prev) => ({
-      ...prev,
-      categoryId__in: [Number(categoryId)],
-      page: 1,
-    }));
-  }, [categoryId, setParams]);
 
   // Forms belong to top-level categories, so a request filed under a subcategory
   // shows its parent's name.

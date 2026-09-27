@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { Chip } from "@dgshahr/ui-kit";
 import type { IUserCategoryResponse } from "@/lib/services/landing/type";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
@@ -30,7 +31,7 @@ export function CategoryChips({
       <Chip
         clickable
         type="button"
-        label={parent?.faName ?? copy("artistsCategoryLabel")}
+        label={toResumeName(parent?.faName) || copy("artistsCategoryLabel")}
         filled
         leftIcon={<X size={14} />}
         onClick={() => onSelect(null)}
@@ -41,7 +42,7 @@ export function CategoryChips({
           clickable
           type="button"
           key={child.id}
-          label={child.faName}
+          label={toResumeName(child.faName)}
           filled={categoryId === child.id}
           // Clicking the active child steps back up to the parent.
           onClick={() => onSelect(categoryId === child.id ? parent.id : child.id)}

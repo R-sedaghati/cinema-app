@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { useQuery } from "@tanstack/react-query";
 import { userArtsitList } from "@/lib/services/landing/api";
 import { IArtistItem } from "@/lib/services/admin/type";
@@ -79,7 +80,7 @@ function CastList({ artists }: { artists: IArtistItem[] }) {
         const name = [artist.user.firstName, artist.user.lastName]
           .filter(Boolean)
           .join(" ");
-        const craft = artist.categories?.[0]?.faName;
+        const craft = toResumeName(artist.categories?.[0]?.faName);
         // A profile can exist before its name does. The row still needs a
         // primary label, so the craft moves up rather than leaving it blank.
         const primary = name || craft;
@@ -148,7 +149,7 @@ function ArtistTile({ artist }: { artist: IArtistItem }) {
         )}
       </div>
       <span className="w-full truncate text-xs text-zinc-300 md:text-sm">
-        {name || artist.categories?.[0]?.faName}
+        {name || toResumeName(artist.categories?.[0]?.faName)}
       </span>
     </Link>
   );
@@ -162,7 +163,7 @@ function TextList({ artists }: { artists: IArtistItem[] }) {
         const name = [artist.user.firstName, artist.user.lastName]
           .filter(Boolean)
           .join(" ");
-        const craft = artist.categories?.[0]?.faName;
+        const craft = toResumeName(artist.categories?.[0]?.faName);
 
         return (
           <li key={artist.id} className="mb-1.5 break-inside-avoid">
@@ -286,7 +287,7 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
       <div className="mt-1.5 flex flex-col gap-1 md:mt-2">
         {artist.categories?.[0] && (
           <span className="inline-block w-fit rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400 md:px-2.5 md:py-1 md:text-sm">
-            {artist.categories[0].faName}
+            {toResumeName(artist.categories[0].faName)}
           </span>
         )}
         {typeof artist.answers?.city === "string" && artist.answers.city && (

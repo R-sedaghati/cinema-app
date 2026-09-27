@@ -36,12 +36,17 @@ function FontSizeInput({
       hintMessage={`${current ? `اندازه فعلی پیش‌فرض: ${current}؛ ` : ""}خالی = اندازه پیش‌فرض؛ بین ۸ تا ۱۲۰ پیکسل`}
       value={value ?? ""}
       onChange={(e) => {
-        const raw = e.target.value;
+        // Persian (۰-۹) / Arabic (٠-٩) digits → ASCII; type="number" would reject them
+        const raw = e.target.value
+          .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+          .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+          .replace(/\D/g, "");
         if (raw === "") return onChange(null);
-        const size = Number(raw);
-        // ponytail: min/max moved off the element — type="number" rejects Persian digits
-        if (!Number.isFinite(size)) return;
-        onChange(Math.min(120, Math.max(8, size)));
+        // Only cap the max while typing — clamping the min here turns "1" into 8 before "14" can be typed
+        onChange(Math.min(120, Number(raw)));
+      }}
+      onBlur={() => {
+        if (value != null && value < 8) onChange(8);
       }}
     />
   );

@@ -406,6 +406,9 @@ interface SiteContent {
     paddingBottom?: number; paddingBottomDesktop?: number;
     gap?: number; gapDesktop?: number;   // space between the page's stacked blocks
   }> | null;
+  // site-wide table colors, set in `/admin/page-backgrounds`. Each `#rrggbb`; unknown
+  // keys and non-hex values are dropped. Absent key = theme default.
+  tableColors?: { headerBg?: string; headerText?: string; rowBg?: string; rowText?: string; border?: string } | null;
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -1307,7 +1310,9 @@ Every contact-detail purchase, paginated — the transactions table.
 **Query params:** `page`, `count`, `status` (`PENDING` / `COMPLETED` / `FAILED` /
 `CANCELED`), `search` (tracking code, requester name, or buyer phone)
 
-**Response:** `ApiResponse<Transaction[]>` with buyer and artist summaries
+**Response:** `ApiResponse<Transaction[]>` with buyer and artist summaries (`artist.name`,
+`artist.code`, `artist.categories`). `amount` is the **total** (gateway + wallet);
+`walletAmount` is the part paid from the buyer's wallet.
 
 ---
 
@@ -1436,6 +1441,13 @@ empty body.
 List all users.
 
 **Response:** `ApiResponse<User[]>`
+
+---
+
+### `GET /admin/users/:id/`
+Profile of one user — works whether or not they have any artist request. `404` if missing.
+
+**Response:** `ApiResponse<{ id, firstName, lastName, avatar, phoneNumber, email, nationalCode, code }>` (`avatar` is a public URL)
 
 ---
 

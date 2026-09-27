@@ -6,6 +6,7 @@ import Input from "@/components/common/Input";
 import {
   useUserContactPrice,
   useUserCreateContactRequest,
+  useUserProfile,
 } from "@/lib/services/landing/hook";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
@@ -28,6 +29,12 @@ const CallDetail = ({
   const { data: priceData, isLoading: isPriceLoading } =
     useUserContactPrice(artistId);
   const { mutate, isPending } = useUserCreateContactRequest();
+  const { data: profile } = useUserProfile();
+  // Profile already has a name → use it and skip the field.
+  const profileName = [profile?.firstName, profile?.lastName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
 
   // Admins set this per category, in Toman. A price of 0 is a real answer — the
   // category is free — so it must not be conflated with "not loaded yet".
@@ -41,14 +48,15 @@ const CallDetail = ({
       return;
     }
 
-    if (!requesterName.trim()) {
+    const name = profileName || requesterName.trim();
+    if (!name) {
       setError(copy("callNameError"));
       return;
     }
 
     setError(null);
     mutate(
-      { artistId, requesterName: requesterName.trim() },
+      { artistId, requesterName: name },
       {
         onSuccess: (response) => {
           const { redirectUrl } = response.result;
@@ -67,7 +75,7 @@ const CallDetail = ({
           ? copy("callFormFreeDesc")
           : copy("callFormPaidDesc")}
       </p>
-      <Input
+      {!profileName && <Input
         labelContent={copy("callNameLabel")}
         required
         type="text"
@@ -75,7 +83,7 @@ const CallDetail = ({
         onChange={(e) => setRequesterName(e.target.value)}
         placeholder={copy("callNamePlaceholder")}
         {...(error && { status: "error", hintMessage: error })}
-      />
+      />}
       <div className="border border-zinc-600 rounded-2xl p-6 flex justify-between items-center">
         <span className="text-zinc-400 text-sm"><span style={copy.style("callAmountLabel")}>{copy("callAmountLabel")}</span></span>
         <span className="text-zinc-100 text-lg font-semibold">

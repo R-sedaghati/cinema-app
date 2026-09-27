@@ -1,6 +1,7 @@
 import type { ISectionConfig } from "@/lib/utils/resolveSections";
 import type { IPageBackground } from "@/lib/utils/pageBackground";
 import type { IPageLayout } from "@/lib/utils/pageLayout";
+import type { ITableColors } from "@/lib/utils/tableColors";
 
 export interface IRetriveResponse<T> {
   errors: string | null;
@@ -443,6 +444,11 @@ export interface IUserRetrive {
   result: IArtistItem[];
 }
 
+export interface IUserDetailResponse {
+  message: string | null;
+  result: IArtistUser;
+}
+
 export interface IAdminFaqUpdateItem {
   id: number;
   question: string;
@@ -681,6 +687,8 @@ export interface ISiteContent {
    * each page merges over. See `lib/utils/pageLayout.ts`.
    */
   pageLayouts?: Record<string, IPageLayout> | null;
+  /** Site-wide table colors, `#rrggbb` each; absent = theme default. */
+  tableColors?: ITableColors | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
@@ -773,7 +781,9 @@ export interface ITransactionItem {
   id: number;
   trackingCode: string;
   status: ITransactionStatus;
+  /** Total cost of the view: gateway part + wallet part. */
   amount: number;
+  walletAmount: number;
   paymentGateway: string;
   createdAt: string | null;
   requesterName: string;
@@ -781,6 +791,7 @@ export interface ITransactionItem {
   artist: {
     id: number | null;
     code: string | null;
+    name: string | null;
     categories: { id: number; faName: string }[];
   };
   [key: string]: unknown;

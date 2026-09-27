@@ -2,7 +2,7 @@
 
 import ArtistStatus from "@/components/admin/artist-registration/ArtistStatus";
 import UserWallet from "@/components/admin/users/UserWallet";
-import { useAdminUserRequest } from "@/lib/services/admin/hook";
+import { useAdminUserDetail, useAdminUserRequest } from "@/lib/services/admin/hook";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { toResumeName } from "@/lib/utils/resumeName";
@@ -18,6 +18,7 @@ function ArtistDetail() {
 
   const { data: userDetail } = useAdminUserRequest(id);
   const data = userDetail?.result?.at(0);
+  const user = useAdminUserDetail(id).data?.result;
 
   return (
     <div className="flex flex-col gap-3">
@@ -41,7 +42,7 @@ function ArtistDetail() {
                   leftButton: false,
                 }}
                 files={{
-                  src: data?.user?.avatar ?? "",
+                  src: user?.avatar ?? "",
                 }}
               />
               <div className="w-82.5 bg-primary-100 p-2 flex justify-center">
@@ -52,17 +53,17 @@ function ArtistDetail() {
               <Input
                 placeholder="نام و نام خانوادگی"
                 labelContent="نام و نام خانوادگی"
-                value={`${data?.user?.firstName}  ${data?.user?.lastName}`}
+                value={[user?.firstName, user?.lastName].filter(Boolean).join(" ")}
               />
               <Input
                 placeholder="شماره تماس"
                 labelContent="شماره تماس"
-                value={data?.user?.phoneNumber ?? ""}
+                value={user?.phoneNumber ?? ""}
               />
               <Input
                 placeholder="ایمیل"
                 labelContent="ایمیل"
-                value={data?.user?.email ?? ""}
+                value={user?.email ?? ""}
               />
               <Input
                 placeholder="قد"

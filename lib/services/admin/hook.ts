@@ -49,6 +49,7 @@ import {
   IUpdateFormFieldRequest,
   IUpdateFormStepRequest,
   IUserRetrive,
+  IUserDetailResponse,
   IUsersListResponse,
   LoginRequest,
   LoginResponse,
@@ -120,6 +121,7 @@ import {
   adminUploadBannerImage,
   adminUploadTutorialThumbnail,
   adminUserRequest,
+  adminUserDetail,
   adminUsersList,
   adminUserDelete,
 } from "./api";
@@ -504,6 +506,17 @@ export const useAdminUserRequest = (id: number | undefined) => {
     refetchInterval: 30 * 1000,
     enabled: Boolean(id),
     refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminUserDetail = (id: number | undefined) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IUserDetailResponse>({
+    queryKey: ["adminUserDetail", id],
+    queryFn: () => adminUserDetail(id, accessToken),
+    enabled: Boolean(id),
     refetchOnWindowFocus: false,
   });
 };
