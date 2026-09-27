@@ -1144,7 +1144,9 @@ target is itself a subcategory, is the category itself, or the category has subc
 `priority` orders a category among its siblings — the main categories among themselves, or
 one parent's subcategories among themselves. Setting it to a taken slot shifts the rows
 between the old and the new position, so the list stays a gap-free sequence. To reorder a
-whole list at once, use `PATCH /admin/categories/reorder/` instead.
+whole list at once, use `PATCH /admin/categories/reorder/` instead. `400` unless `priority`
+is `null` or an integer ≥ 1. `POST /admin/categories/` follows the same rule: a given
+`priority` opens that slot among the new category's siblings; without one it goes last.
 
 ---
 
@@ -1161,10 +1163,13 @@ a single move but scrambles a list sent as one request per row.
 }
 ```
 
-`400` if `ids` is empty, holds a non-integer or a duplicate, or contains an id that is not
-a child of `parentId`.
+`400` if `ids` is empty, holds a non-integer or a duplicate, contains an id that is not
+a child of `parentId`, or `parentId` is not an integer or `null`.
 
-**Response:** `ApiResponse<{ ids: number[] }>`
+Siblings missing from `ids` (e.g. created mid-drag) are kept after the sent ones, in their
+current order, so every sibling ends up with a distinct `priority`.
+
+**Response:** `ApiResponse<{ ids: number[] }>` — the full sibling order that was applied.
 
 ---
 
