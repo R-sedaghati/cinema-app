@@ -16,6 +16,7 @@ import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { toast } from "react-toastify";
 import { formatAnswer } from "@/lib/utils/formatAnswer";
+import { toResumeName } from "@/lib/utils/resumeName";
 
 /** Private answers the fixed contact rows below already show. */
 const FIXED_CONTACT_KEYS = new Set(["email", "address", "postalCode"]);
@@ -110,7 +111,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
             <span className="text-zinc-500"><span style={copy.style("artistCategory")}>{copy("artistCategory")}</span></span>
-            <span>{artist.categories[0]?.faName ?? "—"}</span>
+            <span>{toResumeName(artist.categories[0]?.faName) || "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { orderedHomeSections, resolveHomeSections } from "./resolveHomeSections.ts";
 import { DEFAULT_HOME_SECTIONS } from "../constants/homeSections.ts";
+import { sectionBoxProps } from "./resolveSections.ts";
 
 const keysOf = (config?: Parameters<typeof resolveHomeSections>[0]) =>
   resolveHomeSections(config).map((s) => s.key);
@@ -74,4 +75,26 @@ test("valid size overrides pass through, junk is dropped", () => {
   const [bare] = orderedHomeSections([{ key: "artistGrid", hidden: false }]);
   assert.equal(bare.maxWidth, undefined);
   assert.equal(bare.cardWidth, undefined);
+});
+
+test("fixed width/height survive resolving and clamp to the screen", () => {
+  const [first] = orderedHomeSections([
+    { key: "artistGrid", hidden: false, width: 600, height: 30 },
+  ]);
+  assert.equal(first.width, 600);
+  assert.equal(first.height, undefined);
+
+  const { style } = sectionBoxProps({ width: 600, height: 300 });
+  assert.equal(style.width, "min(600px, 100%)");
+  assert.equal(style.height, 300);
+  assert.equal(style.overflow, "hidden");
+});
+
+test("section spacing keeps 0–200 (0 included) and becomes inline padding", () => {
+  const [section] = orderedHomeSections([
+    { key: "artistGrid", hidden: false, paddingTop: 0, paddingBottom: 201, paddingX: 24 },
+  ]);
+  assert.equal(section.paddingTop, 0);
+  assert.equal(section.paddingBottom, undefined);
+  assert.deepEqual(sectionBoxProps(section).style, { paddingTop: 0, paddingInline: 24 });
 });

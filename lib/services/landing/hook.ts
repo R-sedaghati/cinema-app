@@ -62,6 +62,8 @@ import {
   userProfile,
   userProvinceList,
   userSupport,
+  userSupportRetrieve,
+  userSupportReply,
   userUpdatePofile,
   userUploadAvatar,
   userUploadImage,
@@ -186,10 +188,38 @@ export const useUpdateUserProfile = () => {
   });
 };
 
-export const useCreateUserSupport = () =>
-  useMutation<ISupportItem, AxiosError, UserCreateSupport>({
+export const useCreateUserSupport = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<ISupportItem, AxiosError, UserCreateSupport>({
     mutationFn: userCreateSupport,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["userSupport"] }),
   });
+};
+
+export const useUserSupportDetail = (id: number | null) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery({
+    queryKey: ["userSupportDetail", id],
+    queryFn: () => userSupportRetrieve(id!),
+    enabled: Boolean(accessToken && id),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useUserSupportReply = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: userSupportReply,
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["userSupportDetail", id] });
+      queryClient.invalidateQueries({ queryKey: ["userSupport"] });
+    },
+  });
+};
 
 export const useUserCategoryList = (params: IPagination) => {
   return useQuery<IUserCategoryListResponse>({

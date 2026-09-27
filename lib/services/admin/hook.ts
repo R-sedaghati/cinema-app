@@ -100,6 +100,7 @@ import {
   adminUserWallet,
   adminPaymentSettingsUpdate,
   adminPaymentSettingsTest,
+  adminGatewayLogs,
   adminNotificationSettings,
   adminNotificationSettingsUpdate,
   adminSiteContent,
@@ -108,6 +109,7 @@ import {
   adminSupportList,
   adminSupportRetrieve,
   adminSupportUpdate,
+  adminSupportReply,
   adminTutorialCreate,
   adminTutorialDelete,
   adminTutorialList,
@@ -431,6 +433,18 @@ export const useAdminPaymentSettingsUpdate = () => {
   });
 };
 
+export const useAdminGatewayLogs = (params: { page: number; level?: string }) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery({
+    queryKey: ["adminGatewayLogs", params],
+    queryFn: () => adminGatewayLogs(params, accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useAdminPaymentSettingsTest = () => {
   const { accessToken } = useAdminAuthStore();
 
@@ -536,6 +550,20 @@ export const useAdminSupportUpdate = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: number; status: string }) =>
       adminSupportUpdate(id, status, accessToken),
+  });
+};
+
+export const useAdminSupportReply = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number; body: string }) =>
+      adminSupportReply(id, body, accessToken),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["supportRetirive"] });
+      queryClient.invalidateQueries({ queryKey: ["supportList"] });
+    },
   });
 };
 

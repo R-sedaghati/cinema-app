@@ -33,6 +33,10 @@ export const SMS_EVENT: Record<
     label: "پرداخت ناموفق",
     description: "پس از پرداخت ناموفق یا لغو شده ارسال می‌شود.",
   },
+  [ESmsEvent.SUPPORT_REPLY]: {
+    label: "پاسخ تیکت پشتیبانی",
+    description: "زمانی که ادمین به تیکت پشتیبانی کاربر پاسخ می‌دهد ارسال می‌شود.",
+  },
 };
 
 /** Pipeline order — the list reads top to bottom as the applicant's journey. */
@@ -43,6 +47,7 @@ export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.NEED_REVISION,
   ESmsEvent.APPROVED,
   ESmsEvent.REJECTED,
+  ESmsEvent.SUPPORT_REPLY,
 ];
 
 /** Sample values used only for the drawer preview; never sent. */
@@ -55,4 +60,6 @@ export const SMS_VARIABLE_SAMPLE: Record<string, string> = {
   amount: "۵۰۰٬۰۰۰ تومان",
   trackingCode: "۱۲۳۴۵۶",
   nextStep: "درخواست شما در حال بررسی است.",
+  subject: "مشکل در پرداخت",
+  ticketId: "۴۲",
 };

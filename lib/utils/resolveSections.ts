@@ -6,25 +6,39 @@ export interface ISectionConfig {
   hidden: boolean;
   /** Layout variant key from the section's catalog entry; falls back to the first. */
   variant?: string;
-  /** Size overrides in px; absent = the variant's shipped size. */
+  /** Size overrides in px; absent = the variant's shipped size. `width`/`height`
+   *  are fixed sizes, `maxWidth`/`minHeight` bounds. */
+  width?: number;
+  height?: number;
   maxWidth?: number;
   minHeight?: number;
   cardWidth?: number;
   cardHeight?: number;
+  /** Inner spacing in px (0–200); absent = the section's own. */
+  paddingTop?: number;
+  paddingBottom?: number;
+  paddingX?: number;
 }
 
 export interface IResolvedSection<K extends string> {
   key: K;
   hidden: boolean;
   variant: string;
+  width?: number;
+  height?: number;
   maxWidth?: number;
   minHeight?: number;
   cardWidth?: number;
   cardHeight?: number;
+  paddingTop?: number;
+  paddingBottom?: number;
+  paddingX?: number;
 }
 
-export const SIZE_KEYS = ["maxWidth", "minHeight", "cardWidth", "cardHeight"] as const;
+export const SIZE_KEYS = ["width", "height", "maxWidth", "minHeight", "cardWidth", "cardHeight"] as const;
 export type SizeKey = (typeof SIZE_KEYS)[number];
+export const SPACING_KEYS = ["paddingTop", "paddingBottom", "paddingX"] as const;
+export type SpacingKey = (typeof SPACING_KEYS)[number];
 
 /** Stored JSON is untrusted: keep only sane px values, drop the rest. */
 const toPx = (value: unknown): number | undefined =>
@@ -32,10 +46,19 @@ const toPx = (value: unknown): number | undefined =>
     ? Math.round(value)
     : undefined;
 
+const toSpacing = (value: unknown): number | undefined =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 200
+    ? Math.round(value)
+    : undefined;
+
 const sizesOf = (entry: ISectionConfig) => {
-  const sizes: Partial<Record<SizeKey, number>> = {};
+  const sizes: Partial<Record<SizeKey | SpacingKey, number>> = {};
   for (const k of SIZE_KEYS) {
     const px = toPx(entry[k]);
+    if (px !== undefined) sizes[k] = px;
+  }
+  for (const k of SPACING_KEYS) {
+    const px = toSpacing(entry[k]);
     if (px !== undefined) sizes[k] = px;
   }
   return sizes;
@@ -46,10 +69,17 @@ const sizesOf = (entry: ISectionConfig) => {
  * picked up by `[data-card]` elements (rules in `app/globals.css`); the data
  * attrs gate those rules so unset sizes leave the Tailwind defaults alone.
  */
-export function sectionBoxProps(section: Partial<Record<SizeKey, number>>) {
+export function sectionBoxProps(section: Partial<Record<SizeKey | SpacingKey, number>>) {
   const style: Record<string, string | number> = {};
+  // Fixed width still yields to a narrower screen instead of scrolling sideways.
+  if (section.width) Object.assign(style, { width: `min(${section.width}px, 100%)`, marginInline: "auto" });
+  if (section.height) Object.assign(style, { height: section.height, overflow: "hidden" });
   if (section.maxWidth) Object.assign(style, { maxWidth: section.maxWidth, marginInline: "auto" });
   if (section.minHeight) style.minHeight = section.minHeight;
+  // 0 is a real value here ("no padding"), so test for undefined, not truthiness.
+  if (section.paddingTop !== undefined) style.paddingTop = section.paddingTop;
+  if (section.paddingBottom !== undefined) style.paddingBottom = section.paddingBottom;
+  if (section.paddingX !== undefined) style.paddingInline = section.paddingX;
   if (section.cardWidth) style["--card-w"] = `${section.cardWidth}px`;
   if (section.cardHeight) style["--card-h"] = `${section.cardHeight}px`;
 

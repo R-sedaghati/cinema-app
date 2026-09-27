@@ -5,6 +5,7 @@ import { ChevronDown, Eye, EyeOff, GripVertical } from "lucide-react";
 import Input from "@/components/common/Input";
 import type { IResolvedSection, SizeKey } from "@/lib/utils/resolveSections";
 import { VariantGlyph } from "./VariantGlyph";
+import { SpacingBox } from "@/components/admin/SpacingBox";
 
 /** The slice of a page's section catalog this list renders. */
 export interface ISectionListEntry {
@@ -13,13 +14,21 @@ export interface ISectionListEntry {
   hasCards?: boolean;
 }
 
-const SECTION_SIZES: { key: SizeKey; label: string }[] = [
-  { key: "maxWidth", label: "عرض بیشینه بخش" },
-  { key: "minHeight", label: "حداقل ارتفاع بخش" },
+interface ISizeField {
+  key: SizeKey;
+  label: string;
+  hint: string;
+}
+
+const SECTION_SIZES: ISizeField[] = [
+  { key: "width", label: "عرض ثابت بخش", hint: "دقیقاً همین عرض؛ در صفحه باریک‌تر جمع می‌شود" },
+  { key: "height", label: "ارتفاع ثابت بخش", hint: "دقیقاً همین ارتفاع؛ اضافه بریده می‌شود" },
+  { key: "maxWidth", label: "عرض بیشینه بخش", hint: "پهن‌تر از این نمی‌شود؛ بیش از عرض صفحه اثری ندارد" },
+  { key: "minHeight", label: "حداقل ارتفاع بخش", hint: "کوتاه‌تر از این نمی‌شود؛ با محتوا بلندتر می‌شود" },
 ];
-const CARD_SIZES: { key: SizeKey; label: string }[] = [
-  { key: "cardWidth", label: "عرض کارت" },
-  { key: "cardHeight", label: "ارتفاع کارت" },
+const CARD_SIZES: ISizeField[] = [
+  { key: "cardWidth", label: "عرض کارت", hint: "عرض ثابت هر کارت؛ در شبکه تعداد ستون را تعیین می‌کند" },
+  { key: "cardHeight", label: "ارتفاع کارت", hint: "ارتفاع ثابت هر کارت؛ اضافه بریده می‌شود" },
 ];
 
 interface Props<K extends string> {
@@ -158,17 +167,18 @@ export function SectionList<K extends string>({
 
                 <fieldset className="flex flex-col gap-2">
                   <legend className="text-sm text-gray-600">
-                    اندازه (پیکسل، خالی = پیش‌فرض)
+                    اندازه (پیکسل ۴۰ تا ۲۰۰۰، خالی = پیش‌فرض)
                   </legend>
                   <div className="grid grid-cols-2 gap-2">
                     {[...SECTION_SIZES, ...(meta.hasCards ? CARD_SIZES : [])].map(
-                      ({ key, label }) => (
+                      ({ key, label, hint }) => (
                         <Input
                           key={key}
                           type="number"
                           min={40}
                           max={2000}
                           labelContent={label}
+                          hintMessage={hint}
                           placeholder="پیش‌فرض"
                           value={section[key] ?? ""}
                           onChange={(e) =>
@@ -180,6 +190,24 @@ export function SectionList<K extends string>({
                       ),
                     )}
                   </div>
+                </fieldset>
+
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="text-sm text-gray-600">فاصله داخلی بخش</legend>
+                  <SpacingBox
+                    values={{
+                      top: section.paddingTop,
+                      bottom: section.paddingBottom,
+                      sides: section.paddingX,
+                    }}
+                    onChange={(v) =>
+                      patch(section.key, {
+                        paddingTop: v.top,
+                        paddingBottom: v.bottom,
+                        paddingX: v.sides,
+                      })
+                    }
+                  />
                 </fieldset>
 
                 {renderExtra?.(section.key)}

@@ -1,0 +1,19 @@
+/* Page-level layout overrides (see `pageLayoutProps` in lib/utils/pageLayout.ts).
+   `<main>` carries the vars and gates; `[data-page]` is each page's content box,
+   `[data-page-stack]` the element whose children are the page's stacked blocks.
+   Unlayered so they beat Tailwind utilities, but only when the admin set a value. */
+[data-pl-w] [data-page] { max-width: var(--pl-w); margin-inline: auto; }
+[data-pl-x] [data-page] { padding-inline: var(--pl-x); }
+[data-pl-t] [data-page] { padding-top: var(--pl-t); }
+[data-pl-b] [data-page] { padding-bottom: var(--pl-b); }
+/* One gap mechanism whatever the page shipped with (flex gap or space-y margins). */
+[data-pl-gap] [data-page-stack] { display: flex; flex-direction: column; gap: var(--pl-gap); }
+[data-pl-gap] [data-page-stack] > * { margin-block: 0; }
+
+@media (min-width: 768px) {
+  [data-pl-x-d] [data-page] { padding-inline: var(--pl-x-d); }
+  [data-pl-t-d] [data-page] { padding-top: var(--pl-t-d); }
+  [data-pl-b-d] [data-page] { padding-bottom: var(--pl-b-d); }
+  [data-pl-gap-d] [data-page-stack] { display: flex; flex-direction: column; gap: var(--pl-gap-d); }
+  [data-pl-gap-d] [data-page-stack] > * { margin-block: 0; }
+}

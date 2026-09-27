@@ -3,6 +3,7 @@
 
 import { EArtistGender, IArtistItem } from "@/lib/services/admin/type";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -32,7 +33,7 @@ export default function ArtistCard({
       </div>
       <div className="mt-2 flex flex-wrap gap-2 text-xs">
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-          {artist?.categories?.at(0)?.faName ?? ""}
+          {toResumeName(artist?.categories?.at(0)?.faName)}
         </span>
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {artist?.answers?.gender === EArtistGender.MAN

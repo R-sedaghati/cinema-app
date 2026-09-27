@@ -4,7 +4,7 @@ import { Button, Card } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import Textarea from "@/components/common/Textarea";
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -14,19 +14,28 @@ import {
 import { LANDING_COPY } from "@/lib/constants/landingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import { HOME_SECTIONS, type HomeSectionKey } from "@/lib/constants/homeSections";
-import { HOME_SECTION_COMPONENTS } from "@/components/home/sections/registry";
 import {
   orderedHomeSections,
   type IResolvedHomeSection,
 } from "@/lib/utils/resolveHomeSections";
-import { sectionBoxProps } from "@/lib/utils/resolveSections";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
-import { LandingCopyDraftProvider } from "@/lib/hooks/useLandingCopy";
 import withNoSSR from "@/lib/utils/withNoSSR";
+import {
+  PREVIEW_DRAFT,
+  PREVIEW_PATH,
+  PREVIEW_READY,
+} from "@/lib/constants/pageBuilderPreview";
 
 /** Long copy gets a textarea — the same cut `CopyCard` makes. */
 const isLongCopy = (key: LandingCopyKey) =>
   LANDING_COPY[key].value.includes("\n") || LANDING_COPY[key].value.length > 60;
+
+/** Preview widths — the iframe's own viewport, so md:/lg: breakpoints react. */
+const DEVICES = [
+  { label: "موبایل", width: 390 },
+  { label: "تبلت", width: 768 },
+  { label: "دسکتاپ", width: 1280 },
+];
 
 function PageBuilder() {
   const queryClient = useQueryClient();
@@ -44,7 +53,23 @@ function PageBuilder() {
     setLanding({ ...(data.result.landing ?? {}) });
   }, [data, dirty]);
 
-  const visible = useMemo(() => sections.filter((s) => !s.hidden), [sections]);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [device, setDevice] = useState(DEVICES[0].width);
+  const [guides, setGuides] = useState(true);
+
+  // Push the draft on every edit, and again whenever the iframe (re)loads and
+  // says it is ready — its listener may attach after our first post.
+  useEffect(() => {
+    const frame = () => iframeRef.current?.contentWindow;
+    const send = () =>
+      frame()?.postMessage({ type: PREVIEW_DRAFT, sections, landing, guides }, location.origin);
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin === location.origin && e.source === frame() && e.data?.type === PREVIEW_READY) send();
+    };
+    send();
+    addEventListener("message", onMessage);
+    return () => removeEventListener("message", onMessage);
+  }, [sections, landing, guides]);
 
   const setCopy = (key: LandingCopyKey, value: string) => {
     setLanding((prev) => ({ ...prev, [key]: value }));
@@ -138,41 +163,40 @@ function PageBuilder() {
           />
         </Card>
 
-        <Card className="p-3">
-          <p className="mb-2 text-sm text-gray-500">پیش‌نمایش</p>
-          {/* pointer-events-none: the real sections contain links and router
-              pushes — the preview must never navigate the panel away. */}
-          <LandingCopyDraftProvider value={landing}>
-            <div
-              dir="rtl"
-              className="pointer-events-none select-none max-w-[900px] overflow-hidden rounded-2xl bg-zinc-950 text-zinc-100"
-            >
-              <PreviewSections sections={visible} />
+        <Card className="flex min-w-0 flex-col gap-3 p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm text-gray-500">پیش‌نمایش</p>
+            <div className="flex gap-1">
+              {DEVICES.map((d) => (
+                <button
+                  key={d.width}
+                  type="button"
+                  onClick={() => setDevice(d.width)}
+                  className={`rounded-lg border px-2.5 py-1 text-xs ${device === d.width
+                      ? "border-primary-500 bg-primary-50 text-primary-700"
+                      : "border-gray-200 text-gray-600 hover:border-gray-300"
+                    }`}
+                >
+                  {d.label} · {d.width}
+                </button>
+              ))}
             </div>
-          </LandingCopyDraftProvider>
+            <label className="ms-auto flex cursor-pointer items-center gap-1.5 text-xs text-gray-600">
+              <input type="checkbox" checked={guides} onChange={(e) => setGuides(e.target.checked)} />
+              راهنمای اندازه (کادر آبی: بخش، صورتی: کارت)
+            </label>
+          </div>
+
+          <div className="overflow-x-auto rounded-2xl bg-zinc-950">
+            <iframe
+              ref={iframeRef}
+              src={PREVIEW_PATH}
+              title="پیش‌نمایش صفحه اصلی"
+              style={{ width: device }}
+              className="mx-auto block h-[75vh] border-0"
+            />
+          </div>
         </Card>
-      </div>
-    </div>
-  );
-}
-
-function PreviewSections({ sections }: { sections: IResolvedHomeSection[] }) {
-  const render = (section: IResolvedHomeSection) => {
-    const Section = HOME_SECTION_COMPONENTS[section.key];
-    return (
-      <div key={section.key} {...sectionBoxProps(section)}>
-        <Section variant={section.variant} />
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-40 pb-6">
-      {sections.filter((s) => HOME_SECTIONS[s.key].fullBleed).map(render)}
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="space-y-5 md:space-y-8">
-          {sections.filter((s) => !HOME_SECTIONS[s.key].fullBleed).map(render)}
-        </div>
       </div>
     </div>
   );

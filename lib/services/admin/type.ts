@@ -1,5 +1,6 @@
 import type { ISectionConfig } from "@/lib/utils/resolveSections";
 import type { IPageBackground } from "@/lib/utils/pageBackground";
+import type { IPageLayout } from "@/lib/utils/pageLayout";
 
 export interface IRetriveResponse<T> {
   errors: string | null;
@@ -316,9 +317,17 @@ export interface ICategoryItem {
 }
 
 export enum ESupportStatus {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
+  OPEN = "OPEN",
+  ANSWERED = "ANSWERED",
+  CLOSED = "CLOSED",
+}
+
+/** A reply on a support ticket. `admin` null = the ticket's user wrote it. */
+export interface ISupportMessage {
+  id: number;
+  body: string;
+  createdAt: string;
+  admin: { id: number; firstName: string | null; lastName: string | null } | null;
 }
 
 export interface ParamsSupportList {
@@ -347,6 +356,9 @@ export interface ISupportItem {
   phoneNumber: string | null;
   subject: string | null;
   updatedAt: string | null;
+  /** Only on the detail endpoints. */
+  messages?: ISupportMessage[];
+  userId?: number | null;
   [key: string]: unknown;
 }
 
@@ -664,6 +676,11 @@ export interface ISiteContent {
    * covers pages without their own entry. Empty/absent = the stock gradient.
    */
   pageBackgrounds?: Record<string, IPageBackground> | null;
+  /**
+   * Per-page width/padding, same keys as `pageBackgrounds`; `default` is the base
+   * each page merges over. See `lib/utils/pageLayout.ts`.
+   */
+  pageLayouts?: Record<string, IPageLayout> | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
@@ -698,6 +715,33 @@ export type IPaymentSettingTestResponse = IRetriveResponse<{
   ok: boolean;
   message: string;
 }>;
+
+/** `warning` = the bank refused one buyer; says nothing about the gateway itself. */
+export type GatewayLogLevel = "ok" | "warning" | "error";
+
+export interface IGatewayLogItem {
+  id: number;
+  action: "check" | "token" | "verify" | "reverse";
+  level: GatewayLogLevel;
+  /** Plain Persian, written for a non-technical admin. */
+  message: string;
+  /** Raw error text, for whoever debugs it. */
+  detail: string | null;
+  createdAt: string;
+}
+
+export interface IGatewayLogResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  result: {
+    status: GatewayLogLevel | "unknown";
+    statusMessage: string | null;
+    checkedAt: string | null;
+    lastOkAt: string | null;
+    items: IGatewayLogItem[];
+  };
+}
 
 /** Events that fan out an SMS to the admin numbers below. */
 export type NotificationEvent = "REGISTRATION" | "TRANSACTION" | "SUPPORT_TICKET";
@@ -784,6 +828,7 @@ export enum ESmsEvent {
   REJECTED = "REJECTED",
   PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
   PAYMENT_FAILED = "PAYMENT_FAILED",
+  SUPPORT_REPLY = "SUPPORT_REPLY",
 }
 
 export interface ISmsTemplate {
