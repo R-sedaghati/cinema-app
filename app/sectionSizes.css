@@ -1,0 +1,20 @@
+/* Page-builder size overrides (see `sectionBoxProps` in lib/utils/resolveSections.ts).
+   Imported by the root layout so the public pages, the admin previews and the
+   preview iframe all get them. Unlayered so they beat Tailwind utilities, but only
+   when the admin set a size. */
+[data-card-w] [data-card] { width: min(var(--card-w), 100%); flex-shrink: 0; }
+[data-card-h] [data-card] { height: var(--card-h); overflow: hidden; }
+/* Fixed tracks, not 1fr: the card is exactly the width the admin typed. */
+[data-card-w] [data-card-grid] { grid-template-columns: repeat(auto-fill, min(var(--card-w), 100%)); }
+[data-card-w] [data-card-grid] > [data-card] { width: auto; }
+
+/* Page-builder preview guides (`data-guides` on the preview root). */
+[data-guides] [data-guide] { position: relative; outline: 1px dashed #38bdf8; outline-offset: -1px; }
+[data-guides] [data-guide]::before {
+  content: attr(data-guide);
+  position: absolute; top: 0; inset-inline-start: 0; z-index: 60;
+  padding: 1px 6px; border-end-end-radius: 6px;
+  background: #38bdf8; color: #082f49; font: 11px/1.5 ui-monospace, monospace;
+  direction: ltr; pointer-events: none; white-space: nowrap;
+}
+[data-guides] [data-card] { outline: 1px dashed #f472b6; outline-offset: -1px; }

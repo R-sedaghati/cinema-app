@@ -419,6 +419,7 @@ function ContentManagement() {
                 label="اندازه فونت متن درباره ما"
                 wrapperClassName="w-1/3"
                 value={aboutFontSize}
+                defaultSize="20"
                 onChange={setAboutFontSize}
               />
               <ColorInput value={aboutColor} onChange={setAboutColor} />
@@ -465,6 +466,7 @@ function ContentManagement() {
                 label="اندازه فونت متن کارت‌ها"
                 wrapperClassName="w-1/3"
                 value={benefitsFontSize}
+                defaultSize="16"
                 onChange={setBenefitsFontSize}
               />
               <ColorInput value={benefitsColor} onChange={setBenefitsColor} />
@@ -530,6 +532,7 @@ function ContentManagement() {
                 label="اندازه فونت توضیحات و متن کارت‌ها"
                 wrapperClassName="w-1/3"
                 value={supportFontSize}
+                defaultSize="16"
                 onChange={setSupportFontSize}
               />
               <ColorInput value={supportColor} onChange={setSupportColor} />
@@ -624,6 +627,7 @@ function ContentManagement() {
                 label="اندازه فونت متن قوانین"
                 wrapperClassName="w-1/3"
                 value={termsFontSize}
+                defaultSize="20"
                 onChange={setTermsFontSize}
               />
               <ColorInput value={termsColor} onChange={setTermsColor} />

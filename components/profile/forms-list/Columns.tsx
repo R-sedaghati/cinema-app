@@ -6,11 +6,16 @@ import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
 import type { CopyResolver } from "@/lib/utils/copy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
+import { toResumeName } from "@/lib/utils/resumeName";
 
 // The form a request belongs to is its categories; the user's own name is the same on
 // every row, so it only serves as a fallback for a request with no category.
 export const formName = (item: IArtistItem) =>
-  item.categories?.map((c) => c.faName).join("، ") ?? "";
+  item.categories?.map((c) => toResumeName(c.faName, item.status)).join("، ") ?? "";
+
+// An approved request is a resume.
+export const viewKey = (item: IArtistItem): LandingCopyKey =>
+  item.status === EArtistRequestStatus.APPROVED ? "profileResumeView" : "profileFormView";
 
 export const generateColumns = (
   onEdit: (item: IArtistItem) => void,
@@ -74,7 +79,7 @@ export const generateColumns = (
           leftIcon={<ChevronLeft />}
           onClick={() => onView(data)}
         >
-          <span style={copy.style("profileFormView")}>{copy("profileFormView")}</span>
+          <span style={copy.style(viewKey(data))}>{copy(viewKey(data))}</span>
         </Button>
 
         {data.status === EArtistRequestStatus.APPROVED && (

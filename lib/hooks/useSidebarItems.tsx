@@ -15,6 +15,7 @@ import {
   Settings,
   MessageSquare,
   Wallpaper,
+  Activity,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -80,6 +81,12 @@ export const useSidebarItems = (): {
         active: pathname.startsWith("/admin/transactions"),
       },
       {
+        icon: <Activity />,
+        title: "گزارش درگاه پرداخت",
+        link: "/admin/gateway-logs",
+        active: pathname.startsWith("/admin/gateway-logs"),
+      },
+      {
         icon: <LayoutTemplate />,
         title: "صفحه‌ساز صفحه اصلی",
         link: "/admin/page-builder",
@@ -93,7 +100,7 @@ export const useSidebarItems = (): {
       },
       {
         icon: <Wallpaper />,
-        title: "پس‌زمینه صفحات",
+        title: "ظاهر صفحات",
         link: "/admin/page-backgrounds",
         active: pathname.startsWith("/admin/page-backgrounds"),
       },

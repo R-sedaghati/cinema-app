@@ -8,6 +8,7 @@ import {
   IRetriveResponse,
   ISiteContentResponse,
   ISupportItem,
+  ISupportMessage,
   ITutorialListResponse,
   LoginResponse,
   ParamsArtistList,
@@ -94,6 +95,21 @@ export const userSupport = async (params: IPagination, accessToken: string) => {
     },
   );
 
+  return data;
+};
+
+export const userSupportRetrieve = async (id: number) => {
+  const { data } = await landingApi.get<IRetriveResponse<ISupportItem>>(
+    `/user/supports/${id}/`,
+  );
+  return data;
+};
+
+export const userSupportReply = async ({ id, body }: { id: number; body: string }) => {
+  const { data } = await landingApi.post<IRetriveResponse<ISupportMessage>>(
+    `/user/supports/${id}/messages/`,
+    { body },
+  );
   return data;
 };
 

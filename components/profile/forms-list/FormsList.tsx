@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ContentCard from "../ContentCard";
 import { Table } from "@dgshahr/ui-kit";
-import { formName, generateColumns } from "./Columns";
+import { formName, generateColumns, viewKey } from "./Columns";
 import { useUserAtristRequests } from "@/lib/services/landing/hook";
 import TableEmptyState from "@/components/common/TableEmptyState";
 import { tableEmptyMessage } from "@/lib/mock/messages";
@@ -121,7 +121,7 @@ export default function FormsList() {
                   onClick={() => handleView(item)}
                   className="p-0! text-sm"
                 >
-                  <span style={copy.style("profileFormView")}>{copy("profileFormView")}</span>
+                  <span style={copy.style(viewKey(item))}>{copy(viewKey(item))}</span>
                 </Button>
 
                 {item.status === EArtistRequestStatus.APPROVED && (

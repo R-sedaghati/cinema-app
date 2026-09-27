@@ -8,7 +8,7 @@ import MessagesList from "./messages/MessagesList";
 import RequestsList from "./requests-list/RequestsList";
 import PaymentsList from "./payments/PaymentsList";
 import WalletCard from "./wallet/WalletCard";
-import SupportCard from "./SupportCard";
+import SupportTickets from "./support/SupportTickets";
 import LogoutCard from "./LogoutCard";
 
 export default function ProfileContent({
@@ -28,7 +28,7 @@ export default function ProfileContent({
     case "wallet":
       return <WalletCard />;
     case "support":
-      return <SupportCard />;
+      return <SupportTickets />;
     case "logout":
       return <LogoutCard />;
     default:

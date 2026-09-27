@@ -5,16 +5,16 @@ export const SUPPOET_STATUS: Record<
   ESupportStatus,
   { label: string; color: BadgeProps["color"] }
 > = {
-  [ESupportStatus.ACCEPTED]: {
-    label: "تایید شده",
-    color: "success",
-  },
-  [ESupportStatus.PENDING]: {
-    label: "نیاز به بررسی",
+  [ESupportStatus.OPEN]: {
+    label: "در انتظار پاسخ",
     color: "warning",
   },
-  [ESupportStatus.REJECTED]: {
-    label: "رد شده",
-    color: "error",
+  [ESupportStatus.ANSWERED]: {
+    label: "پاسخ داده شد",
+    color: "success",
+  },
+  [ESupportStatus.CLOSED]: {
+    label: "بسته شده",
+    color: "gray",
   },
 };

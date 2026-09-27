@@ -352,7 +352,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
   const showBackLink = selectSections.some((s) => s.key === "backLink");
 
   return (
-    <div className="mt-4">
+    <div data-page className="mt-4">
       {step === 0 && !editId && (
         <SelectScreen
           sections={selectSections}

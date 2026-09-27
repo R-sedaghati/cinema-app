@@ -36,6 +36,7 @@ import {
   IFormStepRetrieveResponse,
   IPaymentSettingResponse,
   IPaymentSettingTestResponse,
+  IGatewayLogResponse,
   INotificationSettingResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -43,6 +44,7 @@ import {
   ISiteContentResponse,
   ISupportListResponse,
   ISupportRetriveResponse,
+  ISupportMessage,
   ITransactionItem,
   ITutorialListResponse,
   ITutorialRetrieveResponse,
@@ -468,6 +470,18 @@ export const adminPaymentSettingsTest = async (accessToken: string) => {
   return data;
 };
 
+export const adminGatewayLogs = async (
+  params: { page: number; level?: string },
+  accessToken: string,
+) => {
+  const { data } = await api.get<IGatewayLogResponse>("/admin/gateway-logs/", {
+    params: { count: 20, ...params },
+    headers: { Authorization: accessToken },
+  });
+
+  return data;
+};
+
 export const adminNotificationSettings = async (accessToken: string) => {
   const { data } = await api.get<INotificationSettingResponse>(
     "/admin/notification-settings/",
@@ -568,6 +582,19 @@ export const adminSupportUpdate = async (
   return data;
 };
 
+export const adminSupportReply = async (
+  id: number,
+  body: string,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IRetriveResponse<ISupportMessage>>(
+    `/admin/supports/${id}/messages/`,
+    { body },
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
 export const adminCreateFaq = async (
   payload: { question: string; answer: string },
   accessToken: string,
@@ -649,7 +676,7 @@ export const adminUploadBannerImage = async (
 ) => {
   const form = new FormData();
   form.append("file", await prepareImage(file));
-  const { data } = await api.post<{ path: string }>(
+  const { data } = await api.post<{ path: string; url?: string }>(
     "/admin/upload/image",
     form,
     { headers: { Authorization: accessToken } },
@@ -727,7 +754,7 @@ export const adminUploadTutorialThumbnail = async (
 ) => {
   const form = new FormData();
   form.append("file", await prepareImage(file));
-  const { data } = await api.post<{ path: string }>(
+  const { data } = await api.post<{ path: string; url?: string }>(
     "/admin/upload/image",
     form,
     { headers: { Authorization: accessToken } },

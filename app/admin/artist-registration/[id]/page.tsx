@@ -11,6 +11,7 @@ import {
 import { EArtistRequestStatus, EFormFieldType } from "@/lib/services/admin/type";
 import { formatAnswer } from "@/lib/utils/formatAnswer";
 import withNoSSR from "@/lib/utils/withNoSSR";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -240,7 +241,7 @@ function ArtistDetail() {
                   wrapperClassName="w-1/3"
                   labelContent="زمینه فعالیت"
                   placeholder="زمینه فعالیت"
-                  value={category.faName}
+                  value={toResumeName(category.faName, data?.status)}
                 />
               ))}
             </div>

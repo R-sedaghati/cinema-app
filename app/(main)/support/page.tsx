@@ -3,7 +3,7 @@ import SupportCenter from "@/components/support/SupportCenter";
 
 export default function SupportPage() {
   return (
-    <div className="relative mx-auto max-w-6xl px-4 py-10 space-y-20">
+    <div data-page data-page-stack className="relative mx-auto max-w-6xl px-4 py-10 space-y-20">
       <SupportCenter />
       <ContactUsForm />
       <div

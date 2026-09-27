@@ -20,6 +20,7 @@ import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { groupPortfolios } from "@/lib/utils/portfolioAnswers";
+import { EArtistRequestStatus } from "@/lib/services/admin/type";
 
 /**
  * Read-only view of a request the caller submitted, at any status. The public artist page
@@ -120,6 +121,10 @@ export default function ArtistRequestViewPage() {
     );
   }
 
+  // An approved request is a resume.
+  const titleKey =
+    request.status === EArtistRequestStatus.APPROVED ? "profileResumeViewTitle" : "profileFormViewTitle";
+
   return (
     <div className="mt-4">
       <div className={clsx("mx-auto mb-3 w-[90%]", isDesktop && "w-4/5")}>
@@ -141,7 +146,7 @@ export default function ArtistRequestViewPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-col gap-1">
                 <p className="font-h5-bold">
-                  <span style={landingCopy.style("profileFormViewTitle")}>{landingCopy("profileFormViewTitle")}</span>
+                  <span style={landingCopy.style(titleKey)}>{landingCopy(titleKey)}</span>
                 </p>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                   {request.trackingCode && (

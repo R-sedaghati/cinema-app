@@ -5,6 +5,7 @@ import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
 import ArtistStatus from "./ArtistStatus";
 import CrmStage from "./CrmStage";
+import { toResumeName } from "@/lib/utils/resumeName";
 
 /** A follow-up date at or before today is overdue and gets flagged in the table. */
 const isOverdue = (followUpAt: string | null) => {
@@ -78,7 +79,7 @@ export const generateColumns = (
       title: " زمینه فعالیت",
       className: "align-middle",
       render: (data) => (
-        <p className="font-p1-regular">{data?.categories?.at(0)?.faName}</p>
+        <p className="font-p1-regular">{toResumeName(data?.categories?.at(0)?.faName, data?.status)}</p>
       ),
     },
     {

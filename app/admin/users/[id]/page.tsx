@@ -5,6 +5,7 @@ import UserWallet from "@/components/admin/users/UserWallet";
 import { useAdminUserRequest } from "@/lib/services/admin/hook";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import withNoSSR from "@/lib/utils/withNoSSR";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import { useParams, useRouter } from "next/navigation";
@@ -125,7 +126,7 @@ function ArtistDetail() {
                   className="flex items-center justify-between p-5 border border-solid border-gray-300 rounded-xl"
                 >
                   <p className="font-p1-regular">
-                    {item?.categories?.at(0)?.faName}
+                    {toResumeName(item?.categories?.at(0)?.faName, item?.status)}
                   </p>
                   {item.trackingCode ? (
                     <Badge type="twoTone" color="success" value="پرداخت شده" />

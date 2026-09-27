@@ -3,7 +3,7 @@ import Benefits from "@/components/about/Benefits";
 
 export default function AboutPage() {
   return (
-    <div className="relative flex flex-col gap-10 mx-auto max-w-6xl px-4 py-10">
+    <div data-page data-page-stack className="relative flex flex-col gap-10 mx-auto max-w-6xl px-4 py-10">
       <Description />
       <Benefits />
       <div

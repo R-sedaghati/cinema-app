@@ -2,6 +2,8 @@ import { ToastContainer } from "react-toastify";
 import localFont from "next/font/local";
 import { Metadata, Viewport } from "next";
 import "./admin.css";
+import "./sectionSizes.css";
+import "./pageLayout.css";
 
 export const metadata: Metadata = {
   title: "آرشیو هنر",

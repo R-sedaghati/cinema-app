@@ -3,7 +3,7 @@ import { ArtistsSearchClient } from "../../../components/artists/ArtistsSearchCl
 
 export default function ArtistsPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-10">
+    <div data-page className="mx-auto max-w-6xl px-4 pt-10">
       {/* Search state is read from useSearchParams, which needs a Suspense boundary. */}
       <Suspense>
         <ArtistsSearchClient />

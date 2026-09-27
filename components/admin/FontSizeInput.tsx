@@ -9,6 +9,8 @@ interface Props {
   wrapperClassName?: string;
   isError?: boolean;
   errorMessage?: string;
+  /** Size the public page renders when no override is set, e.g. "20" or "24–48". */
+  defaultSize?: string;
 }
 
 /** Numeric px font-size control. Empty input means "use the default size". */
@@ -19,17 +21,19 @@ function FontSizeInput({
   wrapperClassName = "w-full",
   isError,
   errorMessage,
+  defaultSize,
 }: Props) {
+  const current = defaultSize ? `${defaultSize}px` : null;
   return (
     <Input
       labelContent={label}
-      placeholder="پیش‌فرض"
+      placeholder={current ? `پیش‌فرض (${current})` : "پیش‌فرض"}
       type="text"
       inputMode="numeric"
       wrapperClassName={wrapperClassName}
       isError={isError}
       errorMessage={errorMessage}
-      hintMessage="خالی = اندازه پیش‌فرض؛ بین ۸ تا ۱۲۰ پیکسل"
+      hintMessage={`${current ? `اندازه فعلی پیش‌فرض: ${current}؛ ` : ""}خالی = اندازه پیش‌فرض؛ بین ۸ تا ۱۲۰ پیکسل`}
       value={value ?? ""}
       onChange={(e) => {
         const raw = e.target.value;

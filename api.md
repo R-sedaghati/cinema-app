@@ -60,6 +60,7 @@ enum SmsEvent {
   REJECTED        = "REJECTED",         // admin rejected the request
   PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
   PAYMENT_FAILED  = "PAYMENT_FAILED",
+  SUPPORT_REPLY   = "SUPPORT_REPLY",    // admin replied to a support ticket (vars: subject, ticketId)
 }
 
 // Named validations an admin picks in the form-builder; enforced on submit by the API
@@ -90,9 +91,9 @@ enum PaymentStatus {
 }
 
 enum SupportStatus {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  REJECTED = "REJECTED",
+  OPEN = "OPEN",           // waiting on an admin (new, or the user replied last)
+  ANSWERED = "ANSWERED",   // an admin replied last
+  CLOSED = "CLOSED",       // closed by an admin; the user can no longer reply
 }
 
 enum FormFieldType {
@@ -378,18 +379,33 @@ interface SiteContent {
   // home-page section order, visibility and layout variant, set in the admin
   // page-builder. Keyed by the frontend catalog in `lib/constants/homeSections.ts`;
   // empty/absent = the shipped catalog order. Optional size overrides, all
-  // integers in px (40–2000), absent = default: `maxWidth`/`minHeight` of the
-  // section, `cardWidth`/`cardHeight` of its cards. Must be stored as sent.
-  homeSections?: { key: string; hidden: boolean; variant?: string; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number }[] | null;
+  // integers in px (40–2000), absent = default: fixed `width`/`height` and
+  // `maxWidth`/`minHeight` of the section, `cardWidth`/`cardHeight` of its cards. Inner spacing `paddingTop`/`paddingBottom`/`paddingX`
+  // is px 0–200 (0 kept). Must be stored as sent.
+  // `background`: section bg color, strict `#rrggbb` (anything else dropped); absent = transparent.
+  // `backgroundImage`: bare storage path on write (from `POST /admin/upload/image`), public URL on read;
+  // `backgroundOverlay`: 0–90 % black over it (absent = 50), kept only with an image.
+  homeSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number }[] | null;
   // same, for the artist-registration page, keyed by
   // `lib/constants/registrationSections.ts` and set in `/admin/registration-builder`.
-  registrationSections?: { key: string; hidden: boolean; variant?: string; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number }[] | null;
+  registrationSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number }[] | null;
   // per-page backgrounds, set in `/admin/page-backgrounds`. Keyed by the frontend
   // catalog `lib/constants/pageBackgrounds.ts` (first path segment, `home` for `/`,
   // `default` for every page without its own entry). `color` is `#rrggbb`; `image`
   // is a storage path on write (from `/admin/upload/image`), full URL on read;
   // `overlay` is 0–90 (% black over the image). Entries with neither are dropped.
   pageBackgrounds?: Record<string, { color?: string; image?: string; overlay?: number }> | null;
+  // per-page content box, same keys as `pageBackgrounds`, set in `/admin/page-backgrounds`.
+  // `default` is the base each page merges over field by field. All integers in px:
+  // `maxWidth` 320–2400, the rest 0–200. `*Desktop` applies from 768px up (else the
+  // mobile value holds). Absent = the page's shipped layout. Empty entries are dropped.
+  pageLayouts?: Record<string, {
+    maxWidth?: number;
+    paddingX?: number; paddingXDesktop?: number;
+    paddingTop?: number; paddingTopDesktop?: number;
+    paddingBottom?: number; paddingBottomDesktop?: number;
+    gap?: number; gapDesktop?: number;   // space between the page's stacked blocks
+  }> | null;
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -673,7 +689,10 @@ message id should not be confirmable).
 ---
 
 ### `POST /user/supports/`
-Create a support ticket. No auth required.
+Create a support ticket. Auth **optional**: with a valid user token the ticket is linked
+to the account (`user_id`), missing name/email are filled from the profile, and the
+account's phone replaces `phoneNumber`. Without a token (or with an invalid one) it is an
+anonymous public-form ticket. `subject` and `message` are required (400 otherwise).
 
 The form is admin-defined (`SiteContent.contactForm`). Fields whose key is one of
 the built-ins below map to the columns; answers to admin-added fields are appended
@@ -697,9 +716,46 @@ to `message` as `label: value` lines, since there is no free-form answers column
 ---
 
 ### `GET /user/supports/`
-List own support tickets. **Auth required.**
+List own support tickets, newest first. **Auth required.**
 
-**Response:** `ApiResponse<Support[]>`
+"Own" = linked to the caller's account, plus legacy tickets with no account whose
+`phoneNumber` matches the caller. A public-form ticket that is linked to nobody no longer
+leaks into a stranger's list once any account claims it.
+
+**Query params:** `page`, `count`
+
+**Response:** `ApiResponse<Support[]>` + pagination
+
+---
+
+### `GET /user/supports/:id/`
+One own ticket with its thread. **Auth required.** 404 for a stranger's ticket.
+
+**Response:** `ApiResponse<Support & { userId: number | null; messages: SupportMessage[] }>`
+
+```ts
+type SupportMessage = {
+  id: number;
+  body: string;
+  createdAt: string;
+  admin: { id: number; firstName: string | null; lastName: string | null } | null; // null = the user
+};
+```
+
+`message` on the ticket is the opening post; `messages` are the replies, oldest first.
+
+---
+
+### `POST /user/supports/:id/messages/`
+Reply to an own ticket. **Auth required.**
+
+**Body:** `{ body: string }`
+
+Status becomes `OPEN`; admins are notified (`SUPPORT_TICKET`). A legacy phone-matched
+ticket gets linked to the replying account. 400 when `body` is empty or the ticket is
+`CLOSED`; 404 when not own.
+
+**Response:** `ApiResponse<SupportMessage>` (201)
 
 ---
 
@@ -1091,7 +1147,9 @@ target is itself a subcategory, is the category itself, or the category has subc
 `priority` orders a category among its siblings — the main categories among themselves, or
 one parent's subcategories among themselves. Setting it to a taken slot shifts the rows
 between the old and the new position, so the list stays a gap-free sequence. To reorder a
-whole list at once, use `PATCH /admin/categories/reorder/` instead.
+whole list at once, use `PATCH /admin/categories/reorder/` instead. `400` unless `priority`
+is `null` or an integer ≥ 1. `POST /admin/categories/` follows the same rule: a given
+`priority` opens that slot among the new category's siblings; without one it goes last.
 
 ---
 
@@ -1108,10 +1166,13 @@ a single move but scrambles a list sent as one request per row.
 }
 ```
 
-`400` if `ids` is empty, holds a non-integer or a duplicate, or contains an id that is not
-a child of `parentId`.
+`400` if `ids` is empty, holds a non-integer or a duplicate, contains an id that is not
+a child of `parentId`, or `parentId` is not an integer or `null`.
 
-**Response:** `ApiResponse<{ ids: number[] }>`
+Siblings missing from `ids` (e.g. created mid-drag) are kept after the sent ones, in their
+current order, so every sibling ends up with a distinct `priority`.
+
+**Response:** `ApiResponse<{ ids: number[] }>` — the full sibling order that was applied.
 
 ---
 
@@ -1171,6 +1232,22 @@ nobody is sent to the payment page — the token simply expires.
 A rejected terminal is a normal answer, not a transport error: the call succeeds with
 `ok: false` and SEP's own message. Note this checks what is **stored**, so unsaved edits
 in the admin form are not covered.
+
+---
+
+### `GET /admin/gateway-logs/`
+Gateway health log, newest first. **Admin auth required.**
+
+**Query:** `page`, `count` (max 50), `level?` (`ok` | `warning` | `error`)
+
+**Response:** paginated envelope (`count`/`next`/`previous`) whose `result` is
+`{ status: "ok" | "error" | "unknown", statusMessage, checkedAt, lastOkAt, items: GatewayLog[] }`,
+`GatewayLog = { id, action: "check" | "token" | "verify" | "reverse", level: "ok" | "warning" | "error", message, detail, createdAt }`.
+
+`message` is plain Persian for a non-technical admin; `detail` is the raw error. `status`
+comes from the latest non-`warning` row — `warning` is one buyer refused by the bank, not
+a gateway fault. The server runs a `check` at startup and hourly, and keeps 30 days.
+`POST /admin/payment-settings/test/` also writes a `check` row.
 
 ---
 
@@ -1313,7 +1390,7 @@ Delete a field.
 ---
 
 ### `GET /admin/supports/`
-List all support tickets (paginated).
+List all support tickets (paginated, newest first).
 
 **Query params:** `page`, `count`
 
@@ -1322,21 +1399,36 @@ List all support tickets (paginated).
 ---
 
 ### `GET /admin/supports/:id/`
-Get support ticket by ID.
+Get support ticket by ID, with its thread (same shape as `GET /user/supports/:id/`).
+
+**Response:** `ApiResponse<Support & { userId: number | null; messages: SupportMessage[] }>`
+
+---
+
+### `PATCH /admin/supports/:id/`
+Update support ticket status — used to close (`CLOSED`) or reopen (`OPEN`). 400 on an
+unknown status.
+
+**Body:**
+```json
+{ "status": "OPEN" | "ANSWERED" | "CLOSED" }
+```
 
 **Response:** `ApiResponse<Support>`
 
 ---
 
-### `PATCH /admin/supports/:id/`
-Update support ticket status.
+### `POST /admin/supports/:id/messages/`
+Reply to a ticket as the calling admin.
 
-**Body:**
-```json
-{ "status": "SupportStatus" }
-```
+**Body:** `{ body: string }`
 
-**Response:** `ApiResponse<Support>`
+Status becomes `ANSWERED` (stays `CLOSED` if closed). Fires the `SUPPORT_REPLY` SMS
+template to the account's phone (or the ticket's `phoneNumber` for public-form tickets);
+for linked tickets the rendered text also lands in the user's profile inbox. 400 on an
+empty body.
+
+**Response:** `ApiResponse<SupportMessage>` (201)
 
 ---
 
@@ -1365,8 +1457,8 @@ only fires on a hard delete, and TypeORM's `softRemove` does not cascade):
    `artist_portfolios`, `artist_requests_rejected_reasons`, `crm_notes`,
    `contact_requests` (both as buyer and as target), `wallet_transactions`,
    `user_messages`, `artist_requests`, and the user row. `supports` is included too,
-   matched on phone/email — support tickets have no user FK, they copy the name, email
-   and phone in as plain columns.
+   matched on `user_id` or phone/email (legacy and public-form tickets have no user FK and
+   copy the name, email and phone in as plain columns), along with their `support_messages`.
 2. **PII scrub.** `first_name`, `last_name`, `email`, `national_code` and `avatar_path`
    are set to `NULL`; `artist_requests.answers` is emptied to `{}` (it holds the name,
    email, national code and address the form collected);
@@ -1539,10 +1631,10 @@ Upload a banner image. **Auth required.** `multipart/form-data`
 
 **Response:**
 ```json
-{ "path": "banners/{uuid}.{ext}" }
+{ "path": "banners/{uuid}.{ext}", "url": "https://storage.archivehonar.ir/banners/{uuid}.{ext}" }
 ```
 
-The returned `path` is sent back in the `image` field of `POST`/`PATCH /admin/banners/`; it's resolved to a full URL when the banner is read via `GET /banners/` or `GET /admin/banners/:id/`.
+`url` is for previewing before save only. The returned `path` is sent back in the `image` field of `POST`/`PATCH /admin/banners/`; it's resolved to a full URL when the banner is read via `GET /banners/` or `GET /admin/banners/:id/`.
 
 ---
 
