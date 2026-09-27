@@ -28,6 +28,7 @@ import Input from "@/components/common/Input";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
 import { CategoryOrderList } from "@/components/admin/page-builder/CategoryOrderList";
 import SelectScreen from "@/components/artist-registration/sections/SelectScreen";
+import { withStoragePaths } from "@/lib/utils/resolveSections";
 import withNoSSR from "@/lib/utils/withNoSSR";
 
 const SCREEN_LABEL: Record<RegistrationScreen, string> = {
@@ -153,7 +154,7 @@ function RegistrationBuilder() {
     save(
       // Re-resolve so half-typed sizes (<40px) are dropped, not sent.
       {
-        registrationSections: orderedRegistrationSections(sections),
+        registrationSections: withStoragePaths(orderedRegistrationSections(sections)),
         // `form` is saved whole, so merge onto the stored copy rather than replace it.
         form: {
           ...data?.result?.form,

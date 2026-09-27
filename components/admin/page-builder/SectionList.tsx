@@ -6,6 +6,8 @@ import Input from "@/components/common/Input";
 import type { IResolvedSection, SizeKey } from "@/lib/utils/resolveSections";
 import { VariantGlyph } from "./VariantGlyph";
 import { SpacingBox } from "@/components/admin/SpacingBox";
+import ColorInput from "@/components/admin/ColorInput";
+import { useAdminUploadBannerImage } from "@/lib/services/admin/hook";
 
 /** The slice of a page's section catalog this list renders. */
 export interface ISectionListEntry {
@@ -54,6 +56,8 @@ export function SectionList<K extends string>({
   const [expanded, setExpanded] = useState<K | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const { mutate: upload } = useAdminUploadBannerImage();
+  const [uploading, setUploading] = useState<string | null>(null);
 
   const move = (fromKey: string, to: number) => {
     const from = sections.findIndex((s) => s.key === fromKey);
@@ -66,6 +70,18 @@ export function SectionList<K extends string>({
 
   const patch = (key: string, change: Partial<IResolvedSection<K>>) =>
     onChange(sections.map((s) => (s.key === key ? { ...s, ...change } : s)));
+
+  const handleFile = (key: string, file?: File) => {
+    if (!file) return;
+    setUploading(key);
+    upload(file, {
+      // Hold the public URL so the thumbnail and live preview can load it;
+      // `withStoragePaths` turns it back into a path on save.
+      onSuccess: (res) => patch(key, { backgroundImage: res.url ?? res.path }),
+      onSettled: () => setUploading(null),
+      // The admin axios interceptor already toasts the failure.
+    });
+  };
 
   return (
     <>
@@ -209,6 +225,74 @@ export function SectionList<K extends string>({
                     }
                   />
                 </fieldset>
+
+                <ColorInput
+                  label="رنگ پس‌زمینه بخش"
+                  value={section.background}
+                  onChange={(color) => patch(section.key, { background: color ?? undefined })}
+                />
+
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm">تصویر پس‌زمینه بخش</span>
+                  <div className="flex items-center gap-3">
+                    {section.backgroundImage && (
+                      <div
+                        className="relative h-12 w-20 overflow-hidden rounded-lg bg-cover bg-center"
+                        style={{
+                          backgroundImage: `url("${section.backgroundImage}")`,
+                        }}
+                      >
+                        <div
+                          className="absolute inset-0 bg-black"
+                          style={{ opacity: (section.backgroundOverlay ?? 50) / 100 }}
+                        />
+                      </div>
+                    )}
+                    <label className="cursor-pointer text-sm text-primary-600 underline">
+                      {uploading === section.key
+                        ? "در حال بارگذاری..."
+                        : section.backgroundImage
+                          ? "تغییر تصویر"
+                          : "انتخاب تصویر"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        disabled={uploading !== null}
+                        onChange={(e) => {
+                          handleFile(section.key, e.target.files?.[0]);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {section.backgroundImage && (
+                      <button
+                        type="button"
+                        className="text-xs text-gray-500 underline"
+                        onClick={() =>
+                          patch(section.key, { backgroundImage: undefined, backgroundOverlay: undefined })
+                        }
+                      >
+                        حذف تصویر
+                      </button>
+                    )}
+                  </div>
+                  {section.backgroundImage && (
+                    <label className="flex flex-col gap-1 text-sm">
+                      تیرگی روی تصویر: {section.backgroundOverlay ?? 50}٪
+                      <input
+                        type="range"
+                        min={0}
+                        max={90}
+                        step={10}
+                        value={section.backgroundOverlay ?? 50}
+                        onChange={(e) =>
+                          patch(section.key, { backgroundOverlay: Number(e.target.value) })
+                        }
+                      />
+                    </label>
+                  )}
+                </div>
 
                 {renderExtra?.(section.key)}
               </div>

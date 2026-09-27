@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { toStoragePath } from "./toStoragePath.ts";
 
 /** The stored shape of one section, as it lives in `SiteContent`. */
 export interface ISectionConfig {
@@ -18,6 +19,12 @@ export interface ISectionConfig {
   paddingTop?: number;
   paddingBottom?: number;
   paddingX?: number;
+  /** Section background, `#rrggbb`; absent = transparent. */
+  background?: string;
+  /** Full URL on read, bare storage path on write (see `toStoragePath`). */
+  backgroundImage?: string;
+  /** 0–90, % black over the image; absent = 50. */
+  backgroundOverlay?: number;
 }
 
 export interface IResolvedSection<K extends string> {
@@ -33,6 +40,9 @@ export interface IResolvedSection<K extends string> {
   paddingTop?: number;
   paddingBottom?: number;
   paddingX?: number;
+  background?: string;
+  backgroundImage?: string;
+  backgroundOverlay?: number;
 }
 
 export const SIZE_KEYS = ["width", "height", "maxWidth", "minHeight", "cardWidth", "cardHeight"] as const;
@@ -64,12 +74,37 @@ const sizesOf = (entry: ISectionConfig) => {
   return sizes;
 };
 
+/** Hex only — it lands in a style attr. */
+const toHex = (value: unknown): string | undefined =>
+  typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value) ? value : undefined;
+
+/** Lands in `url("…")`, so nothing that could close it. */
+const toImage = (value: unknown): string | undefined =>
+  typeof value === "string" && /^[^"'\\()\s]+$/.test(value) ? value : undefined;
+
+const toOverlay = (value: unknown): number | undefined =>
+  typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 90 ? value : undefined;
+
+const backgroundOf = (entry: ISectionConfig) => {
+  const out: Pick<ISectionConfig, "background" | "backgroundImage" | "backgroundOverlay"> = {};
+  const color = toHex(entry.background);
+  const image = toImage(entry.backgroundImage);
+  const overlay = toOverlay(entry.backgroundOverlay);
+  if (color) out.background = color;
+  if (image) out.backgroundImage = image;
+  if (image && overlay !== undefined) out.backgroundOverlay = overlay;
+  return out;
+};
+
 /**
  * Wrapper props that apply a section's size overrides. Card sizes ride CSS vars
  * picked up by `[data-card]` elements (rules in `app/globals.css`); the data
  * attrs gate those rules so unset sizes leave the Tailwind defaults alone.
  */
-export function sectionBoxProps(section: Partial<Record<SizeKey | SpacingKey, number>>) {
+export function sectionBoxProps(
+  section: Partial<Record<SizeKey | SpacingKey, number>> &
+    Pick<ISectionConfig, "background" | "backgroundImage" | "backgroundOverlay">,
+) {
   const style: Record<string, string | number> = {};
   // Fixed width still yields to a narrower screen instead of scrolling sideways.
   if (section.width) Object.assign(style, { width: `min(${section.width}px, 100%)`, marginInline: "auto" });
@@ -80,6 +115,16 @@ export function sectionBoxProps(section: Partial<Record<SizeKey | SpacingKey, nu
   if (section.paddingTop !== undefined) style.paddingTop = section.paddingTop;
   if (section.paddingBottom !== undefined) style.paddingBottom = section.paddingBottom;
   if (section.paddingX !== undefined) style.paddingInline = section.paddingX;
+  if (section.background) style.backgroundColor = section.background;
+  if (section.backgroundImage) {
+    // Overlay as a flat gradient layer on top of the image — no extra element needed.
+    const shade = `rgba(0,0,0,${(section.backgroundOverlay ?? 50) / 100})`;
+    Object.assign(style, {
+      backgroundImage: `linear-gradient(${shade}, ${shade}), url("${section.backgroundImage}")`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    });
+  }
   if (section.cardWidth) style["--card-w"] = `${section.cardWidth}px`;
   if (section.cardHeight) style["--card-h"] = `${section.cardHeight}px`;
 
@@ -125,6 +170,7 @@ export function orderedSections<K extends string>(
       hidden: entry.hidden === true,
       variant: resolveVariant(entry.key, entry.variant),
       ...sizesOf(entry),
+      ...backgroundOf(entry),
     });
   }
 
@@ -144,3 +190,7 @@ export function resolveSections<K extends string>(
 ): IResolvedSection<K>[] {
   return orderedSections(catalog, config).filter((s) => !s.hidden);
 }
+
+/** Admin save: reads carry full image URLs, the backend only accepts bare storage paths. */
+export const withStoragePaths = <T extends { backgroundImage?: string }>(sections: T[]): T[] =>
+  sections.map((s) => (s.backgroundImage ? { ...s, backgroundImage: toStoragePath(s.backgroundImage) } : s));

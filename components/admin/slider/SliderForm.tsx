@@ -266,6 +266,7 @@ function SliderForm({ mode, id, initialData }: Props) {
                 <FontSizeInput
                   label="اندازه فونت عنوان"
                   value={titleFontSize}
+                  defaultSize="24–48"
                   onChange={(value) => {
                     setTitleFontSize(value);
                     clearError("titleFontSize");
@@ -281,6 +282,7 @@ function SliderForm({ mode, id, initialData }: Props) {
                 <FontSizeInput
                   label="اندازه فونت زیرعنوان"
                   value={subtitleFontSize}
+                  defaultSize="14–16"
                   onChange={(value) => {
                     setSubtitleFontSize(value);
                     clearError("subtitleFontSize");
@@ -320,6 +322,7 @@ function SliderForm({ mode, id, initialData }: Props) {
                 <FontSizeInput
                   label="اندازه فونت دکمه"
                   value={ctaLabelFontSize}
+                  defaultSize="14–16"
                   onChange={(value) => {
                     setCtaLabelFontSize(value);
                     clearError("ctaLabelFontSize");

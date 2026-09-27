@@ -19,6 +19,7 @@ import {
   type IResolvedHomeSection,
 } from "@/lib/utils/resolveHomeSections";
 import { SectionList } from "@/components/admin/page-builder/SectionList";
+import { withStoragePaths } from "@/lib/utils/resolveSections";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import {
   PREVIEW_DRAFT,
@@ -79,7 +80,7 @@ function PageBuilder() {
   const handleSave = () => {
     save(
       // Re-resolve so half-typed sizes (<40px) are dropped, not sent.
-      { homeSections: orderedHomeSections(sections), landing },
+      { homeSections: withStoragePaths(orderedHomeSections(sections)), landing },
       {
         onSuccess: () => {
           setDirty(false);

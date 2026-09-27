@@ -676,7 +676,7 @@ export const adminUploadBannerImage = async (
 ) => {
   const form = new FormData();
   form.append("file", await prepareImage(file));
-  const { data } = await api.post<{ path: string }>(
+  const { data } = await api.post<{ path: string; url?: string }>(
     "/admin/upload/image",
     form,
     { headers: { Authorization: accessToken } },
@@ -754,7 +754,7 @@ export const adminUploadTutorialThumbnail = async (
 ) => {
   const form = new FormData();
   form.append("file", await prepareImage(file));
-  const { data } = await api.post<{ path: string }>(
+  const { data } = await api.post<{ path: string; url?: string }>(
     "/admin/upload/image",
     form,
     { headers: { Authorization: accessToken } },

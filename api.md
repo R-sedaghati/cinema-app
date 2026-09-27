@@ -382,10 +382,13 @@ interface SiteContent {
   // integers in px (40–2000), absent = default: fixed `width`/`height` and
   // `maxWidth`/`minHeight` of the section, `cardWidth`/`cardHeight` of its cards. Inner spacing `paddingTop`/`paddingBottom`/`paddingX`
   // is px 0–200 (0 kept). Must be stored as sent.
-  homeSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number }[] | null;
+  // `background`: section bg color, strict `#rrggbb` (anything else dropped); absent = transparent.
+  // `backgroundImage`: bare storage path on write (from `POST /admin/upload/image`), public URL on read;
+  // `backgroundOverlay`: 0–90 % black over it (absent = 50), kept only with an image.
+  homeSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number }[] | null;
   // same, for the artist-registration page, keyed by
   // `lib/constants/registrationSections.ts` and set in `/admin/registration-builder`.
-  registrationSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number }[] | null;
+  registrationSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number }[] | null;
   // per-page backgrounds, set in `/admin/page-backgrounds`. Keyed by the frontend
   // catalog `lib/constants/pageBackgrounds.ts` (first path segment, `home` for `/`,
   // `default` for every page without its own entry). `color` is `#rrggbb`; `image`
@@ -1628,10 +1631,10 @@ Upload a banner image. **Auth required.** `multipart/form-data`
 
 **Response:**
 ```json
-{ "path": "banners/{uuid}.{ext}" }
+{ "path": "banners/{uuid}.{ext}", "url": "https://storage.archivehonar.ir/banners/{uuid}.{ext}" }
 ```
 
-The returned `path` is sent back in the `image` field of `POST`/`PATCH /admin/banners/`; it's resolved to a full URL when the banner is read via `GET /banners/` or `GET /admin/banners/:id/`.
+`url` is for previewing before save only. The returned `path` is sent back in the `image` field of `POST`/`PATCH /admin/banners/`; it's resolved to a full URL when the banner is read via `GET /banners/` or `GET /admin/banners/:id/`.
 
 ---
 
