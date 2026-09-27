@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { ArrowRight, MoveLeft, Search, X } from "lucide-react";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { useRouter } from "next/navigation";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import ArtistCard from "./Card";
@@ -168,13 +169,13 @@ export function ArtistsSearchClient() {
                   onClick={() => setCategory(item.id)}
                   className="md:w-60 overflow-hidden w-36 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
                 >
-                  <p className="text-nowrap text-sm md:text-base z-1">{item.faName}</p>
+                  <p className="text-nowrap text-sm md:text-base z-1">{toResumeName(item.faName)}</p>
                   <MoveLeft className="text-error-500 z-1" />
                   <img
                     src={item.image ?? "/cat-1.svg"}
                     width={90}
                     height={90}
-                    alt={item.faName}
+                    alt={toResumeName(item.faName)}
                     className="absolute md:relative left-3 md:left-0 bottom-0 z-0 w-12.5 h-12.5 md:w-auto md:h-auto"
                   />
                 </button>

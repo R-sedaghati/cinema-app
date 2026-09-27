@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { hasValidParams } from "@/lib/utils/hasValidParams";
 import { ParamsArtistList } from "@/lib/services/admin/type";
 
@@ -26,9 +27,18 @@ const initialParams: Partial<ParamsArtistList> = {
   hidden: null,
 };
 
+/** `?status__in=` / `?categoryId=` in the URL seed the filters (sidebar, category links). */
 export default function useArtistListParams() {
-  const [params, setParams] =
-    useState<Partial<ParamsArtistList>>(initialParams);
+  const searchParams = useSearchParams();
+  const [params, setParams] = useState<Partial<ParamsArtistList>>(() => {
+    const status = searchParams.getAll("status__in");
+    const categoryId = Number(searchParams.get("categoryId"));
+    return {
+      ...initialParams,
+      ...(status.length && { status__in: status }),
+      ...(categoryId && { categoryId__in: [categoryId] }),
+    };
+  });
   const [pagination, setPagination] = useState<Pagination>({
     count: 10,
     page: 1,

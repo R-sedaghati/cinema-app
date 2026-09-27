@@ -70,13 +70,13 @@ export const useSidebarItems = (): {
       },
       {
         icon: <Handshake />,
-        title: "لیست درخواست‌های ارتباط",
+        title: "تیکت‌های پشتیبانی",
         link: "/admin/requests",
         active: pathname.startsWith("/admin/requests"),
       },
       {
         icon: <CircleDollarSign />,
-        title: "لیست تراکنش‌ها",
+        title: "درخواست‌های مشاهده رزومه",
         link: "/admin/transactions",
         active: pathname.startsWith("/admin/transactions"),
       },

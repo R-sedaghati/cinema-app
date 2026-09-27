@@ -8,13 +8,17 @@ import LoginDrawer from "@/components/login/LoginDrawer";
 import ProfileCompletionChecker from "@/components/login/ProfileCompletionChecker";
 import { PageProgressBar } from "@/components/site/PageProgressBar";
 import { PageBackground } from "@/components/site/PageBackground";
+import { TableColors } from "@/components/site/TableColors";
 import { PageLayoutMain } from "@/components/site/PageLayoutMain";
 import "../globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo } from "react";
 import Script from "next/script";
+import withNoSSR from "@/lib/utils/withNoSSR";
 
-export default function RootLayout({
+// Public site renders client-only (CSR): the server sends an empty shell and
+// everything below mounts in the browser. Tradeoff: no HTML for crawlers/first paint.
+function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -25,6 +29,7 @@ export default function RootLayout({
     <QueryClientProvider client={queryClient}>
       <PageProgressBar />
       <PageBackground />
+      <TableColors />
       <div className="flex min-h-dvh flex-col  text-zinc-100 antialiased">
         <SiteHeader />
         <PageLayoutMain className="flex-1 md:mt-10 pb-safe-24 lg:pb-8 overflow-hidden">{children}</PageLayoutMain>
@@ -46,4 +51,10 @@ export default function RootLayout({
       />
     </QueryClientProvider>
   );
+}
+
+const ClientOnlyLayout = withNoSSR(MainLayout);
+
+export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <ClientOnlyLayout>{children}</ClientOnlyLayout>;
 }

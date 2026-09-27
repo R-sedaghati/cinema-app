@@ -1,8 +1,10 @@
 import { ITransactionItem } from "@/lib/services/admin/type";
+import { toResumeName } from "@/lib/utils/resumeName";
 import convertEnNumberToFaNumberWithSeparation from "@/lib/utils/convertEnNumberToFaNumberWithSeparation";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { Badge } from "@dgshahr/ui-kit";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
+import Link from "next/link";
 
 const statusLabels: Record<ITransactionItem["status"], string> = {
   PENDING: "در انتظار پرداخت",
@@ -57,11 +59,30 @@ export const generateColumns = (): ColumnsType<ITransactionItem>[] => {
       align: "center",
       key: "artist",
       dataIndex: "artist",
-      title: "کد هنرمند",
+      title: "رزومه هنرمند",
       className: "align-middle",
-      render: (data) => (
-        <p className="font-p1-regular">{data.artist?.code ?? "—"}</p>
-      ),
+      render: (data) => {
+        const label = (
+          <>
+            <span className="block">{data.artist?.name ?? "—"}</span>
+            <span className="block text-xs text-gray-500">
+              {[toResumeName(data.artist?.categories?.[0]?.faName), data.artist?.code]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          </>
+        );
+        return data.artist?.id ? (
+          <Link
+            href={`/admin/artist-registration/${data.artist.id}`}
+            className="font-p1-regular text-primary-600 hover:underline"
+          >
+            {label}
+          </Link>
+        ) : (
+          <p className="font-p1-regular">{label}</p>
+        );
+      },
     },
     {
       align: "center",
@@ -94,14 +115,23 @@ export const generateColumns = (): ColumnsType<ITransactionItem>[] => {
       align: "center",
       key: "amount",
       dataIndex: "amount",
-      title: "مبلغ تراکنش(تومان)",
+      title: "مبلغ (تومان)",
       className: "align-middle",
       render: (data) => (
-        <p className="font-p1-regular text-gray-700">
-          {data.amount === 0
-            ? "رایگان"
-            : convertEnNumberToFaNumberWithSeparation(data.amount)}
-        </p>
+        <div className="font-p1-regular text-gray-700">
+          <p>
+            {data.amount === 0
+              ? "رایگان"
+              : convertEnNumberToFaNumberWithSeparation(data.amount)}
+          </p>
+          {data.walletAmount > 0 && (
+            <p className="text-xs text-gray-500">
+              {data.walletAmount === data.amount
+                ? "کامل از کیف پول"
+                : `${convertEnNumberToFaNumberWithSeparation(data.walletAmount)} از کیف پول`}
+            </p>
+          )}
+        </div>
       ),
     },
   ];

@@ -29,7 +29,7 @@ export const generateColumns = (
       title: "نام و نام‌ خانوادگی",
       className: "align-middle",
       render: (data) => (
-        <p className="font-p1-regular">{`${data.firstName}  ${data.lastName}`}</p>
+        <p className="font-p1-regular">{[data.firstName, data.lastName].filter(Boolean).join(" ")}</p>
       ),
     },
     {

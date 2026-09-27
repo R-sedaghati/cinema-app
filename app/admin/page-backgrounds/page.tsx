@@ -15,6 +15,7 @@ import { toStoragePath } from "@/lib/utils/toStoragePath";
 import ColorInput from "@/components/admin/ColorInput";
 import { SpacingBox, type SpacingValues } from "@/components/admin/SpacingBox";
 import { cleanPageLayout, type IPageLayout } from "@/lib/utils/pageLayout";
+import { TABLE_COLOR_LABELS, type ITableColors } from "@/lib/utils/tableColors";
 import Link from "next/link";
 import withNoSSR from "@/lib/utils/withNoSSR";
 
@@ -60,6 +61,7 @@ function PageBackgrounds() {
    *  browser can't load; the saved value is still that path. */
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const [layouts, setLayouts] = useState<Record<string, IPageLayout>>({});
+  const [tableColors, setTableColors] = useState<ITableColors>({});
   const [device, setDevice] = useState<Device>("mobile");
   const [dirty, setDirty] = useState(false);
 
@@ -68,6 +70,7 @@ function PageBackgrounds() {
     if (!data?.result || dirty) return;
     setBackgrounds({ ...(data.result.pageBackgrounds ?? {}) });
     setLayouts({ ...(data.result.pageLayouts ?? {}) });
+    setTableColors({ ...(data.result.tableColors ?? {}) });
   }, [data, dirty]);
 
   const patch = (key: string, change: Partial<IPageBackground>) => {
@@ -132,7 +135,7 @@ function PageBackgrounds() {
     );
 
     save(
-      { pageBackgrounds, pageLayouts },
+      { pageBackgrounds, pageLayouts, tableColors },
       {
         onSuccess: () => {
           setDirty(false);
@@ -171,6 +174,60 @@ function PageBackgrounds() {
           {isPending ? "در حال ذخیره..." : "ذخیره"}
         </Button>
       </div>
+
+      <Card className="flex flex-col gap-3 p-3">
+        <p className="text-sm font-medium">رنگ جدول‌ها (همه صفحات)</p>
+        {/* Live swatch: mirrors the rules in `tableColorsCss`. */}
+        <table className="w-full max-w-md overflow-hidden rounded-xl text-sm">
+          <thead>
+            <tr>
+              {["عنوان", "وضعیت"].map((h) => (
+                <th
+                  key={h}
+                  className="border-b p-2 text-right"
+                  style={{
+                    backgroundColor: tableColors.headerBg ?? "rgb(24 34 40)",
+                    color: tableColors.headerText ?? "rgb(145 160 170)",
+                    borderColor: tableColors.border ?? "rgb(54 69 78)",
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {["نمونه ردیف", "تایید شده"].map((c) => (
+                <td
+                  key={c}
+                  className="border-b p-2"
+                  style={{
+                    backgroundColor: tableColors.rowBg ?? "#344851",
+                    color: tableColors.rowText ?? "rgb(220 226 230)",
+                    borderColor: tableColors.border ?? "rgb(54 69 78)",
+                  }}
+                >
+                  {c}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+        <div className="flex flex-wrap gap-4">
+          {(Object.keys(TABLE_COLOR_LABELS) as (keyof ITableColors)[]).map((key) => (
+            <ColorInput
+              key={key}
+              label={TABLE_COLOR_LABELS[key]}
+              value={tableColors[key]}
+              onChange={(color) => {
+                setTableColors((prev) => ({ ...prev, [key]: color ?? undefined }));
+                setDirty(true);
+              }}
+            />
+          ))}
+        </div>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {KEYS.map((key) => {

@@ -1,4 +1,5 @@
 import Button from "@/components/common/Button";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { IContactRequestItem } from "@/lib/services/landing/type";
 import convertEnNumberToFaNumberWithSeparation from "@/lib/utils/convertEnNumberToFaNumberWithSeparation";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
@@ -34,7 +35,7 @@ export const generateColumns = (
       <div className="flex flex-col gap-1">
         <p className="font-p1-regular">{data.artist?.code ?? "—"}</p>
         <span className="text-xs text-zinc-500">
-          {data.artist?.categories?.map((category) => category.faName).join(copy("listSeparator"))}
+          {data.artist?.categories?.map((category) => toResumeName(category.faName)).join(copy("listSeparator"))}
         </span>
       </div>
     ),

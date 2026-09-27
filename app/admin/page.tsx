@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { Badge } from "@dgshahr/ui-kit";
 import { ARTSIT_STATUS } from "@/lib/constants/artist/status";
 import {
@@ -75,7 +76,7 @@ export default function Admin() {
                     {[item.user?.firstName, item.user?.lastName].filter(Boolean).join(" ") ||
                       item.user?.phoneNumber}
                     <span className="mr-2 text-xs text-gray-500">
-                      {item.categories?.map((c) => c.faName).join("، ")}
+                      {item.categories?.map((c) => toResumeName(c.faName, item.status)).join("، ")}
                     </span>
                   </span>
                   <span className="flex items-center gap-3">

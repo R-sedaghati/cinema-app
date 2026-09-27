@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useRouter } from "next/navigation";
+import { toResumeName } from "@/lib/utils/resumeName";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useHomeCategories } from "./useHomeCategories";
 
@@ -36,7 +37,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-black/10" />
             <span className="absolute inset-x-0 bottom-0 p-2 text-xs font-medium text-zinc-100 md:text-sm">
-              {cat.faName}
+              {toResumeName(cat.faName)}
             </span>
           </button>
         ))}
@@ -59,7 +60,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
             onClick={() => router.push(`/artists?category=${cat.id}`)}
             className="flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
           >
-            <span>{cat.faName}</span>
+            <span>{toResumeName(cat.faName)}</span>
             {cat.description && (
               <span className="text-[10px] md:text-xs font-normal text-zinc-500">
                 {cat.description}
