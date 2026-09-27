@@ -728,6 +728,8 @@ export interface IGatewayLogItem {
   /** Raw error text, for whoever debugs it. */
   detail: string | null;
   createdAt: string;
+  /** The ui-kit Table constrains its row type to an index-signature record. */
+  [key: string]: unknown;
 }
 
 export interface IGatewayLogResponse {
