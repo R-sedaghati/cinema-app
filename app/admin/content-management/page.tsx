@@ -745,6 +745,7 @@ function ContentManagement() {
           onSave={(contactForm) => updateSiteContent({ contactForm }, saveSiteContent())}
         />
 
+        <div id="resume-request-form" className="scroll-mt-4">
         <ContactFormCard
           title="فرم درخواست مشاهده رزومه"
           note="این فرم را کاربر پیش از درخواست مشاهده رزومه یک هنرمند پر می‌کند. همه پاسخ‌ها در صفحه همان درخواست (درخواست‌های مشاهده رزومه) نمایش داده می‌شود. پاسخ فیلدهای firstName و lastName نام درخواست‌دهنده در لیست است."
@@ -756,6 +757,7 @@ function ContentManagement() {
           isPending={isSiteContentPending}
           onSave={(resumeRequestForm) => updateSiteContent({ resumeRequestForm }, saveSiteContent())}
         />
+        </div>
       </div>
     </div>
   );
