@@ -2,6 +2,8 @@ import { prepareImage } from "@/lib/utils/prepareUpload";
 import api from "../axiosInstance";
 import { fetchAllCategoryPages } from "../categoryPages";
 import {
+  IAdminProfileResponse,
+  IUpdateAdminProfileRequest,
   IAboutUsResponse,
   IAdjustWalletRequest,
   IAdminFaqUpdateItem,
@@ -38,6 +40,8 @@ import {
   IPaymentSettingTestResponse,
   IGatewayLogResponse,
   INotificationSettingResponse,
+  IAdminNotificationListResponse,
+  IAdminBadgeCountsResponse,
   IProvinceListResponse,
   IRetriveResponse,
   ISiteContent,
@@ -64,6 +68,7 @@ import {
   ParamsBannerList,
   ParamsCategoryList,
   ParamsTransactionList,
+  ITransactionDetail,
   ParamsTutorialList,
   ParamsUsersList,
 } from "./type";
@@ -505,6 +510,38 @@ export const adminNotificationSettingsUpdate = async (
   return data;
 };
 
+export const adminNotifications = async (accessToken: string) => {
+  const { data } = await api.get<IAdminNotificationListResponse>(
+    "/admin/notifications/",
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+/** Omit `id` to mark every unread notification read. */
+export const adminNotificationsRead = async (
+  id: number | undefined,
+  accessToken: string,
+) => {
+  const { data } = await api.patch(
+    "/admin/notifications/read/",
+    id === undefined ? {} : { id },
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminBadgeCounts = async (accessToken: string) => {
+  const { data } = await api.get<IAdminBadgeCountsResponse>(
+    "/admin/badge-counts/",
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
 export const adminTransactionList = async (
   params: Partial<ParamsTransactionList> | undefined,
   accessToken: string,
@@ -512,6 +549,29 @@ export const adminTransactionList = async (
   const { data } = await api.get<IBasePaginateResponse<ITransactionItem>>(
     "/admin/contact-requests/",
     { params: { count: 10, ...params }, headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminTransactionRetrieve = async (id: number, accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<ITransactionDetail>>(
+    `/admin/contact-requests/${id}/`,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminTransactionReview = async (
+  id: number,
+  status: "APPROVED" | "REJECTED",
+  accessToken: string,
+) => {
+  const { data } = await api.patch(
+    `/admin/contact-requests/${id}/`,
+    { status },
+    { headers: { Authorization: accessToken } },
   );
 
   return data;
@@ -913,5 +973,24 @@ export const adminSmsTemplateTest = async (
     },
   );
 
+  return data;
+};
+
+export const adminProfile = async (accessToken: string) => {
+  const { data } = await api.get<IAdminProfileResponse>("/admin/profile/", {
+    headers: { Authorization: accessToken },
+  });
+  return data;
+};
+
+export const adminProfileUpdate = async (
+  payload: IUpdateAdminProfileRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IAdminProfileResponse>(
+    "/admin/profile/",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
   return data;
 };

@@ -2,6 +2,7 @@
 
 import { useSidebarItems } from "@/lib/hooks/useSidebarItems";
 import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
+import { useAdminProfile } from "@/lib/services/admin/hook";
 import { Sidebar } from "@dgshahr/ui-kit";
 import clsx from "clsx";
 import { usePathname, useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ const AdminMainLayout = (props: Props) => {
   const hideSidebar = /\/document\/[^/]+\/?$/.test(pathname);
 
   const { mainMenuItems } = useSidebarItems();
+  const profile = useAdminProfile().data?.result;
 
   if (usePathname() === "/home")
     return <React.Fragment>{props.children}</React.Fragment>;
@@ -43,9 +45,12 @@ const AdminMainLayout = (props: Props) => {
           className="z-15 absolute top-0 left-0 h-screen text-xl"
           userProfile={{
             image:
+              profile?.avatar ??
               "https://lend-front.s3.ir-thr-at1.arvanstorage.ir/images/Profile.png",
-            name: userName,
-            link: "/panel/admin/settings",
+            name:
+              [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
+              userName,
+            link: "/admin/settings",
           }}
           onLogout={() => {
             logout();

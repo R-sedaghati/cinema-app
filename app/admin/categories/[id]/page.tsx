@@ -77,7 +77,6 @@ function CategoryDetail() {
   const [isActive, setIsActive] = useState(false);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
-  const [contactAmount, setContactAmount] = useState<string>("");
   const [registrationAmount, setRegistrationAmount] = useState<string>("");
 
   const uploadImage = useAdminUploadBannerImage();
@@ -93,11 +92,6 @@ function CategoryDetail() {
     setPriority(data.priority);
     setImagePath(toStoragePath(data.image ?? ""));
     setImageFile(data.image ? { src: data.image } : null);
-    setContactAmount(
-      data.contactAmount === null || data.contactAmount === undefined
-        ? ""
-        : String(data.contactAmount),
-    );
     setRegistrationAmount(
       data.registrationAmount === null || data.registrationAmount === undefined
         ? ""
@@ -193,7 +187,6 @@ function CategoryDetail() {
           ...(priority !== data?.priority && { priority }),
           image: imagePath || null,
           // An empty field means "not set" (inherit / fall back); a typed 0 means free.
-          contactAmount: contactAmount === "" ? null : Number(contactAmount),
           registrationAmount:
             registrationAmount === "" ? null : Number(registrationAmount),
         },
@@ -501,17 +494,6 @@ function CategoryDetail() {
             <p className="font-h3-bold text-error-500">پرداخت</p>
             <Divider color="gray" size="thin" type="horizontal" />
             <div className="flex flex-col gap-3 border border-solid border-gray-300 rounded-xl p-3">
-              <Input
-                labelContent="مبلغ پرداختی کاربر"
-                placeholder="مبلغ پرداختی کاربر"
-                postfix="تومان"
-                type="text"
-                inputMode="numeric"
-                value={contactAmount}
-                onChange={(e) => setContactAmount(e.target.value)}
-                hintMessage={`مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
-                wrapperClassName="w-1/3"
-              />
               <Input
                 labelContent="مبلغ ثبت‌نام هنرمند"
                 placeholder="مبلغ ثبت‌نام هنرمند"

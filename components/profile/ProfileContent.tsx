@@ -6,7 +6,6 @@ import Overview from "./Overview";
 import FormsList from "./forms-list/FormsList";
 import MessagesList from "./messages/MessagesList";
 import RequestsList from "./requests-list/RequestsList";
-import PaymentsList from "./payments/PaymentsList";
 import WalletCard from "./wallet/WalletCard";
 import SupportTickets from "./support/SupportTickets";
 import LogoutCard from "./LogoutCard";
@@ -23,8 +22,6 @@ export default function ProfileContent({
       return <MessagesList />;
     case "requests":
       return <RequestsList />;
-    case "payments":
-      return <PaymentsList />;
     case "wallet":
       return <WalletCard />;
     case "support":

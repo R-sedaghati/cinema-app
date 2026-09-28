@@ -2,19 +2,21 @@
 
 import { EFormFieldType, IArtistItem } from "@/lib/services/admin/type";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Clock, Lock } from "lucide-react";
 import CallDetailDrawer from "./CallDetailDrawer";
 import Button from "@/components/common/Button";
 import SuccessDrawer from "./SuccessDrawer";
 import {
+  useGuestArtistContact,
+  useGuestContactRequests,
   useUserArtistContact,
   useUserContactRequests,
+  useUserSiteContent,
 } from "@/lib/services/landing/hook";
+import { loadAccessTokens } from "@/lib/constants/resumeRequestForm";
 import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
-import { toast } from "react-toastify";
 import { formatAnswer } from "@/lib/utils/formatAnswer";
 import { toResumeName } from "@/lib/utils/resumeName";
 
@@ -25,59 +27,76 @@ const FILE_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
 const Aside = ({ artist }: { artist: IArtistItem }) => {
   const [openCallDetail, setOpenCallDetail] = useState<boolean>(false);
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
-  const searchParams = useSearchParams();
+  const [trackingCode, setTrackingCode] = useState<string | null>(null);
   const { accessToken } = useAuthStore();
-  const { open: openLoginDrawer } = useLoginDrawerStore();
+  const { open: openLoginDrawer, isOpen: isLoginOpen } = useLoginDrawerStore();
+  // Clicked the request button while signed out: open the form once login succeeds.
+  const [formAfterLogin, setFormAfterLogin] = useState(false);
   const copy = useLandingCopy();
   const genderMap: Record<string, string> = {
     MAN: copy("labelGenderMan"),
     WOMAN: copy("labelGenderWoman"),
   };
 
-  // The gateway sends the buyer back here after paying.
-  const paymentOutcome = searchParams.get("contact");
-  const trackingCode = searchParams.get("tracking");
-
-  useEffect(() => {
-    if (paymentOutcome === "success") setOpenSuccess(true);
-
-    // Anything other than success needs saying out loud — a buyer who is told nothing
-    // assumes the payment did not happen and pays again.
-    if (paymentOutcome === "pending") {
-      toast.info(copy("contactPaymentPendingToast"));
-    }
-
-    if (paymentOutcome === "failed" || paymentOutcome === "canceled") {
-      toast.error(copy("contactPaymentFailedToast"));
-    }
-  }, [paymentOutcome, copy]);
-
-  // Asking the contact endpoint directly would 403 (and toast) for everyone who has not
-  // paid, so ownership is established from the buyer's own purchase list first.
-  // ponytail: 50 is the server's max page size; a buyer with more purchases than that
+  // Asking the contact endpoint directly would 403 (and toast) for everyone not yet
+  // approved, so the state is read from the viewer's own request list first.
+  // ponytail: 50 is the server's max page size; a viewer with more requests than that
   // sees page 1 only — paginate here if that ever happens in practice.
   const { data: myRequests } = useUserContactRequests({ page: 1, count: 50 });
 
-  const isUnlocked = useMemo(
-    () =>
-      Boolean(
-        myRequests?.result?.some(
-          (request) =>
-            request.artist.id === artist.id && request.status === "COMPLETED",
-        ),
-      ),
-    [myRequests, artist.id],
+  // No-OTP mode: a visitor without an account requests as a guest. Their proof of access
+  // is the tokens this browser kept; read after mount so the server render matches.
+  const { data: siteContent } = useUserSiteContent();
+  const guestMode = Boolean(siteContent?.result?.resumeRequestForm?.guestMode);
+  const isGuest = !accessToken && guestMode;
+  const [guestTokens, setGuestTokens] = useState<string[]>([]);
+  useEffect(() => setGuestTokens(loadAccessTokens()), []);
+
+  // OTP success sets the token and closes the drawer in one go, so a closed drawer with
+  // no token means the visitor gave up — forget the intent then.
+  useEffect(() => {
+    if (!formAfterLogin) return;
+    if (accessToken) setOpenCallDetail(true);
+    if (accessToken || !isLoginOpen) setFormAfterLogin(false);
+  }, [formAfterLogin, accessToken, isLoginOpen]);
+  // Tokens outlive the mode switch: access granted while it was on stays granted.
+  const { data: guestRequests } = useGuestContactRequests(guestTokens, true);
+
+  const guestMine = useMemo(
+    () => guestRequests?.result?.filter((request) => request.artistId === artist.id) ?? [],
+    [guestRequests, artist.id],
+  );
+  const guestApprovedToken = guestMine.find((request) => request.status === "APPROVED")?.token ?? null;
+
+  // A rejected request is ignored: the viewer may simply ask again.
+  const requestStatus = useMemo(() => {
+    const mine = [
+      ...(myRequests?.result?.filter((request) => request.artist.id === artist.id) ?? []),
+      ...guestMine,
+    ];
+    if (mine.some((request) => request.status === "APPROVED")) return "APPROVED";
+    if (mine.some((request) => request.status === "PENDING")) return "PENDING";
+    return null;
+  }, [myRequests, guestMine, artist.id]);
+
+  const isUnlocked = requestStatus === "APPROVED";
+  const accountUnlocked = Boolean(
+    myRequests?.result?.some((r) => r.artist.id === artist.id && r.status === "APPROVED"),
   );
 
-  const { data: contactData } = useUserArtistContact(artist.id, isUnlocked);
-  const contact = contactData?.result;
+  const { data: accountContact } = useUserArtistContact(artist.id, accountUnlocked);
+  const { data: guestContact } = useGuestArtistContact(
+    artist.id,
+    accountUnlocked ? null : guestApprovedToken,
+  );
+  const contact = (accountContact ?? guestContact)?.result;
 
   const unlockedName = [contact?.firstName, contact?.lastName]
     .filter(Boolean)
     .join(" ")
     .trim();
 
-  // Until it is paid for, an artist is identified only by their public code.
+  // Until a request is approved, an artist is identified only by their public code.
   const displayName = unlockedName || artist.user?.code || "—";
 
   return (
@@ -189,12 +208,25 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
         )}
 
         <div className="mt-6 sm:mt-10 space-y-3">
-          {!isUnlocked && (
+          {requestStatus === "PENDING" && (
             <Button
-              // Nothing here can be bought signed out, so ask for the account before the
+              disabled
+              size="small"
+              isFullWidth
+              className="rounded-full!"
+              leftIcon={<Clock size={16} />}
+            >
+              <span style={copy.style("callPendingCta")}>{copy("callPendingCta")}</span>
+            </Button>
+          )}
+          {requestStatus === null && (
+            <Button
+              // Nothing here can be requested signed out, so ask for the account before the
               // form rather than after it is filled in.
               onClick={() =>
-                accessToken ? setOpenCallDetail(true) : openLoginDrawer()
+                accessToken || isGuest
+                  ? setOpenCallDetail(true)
+                  : (setFormAfterLogin(true), openLoginDrawer())
               }
               size="small"
               isFullWidth
@@ -222,7 +254,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
           </Button>
         </div>
 
-        {!accessToken && (
+        {!accessToken && !isGuest && !isUnlocked && (
           <p className="mt-4 text-center text-xs text-zinc-500">
             <span style={copy.style("artistLoginFirst")}>{copy("artistLoginFirst")}</span>
           </p>
@@ -232,11 +264,18 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
         open={openCallDetail}
         setOpen={setOpenCallDetail}
         artistId={artist.id}
+        guest={isGuest}
+        onSubmitted={(code) => {
+          setTrackingCode(code);
+          setOpenSuccess(true);
+          setGuestTokens(loadAccessTokens());
+        }}
       />
       <SuccessDrawer
         open={openSuccess}
         setOpen={setOpenSuccess}
         trackingCode={trackingCode}
+        guest={isGuest}
       />
     </>
   );

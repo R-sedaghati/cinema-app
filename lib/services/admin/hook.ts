@@ -8,6 +8,8 @@ import {
   ITransactionItem,
   IPaymentSettingResponse,
   INotificationSettingResponse,
+  IAdminNotificationListResponse,
+  IAdminBadgeCountsResponse,
   IBasePaginateResponse,
   EArtistRequestStatus,
   IAboutUsResponse,
@@ -58,6 +60,9 @@ import {
   ParamsCategoryList,
   ParamsTutorialList,
   ParamsUsersList,
+  IAdminProfileResponse,
+  IUpdateAdminProfileRequest,
+  ITransactionDetail,
 } from "./type";
 import {
   adminAboutUs,
@@ -104,9 +109,14 @@ import {
   adminGatewayLogs,
   adminNotificationSettings,
   adminNotificationSettingsUpdate,
+  adminNotifications,
+  adminNotificationsRead,
+  adminBadgeCounts,
   adminSiteContent,
   adminSiteContentUpdate,
   adminTransactionList,
+  adminTransactionRetrieve,
+  adminTransactionReview,
   adminSupportList,
   adminSupportRetrieve,
   adminSupportUpdate,
@@ -124,6 +134,8 @@ import {
   adminUserDetail,
   adminUsersList,
   adminUserDelete,
+  adminProfile,
+  adminProfileUpdate,
 } from "./api";
 import { AxiosError } from "axios";
 import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
@@ -466,6 +478,43 @@ export const useAdminNotificationSettings = () => {
   });
 };
 
+export const useAdminNotifications = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IAdminNotificationListResponse>({
+    queryKey: ["adminNotifications"],
+    queryFn: () => adminNotifications(accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminNotificationsRead = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id?: number) => adminNotificationsRead(id, accessToken),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminNotifications"] });
+      queryClient.invalidateQueries({ queryKey: ["adminBadgeCounts"] });
+    },
+  });
+};
+
+export const useAdminBadgeCounts = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IAdminBadgeCountsResponse>({
+    queryKey: ["adminBadgeCounts"],
+    queryFn: () => adminBadgeCounts(accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useAdminNotificationSettingsUpdate = () => {
   const { accessToken } = useAdminAuthStore();
 
@@ -485,6 +534,31 @@ export const useAdminTransactionList = (
     queryFn: () => adminTransactionList(params, accessToken),
     refetchInterval: 30 * 1000,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminTransactionRetrieve = (id: number) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IRetriveResponse<ITransactionDetail>>({
+    queryKey: ["adminTransactionRetrieve", id],
+    queryFn: () => adminTransactionRetrieve(id, accessToken),
+    enabled: Boolean(id),
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminTransactionReview = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: "APPROVED" | "REJECTED" }) =>
+      adminTransactionReview(id, status, accessToken),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminTransactionRetrieve"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTransactionList"] });
+    },
   });
 };
 
@@ -805,5 +879,27 @@ export const useAdminSmsTemplateTest = () => {
       event: ESmsEvent;
       payload: ISmsTemplateTestRequest;
     }) => adminSmsTemplateTest(event, payload, accessToken),
+  });
+};
+
+export const useAdminProfile = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IAdminProfileResponse>({
+    queryKey: ["adminProfile"],
+    queryFn: () => adminProfile(accessToken),
+    enabled: Boolean(accessToken),
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminProfileUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: IUpdateAdminProfileRequest) =>
+      adminProfileUpdate(payload, accessToken),
+    onSuccess: (response) => queryClient.setQueryData(["adminProfile"], response),
   });
 };

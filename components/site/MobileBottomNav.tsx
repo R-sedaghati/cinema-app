@@ -5,6 +5,7 @@ import useAuthStore from "@/lib/stores/useAuthStore";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { Home, LogIn, PenLine, Search, User } from "lucide-react";
+import { useUserBadgeCounts } from "@/lib/services/landing/hook";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -18,6 +19,8 @@ export function MobileBottomNav() {
   const { isLoggedIn } = useAuthStore();
   const { open } = useLoginDrawerStore();
   const copy = useLandingCopy();
+  const counts = useUserBadgeCounts().data?.result;
+  const badgeTotal = (counts?.messages ?? 0) + (counts?.forms ?? 0);
 
   const bottomNavItems = [
     { href: "/", label: <span style={copy.style("navHome")}>{copy("navHome")}</span>, icon: Home },
@@ -69,11 +72,18 @@ export function MobileBottomNav() {
                 active ? "text-error-500" : "text-zinc-400 hover:text-zinc-300",
               ].join(" ")}
             >
-              <Icon
-                size={22}
-                className={active ? "text-error-500" : "text-zinc-400"}
-                strokeWidth={active ? 2.5 : 1.5}
-              />
+              <span className="relative">
+                <Icon
+                  size={22}
+                  className={active ? "text-error-500" : "text-zinc-400"}
+                  strokeWidth={active ? 2.5 : 1.5}
+                />
+                {item.href === "/profile" && badgeTotal > 0 && (
+                  <span className="absolute -top-1.5 -left-2 min-w-4 h-4 px-1 rounded-full bg-error-500 text-white text-[10px] flex items-center justify-center">
+                    {badgeTotal.toLocaleString("fa-IR")}
+                  </span>
+                )}
+              </span>
               <span className="text-xs font-medium">{item.label}</span>
             </Link>
           );

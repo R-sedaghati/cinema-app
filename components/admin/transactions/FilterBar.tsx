@@ -1,7 +1,8 @@
-import { Button } from "@dgshahr/ui-kit";
+import { Button, Select } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { ParamsTransactionList } from "@/lib/services/admin/type";
+import { ITransactionStatus, ParamsTransactionList } from "@/lib/services/admin/type";
+import { statusLabels } from "./columns";
 import ObjectUtils from "@/lib/utils/objectUtils";
 
 interface Props {
@@ -31,8 +32,8 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
     <div className="flex flex-col gap-3 py-1 m-1 mb-5 justify-stretch md:flex-row md:flex-wrap md:py-0">
       <div className="flex flex-col gap-3 w-full md:flex-row">
         <Input
-          placeholder="جستجو نام و نام‌ خانوادگی، شماره موبایل، شماره تراکنش‌"
-          title="جستجو نام و نام‌ خانوادگی، شماره موبایل، شماره تراکنش‌"
+          placeholder="جستجو نام و نام‌ خانوادگی، شماره موبایل، شماره پیگیری"
+          title="جستجو نام و نام‌ خانوادگی، شماره موبایل، شماره پیگیری"
           containerClassName="md:!w-1/3"
           disabled={loading && !params.search}
           value={search}
@@ -58,6 +59,16 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
         </Button>
       </div>
       <div className="flex flex-wrap gap-3 items-center w-full">
+        <Select
+          inputProps={{ placeholder: "وضعیت" }}
+          mode="single"
+          wrapperClassName="md:!w-60"
+          value={params.status ?? null}
+          onChange={(value) =>
+            setParams({ ...params, status: (value as ITransactionStatus) ?? null, page: 1 })
+          }
+          options={Object.entries(statusLabels).map(([value, label]) => ({ label, value }))}
+        />
         {showCleanFilters && (
           <button
             className="flex justify-center items-center mr-auto text-base font-semibold leading-normal transition-transform hover:scale-105 text-error-500"

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import ContentCard from "../ContentCard";
 import convertEnNumberToFaNumberWithSeparation from "@/lib/utils/convertEnNumberToFaNumberWithSeparation";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
@@ -27,7 +28,20 @@ const Row = ({
   <>
     <div className="min-h-21 p-4 flex flex-col gap-2">
       <div className="flex justify-between items-center gap-4">
-        <p className="line-clamp-1">{transaction.typeLabel}</p>
+        <p className="line-clamp-1">
+          {transaction.typeLabel}
+          {transaction.artist && (
+            <>
+              {" — "}
+              <Link
+                href={`/artists/${transaction.artist.id}`}
+                className="underline underline-offset-4 hover:text-zinc-50"
+              >
+                {transaction.artist.name ?? transaction.artist.code ?? "پروفایل"}
+              </Link>
+            </>
+          )}
+        </p>
         <p
           className={
             transaction.amount > 0

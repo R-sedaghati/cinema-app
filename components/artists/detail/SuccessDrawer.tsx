@@ -7,10 +7,12 @@ const SuccessDrawer = ({
   open,
   setOpen,
   trackingCode,
+  guest,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   trackingCode: string | null;
+  guest?: boolean;
 }) => {
   return (
     <Drawer
@@ -23,7 +25,7 @@ const SuccessDrawer = ({
       onClose={() => setOpen(false)}
       containerClassName="min-h-96"
     >
-      <Success trackingCode={trackingCode} />
+      <Success trackingCode={trackingCode} guest={guest} />
     </Drawer>
   );
 };
