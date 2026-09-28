@@ -26,7 +26,6 @@ function CategoryForm() {
   const [parentId, setParentId] = useState<number | null>(presetParentId);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
-  const [contactAmount, setContactAmount] = useState("");
   const [registrationAmount, setRegistrationAmount] = useState("");
 
   const { data: parentOptionsData } = useAdminCategoryList();
@@ -79,7 +78,6 @@ function CategoryForm() {
         isActive,
         image: imagePath || null,
         // An empty field means "not set" (inherit / fall back); a typed 0 means free.
-        contactAmount: contactAmount === "" ? null : Number(contactAmount),
         registrationAmount:
           registrationAmount === "" ? null : Number(registrationAmount),
       },
@@ -196,17 +194,6 @@ function CategoryForm() {
             <p className="font-h3-bold text-error-500">پرداخت</p>
             <Divider color="gray" size="thin" type="horizontal" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                labelContent="مبلغ پرداختی کاربر"
-                placeholder="مبلغ پرداختی کاربر"
-                postfix="تومان"
-                type="text"
-                inputMode="numeric"
-                value={contactAmount}
-                onChange={(e) => setContactAmount(e.target.value)}
-                hintMessage={`مبلغی که کاربر برای مشاهده اطلاعات تماس هنرمندان این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
-                wrapperClassName="w-full"
-              />
               <Input
                 labelContent="مبلغ ثبت‌نام هنرمند"
                 placeholder="مبلغ ثبت‌نام هنرمند"

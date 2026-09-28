@@ -148,7 +148,7 @@ interface FormField {
   order: number;
   options?: { label: string; value: string }[] | null;
   validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
-  isPrivate: boolean;        // paid content: stripped publicly, served by the contact endpoint
+  isPrivate: boolean;        // stripped publicly, served by the contact endpoint after approval
 }
 
 interface FormStep {
@@ -426,6 +426,12 @@ interface SiteContent {
       validation?: { preset?: ValidationPreset; min?: number; max?: number; minLength?: number; maxLength?: number; pattern?: string } | null;
     }[];
   } | null;
+  // same shape as contactForm, for the resume-request form; every key is free-form and
+  // answers are stored whole on the request. null/absent/empty fields = the default in
+  // `lib/constants/resumeRequestForm.ts` (mirrored by backend `services/resumeRequest.ts`)
+  // `guestMode` = requests without login (no OTP); `persist` on a field = remembered in the
+  // guest's browser for the next request.
+  resumeRequestForm?: { title: string; submitLabel: string; guestMode?: boolean; fields: (ContactFormField & { persist?: boolean })[] } | null;
 }
 ```
 
@@ -507,9 +513,13 @@ Upload user avatar. **Auth required.** `multipart/form-data`
 
 **Form field:** `file` (image)
 
+Sets the account's profile picture — the headshot every resume of this user shows
+(`ArtistRequest.user.avatar`). Non-`image/*` files are a `400`. Each upload gets a fresh
+key, so a new picture is never masked by a cached old one.
+
 **Response:**
 ```json
-{ "path": "users/{id}/avatar.{ext}" }
+{ "path": "users/{id}/avatar-{uuid}.{ext}", "url": "https://storage.archivehonar.ir/users/{id}/avatar-{uuid}.{ext}" }
 ```
 
 ---
@@ -550,6 +560,10 @@ both pass it.
   sampleType?: ESampleType;
 }
 ```
+
+SELECT/RADIO/CHECKBOX answers must be option `value`s of the field (each picked value for
+CHECKBOX); anything else is `400`. `PATCH` below applies the same required-field and
+validation checks to the answers it receives.
 
 **Response (201):**
 ```ts
@@ -691,6 +705,15 @@ message id should not be confirmable).
 
 ---
 
+### `GET /user/badge-counts/`
+Badge numbers for the site header and profile menu.
+
+**Response:** `ApiResponse<{ messages: number; forms: number }>`
+
+`messages` = unread inbox messages, `forms` = the caller's artist requests in `NEED_TO_REVISION`.
+
+---
+
 ### `POST /user/supports/`
 Create a support ticket. Auth **optional**: with a valid user token the ticket is linked
 to the account (`user_id`), missing name/email are filled from the profile, and the
@@ -808,60 +831,83 @@ charged.
 
 ---
 
-## Contact-detail purchases
+## Resume requests
 
-An artist's contact fields are the paid product. They are served only by
-`GET /user/artists-requests/:id/contact/`, and only to a caller who owns a `COMPLETED`
-`ContactRequest` for that artist (or is the artist). Every other endpoint strips them:
-answers to fields marked `isPrivate` in the form builder, portfolios uploaded through
+An artist's contact fields are unlocked per viewer by an admin-approved request. They are
+served only by `GET /user/artists-requests/:id/contact/`, and only to a caller who owns an
+`APPROVED` `ContactRequest` for that artist (or is the artist). Every other endpoint strips
+them: answers to fields marked `isPrivate` in the form builder, portfolios uploaded through
 those fields, and the user's name/phone/email/national code. Private fields are also
 never filters or search targets.
 
-### `GET /artists-requests/:id/contact-price/`
-Price, in Toman, to unlock this artist's contact details. No auth.
-
-The price comes from the artist's category (`contactAmount`), inherited from the
-top-level category, falling back to `CONTACT_REQUEST_AMOUNT`. **`0` means free.**
-
-**Response:** `ApiResponse<{ amount: number }>`
-
----
+Requests are free. `status` is `PENDING` → `APPROVED` (requester gets the
+`RESUME_REQUEST_APPROVED` SMS) or `REJECTED` (silent; the viewer may request again).
+Rows from the paid era were migrated: `COMPLETED` → `APPROVED`, everything else →
+`REJECTED`.
 
 ### `POST /user/artists-requests/:id/contact-requests/`
-Start a purchase. **Auth required.**
+Request an artist's resume. **Auth required.**
 
-**Body:** `{ requesterName: string }`
+**Body:** `{ answers: Record<string, unknown> }` — answers to `SiteContent.resumeRequestForm`
+(or the default fields `firstName`, `lastName`, `organization`, `reason` while the admin has
+not customised it). Unknown keys are dropped; required + validation rules are enforced
+server-side. `requesterName` is taken from `firstName`/`lastName`, else the account name.
 
-The amount is read from the category — a client-supplied price is never trusted.
+**Response:** `201 ApiResponse<{ id, trackingCode, status }>`
 
-**Response:** `ApiResponse<{ id, trackingCode, status, redirectUrl }>`
-
-`redirectUrl` is SEP's hosted payment page, or `null` when there is nothing to pay:
-either the artist was already unlocked, or the category is free (in which case the
-request is stored as `COMPLETED` immediately).
-
----
-
-### `ALL /contact-requests/callback/?contactRequestId=` 
-Gateway return URL. No auth (the gateway drives the browser here, so it cannot carry a
-token). Verifies the payment, then redirects to
-`/artists/{id}?contact=success|failed|canceled`.
+**400** invalid answers (`errors: string[]`) · **404** artist not approved ·
+**409** a `PENDING` or `APPROVED` request for this artist already exists.
 
 ---
 
 ### `GET /user/artists-requests/:id/contact/`
-The paid payload: `firstName`, `lastName`, `phoneNumber`, `email`, `address`,
+The unlocked payload: `firstName`, `lastName`, `phoneNumber`, `email`, `address`,
 `postalCode`, plus `fields: { key, label, type, options, value }[]` — every non-empty
 answer to a field marked `isPrivate` in the artist's form (IMAGE/VIDEO `value` is a list
 of file URLs). **Auth required.**
 
-**403** unless the caller owns a `COMPLETED` `ContactRequest` for this artist or is the
+**403** unless the caller owns an `APPROVED` `ContactRequest` for this artist or is the
 artist themselves.
 
 ---
 
+### Guest (no-OTP) mode
+
+On when `SiteContent.resumeRequestForm.guestMode` is `true` (admin switch in the form
+editor). Visitors without an account request by filling the form; logged-in users keep the
+endpoints above. The typed phone is **unverified**, so it never grants access — the create
+call returns a random `accessToken` the browser keeps (localStorage), and only that token
+reaches the unlocked data. Fields with `persist: true` are also remembered in the browser
+to prefill the next guest request. Tokens keep working after the mode is switched off.
+
+#### `POST /artists-requests/:id/guest-contact-requests/`
+No auth. **Body:** `{ answers }` — the form's fields plus `phoneNumber` (always required,
+`MOBILE` preset; appended if the form lacks it).
+
+**Response:** `201 ApiResponse<{ id, trackingCode, status, accessToken }>`
+
+**403** guest mode off · **404** artist not approved · **400** invalid answers ·
+**409** a `PENDING` request from this phone for this artist exists · **429** over
+10 requests/hour per IP or 3/hour per phone. An earlier `APPROVED` request does not block
+(its token may be in a lost browser).
+
+#### `POST /contact-requests/guest/status/`
+No auth. **Body:** `{ tokens: string[] }` (first 50 used).
+
+**Response:** `ApiResponse<{ token, trackingCode, status, createdAt, artistId }[]>` — unknown
+tokens are skipped.
+
+#### `GET /artists-requests/:id/guest-contact/`
+No auth. **Header:** `X-Resume-Token: <accessToken>`. Same payload as
+`GET /user/artists-requests/:id/contact/`; **403** unless the token belongs to an
+`APPROVED` request for this artist.
+
+---
+
 ### `GET /user/contact-requests/`
-The caller's own purchases, paginated. **Auth required.**
+The caller's own requests, paginated. **Auth required.**
+
+**Response:** `ApiResponse<{ id, trackingCode, status, createdAt, reviewedAt, artist }[]>`
 
 ---
 
@@ -875,7 +921,7 @@ positive credits, negative debits.
 `NEED_TO_REVISION` (the registration fee is returned, once per payment), when a gateway
 leg fails and a reservation is released, or when an admin adjusts a balance by hand.
 
-**Money leaves** automatically: both purchase flows take from the wallet first and send
+**Money leaves** automatically: the registration fee takes from the wallet first and send
 only the remainder to the gateway. The wallet is reserved when the purchase starts — not
 at the callback — because that reservation is what stops a second purchase spending the
 same balance while the first is still at the gateway. A leg that never settles returns it.
@@ -893,7 +939,10 @@ Current balance. **Auth required.**
 ### `GET /user/wallet/transactions/`
 The caller's own ledger, paginated. **Auth required.**
 
-**Response:** `ApiResponse<{ id, amount, type, typeLabel, description, createdAt }[]>`
+**Response:** `ApiResponse<{ id, amount, type, typeLabel, description, artist, createdAt }[]>`
+
+`artist` is `{ id, code, name } | null` — the profile whose contact details a
+`SPEND_CONTACT` (or its failed-payment refund) paid for; null otherwise.
 
 `type` is one of `REFUND_REJECTED`, `REFUND_REVISION`, `REFUND_FAILED_PAYMENT`,
 `ADMIN_ADJUST`, `SPEND_REGISTRATION`, `SPEND_CONTACT`.
@@ -914,6 +963,31 @@ Admin login.
 ```ts
 ApiResponse<{ accessToken: string; type: "admin" }>
 ```
+
+---
+
+### `GET /admin/profile/`
+The calling admin's own profile (sidebar name and picture).
+
+**Response:** `ApiResponse<{ id, username, email, role, firstName, lastName, avatar }>` (`avatar` is a public URL or `null`)
+
+---
+
+### `PATCH /admin/profile/`
+Edit the calling admin's own name and picture. Every key optional.
+
+**Body:**
+```ts
+{
+  firstName?: string;
+  lastName?: string;
+  avatar?: string | null;  // storage path from POST /admin/upload/image; null clears
+}
+```
+
+`400` when `avatar` is not a path that upload produced (`banners/...`).
+
+**Response:** same shape as `GET /admin/profile/`.
 
 ---
 
@@ -1133,13 +1207,10 @@ Update category.
 
 **Body:** partial `Category` fields (`config` is no longer supported — use the form-builder endpoints below)
 
-Two price fields, both in Toman, both following the same rule — **`0` means free, `null`
-means "not set here"** (inherit the top-level category, then the env fallback):
-
-| Field | Who pays | Fallback |
-|-------|----------|----------|
-| contactAmount | a viewer unlocking an artist's contact details | `CONTACT_REQUEST_AMOUNT` |
-| registrationAmount | an artist registering in this category | `REGISTRATION_AMOUNT` |
+`registrationAmount` (Toman) is what an artist pays to register in this category —
+**`0` means free, `null` means "not set here"** (inherit the top-level category, then
+`REGISTRATION_AMOUNT`). `contactAmount` is no longer read or written (resume requests are
+free); the column is kept for history.
 
 **Response:** `ApiResponse<Category>`
 
@@ -1275,10 +1346,38 @@ accepted) and deduped; an invalid number is a `400`. An empty `phones` disables 
 | Value | Fires when |
 |-------|-----------|
 | REGISTRATION | a new artist request is submitted, or its registration payment completes |
-| TRANSACTION | a contact-detail purchase or registration payment reaches `COMPLETED` |
+| TRANSACTION | a registration payment reaches `COMPLETED` |
+| RESUME_REQUEST | a viewer submits a resume request |
 | SUPPORT_TICKET | a user opens a support ticket |
 
 The toggles are global: every stored number receives every enabled event.
+
+---
+
+### `GET /admin/notifications/`
+In-panel feed: every `NotificationEvent` above is also recorded here, whether or not SMS
+is enabled for it. Newest 50 entries, no pagination.
+
+**Response:** `ApiResponse<{ unread: number; items: { id: number; event: NotificationEvent; message: string; link: string | null; readAt: string | null; createdAt: string }[] }>`
+
+`link` is the admin panel path the entry opens. Read state is shared by all admins.
+
+---
+
+### `PATCH /admin/notifications/read/`
+Mark one entry read (`{ id }`), or every unread entry (empty body). Idempotent.
+
+**Response:** `ApiResponse<{ unread: number }>`
+
+---
+
+### `GET /admin/badge-counts/`
+Sidebar badges: work still waiting on an admin.
+
+**Response:** `ApiResponse<{ supports: number; contactRequests: number; registrations: number; notifications: number }>`
+
+`supports` = tickets `OPEN`, `contactRequests` = resume requests `PENDING`,
+`registrations` = non-hidden artist requests `PENDING`, `notifications` = unread feed entries.
 
 ---
 
@@ -1286,7 +1385,8 @@ The toggles are global: every stored number receives every enabled event.
 One user's balance and ledger.
 
 **Response:** `ApiResponse<{ balance, transactions[] }>` — each row adds `adminUsername`,
-set only for manual adjustments.
+set only for manual adjustments, and `artist` (`{ id, code, name } | null`): the profile
+viewed for a contact purchase, else the user's own artist request.
 
 ---
 
@@ -1305,14 +1405,35 @@ user has already partly spent.
 ---
 
 ### `GET /admin/contact-requests/`
-Every contact-detail purchase, paginated — the transactions table.
+Every resume request, paginated — the "درخواست‌های مشاهده رزومه" table.
 
-**Query params:** `page`, `count`, `status` (`PENDING` / `COMPLETED` / `FAILED` /
-`CANCELED`), `search` (tracking code, requester name, or buyer phone)
+**Query params:** `page`, `count`, `status` (`PENDING` / `APPROVED` / `REJECTED`),
+`search` (tracking code, requester name, account phone, or guest phone)
 
-**Response:** `ApiResponse<Transaction[]>` with buyer and artist summaries (`artist.name`,
-`artist.code`, `artist.categories`). `amount` is the **total** (gateway + wallet);
-`walletAmount` is the part paid from the buyer's wallet.
+**Response:** `ApiResponse<{ id, trackingCode, status, createdAt, reviewedAt, requesterName, isGuest, buyer: { id, phoneNumber }, artist: { id, code, name, categories } }[]>`
+
+For a guest row `buyer.id` is null and `buyer.phoneNumber` is the typed (unverified) phone.
+
+---
+
+### `GET /admin/contact-requests/:id/`
+One request for the review page.
+
+**Response:** `ApiResponse<{ id, trackingCode, status, createdAt, reviewedAt, requesterName, isGuest, answers, requester, artist }>`
+— `answers` is `{ key, label, type, options, value }[]` labelled by the current form
+(answers to since-removed fields keep their key as label); `requester` is the account
+(`id, code, firstName, lastName, phoneNumber, email, avatar, createdAt`); `artist` is
+`{ id, code, name, phoneNumber, email, avatar, categories, privateFields }`, where
+`privateFields` is exactly what approval unlocks.
+
+---
+
+### `PATCH /admin/contact-requests/:id/`
+Review a request. **Body:** `{ status: "APPROVED" | "REJECTED" }`.
+
+Only from `PENDING` (**409** otherwise). Sets `reviewedAt`. `APPROVED` sends the
+`RESUME_REQUEST_APPROVED` SMS template (variables `firstName`, `lastName`, `fullName`,
+`artistCode`, `trackingCode`) and files it in the requester's inbox.
 
 ---
 
@@ -1372,7 +1493,7 @@ Create a field on a step.
   // `null` clears an existing link.
   syncToUserField?: "firstName" | "lastName" | "avatar" | "email" | "nationalCode" | "phoneNumber" | null;
   multiple?: boolean;      // IMAGE/VIDEO: allow more than one upload
-  isPrivate?: boolean;     // default false; true = shown only after a contact purchase
+  isPrivate?: boolean;     // default false; true = shown only after an approved resume request
 }
 ```
 
@@ -1570,7 +1691,7 @@ Get site-content (see `GET /site-content/` above for shape). Admin auth.
 ---
 
 ### `PATCH /admin/site-content/:id/`
-Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`) may be sent independently; unspecified keys are left unchanged.
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`) may be sent independently; unspecified keys are left unchanged.
 
 **Body:** `Partial<Omit<SiteContent, "id">>`
 

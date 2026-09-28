@@ -20,11 +20,12 @@ import {
   ICityListResponse,
   IArtistContactResponse,
   IArtistFiltersResponse,
-  IContactPriceResponse,
   IWalletBalanceResponse,
   IWalletTransactionListResponse,
   IContactRequestListResponse,
   ICreateContactRequestResponse,
+  ICreateGuestContactRequestResponse,
+  IGuestContactRequestStatusResponse,
   IFormSchemaResponse,
   IPagination,
   IPurchaseResponse,
@@ -34,6 +35,7 @@ import {
   IUserProfile,
   IUserMessage,
   IUserMessageListResponse,
+  IUserBadgeCountsResponse,
   IUserSupportListResponse,
   UserCreateArtistRequest,
   UserCreateSupport,
@@ -210,7 +212,7 @@ export const userCityList = async (provinceId: number) => {
 export const userUploadAvatar = async (file: File) => {
   const form = new FormData();
   form.append("file", await prepareImage(file));
-  const { data } = await landingApi.post<{ path: string }>(
+  const { data } = await landingApi.post<{ path: string; url?: string }>(
     "/user/avatar",
     form,
   );
@@ -294,23 +296,46 @@ export const updateUserArtistRequest = async (
   return data;
 };
 
-export const userContactPrice = async (artistId: number) => {
-  const { data } = await landingApi.get<IContactPriceResponse>(
-    `/artists-requests/${artistId}/contact-price/`,
+export const userCreateContactRequest = async ({
+  artistId,
+  answers,
+}: {
+  artistId: number;
+  answers: Record<string, unknown>;
+}) => {
+  const { data } = await landingApi.post<ICreateContactRequestResponse>(
+    `/user/artists-requests/${artistId}/contact-requests/`,
+    { answers },
   );
   return data;
 };
 
-export const userCreateContactRequest = async ({
+export const guestCreateContactRequest = async ({
   artistId,
-  requesterName,
+  answers,
 }: {
   artistId: number;
-  requesterName: string;
+  answers: Record<string, unknown>;
 }) => {
-  const { data } = await landingApi.post<ICreateContactRequestResponse>(
-    `/user/artists-requests/${artistId}/contact-requests/`,
-    { requesterName },
+  const { data } = await landingApi.post<ICreateGuestContactRequestResponse>(
+    `/artists-requests/${artistId}/guest-contact-requests/`,
+    { answers },
+  );
+  return data;
+};
+
+export const guestContactRequestStatus = async (tokens: string[]) => {
+  const { data } = await landingApi.post<IGuestContactRequestStatusResponse>(
+    "/contact-requests/guest/status/",
+    { tokens },
+  );
+  return data;
+};
+
+export const guestArtistContact = async (artistId: number, token: string) => {
+  const { data } = await landingApi.get<IArtistContactResponse>(
+    `/artists-requests/${artistId}/guest-contact/`,
+    { headers: { "X-Resume-Token": token } },
   );
   return data;
 };
@@ -362,6 +387,15 @@ export const userMessages = async (
         Authorization: accessToken,
       },
     },
+  );
+
+  return data;
+};
+
+export const userBadgeCounts = async (accessToken: string) => {
+  const { data } = await landingApi.get<IUserBadgeCountsResponse>(
+    "/user/badge-counts/",
+    { headers: { Authorization: accessToken } },
   );
 
   return data;

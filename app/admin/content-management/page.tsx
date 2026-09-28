@@ -19,6 +19,7 @@ import CopyCard from "@/components/admin/content/CopyCard";
 import { LANDING_COPY, LANDING_COPY_GROUPS } from "@/lib/constants/landingCopy";
 import { FORM_COPY } from "@/lib/constants/formCopy";
 import ContactFormCard from "@/components/admin/content/ContactFormCard";
+import { resumeRequestFormOf } from "@/lib/constants/resumeRequestForm";
 import ColorInput from "@/components/admin/ColorInput";
 import FontSizeInput from "@/components/admin/FontSizeInput";
 import withNoSSR from "@/lib/utils/withNoSSR";
@@ -742,6 +743,18 @@ function ContentManagement() {
           stored={siteContentData?.result?.contactForm}
           isPending={isSiteContentPending}
           onSave={(contactForm) => updateSiteContent({ contactForm }, saveSiteContent())}
+        />
+
+        <ContactFormCard
+          title="فرم درخواست مشاهده رزومه"
+          note="این فرم را کاربر پیش از درخواست مشاهده رزومه یک هنرمند پر می‌کند. همه پاسخ‌ها در صفحه همان درخواست (درخواست‌های مشاهده رزومه) نمایش داده می‌شود. پاسخ فیلدهای firstName و lastName نام درخواست‌دهنده در لیست است."
+          formOf={resumeRequestFormOf}
+          builtinLabel={() => null}
+          resumeOptions
+          ready={Boolean(siteContentData?.result)}
+          stored={siteContentData?.result?.resumeRequestForm}
+          isPending={isSiteContentPending}
+          onSave={(resumeRequestForm) => updateSiteContent({ resumeRequestForm }, saveSiteContent())}
         />
       </div>
     </div>

@@ -282,33 +282,23 @@ export const LANDING_COPY = {
   artistWorkYear: { group: "صفحه هنرمند", admin: "برچسب سال نمونه‌کار ({year} = سال)", value: "سال {year}" },
 
   // --- درخواست مشاهده اطلاعات تماس ---
-  callFormFreeDesc: {
+  callFormDesc: {
     group: "درخواست اطلاعات تماس",
-    admin: "توضیح فرم (رایگان)",
-    value: "برای مشاهده اطلاعات تماس هنرمند، فرم اطلاعات را پر کنید تا درخواست مشاهده شما ثبت گردد.",
+    admin: "توضیح فرم",
+    value: "برای مشاهده رزومه و اطلاعات تماس هنرمند، فرم زیر را پر کنید. پس از تأیید درخواست توسط پشتیبانی، پیامک دریافت می‌کنید.",
   },
-  callFormPaidDesc: {
-    group: "درخواست اطلاعات تماس",
-    admin: "توضیح فرم (پرداختی)",
-    value: "برای مشاهده اطلاعات تماس هنرمند، بعد از پرکردن فرم اطلاعات، هزینه خدمات سایت را پرداخت کنید تا درخواست مشاهده شما ثبت گردد.",
-  },
-  callNameLabel: { group: "درخواست اطلاعات تماس", admin: "برچسب نام و نام خانوادگی", value: "نام و نام خانوادگی" },
-  callNamePlaceholder: {
-    group: "درخواست اطلاعات تماس",
-    admin: "راهنمای نام و نام خانوادگی",
-    value: "نام و نام خانوادگی خود را وارد کنید.",
-  },
-  callNameError: { group: "درخواست اطلاعات تماس", admin: "خطای نام خالی", value: "نام و نام خانوادگی را وارد کنید." },
-  callAmountLabel: { group: "درخواست اطلاعات تماس", admin: "برچسب مبلغ", value: "مبلغ قابل پرداخت" },
-  callSubmittingFree: { group: "درخواست اطلاعات تماس", admin: "متن در حال ثبت", value: "در حال ثبت درخواست..." },
-  callSubmittingPaid: { group: "درخواست اطلاعات تماس", admin: "متن در حال انتقال به درگاه", value: "در حال انتقال به درگاه..." },
-  callSubmitFree: { group: "درخواست اطلاعات تماس", admin: "دکمه ثبت (رایگان)", value: "مشاهده اطلاعات تماس" },
-  callSubmitPaid: { group: "درخواست اطلاعات تماس", admin: "دکمه ثبت (پرداختی)", value: "پرداخت و ثبت درخواست" },
+  callSubmitting: { group: "درخواست اطلاعات تماس", admin: "متن در حال ثبت", value: "در حال ثبت درخواست..." },
+  callPendingCta: { group: "درخواست اطلاعات تماس", admin: "دکمه درخواست در انتظار تأیید", value: "درخواست شما در انتظار تأیید است" },
   callSuccessTitle: { group: "درخواست اطلاعات تماس", admin: "عنوان موفقیت", value: "درخواست شما با موفقیت ثبت شد" },
   callSuccessDesc: {
     group: "درخواست اطلاعات تماس",
     admin: "توضیح موفقیت",
-    value: "برای دیدن وضعیت درخواست و پروفایل هنرمند، به پروفایل خود و بخش «درخواست‌های ارتباط با هنرمندان» بروید.",
+    value: "پس از بررسی و تأیید درخواست، پیامک دریافت می‌کنید. وضعیت درخواست در پروفایل شما، بخش «درخواست‌های ارتباط با هنرمندان» قابل پیگیری است.",
+  },
+  callSuccessGuestDesc: {
+    group: "درخواست اطلاعات تماس",
+    admin: "توضیح موفقیت (بدون ورود)",
+    value: "پس از تأیید درخواست، پیامک دریافت می‌کنید و اطلاعات تماس در همین مرورگر، روی صفحه هنرمند نمایش داده می‌شود.",
   },
   callSuccessTracking: { group: "درخواست اطلاعات تماس", admin: "برچسب شماره پیگیری", value: "شماره پیگیری:" },
   callSuccessCta: { group: "درخواست اطلاعات تماس", admin: "دکمه رفتن به پروفایل", value: "رفتن به پروفایل" },
@@ -316,6 +306,9 @@ export const LANDING_COPY = {
   // --- پروفایل کاربر ---
   profileOverviewTitle: { group: "پروفایل کاربر", admin: "عنوان ویرایش پروفایل", value: "ویرایش پروفایل" },
   profileOverviewCta: { group: "پروفایل کاربر", admin: "دکمه به‌روزرسانی پروفایل", value: "به‌روزرسانی پروفایل" },
+  profileAvatarCta: { group: "پروفایل کاربر", admin: "دکمه تغییر تصویر پروفایل", value: "تغییر تصویر پروفایل" },
+  profileAvatarHint: { group: "پروفایل کاربر", admin: "توضیح تصویر پروفایل", value: "این تصویر در رزومه شما نمایش داده می‌شود." },
+  profileAvatarError: { group: "پروفایل کاربر", admin: "خطای بارگذاری تصویر پروفایل", value: "خطا در بارگذاری تصویر" },
   profileFormsTitle: { group: "پروفایل کاربر", admin: "عنوان لیست فرم‌ها", value: "لیست فرم‌ها" },
   profileFormsEmpty: { group: "پروفایل کاربر", admin: "متن نبودن فرم", value: "هیچ فرمی ثبت نشده است." },
   profileFormsTracking: { group: "پروفایل کاربر", admin: "برچسب کد پیگیری فرم", value: "کد پیگیری:" },
@@ -335,15 +328,11 @@ export const LANDING_COPY = {
   profileRequestsTabTitle: { group: "پروفایل کاربر", admin: "عنوان تب درخواست‌ها", value: "درخواست‌های ارتباط" },
   profileRequestsColArtist: { group: "پروفایل کاربر", admin: "ستون هنرمند", value: "هنرمند" },
   profileRequestsColTracking: { group: "پروفایل کاربر", admin: "ستون شماره پیگیری", value: "شماره پیگیری" },
-  profileRequestsColAmount: { group: "پروفایل کاربر", admin: "ستون مبلغ", value: "مبلغ" },
+  profileRequestsColDate: { group: "پروفایل کاربر", admin: "ستون تاریخ", value: "تاریخ ثبت" },
+  requestPending: { group: "پروفایل کاربر", admin: "وضعیت درخواست: در انتظار تأیید", value: "در انتظار تأیید" },
+  requestApproved: { group: "پروفایل کاربر", admin: "وضعیت درخواست: تأیید شده", value: "تأیید شده" },
+  requestRejected: { group: "پروفایل کاربر", admin: "وضعیت درخواست: رد شده", value: "رد شده" },
   profileRequestsViewArtist: { group: "پروفایل کاربر", admin: "دکمه مشاهده پروفایل هنرمند", value: "مشاهده پروفایل هنرمند" },
-  profilePaymentsTitle: { group: "پروفایل کاربر", admin: "عنوان تاریخچه پرداخت‌ها", value: "تاریخچه پرداخت‌ها" },
-  profilePaymentsEmpty: { group: "پروفایل کاربر", admin: "متن نبودن پرداخت", value: "هنوز پرداختی ثبت نشده است." },
-  profilePaymentItemLabel: {
-    group: "پروفایل کاربر",
-    admin: "عنوان ردیف پرداخت ({artist} = نام هنرمند)",
-    value: "مشاهده اطلاعات تماس پروفایل: {artist}",
-  },
   profileWalletTitle: { group: "پروفایل کاربر", admin: "عنوان کیف پول", value: "کیف پول" },
   profileWalletBalance: { group: "پروفایل کاربر", admin: "برچسب موجودی", value: "موجودی کیف پول" },
   profileWalletNote: {
@@ -387,12 +376,6 @@ export const LANDING_COPY = {
   // --- بارگذاری فایل ---
   imageUploadFailed: { group: "بارگذاری فایل", admin: "خطای بارگذاری تصویر", value: "بارگذاری تصویر ناموفق بود. دوباره تلاش کنید." },
   videoUploadFailed: { group: "بارگذاری فایل", admin: "خطای بارگذاری ویدیو", value: "بارگذاری ویدیو ناموفق بود. دوباره تلاش کنید." },
-
-  // --- وضعیت پرداخت ---
-  paymentPending: { group: "وضعیت پرداخت", admin: "در انتظار پرداخت", value: "در انتظار پرداخت" },
-  paymentCompleted: { group: "وضعیت پرداخت", admin: "پرداخت شده", value: "پرداخت شده" },
-  paymentFailed: { group: "وضعیت پرداخت", admin: "ناموفق", value: "ناموفق" },
-  paymentCanceled: { group: "وضعیت پرداخت", admin: "لغو شده", value: "لغو شده" },
 
   // --- آموزش‌ها ---
   tutorialsTitle: { group: "آموزش‌ها", admin: "عنوان صفحه آموزش‌ها", value: "آموزش‌ها" },
@@ -447,24 +430,6 @@ export const LANDING_COPY = {
   ariaSupportCall: { group: "دسترس‌پذیری", admin: "لینک تماس با پشتیبانی", value: "تماس با پشتیبانی" },
   ariaRangeFrom: { group: "دسترس‌پذیری", admin: "ورودی «از» فیلتر بازه ({label})", value: "{label} از" },
   ariaRangeTo: { group: "دسترس‌پذیری", admin: "ورودی «تا» فیلتر بازه ({label})", value: "{label} تا" },
-
-  // --- پیام‌های پرداخت درخواست تماس ---
-  contactPaymentPendingToast: {
-    group: "وضعیت پرداخت",
-    admin: "پیام پرداخت در انتظار تأیید",
-    value: "پرداخت شما ثبت شد و در حال تأیید نهایی است. نتیجه تا دقایقی دیگر مشخص می‌شود؛ لطفاً دوباره پرداخت نکنید.",
-  },
-  contactPaymentFailedToast: {
-    group: "وضعیت پرداخت",
-    admin: "پیام پرداخت ناموفق",
-    value: "پرداخت انجام نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد.",
-  },
-  contactPaymentNotFoundToast: {
-    group: "وضعیت پرداخت",
-    admin: "پیام پیدا نشدن پرداخت",
-    value:
-      "این پرداخت پیدا نشد. در صورت کسر وجه، مبلغ تا ۷۲ ساعت به حساب شما برمی‌گردد؛ در غیر این صورت دوباره تلاش کنید.",
-  },
 
   // --- آپلود فایل ---
   uploadImageTypeError: { group: "آپلود فایل", admin: "خطای فرمت تصویر", value: "فرمت تصویر باید JPG، PNG یا WebP باشد." },

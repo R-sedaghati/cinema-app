@@ -37,6 +37,10 @@ export const SMS_EVENT: Record<
     label: "پاسخ تیکت پشتیبانی",
     description: "زمانی که ادمین به تیکت پشتیبانی کاربر پاسخ می‌دهد ارسال می‌شود.",
   },
+  [ESmsEvent.RESUME_REQUEST_APPROVED]: {
+    label: "تایید درخواست مشاهده رزومه",
+    description: "زمانی که ادمین درخواست مشاهده رزومه یک هنرمند را تایید می‌کند، برای درخواست‌دهنده ارسال می‌شود.",
+  },
 };
 
 /** Pipeline order — the list reads top to bottom as the applicant's journey. */
@@ -48,6 +52,7 @@ export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.APPROVED,
   ESmsEvent.REJECTED,
   ESmsEvent.SUPPORT_REPLY,
+  ESmsEvent.RESUME_REQUEST_APPROVED,
 ];
 
 /** Sample values used only for the drawer preview; never sent. */
@@ -62,4 +67,5 @@ export const SMS_VARIABLE_SAMPLE: Record<string, string> = {
   nextStep: "درخواست شما در حال بررسی است.",
   subject: "مشکل در پرداخت",
   ticketId: "۴۲",
+  artistCode: "۱۰۲۳",
 };

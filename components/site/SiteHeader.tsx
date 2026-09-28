@@ -19,6 +19,7 @@ import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import useAuthStore from "@/lib/stores/useAuthStore";
+import { useUserBadgeCounts } from "@/lib/services/landing/hook";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { isMobile } from "react-device-detect";
 
@@ -57,6 +58,8 @@ export function SiteHeader() {
   const { open: openLoginDrawer } = useLoginDrawerStore();
   const { isLoggedIn } = useAuthStore();
   const copy = useLandingCopy();
+  const counts = useUserBadgeCounts().data?.result;
+  const badgeTotal = (counts?.messages ?? 0) + (counts?.forms ?? 0);
 
   useEffect(() => {
     if (sidebarOpen) {
@@ -135,16 +138,23 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex min-w-0 flex-1 items-center justify-end">
-            <Button
-              onClick={
-                isLoggedIn ? () => router.push("/profile") : openLoginDrawer
-              }
-              size="small"
-              rightIcon={<UserRound size={20} />}
-              className="rounded-full! hidden! md:flex!"
-            >
-              {isLoggedIn ? copy("navProfile") : copy("navLogin")}
-            </Button>
+            <div className="relative hidden md:block">
+              <Button
+                onClick={
+                  isLoggedIn ? () => router.push("/profile") : openLoginDrawer
+                }
+                size="small"
+                rightIcon={<UserRound size={20} />}
+                className="rounded-full!"
+              >
+                {isLoggedIn ? copy("navProfile") : copy("navLogin")}
+              </Button>
+              {isLoggedIn && badgeTotal > 0 && (
+                <span className="absolute -top-1 -left-1 min-w-5 h-5 px-1 rounded-full bg-error-500 text-white text-xs flex items-center justify-center">
+                  {badgeTotal.toLocaleString("fa-IR")}
+                </span>
+              )}
+            </div>
             <div className="w-11 lg:hidden" />
           </div>
         </div>

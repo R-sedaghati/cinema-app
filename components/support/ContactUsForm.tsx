@@ -10,26 +10,12 @@ import {
   useUserCategoryList,
   useUserSiteContent,
 } from "@/lib/services/landing/hook";
-import { appendCustomAnswers, contactFormOf } from "@/lib/constants/contactForm";
+import { appendCustomAnswers, asFormField, contactFormOf } from "@/lib/constants/contactForm";
 import { EFormFieldType } from "@/lib/services/admin/type";
-import type { IContactFormField, IFormField, IFormStep } from "@/lib/services/admin/type";
+import type { IFormStep } from "@/lib/services/admin/type";
 import { getStepErrors } from "@/lib/utils/validateFormStep";
 import { toast } from "react-toastify";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
-
-/** The dynamic definition carries no ids/order, which FieldRenderer expects. */
-const asFormField = (field: IContactFormField, index: number): IFormField => ({
-  id: index,
-  key: field.key,
-  label: field.label,
-  type: field.type,
-  placeholder: field.placeholder ?? null,
-  helpText: field.helpText ?? null,
-  required: field.required,
-  order: index,
-  options: field.options ?? null,
-  validation: field.validation ?? null,
-});
 
 const ContactUsForm = () => {
   const { mutate, isPending } = useCreateUserSupport();

@@ -1,7 +1,7 @@
 import Button from "@/components/common/Button";
 import { toResumeName } from "@/lib/utils/resumeName";
 import { IContactRequestItem } from "@/lib/services/landing/type";
-import convertEnNumberToFaNumberWithSeparation from "@/lib/utils/convertEnNumberToFaNumberWithSeparation";
+import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -10,16 +10,14 @@ import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
 const statusClasses: Record<IContactRequestItem["status"], string> = {
   PENDING: "bg-amber-900/40 text-amber-400",
-  COMPLETED: "bg-emerald-900/40 text-emerald-400",
-  FAILED: "bg-red-900/40 text-red-400",
-  CANCELED: "bg-zinc-800 text-zinc-400",
+  APPROVED: "bg-emerald-900/40 text-emerald-400",
+  REJECTED: "bg-red-900/40 text-red-400",
 };
 
 const statusKeys: Record<IContactRequestItem["status"], LandingCopyKey> = {
-  PENDING: "paymentPending",
-  COMPLETED: "paymentCompleted",
-  FAILED: "paymentFailed",
-  CANCELED: "paymentCanceled",
+  PENDING: "requestPending",
+  APPROVED: "requestApproved",
+  REJECTED: "requestRejected",
 };
 
 export const generateColumns = (
@@ -50,16 +48,12 @@ export const generateColumns = (
   },
   {
     align: "center",
-    key: "amount",
-    dataIndex: "amount",
-    title: copy("profileRequestsColAmount"),
+    key: "createdAt",
+    dataIndex: "createdAt",
+    title: copy("profileRequestsColDate"),
     className: "align-middle min-w-28",
     render: (data) => (
-      <span className="text-sm">
-        {data.amount === 0
-          ? copy("labelFree")
-          : `${convertEnNumberToFaNumberWithSeparation(data.amount)} ${copy("labelCurrency")}`}
-      </span>
+      <span className="text-sm">{convertGregorianTimeToShamsiTime(data.createdAt)}</span>
     ),
   },
   {

@@ -23,11 +23,12 @@ import {
   ICityListResponse,
   IArtistContactResponse,
   IArtistFiltersResponse,
-  IContactPriceResponse,
   IWalletBalanceResponse,
   IWalletTransactionListResponse,
   IContactRequestListResponse,
   ICreateContactRequestResponse,
+  ICreateGuestContactRequestResponse,
+  IGuestContactRequestStatusResponse,
   IFormSchemaResponse,
   IPagination,
   ParamsPublicArtistList,
@@ -35,6 +36,7 @@ import {
   IUserCategoryListResponse,
   IUserProfile,
   IUserMessageListResponse,
+  IUserBadgeCountsResponse,
   IUserSupportListResponse,
   UserCreateArtistRequest,
   UserCreateSupport,
@@ -47,6 +49,7 @@ import {
   updateUserArtistRequest,
   userMessages,
   userMessageRead,
+  userBadgeCounts,
   userAboutUs,
   userArtistRequests,
   userArtsitList,
@@ -70,8 +73,10 @@ import {
   userUploadVideo,
   userGetCategoryFormSchema,
   userCategoryFilters,
-  userContactPrice,
   userCreateContactRequest,
+  guestCreateContactRequest,
+  guestContactRequestStatus,
+  guestArtistContact,
   userArtistContact,
   userContactRequests,
   userWalletBalance,
@@ -292,10 +297,15 @@ export const useUserCityList = (provinceId: number) => {
   });
 };
 
-export const useUserUploadAvatar = () =>
-  useMutation<{ path: string }, AxiosError, File>({
+export const useUserUploadAvatar = () => {
+  const queryClient = useQueryClient();
+
+  // The server stores the path on the account itself, so the profile is stale right away.
+  return useMutation<{ path: string; url?: string }, AxiosError, File>({
     mutationFn: userUploadAvatar,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
   });
+};
 
 export const useUserUploadVideo = () =>
   useMutation<{ path: string; filename: string }, AxiosError, File>({
@@ -388,14 +398,6 @@ export const useUpdateUserArtistRequest = () => {
   });
 };
 
-export const useUserContactPrice = (artistId?: number | null) =>
-  useQuery<IContactPriceResponse>({
-    queryKey: ["userContactPrice", artistId],
-    queryFn: () => userContactPrice(artistId!),
-    enabled: Boolean(artistId),
-    refetchOnWindowFocus: false,
-  });
-
 export const useUserContactRequests = (params: IPagination) => {
   const { accessToken } = useAuthStore();
 
@@ -444,13 +446,49 @@ export const useUserWalletTransactions = (params: IPagination) => {
   });
 };
 
-export const useUserCreateContactRequest = () =>
-  useMutation<
+export const useUserCreateContactRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
     ICreateContactRequestResponse,
     AxiosError,
-    { artistId: number; requesterName: string }
+    { artistId: number; answers: Record<string, unknown> }
   >({
     mutationFn: userCreateContactRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["userContactRequests"] }),
+  });
+};
+
+export const useGuestCreateContactRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ICreateGuestContactRequestResponse,
+    AxiosError,
+    { artistId: number; answers: Record<string, unknown> }
+  >({
+    mutationFn: guestCreateContactRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["guestContactRequests"] }),
+  });
+};
+
+/** Status of this browser's guest requests, looked up by their stored tokens. */
+export const useGuestContactRequests = (tokens: string[], enabled: boolean) =>
+  useQuery<IGuestContactRequestStatusResponse>({
+    queryKey: ["guestContactRequests", tokens],
+    queryFn: () => guestContactRequestStatus(tokens),
+    enabled: enabled && tokens.length > 0,
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+/** Only enable with the token of an APPROVED request — anything else answers 403. */
+export const useGuestArtistContact = (artistId: number, token: string | null) =>
+  useQuery<IArtistContactResponse>({
+    queryKey: ["guestArtistContact", artistId, token],
+    queryFn: () => guestArtistContact(artistId, token!),
+    enabled: Boolean(token),
+    refetchOnWindowFocus: false,
   });
 
 export const useUserMessages = (params: IPagination) => {
@@ -467,8 +505,23 @@ export const useUserMessages = (params: IPagination) => {
 
 export const useUserMessageRead = () => {
   const { accessToken } = useAuthStore();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: number) => userMessageRead(id, accessToken),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["userBadgeCounts"] }),
+  });
+};
+
+export const useUserBadgeCounts = () => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IUserBadgeCountsResponse>({
+    queryKey: ["userBadgeCounts"],
+    queryFn: () => userBadgeCounts(accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
   });
 };

@@ -106,7 +106,7 @@ export function ArtistsSearchClient() {
     <div className="space-y-12 relative">
       <button
         type="button"
-        onClick={() => router.back()}
+        onClick={() => (activeFilterCount ? clearFilters() : router.back())}
         className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
       >
         <ArrowRight size={20} />

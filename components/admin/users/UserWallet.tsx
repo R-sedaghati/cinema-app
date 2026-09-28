@@ -2,6 +2,7 @@
 
 import { Button, Card, Divider } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
@@ -121,6 +122,16 @@ const UserWallet = ({ userId }: { userId: number }) => {
               >
                 <div className="flex flex-col gap-1">
                   <p className="font-p1-regular">{transaction.typeLabel}</p>
+                  {transaction.artist && (
+                    <Link
+                      href={`/admin/artist-registration/${transaction.artist.id}`}
+                      className="font-p2-regular text-primary-600 hover:underline"
+                    >
+                      {[transaction.artist.name, transaction.artist.code]
+                        .filter(Boolean)
+                        .join(" · ") || "پروفایل"}
+                    </Link>
+                  )}
                   <p className="font-p2-regular text-gray-500">
                     {transaction.description ?? ""}
                     {transaction.adminUsername

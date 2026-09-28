@@ -9,6 +9,7 @@ import { toResumeName } from "@/lib/utils/resumeName";
 import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
 import { useParams, useRouter } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import React from "react";
 
 function ArtistDetail() {
@@ -22,7 +23,16 @@ function ArtistDetail() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="h-10" />
+      <div className="flex justify-start">
+        <Button
+          onClick={() => router.push("/admin/users")}
+          variant="text"
+          rightIcon={<ChevronRight />}
+          color="gray"
+        >
+          بازگشت به کاربران
+        </Button>
+      </div>
       <div className="p-4 flex flex-col gap-6 bg-gray-100">
         <Card>
           <div className="flex flex-col gap-4">

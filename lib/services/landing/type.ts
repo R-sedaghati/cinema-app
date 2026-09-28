@@ -188,14 +188,15 @@ export interface IArtistContact {
 
 export type IArtistContactResponse = IRetriveResponse<IArtistContact>;
 
-export type ContactRequestStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELED";
+/** A resume request, reviewed by an admin. */
+export type ContactRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface IContactRequestItem {
   id: number;
   trackingCode: string;
   status: ContactRequestStatus;
-  amount: number;
   createdAt: string | null;
+  reviewedAt: string | null;
   artist: {
     id: number;
     code: string | null;
@@ -212,11 +213,19 @@ export type ICreateContactRequestResponse = IRetriveResponse<{
   id: number;
   trackingCode: string;
   status: ContactRequestStatus;
-  /** Null when the artist was already unlocked, so there is nothing to pay. */
-  redirectUrl: string | null;
 }>;
 
-export type IContactPriceResponse = IRetriveResponse<{ amount: number }>;
+/** Guest create also returns the secret the browser must keep to reach the contact data. */
+export type ICreateGuestContactRequestResponse = IRetriveResponse<{
+  id: number;
+  trackingCode: string;
+  status: ContactRequestStatus;
+  accessToken: string;
+}>;
+
+export type IGuestContactRequestStatusResponse = IRetriveResponse<
+  { token: string; trackingCode: string; status: ContactRequestStatus; createdAt: string; artistId: number }[]
+>;
 
 export type WalletTransactionType =
   | "REFUND_REJECTED"
@@ -234,6 +243,8 @@ export interface IWalletTransactionItem {
   /** Persian label for `type`, resolved server-side. */
   typeLabel: string;
   description: string | null;
+  /** The artist profile this row was for; null when it has none (e.g. manual adjustments). */
+  artist: { id: number; code: string | null; name: string | null } | null;
   createdAt: string | null;
   [key: string]: unknown;
 }
@@ -264,3 +275,8 @@ export interface IUserMessage {
 }
 
 export type IUserMessageListResponse = IBasePaginateResponse<IUserMessage>;
+
+export type IUserBadgeCountsResponse = IRetriveResponse<{
+  messages: number;
+  forms: number;
+}>;

@@ -20,12 +20,14 @@ const EVENT_LABELS: Record<NotificationEvent, string> = {
   REGISTRATION: "ثبت‌نام هنرمند جدید",
   TRANSACTION: "تراکنش‌های مالی",
   SUPPORT_TICKET: "پیام جدید پشتیبانی",
+  RESUME_REQUEST: "درخواست جدید مشاهده رزومه",
 };
 
 const EVENT_ORDER: NotificationEvent[] = [
   "REGISTRATION",
   "TRANSACTION",
   "SUPPORT_TICKET",
+  "RESUME_REQUEST",
 ];
 
 /**

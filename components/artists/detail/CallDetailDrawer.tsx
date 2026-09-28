@@ -7,10 +7,14 @@ const CallDetailDrawer = ({
   open,
   setOpen,
   artistId,
+  onSubmitted,
+  guest,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   artistId: number;
+  onSubmitted: (trackingCode: string) => void;
+  guest: boolean;
 }) => {
   return (
     <Drawer
@@ -23,7 +27,7 @@ const CallDetailDrawer = ({
       onClose={() => setOpen(false)}
       containerClassName="min-h-96"
     >
-      <CallDetail artistId={artistId} setOpen={setOpen} />
+      <CallDetail artistId={artistId} setOpen={setOpen} onSubmitted={onSubmitted} guest={guest} />
     </Drawer>
   );
 };

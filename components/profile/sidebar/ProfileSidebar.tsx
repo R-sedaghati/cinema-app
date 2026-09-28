@@ -5,7 +5,6 @@ import {
   FileText,
   UserRound,
   MessageCircle,
-  CreditCard,
   Wallet,
   LogOut,
   ChevronLeft,
@@ -15,7 +14,7 @@ import {
 import { SectionId } from "../types";
 import Button from "../../common/Button";
 import MenuSection from "./MenuSection";
-import { useUserMessages, useUserProfile } from "@/lib/services/landing/hook";
+import { useUserBadgeCounts, useUserProfile } from "@/lib/services/landing/hook";
 import clsx from "clsx";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
@@ -46,11 +45,6 @@ const sectionDefs1: { id: SectionId; label: LandingCopyKey; icon: React.ReactNod
     icon: <MessageCircle className="h-4 w-4" />,
   },
   {
-    id: "payments",
-    label: "profilePaymentsTitle",
-    icon: <CreditCard className="h-4 w-4" />,
-  },
-  {
     id: "wallet",
     label: "profileWalletTitle",
     icon: <Wallet className="h-4 w-4" />,
@@ -79,17 +73,16 @@ export default function ProfileSidebar({
 }>) {
   const { data } = useUserProfile();
   const copy = useLandingCopy();
-  // Same params as MessagesList's first page, so the two share one cache entry.
-  const { data: messages } = useUserMessages({ page: 1, count: 20 });
-
-  const unreadCount = (messages?.result ?? []).filter(
-    (message) => !message.readAt,
-  ).length;
+  const counts = useUserBadgeCounts().data?.result;
+  const badges: Partial<Record<SectionId, number>> = {
+    messages: counts?.messages,
+    forms: counts?.forms,
+  };
   const resolve = (defs: typeof sectionDefs1): SideBarSections[] =>
     defs.map((s) => ({
       ...s,
       label: copy(s.label),
-      ...(s.id === "messages" && { badge: unreadCount }),
+      badge: badges[s.id],
     }));
 
   return (
@@ -100,9 +93,17 @@ export default function ProfileSidebar({
         )}
       >
         <div className="flex items-center justify-start gap-2">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-800/80 ring-1 ring-zinc-700">
-            <UserRound className="h-6 w-6 text-zinc-300" />
-          </div>
+          {data?.avatar ? (
+            <img
+              src={data.avatar}
+              alt=""
+              className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-zinc-700"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-800/80 ring-1 ring-zinc-700">
+              <UserRound className="h-6 w-6 text-zinc-300" />
+            </div>
+          )}
           <div className="flex flex-col gap-2 items-start">
             <h2 className="text-base text-zinc-100">{`${data?.firstName} ${data?.lastName}`}</h2>
             <span dir="ltr" className="text-sm text-zinc-400">

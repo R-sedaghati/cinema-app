@@ -9,7 +9,9 @@ import { isMobile } from "react-device-detect";
 import {
   useUpdateUserProfile,
   useUserProfile,
+  useUserUploadAvatar,
 } from "@/lib/services/landing/hook";
+import { UserRound } from "lucide-react";
 import {
   FIELD_VALIDATION_PRESETS,
   isValidPreset,
@@ -19,6 +21,7 @@ import { toast } from "react-toastify";
 export default function Overview() {
   const { data } = useUserProfile();
   const { mutate, isPending } = useUpdateUserProfile();
+  const uploadAvatar = useUserUploadAvatar();
   const copy = useLandingCopy();
 
   const [form, setForm] = useState({
@@ -94,6 +97,45 @@ export default function Overview() {
         onSubmit={handleSubmit}
         className="flex flex-col gap-8 rounded-xl border-2 border-zinc-700/60 bg-gray-100/60 p-4 backdrop-blur-sm"
       >
+        <div className="flex items-center gap-4">
+          {data?.avatar ? (
+            <img
+              src={data.avatar}
+              alt=""
+              className="h-20 w-20 rounded-full object-cover ring-1 ring-zinc-700"
+            />
+          ) : (
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800/80 ring-1 ring-zinc-700">
+              <UserRound className="h-8 w-8 text-zinc-300" />
+            </div>
+          )}
+          <div className="flex flex-col gap-1">
+            <label className="cursor-pointer text-sm text-error-500">
+              <span style={copy.style("profileAvatarCta")}>
+                {uploadAvatar.isPending ? "..." : copy("profileAvatarCta")}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploadAvatar.isPending}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  uploadAvatar.mutate(file, {
+                    onSuccess: () => toast.success(copy("saveSuccess")),
+                    onError: () => toast.error(copy("profileAvatarError")),
+                  });
+                }}
+              />
+            </label>
+            <span className="text-xs text-zinc-400" style={copy.style("profileAvatarHint")}>
+              {copy("profileAvatarHint")}
+            </span>
+          </div>
+        </div>
+
         <div className="grid w-full gap-4 md:grid-cols-2">
           <Input
             id="first-name"

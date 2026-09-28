@@ -3,7 +3,6 @@
 import {
   CONTACT_BUILTIN_LABELS,
   CONTACT_FIELD_TYPES,
-  CONTACT_FORM_DEFAULT,
   contactFormOf,
   isBuiltinContactKey,
 } from "@/lib/constants/contactForm";
@@ -40,14 +39,36 @@ interface Props {
   stored?: ISiteContentContactForm | null;
   isPending: boolean;
   onSave: (value: ISiteContentContactForm) => void;
+  /** Defaults are the support contact form; the resume-request form passes its own. */
+  title?: string;
+  note?: string;
+  formOf?: (stored?: ISiteContentContactForm | null) => ISiteContentContactForm;
+  /** Label for a key stored in its own column (type locked), or null for a free field. */
+  builtinLabel?: (key: string) => string | null;
+  /** Resume-request form: shows the no-OTP switch and the per-field "save in browser" box. */
+  resumeOptions?: boolean;
 }
 
-export default function ContactFormCard({ ready, stored, isPending, onSave }: Props) {
+const contactBuiltinLabel = (key: string) =>
+  isBuiltinContactKey(key) ? CONTACT_BUILTIN_LABELS[key] : null;
+
+export default function ContactFormCard({
+  ready,
+  stored,
+  isPending,
+  onSave,
+  title = "فرم تماس با پشتیبانی",
+  note = "فیلدهای پایه (نام، ایمیل، موضوع و…) در ستون‌های مخصوص خودشان در پنل ذخیره می‌شوند. پاسخ فیلدهایی که خودتان اضافه می‌کنید، در انتهای متن پیام همان درخواست نوشته می‌شود.",
+  formOf = contactFormOf,
+  builtinLabel = contactBuiltinLabel,
+  resumeOptions = false,
+}: Props) {
   const [form, setForm] = useState<ISiteContentContactForm | null>(null);
+  const defaults = formOf(null);
 
   useEffect(() => {
-    if (ready && !form) setForm(contactFormOf(stored));
-  }, [ready, stored, form]);
+    if (ready && !form) setForm(formOf(stored));
+  }, [ready, stored, form, formOf]);
 
   if (!form) return null;
 
@@ -98,38 +119,50 @@ export default function ContactFormCard({ ready, stored, isPending, onSave }: Pr
   return (
     <Card>
       <div className="flex flex-col gap-4">
-        <p className="font-h3-bold text-error-500">فرم تماس با پشتیبانی</p>
+        <p className="font-h3-bold text-error-500">{title}</p>
 
         <Divider color="gray" size="thin" type="horizontal" />
 
         <div className="grid md:grid-cols-2 gap-2">
           <Input
             labelContent="عنوان فرم"
-            placeholder={CONTACT_FORM_DEFAULT.title}
+            placeholder={defaults.title}
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
           <Input
             labelContent="متن دکمه ارسال"
-            placeholder={CONTACT_FORM_DEFAULT.submitLabel}
+            placeholder={defaults.submitLabel}
             value={form.submitLabel}
             onChange={(e) => setForm({ ...form, submitLabel: e.target.value })}
           />
         </div>
 
-        <p className="text-xs text-gray-500">
-          فیلدهای پایه (نام، ایمیل، موضوع و…) در ستون‌های مخصوص خودشان در پنل ذخیره
-          می‌شوند. پاسخ فیلدهایی که خودتان اضافه می‌کنید، در انتهای متن پیام همان
-          درخواست نوشته می‌شود.
-        </p>
+        <p className="text-xs text-gray-500">{note}</p>
+
+        {resumeOptions && (
+          <div className="flex flex-col gap-1 border border-warning-300 bg-warning-50 rounded-lg p-3">
+            <Checkbox
+              label="درخواست بدون ورود (بدون کد تأیید پیامکی)"
+              containerClassName="w-full"
+              checked={Boolean(form.guestMode)}
+              onChange={(e) => setForm({ ...form, guestMode: e.target.checked })}
+            />
+            <p className="text-xs text-gray-600">
+              بازدیدکننده بدون ورود به حساب، فقط با پر کردن همین فرم درخواست می‌دهد. فیلد
+              «شماره موبایل» (کلید phoneNumber) در این حالت همیشه الزامی است و اگر در فرم نباشد
+              خودکار اضافه می‌شود. شماره تأیید نمی‌شود؛ پیامک تایید به همین شماره می‌رود و
+              اطلاعات تماس فقط در همان مرورگری که درخواست داده نمایش داده می‌شود. کاربرانی که
+              وارد حساب شده‌اند مثل قبل درخواست می‌دهند.
+            </p>
+          </div>
+        )}
 
         {form.fields.map((field, index) => (
           <div key={field.key} className="flex flex-col gap-2 border border-gray-200 rounded-lg p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="font-p2-medium">
-                {isBuiltinContactKey(field.key)
-                  ? CONTACT_BUILTIN_LABELS[field.key]
-                  : `فیلد افزوده‌شده (${field.key})`}
+                {builtinLabel(field.key) ?? `فیلد (${field.key})`}
               </p>
 
               <div className="flex items-center gap-1">
@@ -170,7 +203,7 @@ export default function ContactFormCard({ ready, stored, isPending, onSave }: Pr
 
             <div className="grid md:grid-cols-2 gap-2">
               {/* The two category selects and the built-in columns keep their type. */}
-              {isBuiltinContactKey(field.key) ? null : (
+              {builtinLabel(field.key) ? null : (
                 <Select
                   inputProps={{ labelContent: "نوع فیلد" }}
                   mode="single"
@@ -218,7 +251,7 @@ export default function ContactFormCard({ ready, stored, isPending, onSave }: Pr
               )}
             </div>
 
-            {HAS_OPTIONS.has(field.type) && !isBuiltinContactKey(field.key) && (
+            {HAS_OPTIONS.has(field.type) && !builtinLabel(field.key) && (
               <Input
                 labelContent="گزینه‌ها (برچسب:مقدار، جدا با کاما)"
                 value={(field.options ?? []).map((o) => `${o.label}:${o.value}`).join(", ")}
@@ -243,6 +276,15 @@ export default function ContactFormCard({ ready, stored, isPending, onSave }: Pr
               checked={field.required}
               onChange={(e) => patchField(index, { required: e.target.checked })}
             />
+
+            {resumeOptions && (
+              <Checkbox
+                label="ذخیره پاسخ در مرورگر کاربر برای درخواست بعدی (فقط اطلاعات شخصی، حالت بدون ورود)"
+                containerClassName="w-full"
+                checked={Boolean(field.persist)}
+                onChange={(e) => patchField(index, { persist: e.target.checked })}
+              />
+            )}
           </div>
         ))}
 
@@ -254,7 +296,7 @@ export default function ContactFormCard({ ready, stored, isPending, onSave }: Pr
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => setForm(contactFormOf(null))}
+              onClick={() => setForm(formOf(null))}
             >
               بازگرداندن فرم پیش‌فرض
             </Button>

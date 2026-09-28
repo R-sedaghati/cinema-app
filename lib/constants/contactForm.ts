@@ -1,5 +1,5 @@
 import { EFormFieldType } from "../services/admin/type.ts";
-import type { IContactFormField, ISiteContentContactForm } from "../services/admin/type.ts";
+import type { IContactFormField, IFormField, ISiteContentContactForm } from "../services/admin/type.ts";
 
 /**
  * Keys the backend stores in its own columns. Every other key is a custom field
@@ -140,3 +140,17 @@ export const appendCustomAnswers = (
 
   return extras.length ? `${message}\n\n${extras.join("\n")}` : message;
 };
+
+/** The dynamic definition carries no ids/order, which FieldRenderer expects. */
+export const asFormField = (field: IContactFormField, index: number): IFormField => ({
+  id: index,
+  key: field.key,
+  label: field.label,
+  type: field.type,
+  placeholder: field.placeholder ?? null,
+  helpText: field.helpText ?? null,
+  required: field.required,
+  order: index,
+  options: field.options ?? null,
+  validation: field.validation ?? null,
+});

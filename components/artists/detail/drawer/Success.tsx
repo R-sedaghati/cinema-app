@@ -7,7 +7,8 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-const Success = ({ trackingCode }: { trackingCode: string | null }) => {
+/** `guest` has no profile to go to; their access lives in this browser instead. */
+const Success = ({ trackingCode, guest = false }: { trackingCode: string | null; guest?: boolean }) => {
   const copy = useLandingCopy();
 
   return (
@@ -30,7 +31,11 @@ const Success = ({ trackingCode }: { trackingCode: string | null }) => {
 
       {/* Description */}
       <p className="text-zinc-300 leading-8 text-sm max-w-md mx-auto">
-        <span style={copy.style("callSuccessDesc")}>{copy("callSuccessDesc")}</span>
+        {guest ? (
+          <span style={copy.style("callSuccessGuestDesc")}>{copy("callSuccessGuestDesc")}</span>
+        ) : (
+          <span style={copy.style("callSuccessDesc")}>{copy("callSuccessDesc")}</span>
+        )}
       </p>
 
       {/* Tracking Code */}
@@ -42,13 +47,13 @@ const Success = ({ trackingCode }: { trackingCode: string | null }) => {
       )}
 
       {/* CTA Button */}
-      <div>
+      {!guest && <div>
         <Link href="/profile">
           <Button isFullWidth className="rounded-full!" leftIcon={<ChevronLeft />}>
             <span style={copy.style("callSuccessCta")}>{copy("callSuccessCta")}</span>
           </Button>
         </Link>
-      </div>
+      </div>}
     </div>
   );
 };

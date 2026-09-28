@@ -35,11 +35,15 @@ export default function ArtistCard({
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {toResumeName(artist?.categories?.at(0)?.faName)}
         </span>
-        <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-          {artist?.answers?.gender === EArtistGender.MAN
-            ? copy("labelGenderMan")
-            : copy("labelGenderWoman")}
-        </span>
+        {/* gender is optional in most forms — no answer shows no chip, not a guessed one */}
+        {(artist?.answers?.gender === EArtistGender.MAN ||
+          artist?.answers?.gender === EArtistGender.WOMAN) && (
+          <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
+            {artist.answers.gender === EArtistGender.MAN
+              ? copy("labelGenderMan")
+              : copy("labelGenderWoman")}
+          </span>
+        )}
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {(artist?.answers?.city as string | undefined) ?? ""}
         </span>

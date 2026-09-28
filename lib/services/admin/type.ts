@@ -310,8 +310,6 @@ export interface ICategoryItem {
   updatedAt: string | null;
   priority: number | null;
   parent: number | null;
-  /** Price in Toman a viewer pays to unlock contact details in this category. 0 means free. */
-  contactAmount: number | null;
   /** One-off fee in Toman an artist pays to register in this category. 0 means free. */
   registrationAmount: number | null;
   [key: string]: unknown;
@@ -388,8 +386,6 @@ export interface IUpdateCategoryRequest {
   /** null promotes to a main category. */
   parentId?: number | null;
   image?: string | null;
-  /** Price in Toman a viewer pays to unlock contact details in this category. 0 means free. */
-  contactAmount?: number | null;
   /** One-off fee in Toman an artist pays to register in this category. 0 means free. */
   registrationAmount?: number | null;
 }
@@ -409,7 +405,6 @@ export interface ICreateCategoryRequest {
   priority?: number | null;
   isActive?: boolean;
   image?: string | null;
-  contactAmount?: number | null;
   registrationAmount?: number | null;
 }
 
@@ -621,12 +616,16 @@ export interface IContactFormField {
   required: boolean;
   options?: IFormFieldOption[] | null;
   validation?: IFormFieldValidation | null;
+  /** Resume-request form only: remembered in a guest's browser for the next request. */
+  persist?: boolean;
 }
 
 export interface ISiteContentContactForm {
   title: string;
   submitLabel: string;
   fields: IContactFormField[];
+  /** Resume-request form only: visitors may request without logging in (no OTP). */
+  guestMode?: boolean;
 }
 
 export interface ISiteContentFooter {
@@ -665,6 +664,8 @@ export interface ISiteContent {
   form?: Record<string, string> | null;
   /** Field definition of the support contact form (see `lib/constants/contactForm.ts`). */
   contactForm?: ISiteContentContactForm | null;
+  /** Form a viewer fills to request an artist's resume (see `lib/constants/resumeRequestForm.ts`). */
+  resumeRequestForm?: ISiteContentContactForm | null;
   /**
    * Home-page section order and visibility, keyed by `lib/constants/homeSections.ts`.
    * Empty/absent means "use the shipped catalog order" — see
@@ -754,7 +755,7 @@ export interface IGatewayLogResponse {
 }
 
 /** Events that fan out an SMS to the admin numbers below. */
-export type NotificationEvent = "REGISTRATION" | "TRANSACTION" | "SUPPORT_TICKET";
+export type NotificationEvent = "REGISTRATION" | "TRANSACTION" | "SUPPORT_TICKET" | "RESUME_REQUEST";
 
 export interface INotificationSetting {
   phones: string[];
@@ -763,12 +764,34 @@ export interface INotificationSetting {
 
 export type INotificationSettingResponse = IRetriveResponse<INotificationSetting>;
 
+export interface IAdminNotification {
+  id: number;
+  event: NotificationEvent;
+  message: string;
+  link: string | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export type IAdminNotificationListResponse = IRetriveResponse<{
+  unread: number;
+  items: IAdminNotification[];
+}>;
+
+export type IAdminBadgeCountsResponse = IRetriveResponse<{
+  supports: number;
+  contactRequests: number;
+  registrations: number;
+  notifications: number;
+}>;
+
 export interface IUpdateNotificationSettingRequest {
   phones?: string[];
   events?: NotificationEvent[];
 }
 
-export type ITransactionStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELED";
+/** Resume-request review state (the admin "transactions" page lists resume requests). */
+export type ITransactionStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface ParamsTransactionList {
   count: number;
@@ -781,12 +804,11 @@ export interface ITransactionItem {
   id: number;
   trackingCode: string;
   status: ITransactionStatus;
-  /** Total cost of the view: gateway part + wallet part. */
-  amount: number;
-  walletAmount: number;
-  paymentGateway: string;
   createdAt: string | null;
+  reviewedAt: string | null;
   requesterName: string;
+  /** No-OTP request: `buyer.phoneNumber` is what the guest typed, unverified. */
+  isGuest: boolean;
   buyer: { id: number | null; phoneNumber: string | null };
   artist: {
     id: number | null;
@@ -795,6 +817,41 @@ export interface ITransactionItem {
     categories: { id: number; faName: string }[];
   };
   [key: string]: unknown;
+}
+
+/** One resume request as the admin review page shows it. */
+export interface ITransactionDetail {
+  id: number;
+  trackingCode: string;
+  status: ITransactionStatus;
+  createdAt: string | null;
+  reviewedAt: string | null;
+  requesterName: string;
+  /** Requested without an account (no-OTP mode); `requester` holds only the typed phone. */
+  isGuest: boolean;
+  /** The requester's form answers, labelled by the current form. */
+  answers: (Pick<IFormField, "key" | "label" | "type" | "options"> & { value: unknown })[];
+  requester: {
+    id: number | null;
+    code: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    phoneNumber: string | null;
+    email: string | null;
+    avatar: string | null;
+    createdAt: string | null;
+  };
+  artist: {
+    id: number | null;
+    code: string | null;
+    name: string | null;
+    phoneNumber: string | null;
+    email: string | null;
+    avatar: string | null;
+    categories: { id: number; faName: string }[];
+    /** What an approval unlocks for the requester. */
+    privateFields: (Pick<IFormField, "key" | "label" | "type" | "options"> & { value: unknown })[];
+  };
 }
 
 export type IWalletTransactionType =
@@ -814,6 +871,8 @@ export interface IAdminWalletTransaction {
   description: string | null;
   /** Set only for manual adjustments. */
   adminUsername: string | null;
+  /** The artist profile this row was for; null when it has none (e.g. manual adjustments). */
+  artist: { id: number; code: string | null; name: string | null } | null;
   createdAt: string | null;
 }
 
@@ -842,6 +901,7 @@ export enum ESmsEvent {
   PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
   PAYMENT_FAILED = "PAYMENT_FAILED",
   SUPPORT_REPLY = "SUPPORT_REPLY",
+  RESUME_REQUEST_APPROVED = "RESUME_REQUEST_APPROVED",
 }
 
 export interface ISmsTemplate {
@@ -872,3 +932,19 @@ export type ISmsTemplateTestResponse = IRetriveResponse<{
   sentTo: number;
   message: string;
 }>;
+
+export interface IAdminProfile {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatar: string | null; // public URL on read
+}
+export type IAdminProfileResponse = IRetriveResponse<IAdminProfile>;
+export interface IUpdateAdminProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  avatar?: string | null; // storage path from POST /admin/upload/image; null clears
+}

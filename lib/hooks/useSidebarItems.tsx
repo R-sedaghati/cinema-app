@@ -1,5 +1,6 @@
 import { FirstLevelSidebarItem } from "@dgshahr/ui-kit/Sidebar";
 import { usePathname } from "next/navigation";
+import { useAdminBadgeCounts } from "@/lib/services/admin/hook";
 import {
   User,
   ChartColumnIncreasing,
@@ -16,6 +17,7 @@ import {
   MessageSquare,
   Wallpaper,
   Activity,
+  Bell,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -38,10 +40,18 @@ export const useSidebarItems = (): {
   firstAllowedRoute: string | undefined;
 } => {
   const pathname = usePathname() || "";
+  const counts = useAdminBadgeCounts().data?.result;
 
   const mainMenuItems: FirstLevelSidebarItem = {
     title: "منوی اصلی",
     children: [
+      {
+        icon: <Bell />,
+        title: "اعلان‌ها",
+        link: "/admin/notifications",
+        active: pathname.startsWith("/admin/notifications"),
+        badgeCount: counts?.notifications || undefined,
+      },
       {
         icon: <User />,
         title: "لیست هنرمندان",
@@ -53,6 +63,7 @@ export const useSidebarItems = (): {
         title: "لیست فرم‌های ثبت‌نامی",
         link: "/admin/artist-registration",
         active: pathname.startsWith("/admin/artist-registration"),
+        badgeCount: counts?.registrations || undefined,
       },
       {
         icon: <ChartColumnIncreasing />,
@@ -73,12 +84,14 @@ export const useSidebarItems = (): {
         title: "تیکت‌های پشتیبانی",
         link: "/admin/requests",
         active: pathname.startsWith("/admin/requests"),
+        badgeCount: counts?.supports || undefined,
       },
       {
         icon: <CircleDollarSign />,
         title: "درخواست‌های مشاهده رزومه",
         link: "/admin/transactions",
         active: pathname.startsWith("/admin/transactions"),
+        badgeCount: counts?.contactRequests || undefined,
       },
       {
         icon: <Activity />,
