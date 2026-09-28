@@ -10,7 +10,6 @@ import { formatPhoneNumber } from "@/lib/utils/formatPhoneNumber";
 import Button from "@/components/common/Button";
 import { useUserLogin } from "@/lib/services/landing/hook";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import TermsNotice from "@/components/login/TermsNotice";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
@@ -19,7 +18,6 @@ const OTP_EXPIRATION_KEY = "otpExpirationDate";
 const OTP_LENGTH = 4;
 
 const OtpStep: FC<StepBaseProps> = (props) => {
-  const router = useRouter();
   const { setStep } = props;
   const { phoneNumber, login } = useAuthStore();
   const { close } = useLoginDrawerStore();
@@ -105,8 +103,8 @@ const OtpStep: FC<StepBaseProps> = (props) => {
           }
           toast.success(copy("loginSuccess"));
           login(accessToken, "", true);
+          // Stay on the current page: callers like the resume prompt re-render once logged in.
           close();
-          router.push("/");
         },
         onError: () => {
           setErrorMessage(copy("loginOtpWrong"));

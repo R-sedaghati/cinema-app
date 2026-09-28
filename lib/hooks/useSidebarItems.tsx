@@ -18,6 +18,7 @@ import {
   Wallpaper,
   Activity,
   Bell,
+  FileText,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -92,6 +93,12 @@ export const useSidebarItems = (): {
         link: "/admin/transactions",
         active: pathname.startsWith("/admin/transactions"),
         badgeCount: counts?.contactRequests || undefined,
+      },
+      {
+        icon: <FileText />,
+        title: "فرم درخواست مشاهده رزومه",
+        // ponytail: editor lives in content-management; hash jumps to its card
+        link: "/admin/content-management#resume-request-form",
       },
       {
         icon: <Activity />,
