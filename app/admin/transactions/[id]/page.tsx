@@ -13,7 +13,8 @@ import { toResumeName } from "@/lib/utils/resumeName";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Badge, Button, Card, Divider } from "@dgshahr/ui-kit";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import React from "react";
 import { toast } from "react-toastify";
 
@@ -50,6 +51,7 @@ const AnswerRows = ({ rows }: { rows: ITransactionDetail["answers"] }) =>
 
 function ResumeRequestDetail() {
   const id = Number(useParams().id);
+  const router = useRouter();
   const { data, isPending } = useAdminTransactionRetrieve(id);
   const review = useAdminTransactionReview();
   const request = data?.result;
@@ -71,6 +73,16 @@ function ResumeRequestDetail() {
 
   return (
     <div className="flex flex-col gap-6 p-4 pt-6">
+      <div className="flex justify-start">
+        <Button
+          onClick={() => router.push("/admin/transactions")}
+          variant="text"
+          rightIcon={<ChevronRight />}
+          color="gray"
+        >
+          بازگشت به تراکنش‌ها
+        </Button>
+      </div>
       <Card>
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
