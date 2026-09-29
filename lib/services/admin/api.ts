@@ -39,6 +39,7 @@ import {
   IPaymentSettingResponse,
   IPaymentSettingTestResponse,
   IGatewayLogResponse,
+  IAdminPayment,
   INotificationSettingResponse,
   IAdminNotificationListResponse,
   IAdminBadgeCountsResponse,
@@ -61,6 +62,7 @@ import {
   IUpdateFormStepRequest,
   IUserRetrive,
   IUserDetailResponse,
+  IAdminUserUpdateRequest,
   IUsersListResponse,
   LoginRequest,
   LoginResponse,
@@ -488,6 +490,18 @@ export const adminGatewayLogs = async (
   return data;
 };
 
+export const adminPayments = async (
+  params: { page: number; status?: string },
+  accessToken: string,
+) => {
+  const { data } = await api.get<IBasePaginateResponse<IAdminPayment>>("/admin/payments/", {
+    params: { count: 20, ...params },
+    headers: { Authorization: accessToken },
+  });
+
+  return data;
+};
+
 export const adminNotificationSettings = async (accessToken: string) => {
   const { data } = await api.get<INotificationSettingResponse>(
     "/admin/notification-settings/",
@@ -601,6 +615,18 @@ export const adminUserDetail = async (
     headers: {
       Authorization: accessToken,
     },
+  });
+
+  return data;
+};
+
+export const adminUserUpdate = async (
+  id: number,
+  body: IAdminUserUpdateRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IUserDetailResponse>(`/admin/users/${id}/`, body, {
+    headers: { Authorization: accessToken },
   });
 
   return data;

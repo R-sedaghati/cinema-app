@@ -10,11 +10,17 @@ import {
   ChevronLeft,
   Headset,
   Mail,
+  BadgeCheck,
 } from "lucide-react";
 import { SectionId } from "../types";
 import Button from "../../common/Button";
 import MenuSection from "./MenuSection";
-import { useUserBadgeCounts, useUserProfile } from "@/lib/services/landing/hook";
+import {
+  useUserBadgeCounts,
+  useUserProfile,
+} from "@/lib/services/landing/hook";
+import { subscriptionHref } from "@/lib/services/landing/api";
+import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import clsx from "clsx";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
@@ -64,6 +70,38 @@ const sectionDefs2: { id: SectionId; label: LandingCopyKey; icon: React.ReactNod
   },
 ];
 
+/** The yearly subscription. Active: member badge + end date. Expired: renew. */
+function SubscriptionBadge({ expiresAt }: Readonly<{ expiresAt?: string | null }>) {
+  if (!expiresAt) return null;
+
+  if (new Date(expiresAt) > new Date()) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs text-emerald-400">
+        <BadgeCheck className="h-3.5 w-3.5" />
+        عضو فعال تا {convertGregorianTimeToShamsiTime(expiresAt, false)}
+      </span>
+    );
+  }
+
+  const renew = () => {
+    // landingApi's interceptor already toasts a failure.
+    subscriptionHref()
+      .then((href) => {
+        window.location.href = href;
+      })
+      .catch(() => {});
+  };
+
+  return (
+    <span className="inline-flex items-center gap-2 text-xs text-zinc-500">
+      اشتراک منقضی شده
+      <button type="button" onClick={renew} className="text-zinc-200 underline hover:text-white">
+        تمدید
+      </button>
+    </span>
+  );
+}
+
 export default function ProfileSidebar({
   active,
   setActive,
@@ -110,6 +148,7 @@ export default function ProfileSidebar({
               {data?.phone_number ?? ""}
             </span>
             <p className="text-sm text-zinc-400 truncate">{data?.email}</p>
+            <SubscriptionBadge expiresAt={data?.subscriptionExpiresAt} />
           </div>
         </div>
         <Button

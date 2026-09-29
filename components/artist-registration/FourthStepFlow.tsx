@@ -17,13 +17,14 @@ import { isDesktop, isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { CopyFn } from "@/lib/utils/formCopy";
 import { getStepErrors } from "@/lib/utils/validateFormStep";
-import { userPurchase } from "@/lib/services/landing/api";
+import { subscriptionHref } from "@/lib/services/landing/api";
+import { saveSubscriptionDraft } from "@/lib/utils/subscriptionDraft";
 import FormAnswersSummary from "./FormAnswersSummary";
 
 interface Props {
   steps: IFormStep[];
   copy: CopyFn;
-  /** Resolved server-side from the category. 0 means registration is free here. */
+  /** Yearly subscription price, resolved server-side. 0 means subscribed (or free): submit directly. */
   registrationAmount?: number;
   onNext: () => void;
   onPrevious: () => void;
@@ -39,8 +40,8 @@ const FourthStepFlow: React.FC<Props> = ({
   onGoToStep,
 }) => {
   const store = useArtistRegistrationStore();
-  // Resolved server-side from the category. 0 is a real answer — the category is free —
-  // so it must not be conflated with `undefined`, which means "not loaded yet".
+  // 0 is a real answer — already subscribed, or the subscription is free — so it must
+  // not be conflated with `undefined`, which means "not loaded yet".
   const isFree = registrationAmount === 0;
   const router = useRouter();
   const { mutate: create, isPending: isCreating } =
@@ -71,23 +72,16 @@ const FourthStepFlow: React.FC<Props> = ({
     portfolios: portfolios.length ? portfolios : undefined,
   };
 
-  // The purchase endpoint needs the Authorization header, which a plain
-  // `window.location.href` navigation cannot carry — so ask for the gateway URL over
-  // XHR (the axios instance injects the token) and navigate to whatever comes back.
-  const startPayment = (requestId: number) => {
+  // Pay first, then save: the answers wait in localStorage while the browser is at the
+  // gateway, and the result page submits them once the subscription has settled.
+  // The purchase call goes over XHR because it needs the Authorization header.
+  const buySubscription = () => {
     setIsRedirecting(true);
-    // Read before the reset below, so the fallback URL does not depend on when the
-    // store is cleared.
     const categoryId = store.categoryId[0] ?? "";
+    saveSubscriptionDraft({ editId: store.editId, ...formPayload });
 
-    return userPurchase(requestId)
-      .then(({ result }) => {
-        // No redirectUrl means the server already settled it — a free category, or the
-        // wallet covered the fee — so there is no gateway stop to make.
-        const href =
-          result?.redirectUrl ??
-          `/artist-registration/result?status=success&categoryId=${categoryId}`;
-
+    return subscriptionHref(categoryId)
+      .then((href) => {
         // Only safe once the navigation is certain: resetting earlier unmounts the flow
         // while this call is still in flight.
         store.reset();
@@ -114,47 +108,47 @@ const FourthStepFlow: React.FC<Props> = ({
       update(
         { id: store.editId, ...formPayload },
         {
-          onSuccess: (res) => {
-            // A request sent back for revision had its fee refunded to the wallet, so it
-            // goes through payment again. The wallet normally covers it in full, in which
-            // case the server settles it and redirects without a gateway stop.
-            // Resetting the store here would unmount the flow mid-purchase, so it waits
-            // until the navigation is actually under way.
-            if (res.result.requiresPayment) {
-              startPayment(res.result.artistRequestId);
-              return;
-            }
-
+          onSuccess: () => {
             store.reset();
             toast.success(copy("editSuccessToast"));
             router.push("/profile");
           },
-          onError: () => toast.error(copy("editErrorToast")),
+          onError: (error) => {
+            // 402 = a revision resubmitted after the subscription lapsed: renew, then
+            // the result page sends these same edits.
+            if (error.response?.status === 402) return void buySubscription();
+            toast.error(copy("editErrorToast"));
+          },
         },
       );
-    } else {
-      create(formPayload, {
-        onSuccess: (res) => {
-          // The amount is fixed server-side; sending one here let users choose their own price.
-          // The server resolves the fee (and skips the gateway when it is 0), so this
-          // is the same redirect whether the category is paid or free.
-          startPayment(res.result.artistRequestId);
-        },
-        onError: (error) => {
-          // 409 = this account already filled this category's form. The server owns the
-          // rule, so its message wins; the copy key is the fallback.
-          const message = (error.response?.data as { message?: string } | undefined)
-            ?.message;
-
-          toast.error(
-            message ??
-              (error.response?.status === 409
-                ? copy("duplicateErrorToast")
-                : copy("editErrorToast")),
-          );
-        },
-      });
+      return;
     }
+
+    if (!isFree) return void buySubscription();
+
+    create(formPayload, {
+      onSuccess: () => {
+        const categoryId = store.categoryId[0] ?? "";
+        store.reset();
+        router.push(`/artist-registration/result?status=success&categoryId=${categoryId}`);
+      },
+      onError: (error) => {
+        // 402 = the subscription lapsed since the form loaded; buy it, then submit.
+        if (error.response?.status === 402) return void buySubscription();
+
+        // 409 = this account already filled this category's form. The server owns the
+        // rule, so its message wins; the copy key is the fallback.
+        const message = (error.response?.data as { message?: string } | undefined)
+          ?.message;
+
+        toast.error(
+          message ??
+            (error.response?.status === 409
+              ? copy("duplicateErrorToast")
+              : copy("editErrorToast")),
+        );
+      },
+    });
   };
 
   return (

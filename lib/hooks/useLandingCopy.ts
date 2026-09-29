@@ -5,6 +5,7 @@ import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { makeResolver } from "@/lib/utils/copy";
 import { setLandingCopy } from "@/lib/utils/landingCopy";
+import { setUploadLimits } from "@/lib/utils/prepareUpload";
 import type { CopyResolver } from "@/lib/utils/copy";
 import { createContext, useContext, useMemo } from "react";
 
@@ -24,6 +25,8 @@ export function useLandingCopy(): CopyResolver<LandingCopyKey> {
   const { data } = useUserSiteContent();
   const overrides = data?.result?.landing;
   const draft = useContext(DraftCopyContext);
+  // Same site-content request, same bridge to the non-React upload helpers.
+  setUploadLimits(data?.result?.uploadLimits);
 
   return useMemo(() => {
     const resolver = makeResolver(

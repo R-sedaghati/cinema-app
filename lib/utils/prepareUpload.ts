@@ -1,8 +1,20 @@
 import { toast } from "react-toastify";
 import { landingCopy } from "./landingCopy";
 
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB before compression
-export const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100MB
+export interface IUploadLimits {
+  imageMb: number;
+  videoMb: number;
+}
+
+// Mirrors the backend defaults until site-content lands; the server enforces the real cap.
+let limits: IUploadLimits = { imageMb: 10, videoMb: 100 };
+
+/** `useLandingCopy` publishes the admin-set limits here with the copy overrides. */
+export const setUploadLimits = (next?: IUploadLimits | null) => {
+  if (next) limits = next;
+};
+
+const MB = 1024 * 1024;
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
@@ -16,8 +28,6 @@ const fail = (message: string): never => {
   throw new Error(message);
 };
 
-const toMB = (bytes: number) => Math.round(bytes / 1024 / 1024);
-
 /**
  * Validates an image (type + size) and downscales/re-encodes it to JPEG.
  * Returns the original file if compression is unavailable or not a win.
@@ -25,8 +35,8 @@ const toMB = (bytes: number) => Math.round(bytes / 1024 / 1024);
 export const prepareImage = async (file: File): Promise<File> => {
   if (!IMAGE_TYPES.includes(file.type))
     fail(landingCopy("uploadImageTypeError"));
-  if (file.size > MAX_IMAGE_BYTES)
-    fail(landingCopy("uploadImageSizeError", { mb: toMB(MAX_IMAGE_BYTES) }));
+  if (file.size > limits.imageMb * MB)
+    fail(landingCopy("uploadImageSizeError", { mb: limits.imageMb }));
 
   try {
     const bitmap = await createImageBitmap(file);
@@ -58,8 +68,8 @@ export const prepareImage = async (file: File): Promise<File> => {
 export const prepareVideo = (file: File): File => {
   if (!VIDEO_TYPES.includes(file.type))
     fail(landingCopy("uploadVideoTypeError"));
-  if (file.size > MAX_VIDEO_BYTES)
-    fail(landingCopy("uploadVideoSizeError", { mb: toMB(MAX_VIDEO_BYTES) }));
+  if (file.size > limits.videoMb * MB)
+    fail(landingCopy("uploadVideoSizeError", { mb: limits.videoMb }));
 
   return file;
 };

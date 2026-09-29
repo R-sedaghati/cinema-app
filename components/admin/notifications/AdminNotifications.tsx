@@ -58,8 +58,8 @@ export default function AdminNotifications() {
                 type="button"
                 onClick={() => open(item)}
                 className={clsx(
-                  "w-full text-start rounded-lg border p-3 flex flex-col gap-1 transition-colors hover:bg-gray-50",
-                  item.readAt ? "border-gray-200" : "border-primary-300 bg-primary-50",
+                  "w-full text-start rounded-lg border bg-white p-3 flex flex-col gap-1 transition-colors hover:bg-gray-50",
+                  item.readAt ? "border-gray-200" : "border-primary-300",
                 )}
               >
                 <div className="flex items-center gap-2 font-p3-regular text-gray-500">

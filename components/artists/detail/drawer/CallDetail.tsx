@@ -54,17 +54,21 @@ const CallDetail = ({
   // Read once on mount; a fresh submit writes the same values back, so it cannot go stale.
   const [saved] = useState(() => (guest ? loadSavedAnswers() : {}));
 
-  // Typed answers win; the profile name (or a guest's saved answers) only fills what the
-  // viewer has not touched.
+  // The profile name is the account's own and renders read-only, so it wins; otherwise
+  // typed answers win over a guest's saved ones.
   const [typed, setTyped] = useState<Record<string, unknown>>({});
+  const locked = useMemo<Record<string, string>>(
+    () =>
+      Object.fromEntries(
+        Object.entries({ firstName: profile?.firstName, lastName: profile?.lastName }).filter(
+          ([, value]) => value,
+        ),
+      ) as Record<string, string>,
+    [profile],
+  );
   const answers = useMemo<Record<string, unknown>>(
-    () => ({
-      firstName: profile?.firstName ?? undefined,
-      lastName: profile?.lastName ?? undefined,
-      ...saved,
-      ...typed,
-    }),
-    [profile, saved, typed],
+    () => ({ ...saved, ...typed, ...locked }),
+    [locked, saved, typed],
   );
 
   const submit = () => {
@@ -124,6 +128,7 @@ const CallDetail = ({
             answers[field.key] ??
             (field.type === EFormFieldType.CHECKBOX ? [] : "")
           }
+          disabled={field.key in locked}
           onChange={(value) => setTyped((prev) => ({ ...prev, [field.key]: value }))}
         />
       ))}

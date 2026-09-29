@@ -377,7 +377,11 @@ export const useUpdateUserArtistRequest = () => {
   const { accessToken } = useAuthStore();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<
+    { result: ArtistRequestResult },
+    AxiosError,
+    { id: number } & Partial<UserCreateArtistRequest>
+  >({
     mutationFn: ({
       id,
       ...payload

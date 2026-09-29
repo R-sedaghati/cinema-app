@@ -48,7 +48,7 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
       value: EArtistRequestStatus.APPROVED,
     },
     {
-      label: "در انتظار بررسی",
+      label: "در انتظار تایید ادمین",
       value: EArtistRequestStatus.PENDING,
     },
     {

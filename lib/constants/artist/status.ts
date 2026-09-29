@@ -14,7 +14,7 @@ export const ARTSIT_STATUS: Record<
     color: "gray",
   },
   [EArtistRequestStatus.PENDING]: {
-    label: "در انتظار بررسی",
+    label: "در انتظار تایید ادمین",
     color: "warning",
   },
   [EArtistRequestStatus.PENDING_PAYMENT]: {

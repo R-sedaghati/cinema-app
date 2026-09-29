@@ -313,6 +313,7 @@ export const LANDING_COPY = {
   profileFormsEmpty: { group: "پروفایل کاربر", admin: "متن نبودن فرم", value: "هیچ فرمی ثبت نشده است." },
   profileFormsTracking: { group: "پروفایل کاربر", admin: "برچسب کد پیگیری فرم", value: "کد پیگیری:" },
   profileFormEdit: { group: "پروفایل کاربر", admin: "دکمه ویرایش فرم", value: "ویرایش فرم" },
+  profileFormPay: { group: "پروفایل کاربر", admin: "دکمه پرداخت فرم (پرداخت ناموفق)", value: "پرداخت" },
   profileFormView: { group: "پروفایل کاربر", admin: "دکمه مشاهده فرم", value: "مشاهده فرم" },
   profileFormPublicPage: { group: "پروفایل کاربر", admin: "دکمه صفحه عمومی هنرمند", value: "صفحه عمومی" },
   profileFormViewTitle: { group: "پروفایل کاربر", admin: "عنوان صفحه مشاهده فرم", value: "مشاهده فرم ثبت‌شده" },

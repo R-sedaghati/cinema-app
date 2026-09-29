@@ -2,6 +2,7 @@ import type { ISectionConfig } from "@/lib/utils/resolveSections";
 import type { IPageBackground } from "@/lib/utils/pageBackground";
 import type { IPageLayout } from "@/lib/utils/pageLayout";
 import type { ITableColors } from "@/lib/utils/tableColors";
+import type { IUploadLimits } from "@/lib/utils/prepareUpload";
 
 export interface IRetriveResponse<T> {
   errors: string | null;
@@ -155,7 +156,15 @@ interface IArtistUser {
   id: number;
   lastName: string | null;
   phoneNumber: string | null;
+  nationalCode?: string | null;
   code: string;
+}
+
+export interface IAdminUserUpdateRequest {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  nationalCode?: string;
 }
 
 export interface IArtistItem {
@@ -254,7 +263,7 @@ export interface IFormResultPages {
 
 export interface IFormSchema extends IFormResultPages {
   steps: IFormStep[];
-  /** Registration fee in Toman, already resolved server-side. 0 means free. */
+  /** Yearly subscription price in Toman for this caller, resolved server-side. 0 = subscribed (submit directly). */
   registrationAmount: number;
 }
 
@@ -310,8 +319,6 @@ export interface ICategoryItem {
   updatedAt: string | null;
   priority: number | null;
   parent: number | null;
-  /** One-off fee in Toman an artist pays to register in this category. 0 means free. */
-  registrationAmount: number | null;
   [key: string]: unknown;
 }
 
@@ -386,8 +393,6 @@ export interface IUpdateCategoryRequest {
   /** null promotes to a main category. */
   parentId?: number | null;
   image?: string | null;
-  /** One-off fee in Toman an artist pays to register in this category. 0 means free. */
-  registrationAmount?: number | null;
 }
 
 /** One whole sibling list's new order: `priority` becomes each id's 1-based position. */
@@ -405,7 +410,6 @@ export interface ICreateCategoryRequest {
   priority?: number | null;
   isActive?: boolean;
   image?: string | null;
-  registrationAmount?: number | null;
 }
 
 export interface IFaqItem {
@@ -690,6 +694,8 @@ export interface ISiteContent {
   pageLayouts?: Record<string, IPageLayout> | null;
   /** Site-wide table colors, `#rrggbb` each; absent = theme default. */
   tableColors?: ITableColors | null;
+  /** Per-file upload caps in MB; the API always returns both, defaults filled in. */
+  uploadLimits?: IUploadLimits | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
@@ -711,6 +717,9 @@ export interface IPaymentSetting extends ISepEndpoints {
   defaults: ISepEndpoints;
   /** True while the gateway is still running off the server's env var. */
   usingEnvFallback: boolean;
+  /** Yearly subscription price in Toman; null = `defaultSubscriptionPrice` applies. */
+  subscriptionPrice: number | null;
+  defaultSubscriptionPrice: number;
 }
 
 export type IPaymentSettingResponse = IRetriveResponse<IPaymentSetting>;
@@ -718,6 +727,8 @@ export type IPaymentSettingResponse = IRetriveResponse<IPaymentSetting>;
 /** An endpoint sent as `""` clears the override and falls back to the shipped default. */
 export interface IUpdatePaymentSettingRequest extends Partial<ISepEndpoints> {
   terminalId?: string;
+  /** null clears it back to the default; 0 makes the subscription free. */
+  subscriptionPrice?: number | null;
 }
 
 export type IPaymentSettingTestResponse = IRetriveResponse<{
@@ -947,4 +958,22 @@ export interface IUpdateAdminProfileRequest {
   firstName?: string;
   lastName?: string;
   avatar?: string | null; // storage path from POST /admin/upload/image; null clears
+}
+
+export type IAdminPaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELED";
+
+/** One registration purchase. `amount` went through the gateway, `walletAmount` came from the wallet. */
+export interface IAdminPayment {
+  id: number;
+  amount: number;
+  walletAmount: number;
+  gateway: "saman" | "wallet" | "free" | string;
+  /** SEP's receipt number; set once the gateway leg settled. */
+  refNum: string | null;
+  status: IAdminPaymentStatus;
+  artist: { id: number; code: string | null; name: string | null } | null;
+  phone: string | null;
+  createdAt: string;
+  /** The ui-kit Table constrains its row type to an index-signature record. */
+  [key: string]: unknown;
 }

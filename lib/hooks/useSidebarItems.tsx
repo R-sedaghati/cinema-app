@@ -19,6 +19,7 @@ import {
   Activity,
   Bell,
   FileText,
+  Receipt,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -99,6 +100,12 @@ export const useSidebarItems = (): {
         title: "فرم درخواست مشاهده رزومه",
         // ponytail: editor lives in content-management; hash jumps to its card
         link: "/admin/content-management#resume-request-form",
+      },
+      {
+        icon: <Receipt />,
+        title: "تراکنش‌ها",
+        link: "/admin/payments",
+        active: pathname.startsWith("/admin/payments"),
       },
       {
         icon: <Activity />,

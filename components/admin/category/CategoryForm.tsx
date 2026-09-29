@@ -26,7 +26,6 @@ function CategoryForm() {
   const [parentId, setParentId] = useState<number | null>(presetParentId);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
-  const [registrationAmount, setRegistrationAmount] = useState("");
 
   const { data: parentOptionsData } = useAdminCategoryList();
   const mainCategories = (parentOptionsData?.result ?? []).filter(
@@ -38,10 +37,6 @@ function CategoryForm() {
   }));
   const parentName = mainCategories.find((c) => c.id === parentId)?.faName;
   const presetParentName = mainCategories.find((c) => c.id === presetParentId)?.faName;
-  const amountFallbackHint = parentId
-    ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
-    : "استفاده از مبلغ پیش‌فرض.";
-
   const { mutate: createCategory, isPending } = useAdminCategoryCreate();
   const uploadImage = useAdminUploadBannerImage();
 
@@ -77,9 +72,6 @@ function CategoryForm() {
         priority,
         isActive,
         image: imagePath || null,
-        // An empty field means "not set" (inherit / fall back); a typed 0 means free.
-        registrationAmount:
-          registrationAmount === "" ? null : Number(registrationAmount),
       },
       {
         onSuccess: () => {
@@ -191,21 +183,6 @@ function CategoryForm() {
                 {`زیردسته از فرم ثبت‌نام دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} استفاده می‌کند و ترتیب نمایش آن از دسته‌بندی اصلی پیروی می‌کند.`}
               </p>
             )}
-            <p className="font-h3-bold text-error-500">پرداخت</p>
-            <Divider color="gray" size="thin" type="horizontal" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                labelContent="مبلغ ثبت‌نام هنرمند"
-                placeholder="مبلغ ثبت‌نام هنرمند"
-                postfix="تومان"
-                type="text"
-                inputMode="numeric"
-                value={registrationAmount}
-                onChange={(e) => setRegistrationAmount(e.target.value)}
-                hintMessage={`مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
-                wrapperClassName="w-full"
-              />
-            </div>
             <div className="flex justify-end">
               <Button
                 color="error"

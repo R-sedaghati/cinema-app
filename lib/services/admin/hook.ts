@@ -52,6 +52,7 @@ import {
   IUpdateFormStepRequest,
   IUserRetrive,
   IUserDetailResponse,
+  IAdminUserUpdateRequest,
   IUsersListResponse,
   LoginRequest,
   LoginResponse,
@@ -107,6 +108,7 @@ import {
   adminPaymentSettingsUpdate,
   adminPaymentSettingsTest,
   adminGatewayLogs,
+  adminPayments,
   adminNotificationSettings,
   adminNotificationSettingsUpdate,
   adminNotifications,
@@ -134,6 +136,7 @@ import {
   adminUserDetail,
   adminUsersList,
   adminUserDelete,
+  adminUserUpdate,
   adminProfile,
   adminProfileUpdate,
 } from "./api";
@@ -459,6 +462,18 @@ export const useAdminGatewayLogs = (params: { page: number; level?: string }) =>
   });
 };
 
+export const useAdminPayments = (params: { page: number; status?: string }) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery({
+    queryKey: ["adminPayments", params],
+    queryFn: () => adminPayments(params, accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useAdminPaymentSettingsTest = () => {
   const { accessToken } = useAdminAuthStore();
 
@@ -606,6 +621,22 @@ export const useAdminUsersList = (
     refetchInterval: 30 * 1000,
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminUserUpdate = (id: number) => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation<IUserDetailResponse, AxiosError<{ message?: string }>, IAdminUserUpdateRequest>({
+    mutationFn: (body) => adminUserUpdate(id, body, accessToken),
+    // The name also shows on artist-request pages, which read it off the request.
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminUserDetail", id] }),
+        queryClient.invalidateQueries({ queryKey: ["artistRetrieve"] }),
+        queryClient.invalidateQueries({ queryKey: ["adminUsersList"] }),
+      ]),
   });
 };
 

@@ -21,6 +21,7 @@ export const generateColumns = (
   onEdit: (item: IArtistItem) => void,
   onView: (item: IArtistItem) => void,
   onOpenPublic: (item: IArtistItem) => void,
+  onPay: (item: IArtistItem) => void,
   copy: CopyResolver<LandingCopyKey>,
 ): ColumnsType<IArtistItem>[] => [
   {
@@ -81,6 +82,16 @@ export const generateColumns = (
         >
           <span style={copy.style(viewKey(data))}>{copy(viewKey(data))}</span>
         </Button>
+
+        {data.status === EArtistRequestStatus.PENDING_PAYMENT && (
+          <Button
+            variant="text"
+            leftIcon={<ChevronLeft />}
+            onClick={() => onPay(data)}
+          >
+            <span style={copy.style("profileFormPay")}>{copy("profileFormPay")}</span>
+          </Button>
+        )}
 
         {data.status === EArtistRequestStatus.APPROVED && (
           <Button
