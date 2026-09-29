@@ -127,6 +127,10 @@ interface User {
   avatar?: string | null;    // presigned URL
   code?: string;             // auto-generated sequential code
   lastLogin?: string;        // ISO datetime
+  // GET /user/profile only. End of the yearly subscription (ISO); null = never paid.
+  // Every form submits free while it runs. Once past, the artist stays public;
+  // POST /user/subscription/purchase/ renews it (+1 year, stacked onto any time left).
+  subscriptionExpiresAt?: string | null;
 }
 
 interface Category {
@@ -409,6 +413,7 @@ interface SiteContent {
   // site-wide table colors, set in `/admin/page-backgrounds`. Each `#rrggbb`; unknown
   // keys and non-hex values are dropped. Absent key = theme default.
   tableColors?: { headerBg?: string; headerText?: string; rowBg?: string; rowText?: string; border?: string } | null;
+  uploadLimits: { imageMb: number; videoMb: number }; // per-file caps in MB (defaults 10/100, max 200); enforced by /user/avatar and /user/upload/* (413 when exceeded)
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -546,6 +551,10 @@ to know which keys/types/required-ness apply to the selected category.
 **One form per account per top-level category.** An account (one phone number, one
 account) that already has a request in the selected category — filed under it or under
 any of its children — gets `409` with «شما قبلاً در این دسته‌بندی فرم ثبت کرده‌اید.».
+
+**Pay first, then save:** without a running yearly subscription the request is refused
+with `402` and nothing is stored — buy it via `POST /user/subscription/purchase/` first.
+Accepted requests always start `PENDING`.
 Every status counts, `REJECTED` included; a request needing changes is edited via
 `PATCH /user/artist-requests/:id/`, never re-submitted here. The check runs inside the
 create transaction, under the write lock on the user row, so parallel submissions cannot
@@ -605,16 +614,15 @@ Update own artist request. **Auth required.**
 
 **Body:** same shape as create (all optional). `answers` overwrites wholesale if provided. `portfolios` array replaces existing if provided.
 
+Resubmitting a `NEED_TO_REVISION` request moves it back to `PENDING`, but only inside a
+running subscription — otherwise `402` and nothing changes (renew, then resend).
+
 **Response (200):**
 ```ts
 ApiResponse<{
   artistRequestId: number;
   status: ArtistRequestStatus;
   portfolios: { id: number; filePath: string; type: PortfolioType; fieldKey: string | null }[];
-  // true when the edited request was NEED_TO_REVISION: the fee was refunded to the
-  // wallet when the admin asked for changes, so it is charged again. The client sends
-  // the artist to `GET /user/purchase/` when this is set.
-  requiresPayment: boolean;
 }>
 ```
 
@@ -624,9 +632,10 @@ ApiResponse<{
 Fetch the dynamic step/field schema for a category. No auth. Resolves child categories to
 their top-level parent's schema (only top-level categories own a schema).
 
-Auth is optional and only changes `registrationAmount`: a caller who has already paid one
-registration fee gets `0` here, because the fee is charged once per user (see
-`GET /user/purchase/`). Anonymous callers always see the category price.
+Auth is optional and only changes `registrationAmount`, which is the **yearly subscription
+price** (`PaymentSetting.subscriptionPrice`, falling back to `REGISTRATION_AMOUNT`): a caller
+with a running subscription gets `0` (submit directly). Anonymous callers see the price.
+Categories no longer carry a price.
 
 **Response:**
 ```ts
@@ -785,27 +794,45 @@ ticket gets linked to the replying account. 400 when `body` is empty or the tick
 
 ---
 
+### `POST /user/subscription/purchase/`
+Buy (or renew) the yearly subscription — returns the gateway URL. **Auth required.**
+
+**Query params:** `categoryId` (optional) — only carried to the result page for its copy.
+
+The price is server-side only (`PaymentSetting.subscriptionPrice`, else
+`REGISTRATION_AMOUNT`). The wallet pays first; if it covers everything (or the price is 0)
+a `COMPLETED` payment is recorded, the subscription extends by a year and `redirectUrl`
+comes back `null`. `400` if the subscription is already active.
+
+The payment carries `user` and no artist request: the form is not saved yet. The client
+keeps the answers in localStorage and submits `POST /user/artist-requests` (or the
+revision `PATCH`) from the result page once the payment has settled. Those payments are
+therefore never refunded by a later rejection/revision.
+
+**Response:** `{ "result": { "redirectUrl": "https://sep.shaparak.ir/...|null" } }`
+
+---
+
+### `ALL /user/subscription/callback/`
+SEP callback for the above. No auth. Same settlement rules as `/user/purchase/callback/`
+(token picks the payment, RefNum claimed then verified). Redirects to
+`/artist-registration/result?status=success|failed&kind=subscription&categoryId=…`.
+
+---
+
 ### `GET /user/purchase/`
-Initiate the artist registration payment — returns the gateway URL to redirect to. **Auth required.**
+**Legacy.** Pays for a request saved as `PENDING_PAYMENT` before subscriptions moved ahead
+of the form. Charges the yearly subscription price. **Auth required.**
 
 **Query params:**
 | Param | Type | Description |
 |-------|------|-------------|
 | requestId | number | Artist request ID |
 
-The fee is resolved server-side from the request's category (`registrationAmount`,
-inherited from the top-level category, falling back to `REGISTRATION_AMOUNT`). A
-client-supplied `amount` is ignored — it used to be honored, which let a user pick
-what they paid by editing the URL.
+The amount is the yearly subscription price, or `0` inside a running subscription. A
+client-supplied `amount` is ignored.
 
-The registration fee is charged **once per user**: if the caller already has a COMPLETED
-payment on one of their own artist requests where money actually moved (gateway amount or
-wallet share above zero), the fee resolves to `0` and every later registration form is
-free for them, in any category. A COMPLETED payment of `0` for a free category does not
-count — otherwise one free form would make every later paid form free. A fee later
-refunded (rejection or revision) still counts as paid.
-
-When the resolved fee is `0` the category is free: a `COMPLETED` payment is recorded,
+When the resolved amount is `0`: a `COMPLETED` payment is recorded,
 the request moves to `PENDING`, and `redirectUrl` comes back `null` — there is no
 gateway stop to make, so the client goes straight to the result page. The wallet
 covering the whole fee settles the same way.
@@ -818,6 +845,10 @@ covering the whole fee settles the same way.
 The client fetches this over XHR rather than navigating at it, because the route
 requires the `Authorization` header.
 
+Only a request in `PENDING_PAYMENT` (or `NEED_TO_REVISION`, for the revision re-pay) can be
+paid; any other status gets `400`. A failed attempt leaves the request `PENDING_PAYMENT`, so
+calling this again is how the client retries the payment.
+
 ---
 
 ### `ALL /user/purchase/callback/`
@@ -828,6 +859,9 @@ SEP returns the result as a **urlencoded form POST**, not a query string — `St
 only when `State` is `OK` and a `RefNum` is present; the server then calls SEP's
 `verifyTransaction` and rejects the payment unless the amount it settled matches what was
 charged.
+
+It then redirects the browser to `/artist-registration/result?status=success|failed&categoryId=…&requestId=…`.
+The fail page uses `requestId` to retry the payment.
 
 ---
 
@@ -1207,10 +1241,9 @@ Update category.
 
 **Body:** partial `Category` fields (`config` is no longer supported — use the form-builder endpoints below)
 
-`registrationAmount` (Toman) is what an artist pays to register in this category —
-**`0` means free, `null` means "not set here"** (inherit the top-level category, then
-`REGISTRATION_AMOUNT`). `contactAmount` is no longer read or written (resume requests are
-free); the column is kept for history.
+`registrationAmount` and `contactAmount` are no longer read or written (registration is
+covered by the yearly subscription, resume requests are free); the columns are kept for
+history.
 
 **Response:** `ApiResponse<Category>`
 
@@ -1264,7 +1297,10 @@ Soft-delete a category **and all its subcategories** in one statement
 SEP gateway settings.
 
 **Response:**
-`ApiResponse<{ terminalId, hasTerminalId, tokenUrl, verifyUrl, paymentUrl, defaults, usingEnvFallback }>`
+`ApiResponse<{ terminalId, hasTerminalId, tokenUrl, verifyUrl, paymentUrl, defaults, usingEnvFallback, subscriptionPrice, defaultSubscriptionPrice }>`
+
+`subscriptionPrice` (Toman) is the yearly subscription price; `null` means
+`defaultSubscriptionPrice` (`REGISTRATION_AMOUNT`) applies.
 
 `terminalId` is always **masked** (`****-****-****-abc1`) — the real terminal never
 leaves the server. `usingEnvFallback` is true while no terminal is stored and the gateway
@@ -1283,7 +1319,9 @@ same host, so testing means storing the test terminal here.
 ### `PATCH /admin/payment-settings/`
 Update gateway settings.
 
-**Body:** `{ terminalId?: string, tokenUrl?: string, verifyUrl?: string, paymentUrl?: string }`
+**Body:** `{ terminalId?: string, tokenUrl?: string, verifyUrl?: string, paymentUrl?: string, subscriptionPrice?: number | null }`
+
+`subscriptionPrice`: `0` = free, `null`/blank = back to the default.
 
 Because reads are masked, a submitted `terminalId` that still looks like a mask is
 treated as *unchanged* rather than written. An empty string clears the stored terminal,
@@ -1322,6 +1360,21 @@ Gateway health log, newest first. **Admin auth required.**
 comes from the latest non-`warning` row — `warning` is one buyer refused by the bank, not
 a gateway fault. The server runs a `check` at startup and hourly, and keeps 30 days.
 `POST /admin/payment-settings/test/` also writes a `check` row.
+
+---
+
+### `GET /admin/payments/`
+Every registration payment, newest first — gateway, wallet and free. **Admin auth required.**
+
+**Query:** `page`, `count` (max 50), `status?` (`PENDING` | `COMPLETED` | `FAILED` | `CANCELED`)
+
+**Response:** paginated envelope whose `result` is
+`{ id, amount, walletAmount, gateway: "saman" | "wallet" | "free", refNum, status, artist: { id, code, name } | null, phone, kind: "registration" | "subscription", createdAt }[]`.
+
+`kind: "subscription"` rows were bought before the form was saved, so `artist` is null;
+`phone` comes from the buyer.
+
+`amount` is what the gateway charged; `walletAmount` came from the wallet. Total paid = both.
 
 ---
 
@@ -1572,6 +1625,17 @@ Profile of one user — works whether or not they have any artist request. `404`
 
 ---
 
+### `PATCH /admin/users/:id/`
+Edit a user's profile. Same fields and rules as `PATCH /user/profile/`: `firstName`,
+`lastName`, `email` are ignored when empty; `nationalCode` `""` clears it, otherwise it must
+pass the checksum (`400` if not). `404` if the user is missing.
+
+**Body:** `{ firstName?, lastName?, email?, nationalCode? }`
+
+**Response:** `ApiResponse<{ id, firstName, lastName, phoneNumber, email, nationalCode, code }>`
+
+---
+
 ### `GET /admin/users/:id/artist-requests/`
 Get all artist requests for a specific user (admin view).
 
@@ -1691,7 +1755,7 @@ Get site-content (see `GET /site-content/` above for shape). Admin auth.
 ---
 
 ### `PATCH /admin/site-content/:id/`
-Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`) may be sent independently; unspecified keys are left unchanged.
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`) may be sent independently; unspecified keys are left unchanged.
 
 **Body:** `Partial<Omit<SiteContent, "id">>`
 

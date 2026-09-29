@@ -375,6 +375,38 @@ export const userPurchase = async (requestId: number) => {
   return data;
 };
 
+/**
+ * Where to send the browser to pay for a request: the gateway, or straight to the result
+ * page when the server already settled it (free category, or the wallet covered the fee).
+ */
+export const paymentHref = async (requestId: number, categoryId?: number | string | null) => {
+  const { result } = await userPurchase(requestId);
+  return (
+    result?.redirectUrl ??
+    `/artist-registration/result?status=success&categoryId=${categoryId ?? ""}`
+  );
+};
+
+/** Buys the yearly subscription. The form is saved only after this settles. */
+export const userSubscriptionPurchase = async (categoryId?: number | string | null) => {
+  const { data } = await landingApi.post<IPurchaseResponse>("/user/subscription/purchase/", null, {
+    params: categoryId ? { categoryId } : undefined,
+  });
+  return data;
+};
+
+/**
+ * Where to send the browser to pay for the subscription: the gateway, or straight to the
+ * result page when the server already settled it (the wallet covered it, or it is free).
+ */
+export const subscriptionHref = async (categoryId?: number | string | null) => {
+  const { result } = await userSubscriptionPurchase(categoryId);
+  return (
+    result?.redirectUrl ??
+    `/artist-registration/result?status=success&kind=subscription&categoryId=${categoryId ?? ""}`
+  );
+};
+
 export const userMessages = async (
   params: IPagination,
   accessToken: string,

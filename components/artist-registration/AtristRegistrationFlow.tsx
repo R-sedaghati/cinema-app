@@ -35,13 +35,6 @@ interface ArtistProps {
   onGoToStep: (step: number) => void;
 }
 
-/** Answer shapes that mean "still blank", and so may be filled in from the profile. */
-const isEmptyAnswer = (value: unknown) =>
-  value === undefined ||
-  value === null ||
-  value === "" ||
-  (Array.isArray(value) && value.length === 0);
-
 /**
  * The profile value a `syncToUserField` target prefills from, or `null` when there is
  * nothing safe to prefill. `avatar` is deliberately excluded: the profile exposes a
@@ -125,15 +118,20 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   );
 
   // The phone number belongs to the account, not the form: it is the OTP login identity,
-  // and only the OTP flow may change it. Its fields render read-only.
+  // and only the OTP flow may change it. Any other synced field the profile already holds
+  // is the account's statement too, so those render read-only as well.
   const lockedKeys = useMemo(
     () =>
       new Set(
         syncedFields
-          .filter(({ target }) => target === "phoneNumber")
+          .filter(
+            ({ target }) =>
+              target === "phoneNumber" ||
+              (profileData && profileValue(profileData, target)),
+          )
           .map(({ key }) => key),
       ),
-    [syncedFields],
+    [syncedFields, profileData],
   );
 
   // The schema query refetches on an interval, so `syncedFields` gets a new identity
@@ -146,18 +144,15 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     if (prefilledForRef.current === (category?.id ?? null)) return;
     prefilledForRef.current = category?.id ?? null;
 
-    const { answers, setAnswer } = useArtistRegistrationStore.getState();
+    const { setAnswer } = useArtistRegistrationStore.getState();
 
     for (const { key, target } of syncedFields) {
       const value = profileValue(profileData, target);
 
       if (!value) continue;
 
-      // The phone number is read-only and owned by the account, so it always wins — even
-      // over a hydrated draft carrying an older number. Every other target only fills a
-      // blank: a draft, or anything the user has typed, is the more current statement.
-      if (target !== "phoneNumber" && !isEmptyAnswer(answers[key])) continue;
-
+      // A present profile value locks its field read-only, so it always wins — even over a
+      // hydrated draft carrying an older value the user could no longer edit.
       setAnswer(key, value);
     }
   }, [syncedFields, profileData, category?.id]);

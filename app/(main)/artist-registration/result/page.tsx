@@ -1,16 +1,22 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@dgshahr/ui-kit";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Button from "@/components/common/Button";
-import { useUserCategoryFormSchema } from "@/lib/services/landing/hook";
+import {
+  useUpdateUserArtistRequest,
+  useUserCategoryFormSchema,
+  useUserCreateArtistRequest,
+} from "@/lib/services/landing/hook";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { paymentHref, subscriptionHref } from "@/lib/services/landing/api";
+import { clearSubscriptionDraft, loadSubscriptionDraft } from "@/lib/utils/subscriptionDraft";
 
 function ResultContent() {
   const params = useSearchParams();
@@ -32,8 +38,64 @@ function ResultContent() {
 
   const copy = useFormCopy();
 
-  const isSuccess = params.get("status") === "success";
+  const paid = params.get("status") === "success";
+  const isSubscription = params.get("kind") === "subscription";
   const categoryId = Number(params.get("categoryId")) || null;
+  const requestId = Number(params.get("requestId")) || null;
+
+  // After a subscription payment, the form kept in localStorage before the gateway is
+  // submitted here; a failed submit shows the server's message on the fail layout.
+  const { mutate: create } = useUserCreateArtistRequest();
+  const { mutate: update } = useUpdateUserArtistRequest();
+  const [draftState, setDraftState] = useState<"idle" | "submitting" | "done" | "error">("idle");
+  const [draftError, setDraftError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!paid || !isSubscription || draftState !== "idle") return;
+    const draft = loadSubscriptionDraft();
+    if (!draft) return setDraftState("done");
+
+    setDraftState("submitting");
+    const { editId, ...payload } = draft;
+    const handlers = {
+      onSuccess: () => {
+        clearSubscriptionDraft();
+        setDraftState("done");
+      },
+      onError: (error: { response?: { status?: number; data?: unknown } }) => {
+        // A server answer (duplicate form, validation) will not change on retry, so the
+        // draft goes; a network failure keeps it for the retry button.
+        if (error.response) clearSubscriptionDraft();
+        setDraftError((error.response?.data as { message?: string } | undefined)?.message ?? null);
+        setDraftState("error");
+      },
+    };
+    if (editId) update({ id: editId, ...payload }, handlers);
+    else create(payload, handlers);
+  }, [paid, isSubscription, draftState, create, update]);
+
+  const isSuccess = paid && draftState !== "error";
+  // Stays true until the browser leaves for the gateway, so a second click cannot start
+  // a second payment.
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  // Subscription: the draft is still in localStorage, so paying again needs no refill.
+  // Legacy: the request is still PENDING_PAYMENT. Neither → back to the form.
+  const retryPayment = () => {
+    if (paid && draftState === "error") {
+      // Paid, but the form did not go through: resubmit if the draft survived, else refill.
+      return loadSubscriptionDraft() ? setDraftState("idle") : router.push("/artist-registration");
+    }
+    if (!isSubscription && !requestId) return router.push("/artist-registration");
+
+    setIsRetrying(true);
+    (isSubscription ? subscriptionHref(categoryId) : paymentHref(requestId!, categoryId))
+      .then((href) => {
+        window.location.href = href;
+      })
+      // landingApi's interceptor already toasts the failure.
+      .catch(() => setIsRetrying(false));
+  };
 
   const { data, isLoading } = useUserCategoryFormSchema(categoryId);
   const schema = data?.result;
@@ -42,7 +104,7 @@ function ResultContent() {
     if (isSuccess) reset();
   }, [isSuccess, reset]);
 
-  if (isLoading) {
+  if (isLoading || draftState === "submitting" || (paid && isSubscription && draftState === "idle")) {
     return (
       <div className="flex justify-center items-center py-24">
         <Loader2 className="animate-spin text-error-500" size={40} />
@@ -54,6 +116,7 @@ function ResultContent() {
     (isSuccess ? schema?.successTitle : schema?.failTitle) ||
     DEFAULTS[isSuccess ? "success" : "failed"].title;
   const description =
+    (paid && draftState === "error" && draftError) ||
     (isSuccess ? schema?.successDescription : schema?.failDescription) ||
     DEFAULTS[isSuccess ? "success" : "failed"].description;
 
@@ -74,7 +137,9 @@ function ResultContent() {
             <Button
               className={clsx("rounded-full!", !isMobile && "px-10")}
               isFullWidth={isMobile}
-              onClick={() => router.push(isSuccess ? "/profile" : "/artist-registration")}
+              onClick={() => (isSuccess ? router.push("/profile") : retryPayment())}
+              isLoading={isRetrying}
+              disabled={isRetrying}
             >
               {isSuccess ? copy("successCta") : copy("failCta")}
             </Button>

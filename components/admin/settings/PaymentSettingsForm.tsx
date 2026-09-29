@@ -11,6 +11,7 @@ import {
   useAdminPaymentSettingsTest,
 } from "@/lib/services/admin/hook";
 import type { ISepEndpoints } from "@/lib/services/admin/type";
+import { toEnglishDigits } from "@/lib/utils/toEnglishDigits";
 
 /**
  * SEP (سامان) gateway settings.
@@ -55,6 +56,8 @@ const PaymentSettingsForm = () => {
   const [endpoints, setEndpoints] = useState<ISepEndpoints>(emptyEndpoints);
   const [isEditingKey, setIsEditingKey] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [price, setPrice] = useState("");
+  const [isPriceDirty, setIsPriceDirty] = useState(false);
 
   useEffect(() => {
     if (!setting) return;
@@ -69,7 +72,8 @@ const PaymentSettingsForm = () => {
         paymentUrl: setting.paymentUrl,
       });
     }
-  }, [setting, isEditingKey, isDirty]);
+    if (!isPriceDirty) setPrice(setting.subscriptionPrice === null ? "" : String(setting.subscriptionPrice));
+  }, [setting, isEditingKey, isDirty, isPriceDirty]);
 
   const editEndpoint = (key: keyof ISepEndpoints, value: string) => {
     setIsDirty(true);
@@ -78,12 +82,18 @@ const PaymentSettingsForm = () => {
 
   const handleSubmit = () => {
     mutate(
-      { terminalId, ...endpoints },
+      {
+        terminalId,
+        ...endpoints,
+        // Blank = back to the server default; a typed 0 = free.
+        subscriptionPrice: price.trim() === "" ? null : Number(toEnglishDigits(price.trim())),
+      },
       {
         onSuccess: () => {
           toast.success("با موفقیت تغییر کرد");
           setIsEditingKey(false);
           setIsDirty(false);
+          setIsPriceDirty(false);
           queryClient.invalidateQueries({ queryKey: ["adminPaymentSettings"] });
         },
         onError: () => toast.error("خطا در ذخیره‌سازی"),
@@ -109,6 +119,27 @@ const PaymentSettingsForm = () => {
   return (
     <Card>
       <div className="flex flex-col gap-5">
+        <p className="font-h3-bold text-error-500">اشتراک سالانه</p>
+        <Divider color="gray" size="thin" type="horizontal" />
+
+        <div className="flex flex-col gap-3 border border-solid border-gray-300 rounded-xl p-3">
+          <Input
+            labelContent="قیمت اشتراک سالانه"
+            placeholder={setting ? String(setting.defaultSubscriptionPrice) : ""}
+            postfix="تومان"
+            type="text"
+            inputMode="numeric"
+            value={price}
+            disabled={isLoading}
+            onChange={(e) => {
+              setIsPriceDirty(true);
+              setPrice(e.target.value);
+            }}
+            hintMessage="هنرمند پس از تکمیل فرم این مبلغ را برای یک سال پرداخت می‌کند و فرم پس از پرداخت ثبت می‌شود. در طول اشتراک، ثبت فرم در همه دسته‌بندی‌ها رایگان است. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی مبلغ پیش‌فرض سرور."
+            wrapperClassName="w-full md:w-1/3"
+          />
+        </div>
+
         <p className="font-h3-bold text-error-500">درگاه پرداخت سامان (سپ)</p>
         <Divider color="gray" size="thin" type="horizontal" />
 

@@ -77,7 +77,6 @@ function CategoryDetail() {
   const [isActive, setIsActive] = useState(false);
   const [imagePath, setImagePath] = useState("");
   const [imageFile, setImageFile] = useState<FileType | null>(null);
-  const [registrationAmount, setRegistrationAmount] = useState<string>("");
 
   const uploadImage = useAdminUploadBannerImage();
 
@@ -92,11 +91,6 @@ function CategoryDetail() {
     setPriority(data.priority);
     setImagePath(toStoragePath(data.image ?? ""));
     setImageFile(data.image ? { src: data.image } : null);
-    setRegistrationAmount(
-      data.registrationAmount === null || data.registrationAmount === undefined
-        ? ""
-        : String(data.registrationAmount),
-    );
   }, [data]);
 
   const handleImageChange = (file: File | undefined) => {
@@ -128,10 +122,6 @@ function CategoryDetail() {
   const savedParentName = nameOf(data?.parent);
   const parentChanged = data !== undefined && parentId !== data.parent;
   const hasSubcategories = subcategories.length > 0;
-
-  const amountFallbackHint = parentId
-    ? `استفاده از مبلغ دسته‌بندی اصلی${parentName ? ` «${parentName}»` : ""} و در نبودِ آن، مبلغ پیش‌فرض.`
-    : "استفاده از مبلغ پیش‌فرض.";
 
   const { mutateAsync: reorderCategories } = useAdminCategoryReorder();
 
@@ -186,9 +176,6 @@ function CategoryDetail() {
           // Only a changed priority moves the row; saving other fields leaves the order alone.
           ...(priority !== data?.priority && { priority }),
           image: imagePath || null,
-          // An empty field means "not set" (inherit / fall back); a typed 0 means free.
-          registrationAmount:
-            registrationAmount === "" ? null : Number(registrationAmount),
         },
       },
       {
@@ -491,21 +478,6 @@ function CategoryDetail() {
         </Card>
         <Card>
           <div className="flex flex-col gap-5">
-            <p className="font-h3-bold text-error-500">پرداخت</p>
-            <Divider color="gray" size="thin" type="horizontal" />
-            <div className="flex flex-col gap-3 border border-solid border-gray-300 rounded-xl p-3">
-              <Input
-                labelContent="مبلغ ثبت‌نام هنرمند"
-                placeholder="مبلغ ثبت‌نام هنرمند"
-                postfix="تومان"
-                type="text"
-                inputMode="numeric"
-                value={registrationAmount}
-                onChange={(e) => setRegistrationAmount(e.target.value)}
-                hintMessage={`مبلغی که هنرمند برای ثبت‌نام در این دسته‌بندی پرداخت می‌کند. عدد ۰ یعنی رایگان؛ خالی گذاشتن یعنی ${amountFallbackHint}`}
-                wrapperClassName="w-1/3"
-              />
-            </div>
             <div className="flex justify-end">
               <Button
                 color="error"

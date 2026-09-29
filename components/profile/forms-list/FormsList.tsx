@@ -16,6 +16,7 @@ import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeTo
 import Button from "@/components/common/Button";
 import { ChevronLeft } from "lucide-react";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { paymentHref } from "@/lib/services/landing/api";
 
 export default function FormsList() {
   const router = useRouter();
@@ -48,6 +49,16 @@ export default function FormsList() {
   // An approved request also has a public showcase page worth linking to.
   const handleOpenPublic = (item: IArtistItem) => {
     router.push(`/artists/${item.id}`);
+  };
+
+  // A failed or abandoned payment leaves the request PENDING_PAYMENT; this retries it.
+  // landingApi's interceptor already toasts a failure.
+  const handlePay = (item: IArtistItem) => {
+    paymentHref(item.id, item.categories?.[0]?.id)
+      .then((href) => {
+        window.location.href = href;
+      })
+      .catch(() => {});
   };
 
   const items = data?.result ?? [];
@@ -124,6 +135,17 @@ export default function FormsList() {
                   <span style={copy.style(viewKey(item))}>{copy(viewKey(item))}</span>
                 </Button>
 
+                {item.status === EArtistRequestStatus.PENDING_PAYMENT && (
+                  <Button
+                    variant="text"
+                    leftIcon={<ChevronLeft size={16} />}
+                    onClick={() => handlePay(item)}
+                    className="p-0! text-sm"
+                  >
+                    <span style={copy.style("profileFormPay")}>{copy("profileFormPay")}</span>
+                  </Button>
+                )}
+
                 {item.status === EArtistRequestStatus.APPROVED && (
                   <Button
                     variant="text"
@@ -145,7 +167,7 @@ export default function FormsList() {
           rowKey="id"
           className="w-full"
           stickyTableHeader
-          columns={generateColumns(handleEdit, handleView, handleOpenPublic, copy)}
+          columns={generateColumns(handleEdit, handleView, handleOpenPublic, handlePay, copy)}
           data={items}
           {...(isValidParams && isPending && { loading: { size: 45 } })}
           {...(data?.count && {

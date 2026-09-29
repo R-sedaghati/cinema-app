@@ -37,21 +37,21 @@ export const FORM_COPY = {
 
   paymentTitle: {
     admin: "عنوان باکس پرداخت",
-    value: "هزینه پرداخت ثبت‌نام نهایی در سایت آرشیو هنر",
+    value: "خرید اشتراک سالانه آرشیو هنر",
   },
   paymentNote: {
     admin: "توضیح باکس پرداخت",
-    value: "هزینه یکبار برای همیشه در این دسته بندی میباشد",
+    value: "با اشتراک سالانه، ثبت فرم در همه دسته‌بندی‌ها تا یک سال رایگان است. فرم شما پس از پرداخت ثبت می‌شود.",
   },
   amountLabel: { admin: "برچسب مبلغ", value: "مبلغ قابل پرداخت" },
   currency: { admin: "واحد پول", value: "تومان" },
   labelFree: { admin: "نمایش رایگان", value: "رایگان" },
   paymentFreeTitle: {
     admin: "عنوان باکس رایگان",
-    value: "ثبت‌نام در این دسته‌بندی رایگان است",
+    value: "اشتراک سالانه شما فعال است",
   },
-  submitLabel: { admin: "دکمه پرداخت نهایی", value: "پرداخت و ثبت‌نام نهایی" },
-  freeSubmitLabel: { admin: "دکمه ثبت (رایگان)", value: "ادامه" },
+  submitLabel: { admin: "دکمه پرداخت نهایی", value: "خرید اشتراک سالانه و ثبت فرم" },
+  freeSubmitLabel: { admin: "دکمه ثبت (رایگان)", value: "ثبت فرم" },
   editSubmitLabel: { admin: "دکمه ثبت تغییرات", value: "ثبت تغییرات" },
   editSuccessToast: { admin: "پیام موفقیت ویرایش", value: "فرم با موفقیت ویرایش شد" },
   editErrorToast: { admin: "پیام خطای ویرایش", value: "خطا در ویرایش فرم" },

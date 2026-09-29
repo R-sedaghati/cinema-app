@@ -8,6 +8,7 @@ import withNoSSR from "@/lib/utils/withNoSSR";
 import { toResumeName } from "@/lib/utils/resumeName";
 import { Badge, Button, Card, Divider, FileUploader } from "@dgshahr/ui-kit";
 import Input from "@/components/common/Input";
+import UserProfileEdit from "@/components/admin/users/UserProfileEdit";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import React from "react";
@@ -61,20 +62,11 @@ function ArtistDetail() {
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <Input
-                placeholder="نام و نام خانوادگی"
-                labelContent="نام و نام خانوادگی"
-                value={[user?.firstName, user?.lastName].filter(Boolean).join(" ")}
-              />
-              <Input
                 placeholder="شماره تماس"
                 labelContent="شماره تماس"
                 value={user?.phoneNumber ?? ""}
               />
-              <Input
-                placeholder="ایمیل"
-                labelContent="ایمیل"
-                value={user?.email ?? ""}
-              />
+              <UserProfileEdit userId={id} />
               <Input
                 placeholder="قد"
                 labelContent="قد"
