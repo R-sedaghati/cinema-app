@@ -157,15 +157,13 @@ interface IArtistUser {
   lastName: string | null;
   phoneNumber: string | null;
   nationalCode?: string | null;
+  /** Values of admin-added profile fields, keyed by IProfileField.key. */
+  profileData?: Record<string, unknown>;
   code: string;
 }
 
-export interface IAdminUserUpdateRequest {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  nationalCode?: string;
-}
+/** Keys are IProfileField keys: builtin column names or custom profile keys. */
+export type IAdminUserUpdateRequest = Record<string, unknown>;
 
 export interface IArtistItem {
   categories: IArtistCategory[];
@@ -199,14 +197,11 @@ export enum EFormFieldType {
   VIDEO = "VIDEO",
 }
 
-export type SyncToUserField =
-  | "firstName"
-  | "lastName"
-  | "avatar"
-  | "email"
-  | "nationalCode"
-  /** Read-only: prefilled into the form from the account, never written back. */
-  | "phoneNumber";
+/**
+ * An IProfileField key (builtin column or custom profile key), or the read-only
+ * "phoneNumber" — prefilled into the form from the account, never written back.
+ */
+export type SyncToUserField = string;
 
 export interface IFormFieldOption {
   label: string;
@@ -241,6 +236,23 @@ export interface IFormField {
   isPrivate?: boolean;
 }
 
+/**
+ * An admin-managed account profile field. `builtin` rows are backed by a `users` column
+ * (key = column); custom rows live in the user's `profileData`.
+ */
+export interface IProfileField extends Omit<IFormField, "syncToUserField" | "isPrivate"> {
+  builtin: boolean;
+  /** Left out of the user's profile and its required checks; admins still see it. */
+  hidden: boolean;
+}
+
+export type IProfileFieldRequest = Partial<
+  Pick<
+    IProfileField,
+    "key" | "label" | "type" | "placeholder" | "helpText" | "required" | "options" | "validation" | "multiple" | "hidden"
+  >
+>;
+
 export interface IFormStep {
   id: number;
   title: string;
@@ -250,18 +262,7 @@ export interface IFormStep {
   fields: IFormField[];
 }
 
-/**
- * Admin-editable copy of a category's post-payment result pages. The fixed
- * flow copy is site-wide instead — see `ISiteContent.form`.
- */
-export interface IFormResultPages {
-  successTitle: string | null;
-  successDescription: string | null;
-  failTitle: string | null;
-  failDescription: string | null;
-}
-
-export interface IFormSchema extends IFormResultPages {
+export interface IFormSchema {
   steps: IFormStep[];
   /** Yearly subscription price in Toman for this caller, resolved server-side. 0 = subscribed (submit directly). */
   registrationAmount: number;
@@ -696,6 +697,8 @@ export interface ISiteContent {
   tableColors?: ITableColors | null;
   /** Per-file upload caps in MB; the API always returns both, defaults filled in. */
   uploadLimits?: IUploadLimits | null;
+  /** Public URLs on read, storage paths on write; absent = shipped logo/favicon. */
+  branding?: { logo?: string; favicon?: string } | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
@@ -762,6 +765,35 @@ export interface IGatewayLogResponse {
     checkedAt: string | null;
     lastOkAt: string | null;
     items: IGatewayLogItem[];
+  };
+}
+
+export type SmsLogLevel = "ok" | "error";
+
+export interface ISmsLogItem {
+  id: number;
+  /** `send` plain text, `pattern` OTP login (code never stored), `check` hourly operator check. */
+  action: "send" | "pattern" | "check";
+  level: SmsLogLevel;
+  receptor: string | null;
+  message: string;
+  detail: string | null;
+  createdAt: string;
+  [key: string]: unknown;
+}
+
+export interface ISmsLogResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  result: {
+    status: SmsLogLevel | "unknown";
+    statusMessage: string | null;
+    checkedAt: string | null;
+    lastOkAt: string | null;
+    sentToday: number;
+    failedToday: number;
+    items: ISmsLogItem[];
   };
 }
 

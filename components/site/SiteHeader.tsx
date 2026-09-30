@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @next/next/no-img-element */
 
 import {
   ChevronLeft,
@@ -15,6 +14,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Button from "../common/Button";
+import SiteLogo from "./SiteLogo";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
@@ -89,12 +89,7 @@ export function SiteHeader() {
             </div>
           ) : (
             <Link href="/" className="flex gap-2 items-center">
-              <img
-                src="/assets/images/logo.svg"
-                alt="logo"
-                width={44}
-                height={44}
-              />
+              <SiteLogo size={44} />
               <span className="text-base font-semibold text-error-500 text-nowrap">
                 <span style={copy.style("brandName")}>{copy("brandName")}</span>
               </span>
@@ -104,12 +99,7 @@ export function SiteHeader() {
           <nav className="flex min-w-0 flex-1 items-center justify-center lg:justify-center">
             {isMobile && (
               <Link href="/" className="flex gap-1 items-center">
-                <img
-                  src="/assets/images/logo.svg"
-                  alt="logo"
-                  width={60}
-                  height={60}
-                />
+                <SiteLogo size={60} />
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
                   <span style={copy.style("brandName")}>{copy("brandName")}</span>
                 </span>
@@ -191,12 +181,7 @@ export function SiteHeader() {
           <div className="flex flex-col h-full p-4">
             <div className="flex items-center justify-between mb-6">
               <div className="flex gap-1 items-center">
-                <img
-                  src="/assets/images/logo.svg"
-                  alt="logo"
-                  width={40}
-                  height={40}
-                />
+                <SiteLogo size={40} />
                 <span className="text-xl font-semibold text-error-500 text-nowrap">
                   <span style={copy.style("brandName")}>{copy("brandName")}</span>
                 </span>

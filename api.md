@@ -127,6 +127,8 @@ interface User {
   avatar?: string | null;    // presigned URL
   code?: string;             // auto-generated sequential code
   lastLogin?: string;        // ISO datetime
+  // Values of admin-added profile fields (see ProfileField), keyed by ProfileField.key.
+  profileData?: Record<string, unknown>;
   // GET /user/profile only. End of the yearly subscription (ISO); null = never paid.
   // Every form submits free while it runs. Once past, the artist stays public;
   // POST /user/subscription/purchase/ renews it (+1 year, stacked onto any time left).
@@ -414,6 +416,9 @@ interface SiteContent {
   // keys and non-hex values are dropped. Absent key = theme default.
   tableColors?: { headerBg?: string; headerText?: string; rowBg?: string; rowText?: string; border?: string } | null;
   uploadLimits: { imageMb: number; videoMb: number }; // per-file caps in MB (defaults 10/100, max 200); enforced by /user/avatar and /user/upload/* (413 when exceeded)
+  // Admin-uploaded logo/favicon: public URLs on read, storage paths on write (upload via
+  // POST /admin/upload/image). Absent key = shipped `/assets/images/logo.svg` / `/favicon-default.ico`.
+  branding: { logo?: string; favicon?: string };
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -489,10 +494,36 @@ List all users (no auth required).
 
 ---
 
+### `GET /profile-fields/`
+Visible account profile fields, in display order — what the profile page and the
+post-login completion drawer render. No auth.
+
+**Response:** `ApiResponse<ProfileField[]>`
+
+```ts
+interface ProfileField {
+  id: number;
+  key: string;              // builtin: users column name; custom: profileData key. Immutable.
+  label: string;
+  type: FormFieldType;
+  placeholder: string | null;
+  helpText: string | null;
+  required: boolean;
+  order: number;
+  options: { label: string; value: string }[] | null;
+  validation: FormFieldValidation | null;
+  multiple: boolean;
+  builtin: boolean;         // avatar, firstName, lastName, email, nationalCode — never deleted
+  hidden: boolean;          // always false here; admins can hide fields
+}
+```
+
+---
+
 ### `GET /user/profile/`
 Get own profile. **Auth required.**
 
-**Response:** `Pick<User, "id" | "phone_number" | "avatar" | "lastLogin" | "firstName" | "lastName" | "email" | "nationalCode">`
+**Response:** `Pick<User, "id" | "phone_number" | "avatar" | "lastLogin" | "firstName" | "lastName" | "email" | "nationalCode" | "profileData" | "subscriptionExpiresAt">`
 
 Note: this endpoint returns the object directly, **not** wrapped in `ApiResponse`.
 
@@ -501,13 +532,15 @@ Note: this endpoint returns the object directly, **not** wrapped in `ApiResponse
 ### `PATCH /user/profile/`
 Update own profile. **Auth required.**
 
-**Body:**
-```json
-{ "firstName": "string", "lastName": "string", "email": "string", "nationalCode": "string" }
-```
+**Body:** `{ [profileFieldKey]: value }` — keys are the visible `ProfileField` keys from
+`GET /profile-fields/`. Builtin keys (`firstName`, `lastName`, `email`, `nationalCode`) write
+the `users` column; custom keys write `profileData`. Unknown and hidden keys are ignored, as
+is `avatar` (set by `POST /user/avatar`).
 
-Every key is optional. `nationalCode` must pass the `NATIONAL_CODE` preset (10 digits +
-mod-11 checksum); `""` clears it. An invalid code is a `400` with `"کد ملی معتبر نیست"`.
+Keys missing from the body are left untouched; an empty value clears the field. Each value
+runs through its field's validation (type, options, preset, min/max, pattern);
+`nationalCode` is always checksummed. After applying, every visible required field
+(except `avatar`) must be non-empty — otherwise `400` `"<label> الزامی است"`.
 
 **Response:** `ApiResponse<User>`
 
@@ -660,11 +693,6 @@ ApiResponse<{
       isPrivate: boolean;
     }[];
   }[];
-  // copy for the post-payment result pages, set in the admin form builder
-  successTitle: string | null;
-  successDescription: string | null;
-  failTitle: string | null;
-  failDescription: string | null;
   // overrides for the form's fixed copy (button labels, step counter, payment
   // block, validation messages ...), keyed by the frontend FORM_COPY registry
   // in `lib/constants/formCopy.ts`. Missing keys fall back to the defaults.
@@ -1363,6 +1391,23 @@ a gateway fault. The server runs a `check` at startup and hourly, and keeps 30 d
 
 ---
 
+### `GET /admin/sms-logs/`
+SMS panel log, newest first. **Admin auth required.**
+
+**Query:** `page`, `count` (max 50), `level?` (`ok` | `error`), `action?` (`send` | `pattern` | `check`)
+
+**Response:** paginated envelope whose `result` is
+`{ status: "ok" | "error" | "unknown", statusMessage, checkedAt, lastOkAt, sentToday, failedToday, items: SmsLog[] }`,
+`SmsLog = { id, action: "send" | "pattern" | "check", level: "ok" | "error", receptor, message, detail, createdAt }`.
+
+Every SMS sent through Melli Payamak writes a row (`send` stores the text; `pattern` is the
+OTP login and never stores the code). `status` comes from the latest `check`: the server
+asks the panel for its credit at startup and hourly — `error` means bad credentials, the
+operator is unreachable, or credit is low. `sentToday`/`failedToday` count non-check rows
+since local midnight. Kept 30 days.
+
+---
+
 ### `GET /admin/payments/`
 Every registration payment, newest first — gateway, wallet and free. **Admin auth required.**
 
@@ -1500,12 +1545,14 @@ Get the step/field schema for a top-level category. 400 if `:id` has a parent.
 ### `PATCH /admin/categories/:id/form-schema/`
 Set the editable copy of a top-level category's form. 400 if `:id` has a parent.
 
-**Body:** `{ successTitle?, successDescription?, failTitle?, failDescription? }` (all `string | null`)
-plus `formCopy?: Record<string, string>` — merged key by key into the stored
+**Body:** `{ formCopy?: Record<string, string> }` — merged key by key into the stored
 overrides; a key sent empty/blank deletes that override so the frontend default
 applies again.
 
-**Response:** `ApiResponse<{ successTitle, successDescription, failTitle, failDescription, formCopy }>`
+**Response:** `ApiResponse<{ formCopy }>`
+
+Result-page texts (paid / free-submit / fail) are site-wide FORM_COPY keys
+`result{Paid,Submit,Fail}{Title,Desc}` in `SiteContent.form`, not per category.
 
 ---
 
@@ -1544,7 +1591,9 @@ Create a field on a step.
   // Links the field to the account: prefilled from the profile, and written back on submit.
   // `phoneNumber` is read-only (login identity) — prefilled, never written back.
   // `null` clears an existing link.
-  syncToUserField?: "firstName" | "lastName" | "avatar" | "email" | "nationalCode" | "phoneNumber" | null;
+  // a ProfileField key (builtin or custom; custom answers sync into profileData),
+  // or the read-only "phoneNumber". Unknown keys are a 400.
+  syncToUserField?: string | null;
   multiple?: boolean;      // IMAGE/VIDEO: allow more than one upload
   isPrivate?: boolean;     // default false; true = shown only after an approved resume request
 }
@@ -1565,6 +1614,24 @@ Update a field. **Body:** same shape as create, all optional, plus:
 
 ### `DELETE /admin/form-fields/:fieldId/`
 Delete a field.
+
+---
+
+### `GET /admin/profile-fields/`
+All profile fields including hidden ones. **Response:** `ApiResponse<ProfileField[]>`
+
+### `POST /admin/profile-fields/`
+Add a custom field. **Body:** `{ key, label, type, placeholder?, helpText?, required?, options?, validation?, multiple?, hidden? }`.
+`key` must match `^[a-zA-Z][a-zA-Z0-9_]*$`, be unique, and not be a builtin/reserved name. Appended last.
+
+### `PATCH /admin/profile-fields/:id/`
+Same body minus `key` (immutable). A builtin's `type` and `multiple` cannot change.
+
+### `DELETE /admin/profile-fields/:id/`
+Custom fields only (`400` for builtins — hide them instead). Stored values stay in `profileData`.
+
+### `PATCH /admin/profile-fields/order/`
+**Body:** `{ ids: number[] }` in display order. **Response:** the full list.
 
 ---
 
@@ -1621,18 +1688,17 @@ List all users.
 ### `GET /admin/users/:id/`
 Profile of one user — works whether or not they have any artist request. `404` if missing.
 
-**Response:** `ApiResponse<{ id, firstName, lastName, avatar, phoneNumber, email, nationalCode, code }>` (`avatar` is a public URL)
+**Response:** `ApiResponse<{ id, firstName, lastName, avatar, phoneNumber, email, nationalCode, profileData, code }>` (`avatar` is a public URL)
 
 ---
 
 ### `PATCH /admin/users/:id/`
-Edit a user's profile. Same fields and rules as `PATCH /user/profile/`: `firstName`,
-`lastName`, `email` are ignored when empty; `nationalCode` `""` clears it, otherwise it must
-pass the checksum (`400` if not). `404` if the user is missing.
+Edit a user's profile. Same body and validation as `PATCH /user/profile/`, but hidden
+fields are editable too and required fields are **not** enforced. `404` if the user is missing.
 
-**Body:** `{ firstName?, lastName?, email?, nationalCode? }`
+**Body:** `{ [profileFieldKey]: value }`
 
-**Response:** `ApiResponse<{ id, firstName, lastName, phoneNumber, email, nationalCode, code }>`
+**Response:** `ApiResponse<{ id, firstName, lastName, phoneNumber, email, nationalCode, profileData, code }>`
 
 ---
 
@@ -1747,6 +1813,9 @@ Update about-us text.
 
 ---
 
+### `GET /favicon`
+302 to the admin-uploaded favicon URL, else to `/favicon-default.ico`. `Cache-Control: public, max-age=300`. Used as `<link rel="icon">` by the root layout.
+
 ### `GET /admin/site-content/`
 Get site-content (see `GET /site-content/` above for shape). Admin auth.
 
@@ -1755,7 +1824,7 @@ Get site-content (see `GET /site-content/` above for shape). Admin auth.
 ---
 
 ### `PATCH /admin/site-content/:id/`
-Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`) may be sent independently; unspecified keys are left unchanged.
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`, `branding`) may be sent independently; unspecified keys are left unchanged.
 
 **Body:** `Partial<Omit<SiteContent, "id">>`
 

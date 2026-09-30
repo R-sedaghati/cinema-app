@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import clsx from "clsx";
 import { MoveLeft } from "lucide-react";
 import { isMobile } from "react-device-detect";
 import { mobileSplitPattern, splitPattern } from "@/lib/utils/split-pattern";
 import type { CopyFn } from "@/lib/utils/formCopy";
+import { matchCategories, type SearchableCategory } from "@/lib/utils/matchCategories";
+import Input from "@/components/common/Input";
 
-export interface RegistrationCategory {
-  id: number;
-  title: string;
+export interface RegistrationCategory extends SearchableCategory {
   /** Set when this account already filed here — the card opens that request instead. */
   existingRequestId?: number;
   /** Category image; only the `covers` variant uses it. */
@@ -19,7 +20,34 @@ interface Props {
   items: RegistrationCategory[];
   copy: CopyFn;
   variant?: string;
-  onSelect: (id: number, title: string, existingRequestId?: number) => void;
+  onSelect: (
+    id: number,
+    title: string,
+    existingRequestId?: number,
+    childIds?: number[],
+  ) => void;
+}
+
+const select = (item: RegistrationCategory, onSelect: Props["onSelect"]) =>
+  onSelect(
+    item.id,
+    item.title,
+    item.existingRequestId,
+    item.matchedChildren?.map((child) => child.id),
+  );
+
+/** Which subcategories put this card in the search results. */
+function MatchHint({ item, copy, className }: { item: RegistrationCategory; copy: CopyFn; className: string }) {
+  if (!item.matchedChildren?.length) return null;
+  return (
+    <span className={className}>
+      <span style={copy.style("categorySearchMatch")}>
+        {copy("categorySearchMatch", {
+          name: item.matchedChildren.map((child) => child.title).join("، "),
+        })}
+      </span>
+    </span>
+  );
 }
 
 /** Every variant draws the same button; only its box and the wrapper differ. */
@@ -36,7 +64,7 @@ function CategoryCard({
 }) {
   return (
     <button
-      onClick={() => onSelect(item.id, item.title, item.existingRequestId)}
+      onClick={() => select(item, onSelect)}
       data-card
       className={clsx(
         "relative overflow-hidden bg-zinc-900 border border-transparent hover:border-red-900 cursor-pointer",
@@ -45,6 +73,7 @@ function CategoryCard({
     >
       <div className="flex flex-col items-start gap-1 z-10">
         <p className="text-nowrap text-sm md:text-base">{item.title}</p>
+        <MatchHint item={item} copy={copy} className="text-[10px] md:text-xs text-error-400" />
         {item.existingRequestId && (
           <span className="text-[10px] md:text-xs text-zinc-400">
             <span style={copy.style("alreadyRegistered")}>{copy("alreadyRegistered")}</span>
@@ -57,12 +86,31 @@ function CategoryCard({
   );
 }
 
-const CategoryCardsSection: React.FC<Props> = ({
-  items,
-  copy,
-  variant,
-  onSelect,
-}) => {
+const CategoryCardsSection: React.FC<Props> = ({ items, copy, variant, onSelect }) => {
+  const [query, setQuery] = useState("");
+  const shown = matchCategories(items, query);
+
+  return (
+    <div className="flex w-full flex-col items-center gap-4">
+      <Input
+        placeholder={copy("categorySearchPlaceholder")}
+        title={copy("categorySearchPlaceholder")}
+        containerClassName="w-full md:w-1/2"
+        value={query}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+      />
+      {shown.length ? (
+        <CategoryCards items={shown} copy={copy} variant={variant} onSelect={onSelect} />
+      ) : (
+        <p className="text-sm text-zinc-400">
+          <span style={copy.style("categorySearchEmpty")}>{copy("categorySearchEmpty")}</span>
+        </p>
+      )}
+    </div>
+  );
+};
+
+const CategoryCards: React.FC<Props> = ({ items, copy, variant, onSelect }) => {
   const card = (item: RegistrationCategory, className: string) => (
     <CategoryCard
       key={item.id}
@@ -117,7 +165,7 @@ const CategoryCardsSection: React.FC<Props> = ({
         {items.map((item) => (
           <button
             key={item.id}
-            onClick={() => onSelect(item.id, item.title, item.existingRequestId)}
+            onClick={() => select(item, onSelect)}
             data-card
             className="group relative h-40 w-full overflow-hidden rounded-2xl border border-transparent hover:border-red-900 cursor-pointer md:h-52"
           >
@@ -132,6 +180,7 @@ const CategoryCardsSection: React.FC<Props> = ({
                 <p className="text-sm font-semibold leading-tight text-white md:text-base">
                   {item.title}
                 </p>
+                <MatchHint item={item} copy={copy} className="text-[10px] text-error-400 md:text-xs" />
                 {item.existingRequestId && (
                   <span className="text-[10px] text-zinc-300 md:text-xs">
                     <span style={copy.style("alreadyRegistered")}>{copy("alreadyRegistered")}</span>

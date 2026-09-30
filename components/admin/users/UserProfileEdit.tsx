@@ -1,65 +1,67 @@
 "use client";
 
 import { Button } from "@dgshahr/ui-kit";
-import Input from "@/components/common/Input";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { useAdminUserDetail, useAdminUserUpdate } from "@/lib/services/admin/hook";
+import FieldRenderer from "@/components/artist-registration/fields/FieldRenderer";
+import {
+  useAdminProfileFields,
+  useAdminUserDetail,
+  useAdminUserUpdate,
+} from "@/lib/services/admin/hook";
+import { EFormFieldType } from "@/lib/services/admin/type";
+import { profileValues } from "@/lib/utils/profileFields";
+
+// ponytail: upload fields use the user's upload endpoint (user token), so the admin can't
+// edit them here. Add an admin upload path to FieldRenderer if that's ever needed.
+const UPLOAD_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
 
 /**
- * Editable name/email/national-code inputs for a user. Renders bare grid cells so it
- * drops into the "اطلاعات کاربر" grid on both the user page and the artist-request page.
+ * Editable inputs for every admin-configured profile field, hidden ones included. Renders
+ * bare grid cells so it drops into the "اطلاعات کاربر" grid on both the user page and the
+ * artist-request page.
  */
 const UserProfileEdit = ({ userId }: { userId: number | undefined }) => {
   const user = useAdminUserDetail(userId).data?.result;
+  const { data: fieldsData } = useAdminProfileFields();
   const { mutate, isPending } = useAdminUserUpdate(userId ?? 0);
 
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", nationalCode: "" });
+  const fields = useMemo(
+    () =>
+      (fieldsData?.result ?? [])
+        .filter((f) => !UPLOAD_TYPES.has(f.type))
+        // hidden fields are still editable by the admin; the label says the user can't see it
+        .map((f) => (f.hidden ? { ...f, label: `${f.label} (پنهان)` } : f)),
+    [fieldsData],
+  );
+
+  const [form, setForm] = useState<Record<string, unknown>>({});
 
   useEffect(() => {
-    if (!user) return;
-    setForm({
-      firstName: user.firstName ?? "",
-      lastName: user.lastName ?? "",
-      email: user.email ?? "",
-      nationalCode: user.nationalCode ?? "",
-    });
-  }, [user]);
-
-  const field = (key: keyof typeof form, label: string) => (
-    <Input
-      placeholder={label}
-      labelContent={label}
-      value={form[key]}
-      onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-    />
-  );
+    if (user && fields.length) setForm(profileValues(user, fields));
+  }, [user, fields]);
 
   return (
     <>
-      {field("firstName", "نام")}
-      {field("lastName", "نام خانوادگی")}
-      {field("email", "ایمیل")}
-      {field("nationalCode", "کد ملی")}
+      {fields.map((field) => (
+        <FieldRenderer
+          key={field.key}
+          // the admin may leave a required field empty; the user is asked for it instead
+          field={{ ...field, required: false }}
+          value={form[field.key]}
+          onChange={(value) => setForm((f) => ({ ...f, [field.key]: value }))}
+        />
+      ))}
       <div className="flex items-end">
         <Button
           color="error"
           disabled={!userId || isPending}
           isLoading={isPending}
           onClick={() =>
-            mutate(
-              {
-                firstName: form.firstName.trim(),
-                lastName: form.lastName.trim(),
-                email: form.email.trim(),
-                nationalCode: form.nationalCode.trim(),
-              },
-              {
-                onSuccess: () => toast.success("پروفایل کاربر ذخیره شد"),
-                onError: (e) =>
-                  toast.error(e.response?.data?.message ?? "خطا در ذخیره پروفایل"),
-              },
-            )
+            mutate(form, {
+              onSuccess: () => toast.success("پروفایل کاربر ذخیره شد"),
+              onError: (e) => toast.error(e.response?.data?.message ?? "خطا در ذخیره پروفایل"),
+            })
           }
         >
           ذخیره پروفایل

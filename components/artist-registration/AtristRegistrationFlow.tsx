@@ -35,6 +35,9 @@ interface ArtistProps {
   onGoToStep: (step: number) => void;
 }
 
+/** Profile targets backed by a `users` column; any other target is a custom profile key. */
+const COLUMN_TARGETS = new Set(["firstName", "lastName", "email", "nationalCode"]);
+
 /**
  * The profile value a `syncToUserField` target prefills from, or `null` when there is
  * nothing safe to prefill. `avatar` is deliberately excluded: the profile exposes a
@@ -44,10 +47,13 @@ interface ArtistProps {
 const profileValue = (
   profile: IUserProfile,
   target: SyncToUserField,
-): string | null => {
+): unknown => {
   if (target === "avatar") return null;
+  if (target === "phoneNumber") return profile.phone_number;
+  if (COLUMN_TARGETS.has(target)) return profile[target as keyof IUserProfile];
 
-  return target === "phoneNumber" ? profile.phone_number : profile[target];
+  const value = profile.profileData?.[target];
+  return value === "" || (Array.isArray(value) && !value.length) ? null : value ?? null;
 };
 
 const AtristRegistrationFlow: React.FC<ArtistProps> = ({

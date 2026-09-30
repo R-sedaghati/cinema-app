@@ -130,7 +130,7 @@ const FourthStepFlow: React.FC<Props> = ({
       onSuccess: () => {
         const categoryId = store.categoryId[0] ?? "";
         store.reset();
-        router.push(`/artist-registration/result?status=success&categoryId=${categoryId}`);
+        router.push(`/artist-registration/result?status=success&kind=free&categoryId=${categoryId}`);
       },
       onError: (error) => {
         // 402 = the subscription lapsed since the form loaded; buy it, then submit.

@@ -7,14 +7,12 @@ import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Button from "@/components/common/Button";
 import {
   useUpdateUserArtistRequest,
-  useUserCategoryFormSchema,
   useUserCreateArtistRequest,
 } from "@/lib/services/landing/hook";
 import { useArtistRegistrationStore } from "@/lib/stores/useUserArtist";
 import { isMobile } from "react-device-detect";
 import clsx from "clsx";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
-import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { paymentHref, subscriptionHref } from "@/lib/services/landing/api";
 import { clearSubscriptionDraft, loadSubscriptionDraft } from "@/lib/utils/subscriptionDraft";
 
@@ -22,20 +20,6 @@ function ResultContent() {
   const params = useSearchParams();
   const router = useRouter();
   const reset = useArtistRegistrationStore((state) => state.reset);
-  const landingCopy = useLandingCopy();
-
-  // ponytail: fallbacks, so a category with no copy set still shows a sane page
-  const DEFAULTS = {
-    success: {
-      title: <span style={landingCopy.style("regResultSuccessTitle")}>{landingCopy("regResultSuccessTitle")}</span>,
-      description: <span style={landingCopy.style("regResultSuccessDesc")}>{landingCopy("regResultSuccessDesc")}</span>,
-    },
-    failed: {
-      title: <span style={landingCopy.style("regResultFailTitle")}>{landingCopy("regResultFailTitle")}</span>,
-      description: <span style={landingCopy.style("regResultFailDesc")}>{landingCopy("regResultFailDesc")}</span>,
-    },
-  };
-
   const copy = useFormCopy();
 
   const paid = params.get("status") === "success";
@@ -97,14 +81,11 @@ function ResultContent() {
       .catch(() => setIsRetrying(false));
   };
 
-  const { data, isLoading } = useUserCategoryFormSchema(categoryId);
-  const schema = data?.result;
-
   useEffect(() => {
     if (isSuccess) reset();
   }, [isSuccess, reset]);
 
-  if (isLoading || draftState === "submitting" || (paid && isSubscription && draftState === "idle")) {
+  if (draftState === "submitting" || (paid && isSubscription && draftState === "idle")) {
     return (
       <div className="flex justify-center items-center py-24">
         <Loader2 className="animate-spin text-error-500" size={40} />
@@ -112,13 +93,9 @@ function ResultContent() {
     );
   }
 
-  const title =
-    (isSuccess ? schema?.successTitle : schema?.failTitle) ||
-    DEFAULTS[isSuccess ? "success" : "failed"].title;
-  const description =
-    (paid && draftState === "error" && draftError) ||
-    (isSuccess ? schema?.successDescription : schema?.failDescription) ||
-    DEFAULTS[isSuccess ? "success" : "failed"].description;
+  const page = !isSuccess ? "Fail" : params.get("kind") === "free" ? "Submit" : "Paid";
+  const title = copy(`result${page}Title`);
+  const description = (paid && draftState === "error" && draftError) || copy(`result${page}Desc`);
 
   return (
     <div className="flex justify-center py-10 md:py-20">

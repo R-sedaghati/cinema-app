@@ -32,10 +32,11 @@ import {
   ICatrgotyListResponse,
   ICreateCategoryRequest,
   ICreateFormFieldRequest,
+  IProfileFieldRequest,
+  IProfileField,
   ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
-  IFormResultPages,
   IFormSchemaRetrieveResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -92,6 +93,11 @@ import {
   adminCategoryUpdate,
   adminCreateFaq,
   adminCreateFormField,
+  adminProfileFields,
+  adminCreateProfileField,
+  adminUpdateProfileField,
+  adminDeleteProfileField,
+  adminReorderProfileFields,
   adminCreateFormStep,
   adminDeleteFormField,
   adminDeleteFormStep,
@@ -99,7 +105,6 @@ import {
   adminFaqList,
   adminFaqUpdate,
   adminGetFormSchema,
-  adminUpdateFormResultPages,
   adminLogin,
   adminProvinceList,
   adminAdjustUserWallet,
@@ -108,6 +113,7 @@ import {
   adminPaymentSettingsUpdate,
   adminPaymentSettingsTest,
   adminGatewayLogs,
+  adminSmsLogs,
   adminPayments,
   adminNotificationSettings,
   adminNotificationSettingsUpdate,
@@ -186,15 +192,6 @@ export const useAdminFormSchema = (categoryId?: number) => {
   });
 };
 
-export const useAdminUpdateFormResultPages = () => {
-  const { accessToken } = useAdminAuthStore();
-
-  return useMutation({
-    mutationFn: (data: { categoryId: number; payload: Partial<IFormResultPages> }) =>
-      adminUpdateFormResultPages(data.categoryId, data.payload, accessToken),
-  });
-};
-
 export const useAdminCreateFormStep = () => {
   const { accessToken } = useAdminAuthStore();
 
@@ -246,6 +243,60 @@ export const useAdminDeleteFormField = () => {
     mutationFn: (fieldId: number) => adminDeleteFormField(fieldId, accessToken),
   });
 };
+
+export const useAdminProfileFields = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery({
+    queryKey: ["adminProfileFields"],
+    queryFn: () => adminProfileFields(accessToken),
+    refetchOnWindowFocus: false,
+  });
+};
+
+/** Every profile-field write refreshes the admin list and the public one the site renders. */
+const useProfileFieldMutation = <T,>(fn: (vars: T, accessToken: string) => Promise<unknown>) => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation<unknown, AxiosError<{ message?: string }>, T>({
+    mutationFn: (vars) => fn(vars, accessToken),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminProfileFields"] }),
+        queryClient.invalidateQueries({ queryKey: ["profileFields"] }),
+      ]),
+  });
+};
+
+export const useAdminCreateProfileField = () =>
+  useProfileFieldMutation((payload: IProfileFieldRequest, token) => adminCreateProfileField(payload, token));
+
+export const useAdminUpdateProfileField = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation<unknown, AxiosError<{ message?: string }>, { id: number; payload: IProfileFieldRequest }>({
+    mutationFn: ({ id, payload }) => adminUpdateProfileField(id, payload, accessToken),
+    // Inputs are bound to the cached row and save per keystroke; patching the cache first
+    // keeps typing responsive instead of waiting on each round-trip.
+    onMutate: ({ id, payload }) =>
+      queryClient.setQueryData<IRetriveResponse<IProfileField[]>>(["adminProfileFields"], (old) =>
+        old && { ...old, result: old.result.map((f) => (f.id === id ? { ...f, ...payload } : f)) },
+      ),
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminProfileFields"] }),
+        queryClient.invalidateQueries({ queryKey: ["profileFields"] }),
+      ]),
+  });
+};
+
+export const useAdminDeleteProfileField = () =>
+  useProfileFieldMutation((id: number, token) => adminDeleteProfileField(id, token));
+
+export const useAdminReorderProfileFields = () =>
+  useProfileFieldMutation((ids: number[], token) => adminReorderProfileFields(ids, token));
 
 export const useAdminArtistList = (
   params?: Partial<ParamsArtistList> | undefined,
@@ -456,6 +507,18 @@ export const useAdminGatewayLogs = (params: { page: number; level?: string }) =>
   return useQuery({
     queryKey: ["adminGatewayLogs", params],
     queryFn: () => adminGatewayLogs(params, accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAdminSmsLogs = (params: { page: number; level?: string; action?: string }) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery({
+    queryKey: ["adminSmsLogs", params],
+    queryFn: () => adminSmsLogs(params, accessToken),
     enabled: Boolean(accessToken),
     refetchInterval: 30 * 1000,
     refetchOnWindowFocus: false,
@@ -750,6 +813,14 @@ export const useAdminUploadBannerImage = () => {
 
   return useMutation({
     mutationFn: (file: File) => adminUploadBannerImage(file, accessToken),
+  });
+};
+
+export const useAdminUploadBrandImage = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (file: File) => adminUploadBannerImage(file, accessToken, true),
   });
 };
 

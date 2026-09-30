@@ -7,6 +7,7 @@ import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { FOOTER_DEFAULTS } from "@/lib/constants/footer";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 import { toEnglishDigits } from "@/lib/utils/toEnglishDigits";
+import SiteLogo from "./SiteLogo";
 
 export function SiteFooter() {
   const { data } = useUserSiteContent();
@@ -34,12 +35,7 @@ export function SiteFooter() {
         {/* top */}
         <div className="flex flex-col md:flex-row gap-5 justify-between items-center">
           <div className="flex gap-2 items-center">
-            <img
-              src="/assets/images/logo.svg"
-              alt="logo"
-              width={60}
-              height={60}
-            />
+            <SiteLogo size={60} />
             <h3 className="text-3xl text-error-500 font-extrabold">
               <span style={copy.style("brandName")}>{copy("brandName")}</span>
             </h3>
