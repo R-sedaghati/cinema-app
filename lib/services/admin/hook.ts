@@ -32,6 +32,8 @@ import {
   ICatrgotyListResponse,
   ICreateCategoryRequest,
   ICreateFormFieldRequest,
+  IProfileFieldRequest,
+  IProfileField,
   ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
@@ -92,6 +94,11 @@ import {
   adminCategoryUpdate,
   adminCreateFaq,
   adminCreateFormField,
+  adminProfileFields,
+  adminCreateProfileField,
+  adminUpdateProfileField,
+  adminDeleteProfileField,
+  adminReorderProfileFields,
   adminCreateFormStep,
   adminDeleteFormField,
   adminDeleteFormStep,
@@ -246,6 +253,60 @@ export const useAdminDeleteFormField = () => {
     mutationFn: (fieldId: number) => adminDeleteFormField(fieldId, accessToken),
   });
 };
+
+export const useAdminProfileFields = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery({
+    queryKey: ["adminProfileFields"],
+    queryFn: () => adminProfileFields(accessToken),
+    refetchOnWindowFocus: false,
+  });
+};
+
+/** Every profile-field write refreshes the admin list and the public one the site renders. */
+const useProfileFieldMutation = <T,>(fn: (vars: T, accessToken: string) => Promise<unknown>) => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation<unknown, AxiosError<{ message?: string }>, T>({
+    mutationFn: (vars) => fn(vars, accessToken),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminProfileFields"] }),
+        queryClient.invalidateQueries({ queryKey: ["profileFields"] }),
+      ]),
+  });
+};
+
+export const useAdminCreateProfileField = () =>
+  useProfileFieldMutation((payload: IProfileFieldRequest, token) => adminCreateProfileField(payload, token));
+
+export const useAdminUpdateProfileField = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation<unknown, AxiosError<{ message?: string }>, { id: number; payload: IProfileFieldRequest }>({
+    mutationFn: ({ id, payload }) => adminUpdateProfileField(id, payload, accessToken),
+    // Inputs are bound to the cached row and save per keystroke; patching the cache first
+    // keeps typing responsive instead of waiting on each round-trip.
+    onMutate: ({ id, payload }) =>
+      queryClient.setQueryData<IRetriveResponse<IProfileField[]>>(["adminProfileFields"], (old) =>
+        old && { ...old, result: old.result.map((f) => (f.id === id ? { ...f, ...payload } : f)) },
+      ),
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["adminProfileFields"] }),
+        queryClient.invalidateQueries({ queryKey: ["profileFields"] }),
+      ]),
+  });
+};
+
+export const useAdminDeleteProfileField = () =>
+  useProfileFieldMutation((id: number, token) => adminDeleteProfileField(id, token));
+
+export const useAdminReorderProfileFields = () =>
+  useProfileFieldMutation((ids: number[], token) => adminReorderProfileFields(ids, token));
 
 export const useAdminArtistList = (
   params?: Partial<ParamsArtistList> | undefined,

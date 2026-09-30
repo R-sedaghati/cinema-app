@@ -4,7 +4,7 @@ import { CopyFn, defaultCopy } from "./formCopy.ts";
 import { toEnglishDigits } from "./toEnglishDigits.ts";
 
 export function getStepErrors(
-  step: IFormStep,
+  step: Pick<IFormStep, "fields"> & Partial<IFormStep>,
   answers: Record<string, unknown>,
   copy: CopyFn = defaultCopy,
 ): string[] {

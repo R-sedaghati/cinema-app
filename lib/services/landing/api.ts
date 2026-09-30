@@ -4,6 +4,7 @@ import {
   IArtistRetriveResponse,
   IBannerListResponse,
   IFaqListResponse,
+  IProfileField,
   IProvinceListResponse,
   IRetriveResponse,
   ISiteContentResponse,
@@ -130,6 +131,11 @@ export const userArtistRequests = async (
   );
 
   return data;
+};
+
+export const profileFields = async () => {
+  const { data } = await landingApi.get<IRetriveResponse<IProfileField[]>>("/profile-fields/");
+  return data.result;
 };
 
 export const userUpdatePofile = async (

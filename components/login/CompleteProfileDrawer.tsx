@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Drawer } from "@dgshahr/ui-kit";
-import Input from "@/components/common/Input";
 import { toast } from "react-toastify";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";
-import { useUpdateUserProfile } from "@/lib/services/landing/hook";
+import {
+  useProfileFields,
+  useUpdateUserProfile,
+  useUserProfile,
+  useUserUploadAvatar,
+} from "@/lib/services/landing/hook";
+import FieldRenderer from "@/components/artist-registration/fields/FieldRenderer";
+import { getStepErrors } from "@/lib/utils/validateFormStep";
+import { AVATAR_KEY, missingProfileFields } from "@/lib/utils/profileFields";
 import Button from "@/components/common/Button";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
@@ -17,22 +24,41 @@ interface Props {
 
 const CompleteProfileDrawer = ({ open, onClose }: Props) => {
   const { mutate, isPending } = useUpdateUserProfile();
+  const uploadAvatar = useUserUploadAvatar();
+  const { data: profile } = useUserProfile();
+  const { data: allFields } = useProfileFields();
   const copy = useLandingCopy();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+
+  // Only the required fields still empty. The avatar drops out by itself once uploaded,
+  // since the upload refreshes the profile; the others stay until the save.
+  const missing = useMemo(
+    () => (profile && allFields ? missingProfileFields(profile, allFields) : []),
+    [profile, allFields],
+  );
+  const needsAvatar = missing.some((f) => f.key === AVATAR_KEY);
+  const fields = missing.filter((f) => f.key !== AVATAR_KEY);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim()) return;
+
+    const errors = getStepErrors({ fields }, answers);
+    if (needsAvatar) errors.unshift(copy("profileAvatarCta"));
+    if (errors.length) {
+      toast.error(errors[0]);
+      return;
+    }
+
+    const done = () => {
+      toast.success(copy("completeProfileSuccess"));
+      onClose();
+    };
+
+    if (!fields.length) return done();
 
     mutate(
-      { firstName, lastName },
-      {
-        onSuccess: () => {
-          toast.success(copy("completeProfileSuccess"));
-          onClose();
-        },
-      },
+      Object.fromEntries(fields.map((f) => [f.key, answers[f.key]])),
+      { onSuccess: done },
     );
   };
 
@@ -52,23 +78,36 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
           <span style={copy.style("completeProfileDesc")}>{copy("completeProfileDesc")}</span>
         </p>
 
-        <Input
-          id="complete-first-name"
-          labelContent={copy("fieldFirstName")}
-          required
-          placeholder={copy("fieldFirstNamePlaceholder")}
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
+        {needsAvatar && (
+          <label className="cursor-pointer text-sm text-error-500">
+            <span style={copy.style("profileAvatarCta")}>
+              {uploadAvatar.isPending ? "..." : copy("profileAvatarCta")}
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploadAvatar.isPending}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (!file) return;
+                uploadAvatar.mutate(file, {
+                  onError: () => toast.error(copy("profileAvatarError")),
+                });
+              }}
+            />
+          </label>
+        )}
 
-        <Input
-          id="complete-last-name"
-          labelContent={copy("fieldLastName")}
-          required
-          placeholder={copy("fieldLastNamePlaceholder")}
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
+        {fields.map((field) => (
+          <FieldRenderer
+            key={field.key}
+            field={field}
+            value={answers[field.key] ?? ""}
+            onChange={(value) => setAnswers((prev) => ({ ...prev, [field.key]: value }))}
+          />
+        ))}
 
         <Button
           type="submit"

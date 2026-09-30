@@ -63,6 +63,7 @@ import {
   userSiteContent,
   userTutorialList,
   userProfile,
+  profileFields,
   userProvinceList,
   userSupport,
   userSupportRetrieve,
@@ -156,6 +157,15 @@ export const useUserProfile = () => {
     refetchOnWindowFocus: false,
   });
 };
+
+/** The account profile fields the admin set up (visible ones only), in display order. */
+export const useProfileFields = () =>
+  useQuery({
+    queryKey: ["profileFields"],
+    queryFn: profileFields,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
 export const useUserSupport = (params: IPagination) => {
   const { accessToken } = useAuthStore();

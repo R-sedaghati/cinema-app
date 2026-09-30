@@ -7,6 +7,7 @@ import {
   useAdminDeleteFormField,
   useAdminDeleteFormStep,
   useAdminFormSchema,
+  useAdminProfileFields,
   useAdminUpdateFormField,
   useAdminUpdateFormResultPages,
   useAdminUpdateFormStep,
@@ -15,18 +16,21 @@ import {
   EArtistGender,
   EFormFieldType,
   IFormField,
-  IFormFieldOption,
-  IFormFieldValidation,
   IFormResultPages,
   IFormSchema,
   IFormSchemaRetrieveResponse,
   IFormStep,
+  IUpdateFormFieldRequest,
   SyncToUserField,
 } from "@/lib/services/admin/type";
 import {
-  FIELD_VALIDATION_PRESETS,
-  FieldValidationPreset,
-} from "@/lib/utils/fieldValidationPresets";
+  FIELD_TYPE_OPTIONS,
+  FieldEditor,
+  HAS_OPTIONS,
+  IMAGE_TYPES,
+  fieldErrorMessage,
+  parseOptions,
+} from "@/components/admin/form-builder/FieldEditor";
 import { useQueryClient } from "@tanstack/react-query";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Button, Card, Checkbox, Divider, Select } from "@dgshahr/ui-kit";
@@ -36,7 +40,6 @@ import {
   ChevronRight,
   ChevronUp,
   CreditCard,
-  GripVertical,
   LayoutGrid,
   List,
   Plus,
@@ -46,26 +49,6 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
-const FIELD_TYPE_LABELS: Record<EFormFieldType, string> = {
-  [EFormFieldType.TEXT]: "متن کوتاه",
-  [EFormFieldType.TEXTAREA]: "متن بلند",
-  [EFormFieldType.NUMBER]: "عدد",
-  [EFormFieldType.SELECT]: "لیست کشویی",
-  [EFormFieldType.SELECT_PROVINCE]: "استان (ایران)",
-  [EFormFieldType.SELECT_CITY]: "شهر (ایران)",
-  [EFormFieldType.RADIO]: "تک انتخابی",
-  [EFormFieldType.CHECKBOX]: "چند انتخابی",
-  [EFormFieldType.BOOLEAN]: "بله/خیر (تیک)",
-  [EFormFieldType.DATE]: "تاریخ",
-  [EFormFieldType.IMAGE]: "تصویر",
-  [EFormFieldType.VIDEO]: "ویدئو",
-};
-
-const FIELD_TYPE_OPTIONS = Object.values(EFormFieldType).map((type) => ({
-  label: FIELD_TYPE_LABELS[type],
-  value: type,
-}));
 
 const ICON_COMPONENTS: Record<string, typeof LayoutGrid> = {
   LayoutGrid,
@@ -81,24 +64,6 @@ const ICON_OPTIONS = Object.keys(ICON_COMPONENTS).map((i) => ({
 
 const NO_SYNC = "";
 
-// "" is the cleared state: patching `undefined` would be dropped from the request body,
-// leaving an existing link impossible to remove.
-const SYNC_OPTIONS: { label: string; value: SyncToUserField | typeof NO_SYNC }[] = [
-  { label: "بدون همگام‌سازی", value: NO_SYNC },
-  { label: "نام", value: "firstName" },
-  { label: "نام خانوادگی", value: "lastName" },
-  { label: "تصویر پروفایل", value: "avatar" },
-  { label: "ایمیل", value: "email" },
-  { label: "کد ملی", value: "nationalCode" },
-  { label: "شماره موبایل", value: "phoneNumber" },
-];
-
-const HAS_OPTIONS = new Set([
-  EFormFieldType.SELECT,
-  EFormFieldType.RADIO,
-  EFormFieldType.CHECKBOX,
-]);
-
 /** The site reads `answers.gender` as MAN/WOMAN (components/artists/Card.tsx,
  *  components/artists/detail/Aside.tsx). One click beats an admin retyping the key. */
 const GENDER_FIELD = {
@@ -111,41 +76,10 @@ const GENDER_FIELD = {
   ],
 };
 
-const IMAGE_TYPES = new Set([EFormFieldType.IMAGE, EFormFieldType.VIDEO]);
-
-const TEXT_TYPES = new Set([EFormFieldType.TEXT, EFormFieldType.TEXTAREA]);
-
-/** Types with no text to test — a preset would have nothing to run against. */
-const NO_PRESET_TYPES = new Set([
-  EFormFieldType.BOOLEAN,
-  EFormFieldType.IMAGE,
-  EFormFieldType.VIDEO,
-]);
-
-const PRESET_OPTIONS = [
-  { label: "بدون اعتبارسنجی", value: "" },
-  ...Object.entries(FIELD_VALIDATION_PRESETS).map(([value, { label }]) => ({
-    label,
-    value,
-  })),
-];
-
-const toNumberOrUndefined = (raw: string) =>
-  raw.trim() === "" ? undefined : Number(raw);
-
-const fieldErrorMessage = (err: unknown) =>
-  (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-  "خطا در ایجاد فیلد";
-
 function FieldRow({
   field,
-  index,
-  isDragging,
-  showDropLine,
   onChanged,
-  onDragStart,
-  onDragEnd,
-  onDragOverIndex,
+  ...drag
 }: {
   field: IFormField;
   index: number;
@@ -158,201 +92,42 @@ function FieldRow({
 }) {
   const { mutate: update } = useAdminUpdateFormField();
   const { mutate: remove } = useAdminDeleteFormField();
-  const [optionsText, setOptionsText] = useState(
-    (field.options ?? []).map((o) => `${o.label}:${o.value}`).join(", "),
-  );
-  const [grabbed, setGrabbed] = useState(false);
-  // ponytail: free-text copy is saved on blur, not on every keystroke like the rest
-  const [placeholder, setPlaceholder] = useState(field.placeholder ?? "");
-  const [helpText, setHelpText] = useState(field.helpText ?? "");
+  const { data: profileFields } = useAdminProfileFields();
 
-  const parseOptions = (): IFormFieldOption[] =>
-    optionsText
-      .split(",")
-      .map((chunk) => chunk.trim())
-      .filter(Boolean)
-      .map((chunk) => {
-        const [label, value] = chunk.split(":");
-        return { label: (label ?? "").trim(), value: (value ?? label ?? "").trim() };
-      });
+  // "" is the cleared state: patching `undefined` would be dropped from the request body,
+  // leaving an existing link impossible to remove.
+  const syncOptions: { label: string; value: SyncToUserField }[] = [
+    { label: "بدون همگام‌سازی", value: NO_SYNC },
+    ...(profileFields?.result ?? []).map((f) => ({ label: f.label, value: f.key })),
+    { label: "شماره موبایل", value: "phoneNumber" },
+  ];
 
-  const patch = (payload: Parameters<typeof update>[0]["payload"]) =>
+  const patch = (payload: IUpdateFormFieldRequest) =>
     update({ fieldId: field.id, payload }, { onSuccess: onChanged });
 
-  const validation = field.validation ?? {};
-  const patchValidation = (change: Partial<IFormFieldValidation>) =>
-    patch({ validation: { ...validation, ...change } });
-
   return (
-    <div
-      // ponytail: draggable only while the grip is held, so the row's inputs stay selectable
-      draggable={grabbed}
-      onDragStart={(e) => {
-        e.dataTransfer.effectAllowed = "move";
-        onDragStart();
-      }}
-      onDragEnd={() => {
-        setGrabbed(false);
-        onDragEnd();
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
-        const rect = e.currentTarget.getBoundingClientRect();
-        onDragOverIndex(e.clientY < rect.top + rect.height / 2 ? index : index + 1);
-      }}
-      className={`flex flex-col gap-2 border border-solid rounded-lg p-3 ${
-        showDropLine ? "border-t-2 border-t-primary-500" : ""
-      } ${isDragging ? "opacity-50 border-gray-200" : "border-gray-200"}`}
-    >
-      <div className="flex items-center gap-2">
-        <span
-          className="cursor-grab text-gray-400 shrink-0"
-          onMouseDown={() => setGrabbed(true)}
-          onMouseUp={() => setGrabbed(false)}
-        >
-          <GripVertical size={18} />
-        </span>
-        <span className="text-xs text-gray-500">جابه‌جایی با کشیدن</span>
-      </div>
-
-      <div className="grid md:grid-cols-4 gap-2">
-        <Input
-          labelContent="کلید (key)"
-          value={field.key}
-          onChange={(e) => patch({ key: e.target.value })}
-        />
-        <Input
-          labelContent="برچسب"
-          value={field.label}
-          onChange={(e) => patch({ label: e.target.value })}
-        />
-        <Select
-          inputProps={{ labelContent: "نوع فیلد" }}
-          value={field.type}
-          options={FIELD_TYPE_OPTIONS}
-          onChange={(v) => v && patch({ type: v as EFormFieldType })}
-          mode="single"
-        />
+    <FieldEditor
+      {...drag}
+      field={field}
+      onPatch={patch}
+      onDelete={() => remove(field.id, { onSuccess: onChanged })}
+      extraSelect={
         <Select
           inputProps={{ labelContent: "همگام‌سازی با پروفایل کاربر" }}
           value={field.syncToUserField ?? NO_SYNC}
-          options={SYNC_OPTIONS}
-          onChange={(v) =>
-            patch({ syncToUserField: (v as SyncToUserField) || null })
-          }
+          options={syncOptions}
+          onChange={(v) => patch({ syncToUserField: (v as SyncToUserField) || null })}
           mode="single"
         />
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-2">
-        <Input
-          labelContent="متن راهنمای داخل فیلد (placeholder)"
-          value={placeholder}
-          onChange={(e) => setPlaceholder(e.target.value)}
-          onBlur={() => patch({ placeholder })}
+      }
+      extraFlags={
+        <Checkbox
+          label="خصوصی (نمایش پس از پرداخت)"
+          checked={Boolean(field.isPrivate)}
+          onChange={(e) => patch({ isPrivate: e.target.checked })}
         />
-        <Input
-          labelContent="توضیح زیر فیلد"
-          value={helpText}
-          onChange={(e) => setHelpText(e.target.value)}
-          onBlur={() => patch({ helpText })}
-        />
-      </div>
-
-      {HAS_OPTIONS.has(field.type) && (
-        <Input
-          labelContent="گزینه‌ها (برچسب:مقدار، جدا با کاما)"
-          value={optionsText}
-          onChange={(e) => setOptionsText(e.target.value)}
-          onBlur={() => patch({ options: parseOptions() })}
-        />
-      )}
-
-      {!NO_PRESET_TYPES.has(field.type) && (
-        <Select
-          inputProps={{ labelContent: "اعتبارسنجی آماده" }}
-          value={validation.preset ?? ""}
-          options={PRESET_OPTIONS}
-          onChange={(v) =>
-            patchValidation({ preset: (v as FieldValidationPreset) || undefined })
-          }
-          mode="single"
-        />
-      )}
-
-      {TEXT_TYPES.has(field.type) && (
-        <div className="grid md:grid-cols-3 gap-2">
-          <Input
-            labelContent="حداقل طول"
-            type="text"
-            inputMode="numeric"
-            value={validation.minLength ?? ""}
-            onChange={(e) => patchValidation({ minLength: toNumberOrUndefined(e.target.value) })}
-          />
-          <Input
-            labelContent="حداکثر طول"
-            type="text"
-            inputMode="numeric"
-            value={validation.maxLength ?? ""}
-            onChange={(e) => patchValidation({ maxLength: toNumberOrUndefined(e.target.value) })}
-          />
-          <Input
-            labelContent="الگو (regex)"
-            value={validation.pattern ?? ""}
-            onChange={(e) => patchValidation({ pattern: e.target.value || undefined })}
-          />
-        </div>
-      )}
-
-      {field.type === EFormFieldType.NUMBER && (
-        <div className="grid md:grid-cols-2 gap-2">
-          <Input
-            labelContent="حداقل مقدار"
-            type="text"
-            inputMode="numeric"
-            value={validation.min ?? ""}
-            onChange={(e) => patchValidation({ min: toNumberOrUndefined(e.target.value) })}
-          />
-          <Input
-            labelContent="حداکثر مقدار"
-            type="text"
-            inputMode="numeric"
-            value={validation.max ?? ""}
-            onChange={(e) => patchValidation({ max: toNumberOrUndefined(e.target.value) })}
-          />
-        </div>
-      )}
-
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4 items-center">
-          <Checkbox
-            label="اجباری"
-            checked={field.required}
-            onChange={(e) => patch({ required: e.target.checked })}
-          />
-          <Checkbox
-            label="خصوصی (نمایش پس از پرداخت)"
-            checked={Boolean(field.isPrivate)}
-            onChange={(e) => patch({ isPrivate: e.target.checked })}
-          />
-          {IMAGE_TYPES.has(field.type) && (
-            <Checkbox
-              label="چند فایلی"
-              checked={Boolean(field.multiple)}
-              onChange={(e) => patch({ multiple: e.target.checked })}
-            />
-          )}
-        </div>
-        <Button
-          color="error"
-          variant="text"
-          leftIcon={<Trash2 size={16} />}
-          onClick={() => remove(field.id, { onSuccess: onChanged })}
-        >
-          حذف فیلد
-        </Button>
-      </div>
-    </div>
+      }
+    />
   );
 }
 
@@ -397,15 +172,7 @@ function StepCard({
 
   const sortedFields = [...step.fields].sort((a, b) => a.order - b.order);
 
-  const parseNewOptions = (): IFormFieldOption[] =>
-    newOptionsText
-      .split(",")
-      .map((chunk) => chunk.trim())
-      .filter(Boolean)
-      .map((chunk) => {
-        const [label, value] = chunk.split(":");
-        return { label: (label ?? "").trim(), value: (value ?? label ?? "").trim() };
-      });
+  const parseNewOptions = () => parseOptions(newOptionsText);
 
   const handleAddGender = () =>
     createField(

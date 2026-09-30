@@ -33,6 +33,8 @@ import {
   IFaqItem,
   IFaqListResponse,
   IFormFieldRetrieveResponse,
+  IProfileField,
+  IProfileFieldRequest,
   IFormResultPages,
   IFormSchemaRetrieveResponse,
   IFormStepRetrieveResponse,
@@ -261,6 +263,47 @@ export const adminUpdateFormField = async (
 export const adminDeleteFormField = async (fieldId: number, accessToken: string) => {
   const { data } = await api.delete<IRetriveResponse<{ id: number }>>(
     `/admin/form-fields/${fieldId}/`,
+    { headers: { Authorization: accessToken } },
+  );
+  return data;
+};
+
+export const adminProfileFields = async (accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<IProfileField[]>>("/admin/profile-fields/", {
+    headers: { Authorization: accessToken },
+  });
+  return data;
+};
+
+export const adminCreateProfileField = async (payload: IProfileFieldRequest, accessToken: string) => {
+  const { data } = await api.post<IRetriveResponse<IProfileField>>("/admin/profile-fields/", payload, {
+    headers: { Authorization: accessToken },
+  });
+  return data;
+};
+
+export const adminUpdateProfileField = async (
+  id: number,
+  payload: IProfileFieldRequest,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IRetriveResponse<IProfileField>>(`/admin/profile-fields/${id}/`, payload, {
+    headers: { Authorization: accessToken },
+  });
+  return data;
+};
+
+export const adminDeleteProfileField = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<{ id: number }>>(`/admin/profile-fields/${id}/`, {
+    headers: { Authorization: accessToken },
+  });
+  return data;
+};
+
+export const adminReorderProfileFields = async (ids: number[], accessToken: string) => {
+  const { data } = await api.patch<IRetriveResponse<IProfileField[]>>(
+    "/admin/profile-fields/order/",
+    { ids },
     { headers: { Authorization: accessToken } },
   );
   return data;

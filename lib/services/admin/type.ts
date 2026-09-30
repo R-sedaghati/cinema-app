@@ -157,15 +157,13 @@ interface IArtistUser {
   lastName: string | null;
   phoneNumber: string | null;
   nationalCode?: string | null;
+  /** Values of admin-added profile fields, keyed by IProfileField.key. */
+  profileData?: Record<string, unknown>;
   code: string;
 }
 
-export interface IAdminUserUpdateRequest {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  nationalCode?: string;
-}
+/** Keys are IProfileField keys: builtin column names or custom profile keys. */
+export type IAdminUserUpdateRequest = Record<string, unknown>;
 
 export interface IArtistItem {
   categories: IArtistCategory[];
@@ -199,14 +197,11 @@ export enum EFormFieldType {
   VIDEO = "VIDEO",
 }
 
-export type SyncToUserField =
-  | "firstName"
-  | "lastName"
-  | "avatar"
-  | "email"
-  | "nationalCode"
-  /** Read-only: prefilled into the form from the account, never written back. */
-  | "phoneNumber";
+/**
+ * An IProfileField key (builtin column or custom profile key), or the read-only
+ * "phoneNumber" — prefilled into the form from the account, never written back.
+ */
+export type SyncToUserField = string;
 
 export interface IFormFieldOption {
   label: string;
@@ -240,6 +235,23 @@ export interface IFormField {
   /** Paid content: hidden publicly, served only after a contact purchase. */
   isPrivate?: boolean;
 }
+
+/**
+ * An admin-managed account profile field. `builtin` rows are backed by a `users` column
+ * (key = column); custom rows live in the user's `profileData`.
+ */
+export interface IProfileField extends Omit<IFormField, "syncToUserField" | "isPrivate"> {
+  builtin: boolean;
+  /** Left out of the user's profile and its required checks; admins still see it. */
+  hidden: boolean;
+}
+
+export type IProfileFieldRequest = Partial<
+  Pick<
+    IProfileField,
+    "key" | "label" | "type" | "placeholder" | "helpText" | "required" | "options" | "validation" | "multiple" | "hidden"
+  >
+>;
 
 export interface IFormStep {
   id: number;

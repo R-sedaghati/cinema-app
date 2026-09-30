@@ -127,6 +127,8 @@ interface User {
   avatar?: string | null;    // presigned URL
   code?: string;             // auto-generated sequential code
   lastLogin?: string;        // ISO datetime
+  // Values of admin-added profile fields (see ProfileField), keyed by ProfileField.key.
+  profileData?: Record<string, unknown>;
   // GET /user/profile only. End of the yearly subscription (ISO); null = never paid.
   // Every form submits free while it runs. Once past, the artist stays public;
   // POST /user/subscription/purchase/ renews it (+1 year, stacked onto any time left).
@@ -489,10 +491,36 @@ List all users (no auth required).
 
 ---
 
+### `GET /profile-fields/`
+Visible account profile fields, in display order — what the profile page and the
+post-login completion drawer render. No auth.
+
+**Response:** `ApiResponse<ProfileField[]>`
+
+```ts
+interface ProfileField {
+  id: number;
+  key: string;              // builtin: users column name; custom: profileData key. Immutable.
+  label: string;
+  type: FormFieldType;
+  placeholder: string | null;
+  helpText: string | null;
+  required: boolean;
+  order: number;
+  options: { label: string; value: string }[] | null;
+  validation: FormFieldValidation | null;
+  multiple: boolean;
+  builtin: boolean;         // avatar, firstName, lastName, email, nationalCode — never deleted
+  hidden: boolean;          // always false here; admins can hide fields
+}
+```
+
+---
+
 ### `GET /user/profile/`
 Get own profile. **Auth required.**
 
-**Response:** `Pick<User, "id" | "phone_number" | "avatar" | "lastLogin" | "firstName" | "lastName" | "email" | "nationalCode">`
+**Response:** `Pick<User, "id" | "phone_number" | "avatar" | "lastLogin" | "firstName" | "lastName" | "email" | "nationalCode" | "profileData" | "subscriptionExpiresAt">`
 
 Note: this endpoint returns the object directly, **not** wrapped in `ApiResponse`.
 
@@ -501,13 +529,15 @@ Note: this endpoint returns the object directly, **not** wrapped in `ApiResponse
 ### `PATCH /user/profile/`
 Update own profile. **Auth required.**
 
-**Body:**
-```json
-{ "firstName": "string", "lastName": "string", "email": "string", "nationalCode": "string" }
-```
+**Body:** `{ [profileFieldKey]: value }` — keys are the visible `ProfileField` keys from
+`GET /profile-fields/`. Builtin keys (`firstName`, `lastName`, `email`, `nationalCode`) write
+the `users` column; custom keys write `profileData`. Unknown and hidden keys are ignored, as
+is `avatar` (set by `POST /user/avatar`).
 
-Every key is optional. `nationalCode` must pass the `NATIONAL_CODE` preset (10 digits +
-mod-11 checksum); `""` clears it. An invalid code is a `400` with `"کد ملی معتبر نیست"`.
+Keys missing from the body are left untouched; an empty value clears the field. Each value
+runs through its field's validation (type, options, preset, min/max, pattern);
+`nationalCode` is always checksummed. After applying, every visible required field
+(except `avatar`) must be non-empty — otherwise `400` `"<label> الزامی است"`.
 
 **Response:** `ApiResponse<User>`
 
@@ -1544,7 +1574,9 @@ Create a field on a step.
   // Links the field to the account: prefilled from the profile, and written back on submit.
   // `phoneNumber` is read-only (login identity) — prefilled, never written back.
   // `null` clears an existing link.
-  syncToUserField?: "firstName" | "lastName" | "avatar" | "email" | "nationalCode" | "phoneNumber" | null;
+  // a ProfileField key (builtin or custom; custom answers sync into profileData),
+  // or the read-only "phoneNumber". Unknown keys are a 400.
+  syncToUserField?: string | null;
   multiple?: boolean;      // IMAGE/VIDEO: allow more than one upload
   isPrivate?: boolean;     // default false; true = shown only after an approved resume request
 }
@@ -1565,6 +1597,24 @@ Update a field. **Body:** same shape as create, all optional, plus:
 
 ### `DELETE /admin/form-fields/:fieldId/`
 Delete a field.
+
+---
+
+### `GET /admin/profile-fields/`
+All profile fields including hidden ones. **Response:** `ApiResponse<ProfileField[]>`
+
+### `POST /admin/profile-fields/`
+Add a custom field. **Body:** `{ key, label, type, placeholder?, helpText?, required?, options?, validation?, multiple?, hidden? }`.
+`key` must match `^[a-zA-Z][a-zA-Z0-9_]*$`, be unique, and not be a builtin/reserved name. Appended last.
+
+### `PATCH /admin/profile-fields/:id/`
+Same body minus `key` (immutable). A builtin's `type` and `multiple` cannot change.
+
+### `DELETE /admin/profile-fields/:id/`
+Custom fields only (`400` for builtins — hide them instead). Stored values stay in `profileData`.
+
+### `PATCH /admin/profile-fields/order/`
+**Body:** `{ ids: number[] }` in display order. **Response:** the full list.
 
 ---
 
@@ -1621,18 +1671,17 @@ List all users.
 ### `GET /admin/users/:id/`
 Profile of one user — works whether or not they have any artist request. `404` if missing.
 
-**Response:** `ApiResponse<{ id, firstName, lastName, avatar, phoneNumber, email, nationalCode, code }>` (`avatar` is a public URL)
+**Response:** `ApiResponse<{ id, firstName, lastName, avatar, phoneNumber, email, nationalCode, profileData, code }>` (`avatar` is a public URL)
 
 ---
 
 ### `PATCH /admin/users/:id/`
-Edit a user's profile. Same fields and rules as `PATCH /user/profile/`: `firstName`,
-`lastName`, `email` are ignored when empty; `nationalCode` `""` clears it, otherwise it must
-pass the checksum (`400` if not). `404` if the user is missing.
+Edit a user's profile. Same body and validation as `PATCH /user/profile/`, but hidden
+fields are editable too and required fields are **not** enforced. `404` if the user is missing.
 
-**Body:** `{ firstName?, lastName?, email?, nationalCode? }`
+**Body:** `{ [profileFieldKey]: value }`
 
-**Response:** `ApiResponse<{ id, firstName, lastName, phoneNumber, email, nationalCode, code }>`
+**Response:** `ApiResponse<{ id, firstName, lastName, phoneNumber, email, nationalCode, profileData, code }>`
 
 ---
 

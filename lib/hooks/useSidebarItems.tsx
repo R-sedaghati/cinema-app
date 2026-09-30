@@ -20,6 +20,7 @@ import {
   Bell,
   FileText,
   Receipt,
+  UserCog,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -124,6 +125,12 @@ export const useSidebarItems = (): {
         title: "صفحه‌ساز صفحه ثبت‌نام",
         link: "/admin/registration-builder",
         active: pathname.startsWith("/admin/registration-builder"),
+      },
+      {
+        icon: <UserCog />,
+        title: "فیلدهای پروفایل کاربر",
+        link: "/admin/profile-fields",
+        active: pathname.startsWith("/admin/profile-fields"),
       },
       {
         icon: <Wallpaper />,

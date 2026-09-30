@@ -18,13 +18,8 @@ export interface IPagination {
   count: number;
 }
 
-export type UserUpdateProfile = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  nationalCode: string;
-  phone_number: string;
-};
+/** Keys are IProfileField keys: builtin column names or custom profile keys. */
+export type UserUpdateProfile = Record<string, unknown>;
 
 export type UserCreateSupport = {
   first_name: string;
@@ -52,6 +47,8 @@ export interface IUserProfile {
   lastName: string | null;
   nationalCode: string | null;
   phone_number: string | null;
+  /** Values of admin-added profile fields, keyed by IProfileField.key. */
+  profileData: Record<string, unknown>;
   /** End of the paid registration year (ISO). Null = never paid; past = expired. */
   subscriptionExpiresAt: string | null;
 }
