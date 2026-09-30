@@ -262,18 +262,7 @@ export interface IFormStep {
   fields: IFormField[];
 }
 
-/**
- * Admin-editable copy of a category's post-payment result pages. The fixed
- * flow copy is site-wide instead — see `ISiteContent.form`.
- */
-export interface IFormResultPages {
-  successTitle: string | null;
-  successDescription: string | null;
-  failTitle: string | null;
-  failDescription: string | null;
-}
-
-export interface IFormSchema extends IFormResultPages {
+export interface IFormSchema {
   steps: IFormStep[];
   /** Yearly subscription price in Toman for this caller, resolved server-side. 0 = subscribed (submit directly). */
   registrationAmount: number;
@@ -708,6 +697,8 @@ export interface ISiteContent {
   tableColors?: ITableColors | null;
   /** Per-file upload caps in MB; the API always returns both, defaults filled in. */
   uploadLimits?: IUploadLimits | null;
+  /** Public URLs on read, storage paths on write; absent = shipped logo/favicon. */
+  branding?: { logo?: string; favicon?: string } | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
@@ -774,6 +765,35 @@ export interface IGatewayLogResponse {
     checkedAt: string | null;
     lastOkAt: string | null;
     items: IGatewayLogItem[];
+  };
+}
+
+export type SmsLogLevel = "ok" | "error";
+
+export interface ISmsLogItem {
+  id: number;
+  /** `send` plain text, `pattern` OTP login (code never stored), `check` hourly operator check. */
+  action: "send" | "pattern" | "check";
+  level: SmsLogLevel;
+  receptor: string | null;
+  message: string;
+  detail: string | null;
+  createdAt: string;
+  [key: string]: unknown;
+}
+
+export interface ISmsLogResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  result: {
+    status: SmsLogLevel | "unknown";
+    statusMessage: string | null;
+    checkedAt: string | null;
+    lastOkAt: string | null;
+    sentToday: number;
+    failedToday: number;
+    items: ISmsLogItem[];
   };
 }
 

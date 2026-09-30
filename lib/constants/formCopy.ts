@@ -18,6 +18,15 @@ export const FORM_COPY = {
     admin: "برچسب دسته‌بندی ثبت‌شده (قابل ویرایش)",
     value: "فرم ثبت‌شده — برای ویرایش کلیک کنید",
   },
+  categorySearchPlaceholder: {
+    admin: "متن جستجوی فرم‌ها",
+    value: "جستجوی فرم یا زیرشاخه…",
+  },
+  categorySearchMatch: { admin: "برچسب زیرشاخه یافت‌شده ({name})", value: "زیرشاخه: {name}" },
+  categorySearchEmpty: {
+    admin: "پیام نتیجه خالی جستجوی فرم‌ها",
+    value: "فرمی با این عنوان پیدا نشد",
+  },
   duplicateErrorToast: {
     admin: "پیام خطای فرم تکراری",
     value: "شما قبلاً در این دسته‌بندی فرم ثبت کرده‌اید.",
@@ -56,6 +65,21 @@ export const FORM_COPY = {
   editSuccessToast: { admin: "پیام موفقیت ویرایش", value: "فرم با موفقیت ویرایش شد" },
   editErrorToast: { admin: "پیام خطای ویرایش", value: "خطا در ویرایش فرم" },
 
+  resultPaidTitle: { admin: "عنوان صفحه پرداخت موفق", value: "پرداخت با موفقیت انجام شد" },
+  resultPaidDesc: {
+    admin: "توضیح صفحه پرداخت موفق",
+    value: "درخواست شما ثبت شد و پس از بررسی کارشناسان نتیجه به شما اطلاع داده می‌شود.",
+  },
+  resultSubmitTitle: { admin: "عنوان صفحه ثبت موفق (بدون پرداخت)", value: "فرم شما با موفقیت ثبت شد" },
+  resultSubmitDesc: {
+    admin: "توضیح صفحه ثبت موفق (بدون پرداخت)",
+    value: "درخواست شما ثبت شد و پس از بررسی کارشناسان نتیجه به شما اطلاع داده می‌شود.",
+  },
+  resultFailTitle: { admin: "عنوان صفحه پرداخت ناموفق", value: "پرداخت ناموفق بود" },
+  resultFailDesc: {
+    admin: "توضیح صفحه پرداخت ناموفق",
+    value: "مبلغی از حساب شما کسر نشده است. می‌توانید دوباره تلاش کنید.",
+  },
   successCta: { admin: "دکمه صفحه پرداخت موفق", value: "مشاهده پروفایل" },
   failCta: { admin: "دکمه صفحه پرداخت ناموفق", value: "تلاش دوباره" },
   homeCta: { admin: "دکمه صفحه اصلی (نتیجه پرداخت)", value: "صفحه اصلی" },

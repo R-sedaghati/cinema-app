@@ -1,6 +1,7 @@
 "use client";
 
 import { useSidebarItems } from "@/lib/hooks/useSidebarItems";
+import { useSiteLogo } from "@/lib/hooks/useSiteLogo";
 import useAdminAuthStore from "@/lib/stores/useAdminAuthStore";
 import { useAdminBadgeCounts, useAdminProfile } from "@/lib/services/admin/hook";
 import { Bell } from "lucide-react";
@@ -25,6 +26,7 @@ const AdminMainLayout = (props: Props) => {
   const hideSidebar = /\/document\/[^/]+\/?$/.test(pathname);
 
   const { mainMenuItems } = useSidebarItems();
+  const logo = useSiteLogo() ?? "/assets/images/logo.svg";
   const profile = useAdminProfile().data?.result;
   const unread = useAdminBadgeCounts().data?.result.notifications ?? 0;
 
@@ -36,9 +38,9 @@ const AdminMainLayout = (props: Props) => {
       {!hideSidebar && (
         <Sidebar
           logo={{
-            close: "/assets/images/logo.svg",
+            close: logo,
             loading: "eager",
-            open: "/assets/images/logo.svg",
+            open: logo,
           }}
           items={[mainMenuItems]}
           setIsOpen={setIsSidebarOpen}

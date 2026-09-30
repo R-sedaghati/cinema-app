@@ -1,6 +1,7 @@
 "use client";
 
 import AdminProfileForm from "@/components/admin/settings/AdminProfileForm";
+import BrandingForm from "@/components/admin/settings/BrandingForm";
 import NotificationSettingsForm from "@/components/admin/settings/NotificationSettingsForm";
 import PaymentSettingsForm from "@/components/admin/settings/PaymentSettingsForm";
 import UploadLimitsForm from "@/components/admin/settings/UploadLimitsForm";
@@ -13,6 +14,7 @@ function Settings() {
       <PaymentSettingsForm />
       <NotificationSettingsForm />
       <UploadLimitsForm />
+      <BrandingForm />
     </div>
   );
 }

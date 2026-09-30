@@ -18,7 +18,12 @@ interface Props {
   sections: IResolvedRegistrationSection[];
   items: RegistrationCategory[];
   copy: CopyFn;
-  onSelect: (id: number, title: string, existingRequestId?: number) => void;
+  onSelect: (
+    id: number,
+    title: string,
+    existingRequestId?: number,
+    childIds?: number[],
+  ) => void;
 }
 
 /**

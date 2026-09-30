@@ -35,12 +35,12 @@ import {
   IFormFieldRetrieveResponse,
   IProfileField,
   IProfileFieldRequest,
-  IFormResultPages,
   IFormSchemaRetrieveResponse,
   IFormStepRetrieveResponse,
   IPaymentSettingResponse,
   IPaymentSettingTestResponse,
   IGatewayLogResponse,
+  ISmsLogResponse,
   IAdminPayment,
   INotificationSettingResponse,
   IAdminNotificationListResponse,
@@ -182,19 +182,6 @@ export const adminCategoryRetrieve = async (
 export const adminGetFormSchema = async (categoryId: number, accessToken: string) => {
   const { data } = await api.get<IFormSchemaRetrieveResponse>(
     `/admin/categories/${categoryId}/form-schema/`,
-    { headers: { Authorization: accessToken } },
-  );
-  return data;
-};
-
-export const adminUpdateFormResultPages = async (
-  categoryId: number,
-  payload: Partial<IFormResultPages>,
-  accessToken: string,
-) => {
-  const { data } = await api.patch<IRetriveResponse<IFormResultPages>>(
-    `/admin/categories/${categoryId}/form-schema/`,
-    payload,
     { headers: { Authorization: accessToken } },
   );
   return data;
@@ -533,6 +520,18 @@ export const adminGatewayLogs = async (
   return data;
 };
 
+export const adminSmsLogs = async (
+  params: { page: number; level?: string; action?: string },
+  accessToken: string,
+) => {
+  const { data } = await api.get<ISmsLogResponse>("/admin/sms-logs/", {
+    params: { count: 20, ...params },
+    headers: { Authorization: accessToken },
+  });
+
+  return data;
+};
+
 export const adminPayments = async (
   params: { page: number; status?: string },
   accessToken: string,
@@ -816,9 +815,11 @@ export const adminBannerDelete = async (id: number, accessToken: string) => {
 export const adminUploadBannerImage = async (
   file: File,
   accessToken: string,
+  /** Skip JPEG re-encoding (logo/favicon need SVG/ICO and transparency). */
+  raw = false,
 ) => {
   const form = new FormData();
-  form.append("file", await prepareImage(file));
+  form.append("file", raw ? file : await prepareImage(file));
   const { data } = await api.post<{ path: string; url?: string }>(
     "/admin/upload/image",
     form,

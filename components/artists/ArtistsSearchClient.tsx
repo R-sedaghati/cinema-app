@@ -107,8 +107,9 @@ export function ArtistsSearchClient() {
       <button
         type="button"
         onClick={() =>
-          // setCategory(null) also drops every filter; search text is kept.
-          categoryId || activeFilterCount ? setCategory(null) : router.back()
+          // setCategory(null) also drops every filter; search text is kept. With nothing
+          // to clear, back leaves for home — history may point off-site or nowhere.
+          categoryId || activeFilterCount ? setCategory(null) : router.push("/")
         }
         className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
       >

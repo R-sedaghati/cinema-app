@@ -37,7 +37,6 @@ import {
   ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
-  IFormResultPages,
   IFormSchemaRetrieveResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -106,7 +105,6 @@ import {
   adminFaqList,
   adminFaqUpdate,
   adminGetFormSchema,
-  adminUpdateFormResultPages,
   adminLogin,
   adminProvinceList,
   adminAdjustUserWallet,
@@ -115,6 +113,7 @@ import {
   adminPaymentSettingsUpdate,
   adminPaymentSettingsTest,
   adminGatewayLogs,
+  adminSmsLogs,
   adminPayments,
   adminNotificationSettings,
   adminNotificationSettingsUpdate,
@@ -190,15 +189,6 @@ export const useAdminFormSchema = (categoryId?: number) => {
     enabled: Boolean(categoryId),
     refetchOnReconnect: true,
     refetchOnWindowFocus: false,
-  });
-};
-
-export const useAdminUpdateFormResultPages = () => {
-  const { accessToken } = useAdminAuthStore();
-
-  return useMutation({
-    mutationFn: (data: { categoryId: number; payload: Partial<IFormResultPages> }) =>
-      adminUpdateFormResultPages(data.categoryId, data.payload, accessToken),
   });
 };
 
@@ -523,6 +513,18 @@ export const useAdminGatewayLogs = (params: { page: number; level?: string }) =>
   });
 };
 
+export const useAdminSmsLogs = (params: { page: number; level?: string; action?: string }) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery({
+    queryKey: ["adminSmsLogs", params],
+    queryFn: () => adminSmsLogs(params, accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useAdminPayments = (params: { page: number; status?: string }) => {
   const { accessToken } = useAdminAuthStore();
 
@@ -811,6 +813,14 @@ export const useAdminUploadBannerImage = () => {
 
   return useMutation({
     mutationFn: (file: File) => adminUploadBannerImage(file, accessToken),
+  });
+};
+
+export const useAdminUploadBrandImage = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (file: File) => adminUploadBannerImage(file, accessToken, true),
   });
 };
 

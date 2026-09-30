@@ -8,6 +8,8 @@ import "./pageLayout.css";
 export const metadata: Metadata = {
   title: "آرشیو هنر",
   description: "آرشیو هنر",
+  // Backend redirects to the admin-uploaded favicon, else public/favicon-default.ico.
+  icons: { icon: "/api/favicon", apple: "/api/favicon" },
 };
 
 export const viewport: Viewport = {

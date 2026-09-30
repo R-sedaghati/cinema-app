@@ -94,6 +94,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
         id: c.id,
         title: c.faName,
         image: c.image,
+        children: (c.children ?? []).map((child) => ({ id: child.id, title: child.faName })),
         // A request filed under a child category occupies its parent's form too.
         existingRequestId:
           requestIdByCategory.get(c.id) ??
@@ -273,6 +274,7 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     id: number,
     title: string,
     existingRequestId?: number,
+    childIds: number[] = [],
   ) => {
     // Already filed here: send the user into the edit flow for that request rather
     // than a create that the server would 409.
@@ -282,7 +284,8 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     }
 
     reset();
-    setField("categoryId", [id]);
+    // Subcategories the search matched arrive pre-ticked on the first step.
+    setField("categoryId", [id, ...childIds]);
     setSelectedCategory(id, title);
     setStep(1);
   };

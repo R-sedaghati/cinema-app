@@ -9,15 +9,12 @@ import {
   useAdminFormSchema,
   useAdminProfileFields,
   useAdminUpdateFormField,
-  useAdminUpdateFormResultPages,
   useAdminUpdateFormStep,
 } from "@/lib/services/admin/hook";
 import {
   EArtistGender,
   EFormFieldType,
   IFormField,
-  IFormResultPages,
-  IFormSchema,
   IFormSchemaRetrieveResponse,
   IFormStep,
   IUpdateFormFieldRequest,
@@ -367,87 +364,6 @@ function StepCard({
   );
 }
 
-function FormCopyCard({
-  categoryId,
-  schema,
-  onSaved,
-}: {
-  categoryId: number;
-  schema: IFormSchema | undefined;
-  onSaved: () => void;
-}) {
-  const { mutate: save, isPending } = useAdminUpdateFormResultPages();
-  const [copy, setCopy] = useState<IFormResultPages | null>(null);
-
-  // The inputs are local until saved, so seed them once the schema arrives.
-  useEffect(() => {
-    if (schema && !copy) {
-      setCopy({
-        successTitle: schema.successTitle ?? "",
-        successDescription: schema.successDescription ?? "",
-        failTitle: schema.failTitle ?? "",
-        failDescription: schema.failDescription ?? "",
-      });
-    }
-  }, [schema, copy]);
-
-  if (!copy) return null;
-
-  const set = (key: keyof IFormResultPages) => (value: string) =>
-    setCopy({ ...copy, [key]: value });
-
-  return (
-    <Card>
-      <div className="flex flex-col gap-3">
-        <p className="font-h6-bold">متن‌های صفحه نتیجه پرداخت</p>
-
-        <div className="grid md:grid-cols-2 gap-2">
-          <Input
-            labelContent="عنوان صفحه موفقیت"
-            value={copy.successTitle ?? ""}
-            onChange={(e) => set("successTitle")(e.target.value)}
-          />
-          <Input
-            labelContent="توضیح صفحه موفقیت"
-            value={copy.successDescription ?? ""}
-            onChange={(e) => set("successDescription")(e.target.value)}
-          />
-          <Input
-            labelContent="عنوان صفحه ناموفق"
-            value={copy.failTitle ?? ""}
-            onChange={(e) => set("failTitle")(e.target.value)}
-          />
-          <Input
-            labelContent="توضیح صفحه ناموفق"
-            value={copy.failDescription ?? ""}
-            onChange={(e) => set("failDescription")(e.target.value)}
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            isLoading={isPending}
-            onClick={() =>
-              save(
-                { categoryId, payload: copy },
-                {
-                  onSuccess: () => {
-                    toast.success("متن‌ها ذخیره شد");
-                    onSaved();
-                  },
-                  onError: () => toast.error("خطا در ذخیره متن‌ها"),
-                },
-              )
-            }
-          >
-            ذخیره متن‌ها
-          </Button>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
 function FormBuilder() {
   const params = useParams();
   const router = useRouter();
@@ -613,12 +529,6 @@ function FormBuilder() {
             onFieldDrop={handleFieldDrop}
           />
         ))}
-
-        <FormCopyCard
-          categoryId={id}
-          schema={schemaData?.result}
-          onSaved={() => refetch()}
-        />
 
         <Card>
           <div className="flex gap-2 items-end">

@@ -384,20 +384,6 @@ export const LANDING_COPY = {
   tutorialsSectionTitle: { group: "آموزش‌ها", admin: "عنوان بخش آموزش‌ها در صفحه اول", value: "آموزش‌ها" },
   tutorialsSectionCta: { group: "آموزش‌ها", admin: "لینک «همه» بخش آموزش‌ها", value: "همه" },
 
-  // --- نتیجه ثبت‌نام هنرمند ---
-  regResultSuccessTitle: { group: "نتیجه ثبت‌نام", admin: "عنوان موفق", value: "ثبت‌نام شما با موفقیت انجام شد" },
-  regResultSuccessDesc: {
-    group: "نتیجه ثبت‌نام",
-    admin: "توضیح موفق",
-    value: "درخواست شما ثبت شد و پس از بررسی کارشناسان نتیجه به شما اطلاع داده می‌شود.",
-  },
-  regResultFailTitle: { group: "نتیجه ثبت‌نام", admin: "عنوان ناموفق", value: "پرداخت ناموفق بود" },
-  regResultFailDesc: {
-    group: "نتیجه ثبت‌نام",
-    admin: "توضیح ناموفق",
-    value: "مبلغی از حساب شما کسر نشده است. می‌توانید دوباره تلاش کنید.",
-  },
-
   // --- ورود اجباری پیش از فرم ثبت‌نام ---
   regAuthGateTitle: { group: "نتیجه ثبت‌نام", admin: "عنوان نیاز به ورود", value: "برای ثبت‌نام ابتدا وارد شوید" },
   regAuthGateDesc: {

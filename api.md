@@ -416,6 +416,9 @@ interface SiteContent {
   // keys and non-hex values are dropped. Absent key = theme default.
   tableColors?: { headerBg?: string; headerText?: string; rowBg?: string; rowText?: string; border?: string } | null;
   uploadLimits: { imageMb: number; videoMb: number }; // per-file caps in MB (defaults 10/100, max 200); enforced by /user/avatar and /user/upload/* (413 when exceeded)
+  // Admin-uploaded logo/favicon: public URLs on read, storage paths on write (upload via
+  // POST /admin/upload/image). Absent key = shipped `/assets/images/logo.svg` / `/favicon-default.ico`.
+  branding: { logo?: string; favicon?: string };
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -690,11 +693,6 @@ ApiResponse<{
       isPrivate: boolean;
     }[];
   }[];
-  // copy for the post-payment result pages, set in the admin form builder
-  successTitle: string | null;
-  successDescription: string | null;
-  failTitle: string | null;
-  failDescription: string | null;
   // overrides for the form's fixed copy (button labels, step counter, payment
   // block, validation messages ...), keyed by the frontend FORM_COPY registry
   // in `lib/constants/formCopy.ts`. Missing keys fall back to the defaults.
@@ -1393,6 +1391,23 @@ a gateway fault. The server runs a `check` at startup and hourly, and keeps 30 d
 
 ---
 
+### `GET /admin/sms-logs/`
+SMS panel log, newest first. **Admin auth required.**
+
+**Query:** `page`, `count` (max 50), `level?` (`ok` | `error`), `action?` (`send` | `pattern` | `check`)
+
+**Response:** paginated envelope whose `result` is
+`{ status: "ok" | "error" | "unknown", statusMessage, checkedAt, lastOkAt, sentToday, failedToday, items: SmsLog[] }`,
+`SmsLog = { id, action: "send" | "pattern" | "check", level: "ok" | "error", receptor, message, detail, createdAt }`.
+
+Every SMS sent through Melli Payamak writes a row (`send` stores the text; `pattern` is the
+OTP login and never stores the code). `status` comes from the latest `check`: the server
+asks the panel for its credit at startup and hourly — `error` means bad credentials, the
+operator is unreachable, or credit is low. `sentToday`/`failedToday` count non-check rows
+since local midnight. Kept 30 days.
+
+---
+
 ### `GET /admin/payments/`
 Every registration payment, newest first — gateway, wallet and free. **Admin auth required.**
 
@@ -1530,12 +1545,14 @@ Get the step/field schema for a top-level category. 400 if `:id` has a parent.
 ### `PATCH /admin/categories/:id/form-schema/`
 Set the editable copy of a top-level category's form. 400 if `:id` has a parent.
 
-**Body:** `{ successTitle?, successDescription?, failTitle?, failDescription? }` (all `string | null`)
-plus `formCopy?: Record<string, string>` — merged key by key into the stored
+**Body:** `{ formCopy?: Record<string, string> }` — merged key by key into the stored
 overrides; a key sent empty/blank deletes that override so the frontend default
 applies again.
 
-**Response:** `ApiResponse<{ successTitle, successDescription, failTitle, failDescription, formCopy }>`
+**Response:** `ApiResponse<{ formCopy }>`
+
+Result-page texts (paid / free-submit / fail) are site-wide FORM_COPY keys
+`result{Paid,Submit,Fail}{Title,Desc}` in `SiteContent.form`, not per category.
 
 ---
 
@@ -1796,6 +1813,9 @@ Update about-us text.
 
 ---
 
+### `GET /favicon`
+302 to the admin-uploaded favicon URL, else to `/favicon-default.ico`. `Cache-Control: public, max-age=300`. Used as `<link rel="icon">` by the root layout.
+
 ### `GET /admin/site-content/`
 Get site-content (see `GET /site-content/` above for shape). Admin auth.
 
@@ -1804,7 +1824,7 @@ Get site-content (see `GET /site-content/` above for shape). Admin auth.
 ---
 
 ### `PATCH /admin/site-content/:id/`
-Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`) may be sent independently; unspecified keys are left unchanged.
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`, `branding`) may be sent independently; unspecified keys are left unchanged.
 
 **Body:** `Partial<Omit<SiteContent, "id">>`
 

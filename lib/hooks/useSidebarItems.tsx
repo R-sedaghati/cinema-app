@@ -115,6 +115,12 @@ export const useSidebarItems = (): {
         active: pathname.startsWith("/admin/gateway-logs"),
       },
       {
+        icon: <MessageSquare />,
+        title: "گزارش پنل پیامک",
+        link: "/admin/sms-logs",
+        active: pathname.startsWith("/admin/sms-logs"),
+      },
+      {
         icon: <LayoutTemplate />,
         title: "صفحه‌ساز صفحه اصلی",
         link: "/admin/page-builder",
