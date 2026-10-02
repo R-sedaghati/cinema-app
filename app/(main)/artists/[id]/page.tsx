@@ -51,9 +51,9 @@ export default function ArtistDetailsPage() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="relative mx-auto mb-6 flex w-full max-w-7xl cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+        className="relative mx-auto mb-6 flex w-full max-w-7xl cursor-pointer items-center gap-2 py-2 text-base text-zinc-300 sm:py-0 sm:text-sm transition-colors hover:text-zinc-50"
       >
-        <ArrowRight size={20} />
+        <ArrowRight className="size-6 sm:size-5" />
         <span style={copy.style("actionBack")}>{copy("actionBack")}</span>
       </button>
 
