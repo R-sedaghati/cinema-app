@@ -111,10 +111,10 @@ export function ArtistsSearchClient() {
           // to clear, back leaves for home — history may point off-site or nowhere.
           categoryId || activeFilterCount ? setCategory(null) : router.push("/")
         }
-        className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-zinc-50"
+        className="flex cursor-pointer items-center gap-2 py-2 text-base text-zinc-300 sm:py-0 sm:text-sm transition-colors hover:text-zinc-50"
       >
-        <ArrowRight size={20} />
-        <span style={copy.style("actionBack")}>{copy("actionBack")}</span>
+        <ArrowRight className="size-6 sm:size-5" />
+        <span style={copy.style("actionBack")}>{}</span>
       </button>
 
       <div className="flex flex-col items-center justify-center gap-5">

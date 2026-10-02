@@ -10,9 +10,9 @@ const BackLinkSection: React.FC<{ copy: CopyFn }> = ({ copy }) => (
   <div className={clsx("mx-auto mb-3 w-[90%]", isDesktop && "w-4/5")}>
     <Link
       href="/"
-      className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200"
+      className="inline-flex items-center gap-1 py-2 text-base text-zinc-400 sm:py-0 sm:text-sm hover:text-zinc-200"
     >
-      <MoveRight size={18} />
+      <MoveRight className="size-6 sm:size-[18px]" />
       <span style={copy.style("backHome")}>{copy("backHome")}</span>
     </Link>
   </div>
