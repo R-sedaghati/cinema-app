@@ -485,6 +485,10 @@ ApiResponse<{
 }>
 ```
 
+**Limits** (per phone, 5-min window): step 1 over `OTP_RATE_LIMIT_ATTEMPTS` sends → **429**
+«کد ورود قبلا ارسال شده است» (code still live — client jumps to the OTP step). Step 2 allows
+5 attempts, then **400**. The two counters are separate.
+
 ---
 
 ### `GET /user/`
