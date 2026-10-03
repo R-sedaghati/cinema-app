@@ -55,6 +55,12 @@ const PhoneNumberStep: FC<StepBaseProps> = (props) => {
           setStep("otp");
         },
         onError: (err) => {
+          // 429: a code was already sent and is still valid, so let the user enter it.
+          if (err.response?.status === 429) {
+            setStorePhoneNumber(cleanedPhone);
+            setStep("otp");
+            return;
+          }
           console.error(err);
         },
       },
