@@ -150,7 +150,9 @@ export const useUserProfile = () => {
   // No polling: nothing outside this app edits the profile, and a background refetch
   // landing mid-edit would reset the form the user is typing into.
   return useQuery<IUserProfile>({
-    queryKey: ["userProfile"],
+    // Keyed by session: after logging out and in as someone else the previous account's
+    // cached profile must not be served (it drove the wrong "complete your profile" prompt).
+    queryKey: ["userProfile", accessToken],
     queryFn: () => userProfile(accessToken),
     enabled: Boolean(accessToken),
     refetchOnReconnect: true,
@@ -327,16 +329,23 @@ export const useUserUploadImage = () =>
     mutationFn: userUploadImage,
   });
 
-export const useUserCategoryFormSchema = (categoryId?: number | null) =>
-  useQuery<IFormSchemaResponse>({
-    queryKey: ["userCategoryFormSchema", categoryId],
+export const useUserCategoryFormSchema = (categoryId?: number | null) => {
+  const { accessToken } = useAuthStore();
+
+  return useQuery<IFormSchemaResponse>({
+    // The price in this response depends on who is asking (a subscriber sees 0), so the
+    // session is part of the key: logging in must not keep serving the anonymous price.
+    queryKey: ["userCategoryFormSchema", categoryId, Boolean(accessToken)],
     queryFn: () => userGetCategoryFormSchema(categoryId!),
     enabled: !!categoryId,
+    staleTime: 0,
+    refetchOnMount: "always",
     // A form schema is not live data, and polling it swapped fields out from under a
     // user who was mid-way through filling them in.
     refetchInterval: false,
     refetchOnWindowFocus: false,
   });
+};
 
 export const useUserCreateArtistRequest = () => {
   const queryClient = useQueryClient();

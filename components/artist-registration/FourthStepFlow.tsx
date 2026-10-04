@@ -124,8 +124,9 @@ const FourthStepFlow: React.FC<Props> = ({
       return;
     }
 
-    if (!isFree) return void buySubscription();
-
+    // Always ask the server first, even when the page still shows a price: the amount may
+    // be stale (subscribed in another tab, or just paid), and the server answers 402 when
+    // the subscription really is missing — that is the only case that goes to the gateway.
     create(formPayload, {
       onSuccess: () => {
         const categoryId = store.categoryId[0] ?? "";

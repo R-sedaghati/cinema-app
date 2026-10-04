@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Drawer } from "@dgshahr/ui-kit";
 import { toast } from "react-toastify";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
@@ -38,6 +38,12 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
   );
   const needsAvatar = missing.some((f) => f.key === AVATAR_KEY);
   const fields = missing.filter((f) => f.key !== AVATAR_KEY);
+
+  // Everything required is in (e.g. the avatar was the only gap and its upload finished):
+  // nothing left to ask, so don't leave the user staring at an empty form.
+  useEffect(() => {
+    if (open && profile && allFields && !missing.length) onClose();
+  }, [open, profile, allFields, missing.length, onClose]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,15 +115,27 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
           />
         ))}
 
-        <Button
-          type="submit"
-          isLoading={isPending}
-          disabled={isPending}
-          className="w-full rounded-full!"
-          isFullWidth
-        >
-          <span style={copy.style("actionSave")}>{copy("actionSave")}</span>
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button
+            type="submit"
+            isLoading={isPending}
+            disabled={isPending}
+            className="w-full rounded-full!"
+            isFullWidth
+          >
+            <span style={copy.style("actionSave")}>{copy("actionSave")}</span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isPending}
+            className="w-full rounded-full!"
+            isFullWidth
+          >
+            <span style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
+          </Button>
+        </div>
       </form>
     </Drawer>
   );
