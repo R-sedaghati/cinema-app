@@ -186,7 +186,8 @@ export const useUserAtristRequests = (params: IPagination) => {
   const { accessToken } = useAuthStore();
 
   return useQuery<IUserArtistListResponse>({
-    queryKey: ["userSuserArtistRequestsupport", params],
+    // Keyed by session so another account's forms are never served from the cache.
+    queryKey: ["userSuserArtistRequestsupport", params, accessToken],
     queryFn: () => userArtistRequests(params, accessToken),
     refetchInterval: 30 * 1000,
     enabled: Boolean(accessToken),

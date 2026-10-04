@@ -7,7 +7,7 @@ import {
 import { IUserCategoryResponse, IUserProfile } from "@/lib/services/landing/type";
 import { EFormFieldType, SyncToUserField } from "@/lib/services/admin/type";
 import { Loader2 } from "lucide-react";
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { SelectedCategory } from "@/app/(main)/artist-registration/ArtistRegistrationPageContent";
 import FirstStepFlow from "./FIrstStepFlow";
@@ -105,7 +105,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     [steps],
   );
 
-  const { data: profileData } = useUserProfile();
+  const { data: profileData, isLoading: isProfileLoading } = useUserProfile();
 
   // Fields an admin wired to a profile field in the form-builder. The account is the source
   // of what it already knows, so those answers start out prefilled from it. Running here
@@ -143,12 +143,12 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   // The schema query refetches on an interval, so `syncedFields` gets a new identity
   // every 30s. Without this guard the effect re-fires and silently refills fields the
   // user deliberately cleared.
-  const prefilledForRef = useRef<number | null>(null);
+  const [prefilledFor, setPrefilledFor] = useState<number | null>(null);
 
   useEffect(() => {
     if (!profileData || !syncedFields.length) return;
-    if (prefilledForRef.current === (category?.id ?? null)) return;
-    prefilledForRef.current = category?.id ?? null;
+    if (prefilledFor === (category?.id ?? null)) return;
+    setPrefilledFor(category?.id ?? null);
 
     const { setAnswer } = useArtistRegistrationStore.getState();
 
@@ -161,7 +161,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
       // hydrated draft carrying an older value the user could no longer edit.
       setAnswer(key, value);
     }
-  }, [syncedFields, profileData, category?.id]);
+  }, [syncedFields, profileData, category?.id, prefilledFor]);
 
   useEffect(() => {
     if (data && !hasChildren && flowStep === 0) {
@@ -175,7 +175,17 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   const totalFixedTailSteps = 1; // payment step
   const totalSteps = steps.length + totalFixedTailSteps + (hasChildren ? 1 : 0);
 
-  if (isLoading || isSchemaLoading) {
+  // The fields the account already knows (name, last name, …) are filled by the effect
+  // above once the profile lands. Until then the form would show them empty and then pop
+  // them in locked, so the loader covers the profile fetch and the render before the
+  // prefill has been applied.
+  const isPrefillPending =
+    isProfileLoading ||
+    (Boolean(profileData) &&
+      syncedFields.length > 0 &&
+      prefilledFor !== (category?.id ?? null));
+
+  if (isLoading || isSchemaLoading || isPrefillPending) {
     return (
       <div className="flex justify-center items-center py-24">
         <Loader2 className="animate-spin text-error-500" size={40} />
