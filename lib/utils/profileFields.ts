@@ -19,9 +19,13 @@ const isEmpty = (field: IProfileField, value: unknown) =>
   value === "" ||
   (Array.isArray(value) && value.length === 0);
 
-/** Required fields the user has not filled in — what the completion drawer asks for. */
-export const missingProfileFields = (profile: ProfileSource, fields: IProfileField[]) =>
-  fields.filter((f) => f.required && isEmpty(f, profileValue(profile, f)));
-
 /** The avatar has its own upload endpoint, so it never goes in the profile PATCH body. */
 export const AVATAR_KEY = "avatar";
+
+/**
+ * Required fields the user has not filled in — what the completion drawer asks for.
+ * The avatar is never one of them: it is offered in the drawer but optional, so a missing
+ * photo neither triggers the prompt nor blocks saving.
+ */
+export const missingProfileFields = (profile: ProfileSource, fields: IProfileField[]) =>
+  fields.filter((f) => f.key !== AVATAR_KEY && f.required && isEmpty(f, profileValue(profile, f)));

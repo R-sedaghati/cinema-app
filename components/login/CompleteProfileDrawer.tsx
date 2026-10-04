@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Drawer } from "@dgshahr/ui-kit";
+import { UserRound, Camera } from "lucide-react";
 import { toast } from "react-toastify";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";
@@ -36,8 +37,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
     () => (profile && allFields ? missingProfileFields(profile, allFields) : []),
     [profile, allFields],
   );
-  const needsAvatar = missing.some((f) => f.key === AVATAR_KEY);
-  const fields = missing.filter((f) => f.key !== AVATAR_KEY);
+  // Optional: offered whenever the admin enabled the field, never required.
+  const showAvatar = Boolean(allFields?.some((f) => f.key === AVATAR_KEY));
+  const fields = missing;
 
   // Everything required is in (e.g. the avatar was the only gap and its upload finished):
   // nothing left to ask, so don't leave the user staring at an empty form.
@@ -49,7 +51,6 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
     e.preventDefault();
 
     const errors = getStepErrors({ fields }, answers);
-    if (needsAvatar) errors.unshift(copy("profileAvatarCta"));
     if (errors.length) {
       toast.error(errors[0]);
       return;
@@ -84,26 +85,54 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
           <span style={copy.style("completeProfileDesc")}>{copy("completeProfileDesc")}</span>
         </p>
 
-        {needsAvatar && (
-          <label className="cursor-pointer text-sm text-error-500">
-            <span style={copy.style("profileAvatarCta")}>
-              {uploadAvatar.isPending ? "..." : copy("profileAvatarCta")}
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              disabled={uploadAvatar.isPending}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (!file) return;
-                uploadAvatar.mutate(file, {
-                  onError: () => toast.error(copy("profileAvatarError")),
-                });
-              }}
-            />
-          </label>
+        {showAvatar && (
+          <div className="flex items-center gap-4 rounded-2xl border border-zinc-700/60 bg-zinc-900/40 p-4">
+            {profile?.avatar ? (
+              <img
+                src={profile.avatar}
+                alt=""
+                className="h-20 w-20 shrink-0 rounded-full object-cover ring-2 ring-error-500/60"
+              />
+            ) : (
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-zinc-800/80 ring-1 ring-zinc-600">
+                <UserRound className="h-9 w-9 text-zinc-300" />
+              </div>
+            )}
+            <div className="flex min-w-0 flex-col items-start gap-2">
+              <span className="text-xs text-zinc-400">
+                <span style={copy.style("completeProfileAvatarOptional")}>
+                  {copy("completeProfileAvatarOptional")}
+                </span>
+              </span>
+              <label
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-full border border-error-500 px-4 py-2 text-sm text-error-500 transition hover:bg-error-500/10 ${
+                  uploadAvatar.isPending ? "pointer-events-none opacity-60" : ""
+                }`}
+              >
+                <Camera className="h-4 w-4" />
+                <span style={copy.style("profileAvatarCta")}>
+                  {uploadAvatar.isPending ? "..." : copy("profileAvatarCta")}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadAvatar.isPending}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!file) return;
+                    uploadAvatar.mutate(file, {
+                      onError: () => toast.error(copy("profileAvatarError")),
+                    });
+                  }}
+                />
+              </label>
+              <span className="text-xs text-zinc-400">
+                <span style={copy.style("profileAvatarHint")}>{copy("profileAvatarHint")}</span>
+              </span>
+            </div>
+          </div>
         )}
 
         {fields.map((field) => (

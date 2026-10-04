@@ -219,6 +219,7 @@ export const LANDING_COPY = {
     admin: "توضیح تکمیل پروفایل",
     value: "برای استفاده کامل از سایت، لطفاً اطلاعات زیر را تکمیل کنید.",
   },
+  completeProfileAvatarOptional: { group: "ورود و ثبت‌نام", admin: "برچسب اختیاری بودن تصویر", value: "اختیاری" },
   completeProfileSuccess: { group: "ورود و ثبت‌نام", admin: "پیام تکمیل پروفایل", value: "پروفایل با موفقیت تکمیل شد" },
 
   // --- فیلدهای مشترک ---
