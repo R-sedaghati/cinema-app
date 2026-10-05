@@ -39,10 +39,17 @@ export function RegistrationRowSection({
       className={`mb-3 flex items-center justify-between md:mb-4 ${padded ? "px-4" : ""}`}
     >
       <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
-        <span style={copy.style("homeRegistrationTitle")}>{copy("homeRegistrationTitle")}</span>
+        <span style={copy.style("homeRegistrationTitle")}>
+          {copy("homeRegistrationTitle")}
+        </span>
       </h2>
-      <Link href="/profile" className="text-xs text-error-500 md:text-sm">
-        <span style={copy.style("homeRegistrationCta")}>{copy("homeRegistrationCta")}</span>
+      <Link
+        href="/artist-registration"
+        className="text-xs text-error-500 md:text-sm"
+      >
+        <span style={copy.style("homeRegistrationCta")}>
+          {copy("homeRegistrationCta")}
+        </span>
       </Link>
     </div>
   );
@@ -64,7 +71,9 @@ export function RegistrationRowSection({
                   {cat.faName}
                 </span>
                 {cat.description && (
-                  <span className="text-xs text-zinc-500">{cat.description}</span>
+                  <span className="text-xs text-zinc-500">
+                    {cat.description}
+                  </span>
                 )}
               </span>
               <ArrowLeft size={16} className="shrink-0 text-zinc-600" />
@@ -119,7 +128,10 @@ export function RegistrationRowSection({
     return (
       <section>
         {header(false)}
-        <div data-card-grid className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+        <div
+          data-card-grid
+          className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
+        >
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -168,7 +180,9 @@ export function RegistrationRowSection({
                   {cat.faName}
                 </p>
                 <span className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
-                  <span style={copy.style("homeRegistrationCta")}>{copy("homeRegistrationCta")}</span>
+                  <span style={copy.style("homeRegistrationCta")}>
+                    {copy("homeRegistrationCta")}
+                  </span>
                   <ArrowLeft size={12} />
                 </span>
               </div>

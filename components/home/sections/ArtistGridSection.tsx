@@ -28,10 +28,14 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
         className={`mb-3 flex items-center justify-between md:mb-4 ${isRail ? "px-4" : ""}`}
       >
         <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
-          <span style={copy.style("homeArtistsTitle")}>{copy("homeArtistsTitle")}</span>
+          <span style={copy.style("homeArtistsTitle")}>
+            {copy("homeArtistsTitle")}
+          </span>
         </h2>
         <Link href="/artists" className="text-xs text-error-500 md:text-sm">
-          <span style={copy.style("homeArtistsCta")}>{copy("homeArtistsCta")}</span>
+          <span style={copy.style("homeArtistsCta")}>
+            {copy("homeArtistsCta")}
+          </span>
         </Link>
       </div>
 
@@ -42,7 +46,10 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
       ) : variant === "castlist" ? (
         <CastList artists={artists} />
       ) : variant === "tiles" ? (
-        <div data-card-grid className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 md:gap-y-6 lg:grid-cols-8">
+        <div
+          data-card-grid
+          className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 md:gap-y-6 lg:grid-cols-8"
+        >
           {artists.map((artist) => (
             <ArtistTile key={artist.id} artist={artist} />
           ))}
@@ -60,7 +67,10 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
           </div>
         </div>
       ) : (
-        <div data-card-grid className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-5 lg:grid-cols-5">
+        <div
+          data-card-grid
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-5 lg:grid-cols-5"
+        >
           {artists.map((artist) => (
             <div key={artist.id} data-card>
               <ArtistCard artist={artist} />
@@ -108,11 +118,12 @@ function CastList({ artists }: { artists: IArtistItem[] }) {
                 {craft}
               </span>
             )}
-            {typeof artist.answers?.city === "string" && artist.answers.city && (
-              <span className="hidden shrink-0 text-xs text-zinc-600 md:inline md:text-sm">
-                {artist.answers.city as string}
-              </span>
-            )}
+            {typeof artist.answers?.city === "string" &&
+              artist.answers.city && (
+                <span className="hidden shrink-0 text-xs text-zinc-600 md:inline md:text-sm">
+                  {artist.answers.city as string}
+                </span>
+              )}
           </Link>
         );
       })}

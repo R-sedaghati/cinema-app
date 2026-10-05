@@ -37,7 +37,11 @@ export interface SelectedCategory {
   title: string;
 }
 
-export default function ArtistRegistrationPageContent({ editId }: { editId: number | null }) {
+export default function ArtistRegistrationPageContent({
+  editId,
+}: {
+  editId: number | null;
+}) {
   const copy = useFormCopy();
   const landingCopy = useLandingCopy();
 
@@ -68,15 +72,19 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     if (isSignedOut) openLoginDrawer();
   }, [isSignedOut, openLoginDrawer]);
 
-  const { data: categoryData, isLoading: isCategoryLoading } = useUserCategoryList({
-    page: 1,
-    count: CATEGORY_PAGE_SIZE,
-  });
+  const { data: categoryData, isLoading: isCategoryLoading } =
+    useUserCategoryList({
+      page: 1,
+      count: CATEGORY_PAGE_SIZE,
+    });
 
   // Each account fills a given form once, so a category already registered in opens the
   // existing request for editing instead of starting a second one. The backend enforces
   // the same one-per-category rule on create.
-  const { data: ownRequests } = useUserAtristRequests({ page: 1, count: MAX_PAGE_SIZE });
+  const { data: ownRequests } = useUserAtristRequests({
+    page: 1,
+    count: MAX_PAGE_SIZE,
+  });
 
   const requestIdByCategory = useMemo(
     () =>
@@ -94,7 +102,10 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
         id: c.id,
         title: c.faName,
         image: c.image,
-        children: (c.children ?? []).map((child) => ({ id: child.id, title: child.faName })),
+        children: (c.children ?? []).map((child) => ({
+          id: child.id,
+          title: child.faName,
+        })),
         // A request filed under a child category occupies its parent's form too.
         existingRequestId:
           requestIdByCategory.get(c.id) ??
@@ -138,7 +149,9 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
       ? null
       : { id: selectedCategoryId, title: selectedCategoryTitle };
 
-  const { data: editData, isLoading: editLoading } = useOwnArtistRequest(editId ?? undefined);
+  const { data: editData, isLoading: editLoading } = useOwnArtistRequest(
+    editId ?? undefined,
+  );
 
   // The URL is the only durable copy of the form — category, sub-categories, step and
   // answers: state is a transient mirror of it, so a refresh, a back button, or a shared
@@ -166,13 +179,19 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
     // Merge portfolio rows (grouped by the schema field they were submitted under) back
     // into answers so IMAGE/VIDEO fields hydrate like any other dynamic field.
-    const { answers: portfolioAnswers, urlByPath } = groupPortfolios(r.portfolios);
+    const { answers: portfolioAnswers, urlByPath } = groupPortfolios(
+      r.portfolios,
+    );
 
     setField("portfolioUrls", urlByPath);
     // Portfolio rows are the authoritative record of what was uploaded, so they win over
     // saved answers: a stale or empty file key would otherwise blank the hydrated images.
     // Unsaved edits carried in the URL are newer than either, so they win over both.
-    setField("answers", { ...(r.answers ?? {}), ...portfolioAnswers, ...urlAnswers });
+    setField("answers", {
+      ...(r.answers ?? {}),
+      ...portfolioAnswers,
+      ...urlAnswers,
+    });
 
     const cat = r.categories[0];
     if (cat) {
@@ -229,7 +248,8 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
       if (!editId) params.set("category", String(selectedCategoryId));
       if (step > 0) params.set("step", String(step));
       if (categoryId.length) params.set("ids", categoryId.join(","));
-      if (Object.keys(answers).length) params.set("answers", JSON.stringify(answers));
+      if (Object.keys(answers).length)
+        params.set("answers", JSON.stringify(answers));
     }
 
     const query = params.toString();
@@ -237,7 +257,11 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
 
     // ponytail: native replaceState, not router.replace — Next syncs useSearchParams with
     // it, and it skips a server round trip per debounced keystroke.
-    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
+    window.history.replaceState(
+      null,
+      "",
+      query ? `${pathname}?${query}` : pathname,
+    );
   }, [
     isUrlHydrated,
     editId,
@@ -263,7 +287,11 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
       const poppedCategoryId = Number(params.get("category")) || 0;
       const { selectedCategoryId: currentCategoryId, step: currentStep } =
         useArtistRegistrationStore.getState();
-      if (!editId && (!poppedCategoryId || poppedCategoryId !== currentCategoryId)) return;
+      if (
+        !editId &&
+        (!poppedCategoryId || poppedCategoryId !== currentCategoryId)
+      )
+        return;
       if (poppedStep && poppedStep !== currentStep) setStep(poppedStep);
     };
     window.addEventListener("popstate", onPopState);
@@ -310,12 +338,20 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h4-bold"><span style={landingCopy.style("regAuthGateTitle")}>{landingCopy("regAuthGateTitle")}</span></p>
+            <p className="font-h4-bold">
+              <span style={landingCopy.style("regAuthGateTitle")}>
+                {landingCopy("regAuthGateTitle")}
+              </span>
+            </p>
             <p className="font-p1-regular text-gray-600">
-              <span style={landingCopy.style("regAuthGateDesc")}>{landingCopy("regAuthGateDesc")}</span>
+              <span style={landingCopy.style("regAuthGateDesc")}>
+                {landingCopy("regAuthGateDesc")}
+              </span>
             </p>
             <Button className="rounded-full!" onClick={openLoginDrawer}>
-              <span style={landingCopy.style("regAuthGateCta")}>{landingCopy("regAuthGateCta")}</span>
+              <span style={landingCopy.style("regAuthGateCta")}>
+                {landingCopy("regAuthGateCta")}
+              </span>
             </Button>
           </div>
         </Card>
@@ -331,12 +367,18 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h4-bold"><span style={landingCopy.style("regEditUnavailable")}>{landingCopy("regEditUnavailable")}</span></p>
+            <p className="font-h4-bold">
+              <span style={landingCopy.style("regEditUnavailable")}>
+                {landingCopy("regEditUnavailable")}
+              </span>
+            </p>
             <Button
               className="rounded-full!"
               onClick={() => router.push("/artist-registration")}
             >
-              <span style={landingCopy.style("regEditUnavailableCta")}>{landingCopy("regEditUnavailableCta")}</span>
+              <span style={landingCopy.style("regEditUnavailableCta")}>
+                {landingCopy("regEditUnavailableCta")}
+              </span>
             </Button>
           </div>
         </Card>
@@ -344,7 +386,11 @@ export default function ArtistRegistrationPageContent({ editId }: { editId: numb
     );
   }
 
-  if (!isAuthReady || (editId && editLoading) || (step === 0 && isCategoryLoading)) {
+  if (
+    !isAuthReady ||
+    (editId && editLoading) ||
+    (step === 0 && isCategoryLoading)
+  ) {
     return (
       <div className="flex justify-center items-center py-24">
         <Loader2 className="animate-spin text-error-500" size={40} />

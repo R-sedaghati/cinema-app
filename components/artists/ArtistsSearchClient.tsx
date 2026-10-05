@@ -30,7 +30,11 @@ const PAGE_SIZE = 12;
  * Persian forms of ی/ک, so a raw `includes` misses tiles the user clearly meant.
  */
 const normalizeFa = (value: string) =>
-  value.replace(/\u200c/g, "").replace(/\u064a/g, "\u06cc").replace(/\u0643/g, "\u06a9").trim();
+  value
+    .replace(/\u200c/g, "")
+    .replace(/\u064a/g, "\u06cc")
+    .replace(/\u0643/g, "\u06a9")
+    .trim();
 
 export function ArtistsSearchClient() {
   const copy = useLandingCopy();
@@ -173,7 +177,9 @@ export function ArtistsSearchClient() {
                   onClick={() => setCategory(item.id)}
                   className="md:w-60 overflow-hidden w-36 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
                 >
-                  <p className="text-nowrap text-sm md:text-base z-1">{toResumeName(item.faName)}</p>
+                  <p className="text-nowrap text-sm md:text-base z-1">
+                    {toResumeName(item.faName)}
+                  </p>
                   <MoveLeft className="text-error-500 z-1" />
                   <img
                     src={item.image ?? "/cat-1.svg"}
@@ -193,7 +199,9 @@ export function ArtistsSearchClient() {
         <div className="space-y-6">
           {!isPending && artists.length > 0 && (
             <p className="text-sm text-zinc-500">
-              <span style={copy.style("artistsCount")}>{copy("artistsCount", { count: total })}</span>
+              <span style={copy.style("artistsCount")}>
+                {copy("artistsCount", { count: total })}
+              </span>
             </p>
           )}
 
@@ -214,7 +222,9 @@ export function ArtistsSearchClient() {
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
               >
-                {isFetchingNextPage ? copy("artistsLoading") : copy("artistsLoadMore")}
+                {isFetchingNextPage
+                  ? copy("artistsLoading")
+                  : copy("artistsLoadMore")}
               </Button>
             </div>
           )}

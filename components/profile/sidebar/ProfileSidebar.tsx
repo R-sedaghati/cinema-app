@@ -34,7 +34,11 @@ export interface SideBarSections {
 }
 
 // Labels are copy keys; the admin-editable text is resolved at render time.
-const sectionDefs1: { id: SectionId; label: LandingCopyKey; icon: React.ReactNode }[] = [
+const sectionDefs1: {
+  id: SectionId;
+  label: LandingCopyKey;
+  icon: React.ReactNode;
+}[] = [
   {
     id: "forms",
     label: "profileFormsTitle",
@@ -57,7 +61,11 @@ const sectionDefs1: { id: SectionId; label: LandingCopyKey; icon: React.ReactNod
   },
 ];
 
-const sectionDefs2: { id: SectionId; label: LandingCopyKey; icon: React.ReactNode }[] = [
+const sectionDefs2: {
+  id: SectionId;
+  label: LandingCopyKey;
+  icon: React.ReactNode;
+}[] = [
   {
     id: "support",
     label: "profileSupportTitle",
@@ -71,7 +79,9 @@ const sectionDefs2: { id: SectionId; label: LandingCopyKey; icon: React.ReactNod
 ];
 
 /** The yearly subscription. Active: member badge + end date. Expired: renew. */
-function SubscriptionBadge({ expiresAt }: Readonly<{ expiresAt?: string | null }>) {
+function SubscriptionBadge({
+  expiresAt,
+}: Readonly<{ expiresAt?: string | null }>) {
   if (!expiresAt) return null;
 
   if (new Date(expiresAt) > new Date()) {
@@ -95,7 +105,11 @@ function SubscriptionBadge({ expiresAt }: Readonly<{ expiresAt?: string | null }
   return (
     <span className="inline-flex items-center gap-2 text-xs text-zinc-500">
       اشتراک منقضی شده
-      <button type="button" onClick={renew} className="text-zinc-200 underline hover:text-white">
+      <button
+        type="button"
+        onClick={renew}
+        className="text-zinc-200 underline hover:text-white"
+      >
         تمدید
       </button>
     </span>
@@ -161,8 +175,16 @@ export default function ProfileSidebar({
         </Button>
       </div>
 
-      <MenuSection sections={resolve(sectionDefs1)} active={active} setActive={setActive} />
-      <MenuSection sections={resolve(sectionDefs2)} active={active} setActive={setActive} />
+      <MenuSection
+        sections={resolve(sectionDefs1)}
+        active={active}
+        setActive={setActive}
+      />
+      <MenuSection
+        sections={resolve(sectionDefs2)}
+        active={active}
+        setActive={setActive}
+      />
     </aside>
   );
 }
