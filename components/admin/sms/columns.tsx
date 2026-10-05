@@ -44,12 +44,18 @@ export const generateColumns = (
       dataIndex: "status",
       title: "وضعیت",
       className: "align-middle",
-      render: (data) =>
-        data.isActive ? (
-          <Badge value={"فعال"} type="twoTone" color="success" />
-        ) : (
-          <Badge value={"غیرفعال"} type="twoTone" color="error" />
-        ),
+      render: (data) => (
+        <div className="flex flex-col items-center gap-1">
+          {data.isActive ? (
+            <Badge value={"فعال"} type="twoTone" color="success" />
+          ) : (
+            <Badge value={"غیرفعال"} type="twoTone" color="error" />
+          )}
+          <p className="font-p2-regular text-gray-500">
+            {data.patternBodyId ? `الگو ${data.patternBodyId}` : "متن آزاد"}
+          </p>
+        </div>
+      ),
     },
     {
       align: "center",

@@ -41,6 +41,31 @@ export const SMS_EVENT: Record<
     label: "تایید درخواست مشاهده رزومه",
     description: "زمانی که ادمین درخواست مشاهده رزومه یک هنرمند را تایید می‌کند، برای درخواست‌دهنده ارسال می‌شود.",
   },
+  [ESmsEvent.ADMIN_REGISTRATION]: {
+    label: "اعلان ادمین: ثبت‌نام جدید",
+    description:
+      "به شماره‌های ادمین (تنظیمات اطلاع‌رسانی) هنگام ثبت یا پرداخت ثبت‌نام هنرمند ارسال می‌شود. متن پیش‌فرض {message} همان جمله‌ی ساخته‌شده توسط سیستم است.",
+  },
+  [ESmsEvent.ADMIN_TRANSACTION]: {
+    label: "اعلان ادمین: تراکنش",
+    description:
+      "به شماره‌های ادمین هنگام تکمیل پرداخت ارسال می‌شود. متن پیش‌فرض {message} همان جمله‌ی ساخته‌شده توسط سیستم است.",
+  },
+  [ESmsEvent.ADMIN_SUPPORT_TICKET]: {
+    label: "اعلان ادمین: تیکت جدید",
+    description:
+      "به شماره‌های ادمین هنگام ثبت تیکت پشتیبانی ارسال می‌شود. متن پیش‌فرض {message} همان جمله‌ی ساخته‌شده توسط سیستم است.",
+  },
+  [ESmsEvent.ADMIN_RESUME_REQUEST]: {
+    label: "اعلان ادمین: درخواست رزومه",
+    description:
+      "به شماره‌های ادمین هنگام ثبت درخواست مشاهده رزومه ارسال می‌شود. متن پیش‌فرض {message} همان جمله‌ی ساخته‌شده توسط سیستم است.",
+  },
+  [ESmsEvent.CRM_NOTE]: {
+    label: "پیامک یادداشت CRM",
+    description:
+      "وقتی ادمین در یادداشت‌های CRM کانال «پیامک» را انتخاب می‌کند برای هنرمند ارسال می‌شود. {message} متنی است که ادمین نوشته؛ متن پیش‌فرض عیناً همان را می‌فرستد. (اگر این قالب غیرفعال باشد، همان متن نوشته‌شده ارسال می‌شود.)",
+  },
 };
 
 /** Pipeline order — the list reads top to bottom as the applicant's journey. */
@@ -53,6 +78,11 @@ export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.REJECTED,
   ESmsEvent.SUPPORT_REPLY,
   ESmsEvent.RESUME_REQUEST_APPROVED,
+  ESmsEvent.ADMIN_REGISTRATION,
+  ESmsEvent.ADMIN_TRANSACTION,
+  ESmsEvent.ADMIN_SUPPORT_TICKET,
+  ESmsEvent.ADMIN_RESUME_REQUEST,
+  ESmsEvent.CRM_NOTE,
 ];
 
 /** Sample values used only for the drawer preview; never sent. */
@@ -68,4 +98,6 @@ export const SMS_VARIABLE_SAMPLE: Record<string, string> = {
   subject: "مشکل در پرداخت",
   ticketId: "۴۲",
   artistCode: "۱۰۲۳",
+  message: "ثبت‌نام هنرمند (#۱۲۳) پرداخت شد و در انتظار بررسی است.",
+  link: "/admin/artist-registration/123",
 };

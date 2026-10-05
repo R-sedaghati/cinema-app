@@ -945,12 +945,21 @@ export enum ESmsEvent {
   PAYMENT_FAILED = "PAYMENT_FAILED",
   SUPPORT_REPLY = "SUPPORT_REPLY",
   RESUME_REQUEST_APPROVED = "RESUME_REQUEST_APPROVED",
+  ADMIN_REGISTRATION = "ADMIN_REGISTRATION",
+  ADMIN_TRANSACTION = "ADMIN_TRANSACTION",
+  ADMIN_SUPPORT_TICKET = "ADMIN_SUPPORT_TICKET",
+  ADMIN_RESUME_REQUEST = "ADMIN_RESUME_REQUEST",
+  CRM_NOTE = "CRM_NOTE",
 }
 
 export interface ISmsTemplate {
   event: ESmsEvent;
   body: string;
   isActive: boolean;
+  /** Melli Payamak pattern id; null sends the text above as ordinary SMS (the default). */
+  patternBodyId: string | null;
+  /** Variable names in the order of the pattern's `{0};{1};…` slots. */
+  patternVariables: string[];
   /** Placeholders the renderer substitutes for this event — served per event, never assumed. */
   variables: string[];
   updatedAt: string;
@@ -962,11 +971,16 @@ export interface ISmsTemplate {
 export interface ISmsTemplateUpdateRequest {
   body?: string;
   isActive?: boolean;
+  /** Empty/null switches back to ordinary text SMS. */
+  patternBodyId?: string | null;
+  patternVariables?: string[];
 }
 
 export interface ISmsTemplateTestRequest {
   /** The unsaved draft to test; omitted tests the stored body. */
   body?: string;
+  patternBodyId?: string | null;
+  patternVariables?: string[];
 }
 
 export type ISmsTemplateTestResponse = IRetriveResponse<{

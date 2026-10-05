@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Drawer, Switch } from "@dgshahr/ui-kit";
 import Textarea from "@/components/common/Textarea";
+import Input from "@/components/common/Input";
+import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import { SMS_EVENT, SMS_VARIABLE_SAMPLE } from "@/lib/constants/sms/events";
@@ -42,12 +44,17 @@ const SmsTemplateDrawer = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [body, setBody] = useState("");
   const [isActive, setIsActive] = useState(false);
+  // Empty body id = ordinary text SMS (the default); a number = send through that pattern.
+  const [patternBodyId, setPatternBodyId] = useState("");
+  const [patternVariables, setPatternVariables] = useState<string[]>([]);
 
   // Re-seed whenever a different template is opened.
   useEffect(() => {
     if (!template) return;
     setBody(template.body);
     setIsActive(template.isActive);
+    setPatternBodyId(template.patternBodyId ?? "");
+    setPatternVariables(template.patternVariables ?? []);
   }, [template]);
 
   if (!template) return null;
@@ -58,7 +65,21 @@ const SmsTemplateDrawer = ({
   const isEmpty = !body.trim();
 
   // The panel mirrors the server's 400 conditions so the admin sees them while typing.
-  const canSave = !isEmpty && !tooLong && unknown.length === 0;
+  const patternInvalid = patternBodyId.trim() !== "" && !/^\d+$/.test(patternBodyId.trim());
+  const canSave = !isEmpty && !tooLong && unknown.length === 0 && !patternInvalid;
+  const patternPayload = {
+    patternBodyId: patternBodyId.trim() || null,
+    patternVariables: patternBodyId.trim() ? patternVariables : [],
+  };
+
+  const moveSlot = (index: number, by: -1 | 1) =>
+    setPatternVariables((previous) => {
+      const next = [...previous];
+      const target = index + by;
+      if (target < 0 || target >= next.length) return previous;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
 
   const adminPhones = (notificationSettings?.result?.phones ?? []).filter(Boolean);
 
@@ -88,7 +109,7 @@ const SmsTemplateDrawer = ({
   const handleTest = () => {
     // Send the draft, not the stored body — testing before committing is the whole point.
     sendTest(
-      { event: template.event, payload: { body: body.trim() } },
+      { event: template.event, payload: { body: body.trim(), ...patternPayload } },
       {
         onSuccess: (response) => {
           const { ok, sentTo, message } = response.result;
@@ -105,7 +126,7 @@ const SmsTemplateDrawer = ({
 
   const handleSave = () => {
     mutate(
-      { event: template.event, payload: { body: body.trim(), isActive } },
+      { event: template.event, payload: { body: body.trim(), isActive, ...patternPayload } },
       {
         onSuccess: () => {
           toast.success("متن پیامک ذخیره شد");
@@ -193,6 +214,71 @@ const SmsTemplateDrawer = ({
           <p className="p-3 rounded-lg border border-gray-200 font-p1-regular whitespace-pre-wrap">
             {renderSmsTemplate(body, SMS_VARIABLE_SAMPLE) || "—"}
           </p>
+        </div>
+
+        <div className="flex flex-col gap-3 rounded-lg border border-gray-200 p-3">
+          <p className="font-p2-medium">ارسال با الگوی ملی پیامک (اختیاری)</p>
+          <p className="font-p2-regular text-gray-500">
+            اگر شناسه الگو (bodyId) را وارد کنید، به‌جای متن بالا از متد SendByBaseNumber2 و الگوی
+            تأییدشده در پنل ملی پیامک ارسال می‌شود. خالی بگذارید تا مثل قبل متن آزاد ارسال شود. در
+            صورت رد شدن ارسال با الگو، متن آزاد ارسال می‌شود.
+          </p>
+          <Input
+            labelContent="شناسه الگو (bodyId)"
+            type="text"
+            inputMode="numeric"
+            dir="ltr"
+            value={patternBodyId}
+            onChange={(e) => setPatternBodyId(e.target.value)}
+            placeholder="مثلاً 377250"
+          />
+          {patternInvalid && (
+            <p className="font-p2-regular text-error-500">شناسه الگو باید فقط عدد باشد.</p>
+          )}
+
+          {patternBodyId.trim() !== "" && (
+            <div className="flex flex-col gap-2">
+              <p className="font-p2-medium">
+                ترتیب متغیرها در الگو ({"{0};{1};…"}) — مطابق متن الگو در پنل
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {variables.map((name) => (
+                  <Button
+                    key={name}
+                    onClick={() => setPatternVariables((previous) => [...previous, name])}
+                    variant="outline"
+                    color="error"
+                  >
+                    {`+ {${name}}`}
+                  </Button>
+                ))}
+              </div>
+              {patternVariables.map((name, index) => (
+                <div key={`${name}-${index}`} className="flex items-center gap-2">
+                  <span className="font-p2-regular w-10 text-gray-500" dir="ltr">{`{${index}}`}</span>
+                  <span className="font-p1-regular flex-1">{`{${name}}`}</span>
+                  <Button variant="text" onClick={() => moveSlot(index, -1)} disabled={index === 0}>
+                    <ArrowUp size={16} />
+                  </Button>
+                  <Button
+                    variant="text"
+                    onClick={() => moveSlot(index, 1)}
+                    disabled={index === patternVariables.length - 1}
+                  >
+                    <ArrowDown size={16} />
+                  </Button>
+                  <Button
+                    variant="text"
+                    onClick={() =>
+                      setPatternVariables((previous) => previous.filter((_, i) => i !== index))
+                    }
+                  >
+                    <X size={16} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
