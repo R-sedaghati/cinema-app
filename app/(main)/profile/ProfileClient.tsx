@@ -1,13 +1,21 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SectionId } from "../../../components/profile/types";
 import ProfileSidebar from "../../../components/profile/sidebar/ProfileSidebar";
 import ProfileContent from "../../../components/profile/ProfileContent";
 import useResponsiveSidebar from "../../../components/profile/useResponsiveSidebar";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
+import BackLinkSection from "@/components/artist-registration/sections/BackLinkSection";
+import { useFormCopy } from "@/lib/hooks/useFormCopy";
+import useAuthStore from "@/lib/stores/useAuthStore";
+import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
+import { Card } from "@dgshahr/ui-kit";
+import { landingCopy } from "@/lib/utils/landingCopy";
+import clsx from "clsx";
+import { isDesktop } from "react-device-detect";
 
 const sectionLabelKeys: Record<SectionId, LandingCopyKey> = {
   overview: "profileOverviewTitle",
@@ -20,6 +28,10 @@ const sectionLabelKeys: Record<SectionId, LandingCopyKey> = {
 };
 
 export function ProfileClient() {
+  const fromCopy = useFormCopy();
+  const { accessToken } = useAuthStore();
+  const { open: openLoginDrawer } = useLoginDrawerStore();
+
   const [active, setActive] = useState<SectionId | null>("forms");
   const copy = useLandingCopy();
   const sectionLabels = (id: SectionId) => copy(sectionLabelKeys[id]);
@@ -32,8 +44,32 @@ export function ProfileClient() {
     setActive(null);
   };
 
+  useEffect(() => {
+    if (!accessToken) openLoginDrawer();
+  }, [accessToken, openLoginDrawer]);
+
+  if (!accessToken) {
+    return (
+      <div className="flex justify-center py-16 md:py-24">
+        <Card
+          wrapperClassName={clsx("w-[90%]", isDesktop && "w-1/2")}
+          className="py-10 px-4 md:px-8"
+        >
+          <div className="flex flex-col gap-5 items-center text-center">
+            <p className="font-h4-bold">
+              <span style={landingCopy.style("regAuthGateTitle")}>
+                {landingCopy("regAuthGateTitle")}
+              </span>
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="relative grid gap-9 md:grid-cols-[minmax(260px,0.9fr)_minmax(0,2.1fr)]">
+      {isMobile && <BackLinkSection copy={fromCopy} />}
       {(isMobile === null || !isMobile || showSidebar) && (
         <ProfileSidebar active={active} setActive={handleSelect} />
       )}
@@ -53,6 +89,7 @@ export function ProfileClient() {
               </span>
             </div>
           )}
+          <BackLinkSection copy={fromCopy} />
           <div className="overflow-x-auto">
             <ProfileContent active={active} />
           </div>
