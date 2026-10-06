@@ -1,7 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { notFound } from "next/navigation";
+import { useParams, useRouter, notFound } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { WorksSlider } from "@/components/media/WorksSlider";
 import Aside from "@/components/artists/detail/Aside";
@@ -63,19 +62,31 @@ export default function ArtistDetailsPage() {
         </div>
         <div className="space-y-3 sm:space-y-4 lg:col-span-2">
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500"><span style={copy.style("artistAboutTitle")}>{copy("artistAboutTitle")}</span></h2>
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">
+              <span style={copy.style("artistAboutTitle")}>
+                {copy("artistAboutTitle")}
+              </span>
+            </h2>
             <p className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
               {(artist.answers?.aboutMe as string | undefined) ?? "—"}
             </p>
           </section>
 
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500"><span style={copy.style("artistPhotosTitle")}>{copy("artistPhotosTitle")}</span></h2>
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">
+              <span style={copy.style("artistPhotosTitle")}>
+                {copy("artistPhotosTitle")}
+              </span>
+            </h2>
             <WorksSlider title="" items={photoWorks} variant="photo" />
           </section>
 
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500"><span style={copy.style("artistVideosTitle")}>{copy("artistVideosTitle")}</span></h2>
+            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">
+              <span style={copy.style("artistVideosTitle")}>
+                {copy("artistVideosTitle")}
+              </span>
+            </h2>
             <WorksSlider title="" items={videoWorks} variant="video" />
           </section>
         </div>
