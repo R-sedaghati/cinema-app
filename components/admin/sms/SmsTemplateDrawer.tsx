@@ -72,6 +72,9 @@ const SmsTemplateDrawer = ({
     patternVariables: patternBodyId.trim() ? patternVariables : [],
   };
 
+  // With no saved order the server fills the slots from the text's placeholders.
+  const textSlots = [...new Set([...body.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))];
+
   const moveSlot = (index: number, by: -1 | 1) =>
     setPatternVariables((previous) => {
       const next = [...previous];
@@ -234,6 +237,16 @@ const SmsTemplateDrawer = ({
           />
           {patternInvalid && (
             <p className="font-p2-regular text-error-500">شناسه الگو باید فقط عدد باشد.</p>
+          )}
+
+          {patternBodyId.trim() !== "" && patternVariables.length === 0 && (
+            <p className={textSlots.length ? "font-p2-regular text-gray-500" : "font-p2-regular text-error-500"}>
+              {textSlots.length
+                ? `ترتیب متغیرها تعیین نشده؛ از ترتیب متن بالا استفاده می‌شود: ${textSlots
+                    .map((name, i) => `{${i}} = {${name}}`)
+                    .join(" ، ")}. اگر ترتیب الگوی شما فرق دارد، پایین‌تر خودتان تعیین کنید.`
+                : "هیچ متغیری انتخاب نشده است. اگر الگوی شما جای خالی ({0}) دارد، متغیرها را اضافه کنید؛ وگرنه ملی پیامک به‌جای مقدار، عنوان همان جای خالی را چاپ می‌کند."}
+            </p>
           )}
 
           {patternBodyId.trim() !== "" && (

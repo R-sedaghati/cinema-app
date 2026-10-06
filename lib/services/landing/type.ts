@@ -264,6 +264,8 @@ export interface IUserMessage {
   /** null when an admin typed the message rather than a template firing. */
   event: ESmsEvent | null;
   artistRequestId: number | null;
+  /** Why the form was rejected or sent back; null on every other kind of message. */
+  rejectedReason: string | null;
   readAt: string | null;
   createdAt: string;
 }

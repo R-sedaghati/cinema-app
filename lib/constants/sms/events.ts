@@ -98,6 +98,9 @@ export const SMS_VARIABLE_SAMPLE: Record<string, string> = {
   subject: "مشکل در پرداخت",
   ticketId: "۴۲",
   artistCode: "۱۰۲۳",
+  phone: "09120000000",
+  requestId: "123",
+  artistId: "123",
   message: "ثبت‌نام هنرمند (#۱۲۳) پرداخت شد و در انتظار بررسی است.",
   link: "/admin/artist-registration/123",
 };

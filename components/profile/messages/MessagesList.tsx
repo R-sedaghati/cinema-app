@@ -93,6 +93,13 @@ export default function MessagesList() {
                   {item.body}
                 </p>
 
+                {item.rejectedReason && !item.body.includes(item.rejectedReason) && (
+                  <p className="rounded-xl border border-error-500/30 bg-error-500/10 px-3 py-2 text-sm leading-7 text-zinc-100 whitespace-pre-wrap">
+                    <span className="text-error-500">دلیل: </span>
+                    {item.rejectedReason}
+                  </p>
+                )}
+
                 {requestId && (
                   <div className="flex justify-start">
                     <Button
