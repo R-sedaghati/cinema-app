@@ -84,8 +84,8 @@ const FilterBar = ({ setParams, params, loading, resetParams }: Props) => {
     <div className="flex flex-col gap-3 py-1 m-1 mb-5 justify-stretch md:flex-row md:flex-wrap md:py-0">
       <div className="flex flex-col gap-3 w-full md:flex-row">
         <Input
-          placeholder="جستجو نام و نام‌ خانوادگی، شماره موبایل"
-          title="جستجو نام و نام‌ خانوادگی، شماره موبایل"
+          placeholder="جستجو نام و نام‌ خانوادگی، شماره موبایل، کد کاربر، شماره درخواست"
+          title="جستجو نام و نام‌ خانوادگی، شماره موبایل، کد کاربر، شماره درخواست"
           containerClassName="md:!w-1/3"
           disabled={loading && !params.search}
           value={search}

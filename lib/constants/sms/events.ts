@@ -44,7 +44,12 @@ export const SMS_EVENT: Record<
   [ESmsEvent.ADMIN_REGISTRATION]: {
     label: "اعلان ادمین: ثبت‌نام جدید",
     description:
-      "به شماره‌های ادمین (تنظیمات اطلاع‌رسانی) هنگام ثبت یا پرداخت ثبت‌نام هنرمند ارسال می‌شود. متن پیش‌فرض {message} همان جمله‌ی ساخته‌شده توسط سیستم است.",
+      "به شماره‌های ادمین (در صورت روشن بودن «ثبت‌نام هنرمند جدید» در تنظیمات) وقتی کاربر تازه‌ای بعد از ورود نام و نام خانوادگی‌اش را برای اولین بار تکمیل می‌کند ارسال می‌شود. {fullName} نام کاربر است؛ {message} جمله‌ی «کاربر جدید با نام … در سایت ثبت‌نام کرد».",
+  },
+  [ESmsEvent.ADMIN_FORM_SUBMITTED]: {
+    label: "اعلان ادمین: ثبت فرم",
+    description:
+      "به شماره‌های ادمین هنگام ثبت فرم هنرمند و پرداخت ثبت‌نام ارسال می‌شود. متن پیش‌فرض {message} همان جمله‌ی ساخته‌شده توسط سیستم است؛ {fullName}، {phone} و {requestId} هم قابل استفاده‌اند.",
   },
   [ESmsEvent.ADMIN_TRANSACTION]: {
     label: "اعلان ادمین: تراکنش",
@@ -78,6 +83,7 @@ export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.REJECTED,
   ESmsEvent.SUPPORT_REPLY,
   ESmsEvent.RESUME_REQUEST_APPROVED,
+  ESmsEvent.ADMIN_FORM_SUBMITTED,
   ESmsEvent.ADMIN_REGISTRATION,
   ESmsEvent.ADMIN_TRANSACTION,
   ESmsEvent.ADMIN_SUPPORT_TICKET,
