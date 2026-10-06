@@ -240,7 +240,10 @@ export interface IFormField {
  * An admin-managed account profile field. `builtin` rows are backed by a `users` column
  * (key = column); custom rows live in the user's `profileData`.
  */
-export interface IProfileField extends Omit<IFormField, "syncToUserField" | "isPrivate"> {
+export interface IProfileField extends Omit<
+  IFormField,
+  "syncToUserField" | "isPrivate"
+> {
   builtin: boolean;
   /** Left out of the user's profile and its required checks; admins still see it. */
   hidden: boolean;
@@ -249,7 +252,16 @@ export interface IProfileField extends Omit<IFormField, "syncToUserField" | "isP
 export type IProfileFieldRequest = Partial<
   Pick<
     IProfileField,
-    "key" | "label" | "type" | "placeholder" | "helpText" | "required" | "options" | "validation" | "multiple" | "hidden"
+    | "key"
+    | "label"
+    | "type"
+    | "placeholder"
+    | "helpText"
+    | "required"
+    | "options"
+    | "validation"
+    | "multiple"
+    | "hidden"
   >
 >;
 
@@ -334,7 +346,11 @@ export interface ISupportMessage {
   id: number;
   body: string;
   createdAt: string;
-  admin: { id: number; firstName: string | null; lastName: string | null } | null;
+  admin: {
+    id: number;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
 }
 
 export interface ParamsSupportList {
@@ -499,7 +515,7 @@ export interface ParamsUsersList {
 
 export interface IArtistStatusUpdateRequest {
   status: EArtistRequestStatus;
-  rejected_reason?: string;
+  rejectedReason?: string;
 }
 
 export type IArtistListResponse = IBasePaginateResponse<IArtistItem>;
@@ -798,14 +814,19 @@ export interface ISmsLogResponse {
 }
 
 /** Events that fan out an SMS to the admin numbers below. */
-export type NotificationEvent = "REGISTRATION" | "TRANSACTION" | "SUPPORT_TICKET" | "RESUME_REQUEST";
+export type NotificationEvent =
+  | "REGISTRATION"
+  | "TRANSACTION"
+  | "SUPPORT_TICKET"
+  | "RESUME_REQUEST";
 
 export interface INotificationSetting {
   phones: string[];
   events: NotificationEvent[];
 }
 
-export type INotificationSettingResponse = IRetriveResponse<INotificationSetting>;
+export type INotificationSettingResponse =
+  IRetriveResponse<INotificationSetting>;
 
 export interface IAdminNotification {
   id: number;
@@ -873,7 +894,9 @@ export interface ITransactionDetail {
   /** Requested without an account (no-OTP mode); `requester` holds only the typed phone. */
   isGuest: boolean;
   /** The requester's form answers, labelled by the current form. */
-  answers: (Pick<IFormField, "key" | "label" | "type" | "options"> & { value: unknown })[];
+  answers: (Pick<IFormField, "key" | "label" | "type" | "options"> & {
+    value: unknown;
+  })[];
   requester: {
     id: number | null;
     code: string | null;
@@ -893,7 +916,9 @@ export interface ITransactionDetail {
     avatar: string | null;
     categories: { id: number; faName: string }[];
     /** What an approval unlocks for the requester. */
-    privateFields: (Pick<IFormField, "key" | "label" | "type" | "options"> & { value: unknown })[];
+    privateFields: (Pick<IFormField, "key" | "label" | "type" | "options"> & {
+      value: unknown;
+    })[];
   };
 }
 
@@ -1007,7 +1032,11 @@ export interface IUpdateAdminProfileRequest {
   avatar?: string | null; // storage path from POST /admin/upload/image; null clears
 }
 
-export type IAdminPaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "CANCELED";
+export type IAdminPaymentStatus =
+  | "PENDING"
+  | "COMPLETED"
+  | "FAILED"
+  | "CANCELED";
 
 /** One registration purchase. `amount` went through the gateway, `walletAmount` came from the wallet. */
 export interface IAdminPayment {

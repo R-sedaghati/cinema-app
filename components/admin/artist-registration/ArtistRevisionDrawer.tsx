@@ -24,7 +24,7 @@ const ArtistRevisionDrawer = ({ open, onClose, id }: IRequestDetailProps) => {
     mutate(
       {
         status: EArtistRequestStatus.NEED_TO_REVISION,
-        rejected_reason: rejectedReason,
+        rejectedReason: rejectedReason,
       },
       {
         onSuccess: () => {
