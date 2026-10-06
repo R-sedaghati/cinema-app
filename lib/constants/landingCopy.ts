@@ -263,6 +263,7 @@ export const LANDING_COPY = {
   artistProvince: { group: "صفحه هنرمند", admin: "برچسب استان", value: "استان" },
   artistCategory: { group: "صفحه هنرمند", admin: "برچسب دسته‌بندی", value: "دسته‌بندی" },
   artistGender: { group: "صفحه هنرمند", admin: "برچسب جنسیت", value: "جنسیت" },
+  artistBirthDate: { group: "صفحه هنرمند", admin: "برچسب تاریخ تولد", value: "تاریخ تولد" },
   artistAccent: { group: "صفحه هنرمند", admin: "برچسب لهجه", value: "لهجه" },
   artistContactTitle: { group: "صفحه هنرمند", admin: "عنوان اطلاعات تماس", value: "اطلاعات تماس" },
   artistContactPhone: { group: "صفحه هنرمند", admin: "برچسب شماره تماس", value: "شماره تماس" },

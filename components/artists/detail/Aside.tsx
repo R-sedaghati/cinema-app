@@ -19,6 +19,13 @@ import useLoginDrawerStore from "@/lib/stores/useLoginDrawerStore";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { formatAnswer } from "@/lib/utils/formatAnswer";
 import { toResumeName } from "@/lib/utils/resumeName";
+import {
+  ANSWER_KEYS,
+  displayAnswer,
+  displayGender,
+  pickAnswer,
+} from "@/lib/utils/artistAnswers";
+import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 
 /** Private answers the fixed contact rows below already show. */
 const FIXED_CONTACT_KEYS = new Set(["email", "address", "postalCode"]);
@@ -33,9 +40,9 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
   // Clicked the request button while signed out: open the form once login succeeds.
   const [formAfterLogin, setFormAfterLogin] = useState(false);
   const copy = useLandingCopy();
-  const genderMap: Record<string, string> = {
-    MAN: copy("labelGenderMan"),
-    WOMAN: copy("labelGenderWoman"),
+  const genderLabels = {
+    man: copy("labelGenderMan"),
+    woman: copy("labelGenderWoman"),
   };
 
   // Asking the contact endpoint directly would 403 (and toast) for everyone not yet
@@ -103,6 +110,41 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
   );
   const contact = (accountContact ?? guestContact)?.result;
 
+  const pickFromContact = (keys: readonly string[]) =>
+    contact?.fields?.find((f) =>
+      keys.some((k) => k === f.key || k.toLowerCase() === f.key.toLowerCase()),
+    )?.value;
+
+  const genderText = displayGender(
+    pickAnswer(artist.answers, ANSWER_KEYS.gender) ??
+      pickFromContact(ANSWER_KEYS.gender),
+    genderLabels,
+  );
+  const provinceText =
+    displayAnswer(
+      pickAnswer(artist.answers, ANSWER_KEYS.province) ??
+        pickFromContact(ANSWER_KEYS.province),
+    ) ??
+    displayAnswer(
+      pickAnswer(artist.answers, ANSWER_KEYS.city) ??
+        pickFromContact(ANSWER_KEYS.city),
+    );
+  const birthRaw =
+    pickAnswer(artist.answers, ANSWER_KEYS.birthDate) ??
+    pickFromContact(ANSWER_KEYS.birthDate);
+  const birthText = (() => {
+    const text = displayAnswer(birthRaw);
+    if (!text) return undefined;
+    return convertGregorianTimeToShamsiTime(text, false) || text;
+  })();
+
+  const bioAnswerKeys = new Set<string>([
+    ...ANSWER_KEYS.gender,
+    ...ANSWER_KEYS.province,
+    ...ANSWER_KEYS.city,
+    ...ANSWER_KEYS.birthDate,
+  ]);
+
   const unlockedName = [contact?.firstName, contact?.lastName]
     .filter(Boolean)
     .join(" ")
@@ -141,9 +183,7 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
                 {copy("artistProvince")}
               </span>
             </span>
-            <span>
-              {(artist.answers?.province as string | undefined) ?? "—"}
-            </span>
+            <span>{provinceText ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
@@ -161,14 +201,16 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
                 {copy("artistGender")}
               </span>
             </span>
-            <span>{genderMap[artist.answers?.gender as string] ?? "—"}</span>
+            <span>{genderText ?? "—"}</span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between lg:flex-row lg:justify-between gap-1">
             <span className="text-zinc-500">
-              <span style={copy.style("artistGender")}>تاریخ تولد</span>
+              <span style={copy.style("artistBirthDate")}>
+                {copy("artistBirthDate")}
+              </span>
             </span>
-            <span>{genderMap[artist.answers?.birthday as string] ?? "—"}</span>
+            <span>{birthText ?? "—"}</span>
           </div>
 
           {typeof artist.answers?.dialect === "string" &&
@@ -248,7 +290,10 @@ const Aside = ({ artist }: { artist: IArtistItem }) => {
               </div>
             )}
             {contact.fields
-              ?.filter((f) => !FIXED_CONTACT_KEYS.has(f.key))
+              ?.filter(
+                (f) =>
+                  !FIXED_CONTACT_KEYS.has(f.key) && !bioAnswerKeys.has(f.key),
+              )
               .map((f) => (
                 <div key={f.key} className="flex justify-between gap-2">
                   <span className="text-zinc-500">{f.label}</span>

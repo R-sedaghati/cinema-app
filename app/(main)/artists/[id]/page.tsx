@@ -6,6 +6,7 @@ import { WorksSlider } from "@/components/media/WorksSlider";
 import Aside from "@/components/artists/detail/Aside";
 import { useUserArtistDetail } from "@/lib/services/landing/hook";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { displayAboutMe } from "@/lib/utils/artistAnswers";
 
 export default function ArtistDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -33,6 +34,8 @@ export default function ArtistDetailsPage() {
   const videoWorks = artist.portfolios
     .filter((p) => p.type === "VIDEO")
     .map((p) => ({ id: String(p.id), url: p.url }));
+
+  const aboutMe = displayAboutMe(artist.answers);
 
   return (
     <div className="relative min-h-screen px-3 sm:px-6 py-16">
@@ -68,7 +71,7 @@ export default function ArtistDetailsPage() {
               </span>
             </h2>
             <p className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
-              {(artist.answers?.aboutMe as string | undefined) ?? "—"}
+              {(aboutMe as string | undefined) ?? "—"}
             </p>
           </section>
 

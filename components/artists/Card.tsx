@@ -1,9 +1,15 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
 
-import { EArtistGender, IArtistItem } from "@/lib/services/admin/type";
+import { IArtistItem } from "@/lib/services/admin/type";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { toResumeName } from "@/lib/utils/resumeName";
+import {
+  ANSWER_KEYS,
+  displayAnswer,
+  displayGender,
+  pickAnswer,
+} from "@/lib/utils/artistAnswers";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -11,6 +17,11 @@ export default function ArtistCard({
   artist,
 }: Readonly<{ artist: IArtistItem }>) {
   const copy = useLandingCopy();
+  const genderText = displayGender(pickAnswer(artist?.answers, ANSWER_KEYS.gender), {
+    man: copy("labelGenderMan"),
+    woman: copy("labelGenderWoman"),
+  });
+  const cityText = displayAnswer(pickAnswer(artist?.answers, ANSWER_KEYS.city));
 
   return (
     <Link
@@ -35,17 +46,13 @@ export default function ArtistCard({
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {toResumeName(artist?.categories?.at(0)?.faName)}
         </span>
-        {/* gender is optional in most forms — no answer shows no chip, not a guessed one */}
-        {(artist?.answers?.gender === EArtistGender.MAN ||
-          artist?.answers?.gender === EArtistGender.WOMAN) && (
+        {genderText && (
           <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-            {artist.answers.gender === EArtistGender.MAN
-              ? copy("labelGenderMan")
-              : copy("labelGenderWoman")}
+            {genderText}
           </span>
         )}
         <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
-          {(artist?.answers?.city as string | undefined) ?? ""}
+          {cityText ?? ""}
         </span>
       </div>
       <p className="mt-4 mb-3 line-clamp-2 text-sm leading-7 text-zinc-400">
