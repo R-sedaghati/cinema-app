@@ -15,11 +15,10 @@ import {
   IArtistStatusUpdateRequest,
   ICrmNote,
   ICrmNoteCreateRequest,
-  ESmsEvent,
-  ISmsTemplate,
-  ISmsTemplateUpdateRequest,
-  ISmsTemplateTestRequest,
-  ISmsTemplateTestResponse,
+  ISmsRule,
+  ISmsRuleInput,
+  ISmsRuleTestResponse,
+  ISmsTrigger,
   ICrmUpdateRequest,
   IBasePaginateResponse,
   IBannerListResponse,
@@ -992,56 +991,41 @@ export const adminAdminList = async (accessToken: string) => {
 
 // --- SMS templates -----------------------------------------------------------
 
-export const adminSmsTemplateList = async (accessToken: string) => {
-  const { data } = await api.get<IRetriveResponse<ISmsTemplate[]>>(
-    "/admin/sms-templates/",
-    {
-      headers: {
-        Authorization: accessToken,
-      },
-    },
-  );
+const authHeader = (accessToken: string) => ({ headers: { Authorization: accessToken } });
+
+export const adminSmsTriggerList = async (accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<ISmsTrigger[]>>("/admin/sms-triggers/", authHeader(accessToken));
 
   return data;
 };
 
-export const adminSmsTemplateUpdate = async (
-  event: ESmsEvent,
-  payload: ISmsTemplateUpdateRequest,
-  accessToken: string,
-) => {
-  const { data } = await api.patch<IRetriveResponse<ISmsTemplate>>(
-    `/admin/sms-templates/${event}/`,
-    payload,
-    {
-      headers: {
-        Authorization: accessToken,
-      },
-    },
-  );
+export const adminSmsRuleList = async (accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<ISmsRule[]>>("/admin/sms-rules/", authHeader(accessToken));
 
   return data;
 };
 
-/**
- * Texts one sample of the template to the admin numbers in the notification settings.
- * A provider rejection comes back as `ok: false` with its own message, so this resolves
- * rather than throws on a bad send.
- */
-export const adminSmsTemplateTest = async (
-  event: ESmsEvent,
-  payload: ISmsTemplateTestRequest,
-  accessToken: string,
-) => {
-  const { data } = await api.post<ISmsTemplateTestResponse>(
-    `/admin/sms-templates/${event}/test/`,
-    payload,
-    {
-      headers: {
-        Authorization: accessToken,
-      },
-    },
-  );
+export const adminSmsRuleCreate = async (payload: ISmsRuleInput, accessToken: string) => {
+  const { data } = await api.post<IRetriveResponse<ISmsRule>>("/admin/sms-rules/", payload, authHeader(accessToken));
+
+  return data;
+};
+
+export const adminSmsRuleUpdate = async (id: number, payload: ISmsRuleInput, accessToken: string) => {
+  const { data } = await api.patch<IRetriveResponse<ISmsRule>>(`/admin/sms-rules/${id}/`, payload, authHeader(accessToken));
+
+  return data;
+};
+
+export const adminSmsRuleDelete = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<{ id: number }>>(`/admin/sms-rules/${id}/`, authHeader(accessToken));
+
+  return data;
+};
+
+/** Texts the draft to the admin numbers only; never to an applicant. */
+export const adminSmsRuleTest = async (payload: ISmsRuleInput, accessToken: string) => {
+  const { data } = await api.post<ISmsRuleTestResponse>("/admin/sms-rules/test/", payload, authHeader(accessToken));
 
   return data;
 };

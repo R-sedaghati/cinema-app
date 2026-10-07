@@ -20,10 +20,9 @@ import {
   IArtistStatusUpdateRequest,
   ICrmNote,
   ICrmNoteCreateRequest,
-  ESmsEvent,
-  ISmsTemplate,
-  ISmsTemplateUpdateRequest,
-  ISmsTemplateTestRequest,
+  ISmsRule,
+  ISmsRuleInput,
+  ISmsTrigger,
   ICrmUpdateRequest,
   IBannerListResponse,
   IBannerRetrieveResponse,
@@ -71,9 +70,12 @@ import {
   adminAboutUsUpdate,
   adminArtistList,
   adminAdminList,
-  adminSmsTemplateList,
-  adminSmsTemplateUpdate,
-  adminSmsTemplateTest,
+  adminSmsTriggerList,
+  adminSmsRuleList,
+  adminSmsRuleCreate,
+  adminSmsRuleUpdate,
+  adminSmsRuleDelete,
+  adminSmsRuleTest,
   adminArtistCrmUpdate,
   adminArtistHiddenUpdate,
   adminArtistRetrieve,
@@ -943,44 +945,61 @@ export const useAdminAdminList = () => {
 
 // --- SMS templates -----------------------------------------------------------
 
-export const useAdminSmsTemplateList = () => {
+export const useAdminSmsTriggerList = () => {
   const { accessToken } = useAdminAuthStore();
 
-  return useQuery<IRetriveResponse<ISmsTemplate[]>>({
-    queryKey: ["smsTemplateList"],
-    queryFn: () => adminSmsTemplateList(accessToken),
+  return useQuery<IRetriveResponse<ISmsTrigger[]>>({
+    queryKey: ["smsTriggerList"],
+    queryFn: () => adminSmsTriggerList(accessToken),
     enabled: Boolean(accessToken),
-    refetchInterval: 30 * 1000,
-    refetchOnReconnect: true,
+    staleTime: Infinity,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
   });
 };
 
-export const useAdminSmsTemplateUpdate = () => {
+export const useAdminSmsRuleList = () => {
   const { accessToken } = useAdminAuthStore();
 
-  return useMutation({
-    mutationFn: ({
-      event,
-      payload,
-    }: {
-      event: ESmsEvent;
-      payload: ISmsTemplateUpdateRequest;
-    }) => adminSmsTemplateUpdate(event, payload, accessToken),
+  return useQuery<IRetriveResponse<ISmsRule[]>>({
+    queryKey: ["smsRuleList"],
+    queryFn: () => adminSmsRuleList(accessToken),
+    enabled: Boolean(accessToken),
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 };
 
-export const useAdminSmsTemplateTest = () => {
+export const useAdminSmsRuleCreate = () => {
   const { accessToken } = useAdminAuthStore();
 
   return useMutation({
-    mutationFn: ({
-      event,
-      payload,
-    }: {
-      event: ESmsEvent;
-      payload: ISmsTemplateTestRequest;
-    }) => adminSmsTemplateTest(event, payload, accessToken),
+    mutationFn: (payload: ISmsRuleInput) => adminSmsRuleCreate(payload, accessToken),
+  });
+};
+
+export const useAdminSmsRuleUpdate = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: ISmsRuleInput }) =>
+      adminSmsRuleUpdate(id, payload, accessToken),
+  });
+};
+
+export const useAdminSmsRuleDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => adminSmsRuleDelete(id, accessToken),
+  });
+};
+
+export const useAdminSmsRuleTest = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (payload: ISmsRuleInput) => adminSmsRuleTest(payload, accessToken),
   });
 };
 

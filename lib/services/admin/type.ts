@@ -961,6 +961,7 @@ export interface IAdjustWalletRequest {
  * Pipeline events that can fire an automated SMS. Closed set: the backend owns the
  * trigger points, the admin owns only each row's text and on/off switch.
  */
+/** The events a profile-inbox message can carry (the message's own `event`). */
 export enum ESmsEvent {
   FORM_SUBMITTED = "FORM_SUBMITTED",
   NEED_REVISION = "NEED_REVISION",
@@ -970,46 +971,62 @@ export enum ESmsEvent {
   PAYMENT_FAILED = "PAYMENT_FAILED",
   SUPPORT_REPLY = "SUPPORT_REPLY",
   RESUME_REQUEST_APPROVED = "RESUME_REQUEST_APPROVED",
-  ADMIN_REGISTRATION = "ADMIN_REGISTRATION",
-  ADMIN_FORM_SUBMITTED = "ADMIN_FORM_SUBMITTED",
-  ADMIN_TRANSACTION = "ADMIN_TRANSACTION",
-  ADMIN_SUPPORT_TICKET = "ADMIN_SUPPORT_TICKET",
-  ADMIN_RESUME_REQUEST = "ADMIN_RESUME_REQUEST",
-  CRM_NOTE = "CRM_NOTE",
 }
 
-export interface ISmsTemplate {
-  event: ESmsEvent;
-  body: string;
-  isActive: boolean;
-  /** Melli Payamak pattern id; null sends the text above as ordinary SMS (the default). */
-  patternBodyId: string | null;
-  /** Variable names in the order of the pattern's `{0};{1};…` slots. */
-  patternVariables: string[];
-  /** Placeholders the renderer substitutes for this event — served per event, never assumed. */
+/** Who an automated SMS is texted. */
+export type SmsRecipient = "APPLICANT" | "ADMINS" | "CUSTOM";
+/** Plain text, or a Melli Payamak pattern (SendByBaseNumber2). */
+export type SmsMode = "TEXT" | "PATTERN";
+
+/** A place in the flow an SMS can be attached to — fixed in code, served by the API. */
+export interface ISmsTrigger {
+  key: string;
+  group: string;
+  label: string;
+  description: string;
+  /** Placeholders a message on this trigger may use. */
   variables: string[];
+  defaultRecipient: SmsRecipient;
+  defaultBody: string;
+  /** Texts the admin numbers only for events switched on in «تنظیمات». */
+  adminOptIn: boolean;
+}
+
+/** One automated SMS: when `trigger` happens, text `recipient` this. */
+export interface ISmsRule {
+  id: number;
+  trigger: string;
+  name: string;
+  recipient: SmsRecipient;
+  customPhones: string[];
+  mode: SmsMode;
+  body: string;
+  patternBodyId: string | null;
+  /** The saved order of the pattern's slots; empty means "follow the text". */
+  patternVariables: string[];
+  /** The variable behind each slot as it will actually be sent. */
+  patternSlots: string[];
+  isActive: boolean;
+  createdAt: string;
   updatedAt: string;
   updatedBy: IAdminListItem | null;
   /** The ui-kit Table constrains its row type to an index-signature record. */
   [key: string]: unknown;
 }
 
-export interface ISmsTemplateUpdateRequest {
+export interface ISmsRuleInput {
+  trigger?: string;
+  name?: string;
+  recipient?: SmsRecipient;
+  customPhones?: string[];
+  mode?: SmsMode;
   body?: string;
+  patternBodyId?: string | null;
+  patternVariables?: string[];
   isActive?: boolean;
-  /** Empty/null switches back to ordinary text SMS. */
-  patternBodyId?: string | null;
-  patternVariables?: string[];
 }
 
-export interface ISmsTemplateTestRequest {
-  /** The unsaved draft to test; omitted tests the stored body. */
-  body?: string;
-  patternBodyId?: string | null;
-  patternVariables?: string[];
-}
-
-export type ISmsTemplateTestResponse = IRetriveResponse<{
+export type ISmsRuleTestResponse = IRetriveResponse<{
   ok: boolean;
   /** How many admin numbers were actually texted. */
   sentTo: number;
