@@ -990,7 +990,32 @@ export interface ISmsTrigger {
   defaultBody: string;
   /** Texts the admin numbers only for events switched on in «تنظیمات». */
   adminOptIn: boolean;
+  /** The kinds of picked field this stage can fill (form answers, profile, ticket, payment …). */
+  sources: SmsSource[];
 }
+
+/** Where a picked field is read from — one per record a stage can be about. */
+export type SmsSource =
+  | "form"
+  | "profile"
+  | "user"
+  | "request"
+  | "ticket"
+  | "contact"
+  | "contactForm"
+  | "payment"
+  | "artist";
+
+/** A form or profile field an admin can add to a message as `{form.key}` / `{profile.key}`. */
+export interface ISmsField {
+  key: string;
+  label: string;
+  type: string;
+  /** The forms that use this key (form fields only). */
+  forms?: string[];
+}
+
+export type ISmsFieldCatalog = Record<SmsSource, ISmsField[]>;
 
 /** One automated SMS: when `trigger` happens, text `recipient` this. */
 export interface ISmsRule {

@@ -19,6 +19,7 @@ import {
   ISmsRuleInput,
   ISmsRuleTestResponse,
   ISmsTrigger,
+  ISmsFieldCatalog,
   ICrmUpdateRequest,
   IBasePaginateResponse,
   IBannerListResponse,
@@ -995,6 +996,12 @@ const authHeader = (accessToken: string) => ({ headers: { Authorization: accessT
 
 export const adminSmsTriggerList = async (accessToken: string) => {
   const { data } = await api.get<IRetriveResponse<ISmsTrigger[]>>("/admin/sms-triggers/", authHeader(accessToken));
+
+  return data;
+};
+
+export const adminSmsFieldList = async (accessToken: string) => {
+  const { data } = await api.get<IRetriveResponse<ISmsFieldCatalog>>("/admin/sms-fields/", authHeader(accessToken));
 
   return data;
 };

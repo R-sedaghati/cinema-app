@@ -1,4 +1,17 @@
-import type { SmsMode, SmsRecipient } from "@/lib/services/admin/type";
+import type { SmsMode, SmsRecipient, SmsSource } from "@/lib/services/admin/type";
+
+/** The record each group of pickable fields belongs to, in the order the picker lists them. */
+export const SMS_SOURCE_LABEL: Record<SmsSource, string> = {
+  form: "فرم ثبت‌نام هنرمند (پاسخ‌ها)",
+  request: "درخواست هنرمند",
+  profile: "پروفایل کاربر",
+  user: "حساب کاربر",
+  ticket: "تیکت پشتیبانی",
+  contact: "درخواست مشاهده رزومه",
+  contactForm: "فرم درخواست رزومه (پاسخ‌ها)",
+  artist: "هنرمندِ مورد درخواست",
+  payment: "پرداخت",
+};
 
 export const SMS_RECIPIENT_LABEL: Record<SmsRecipient, string> = {
   APPLICANT: "شخص مربوط (کاربر/هنرمند)",

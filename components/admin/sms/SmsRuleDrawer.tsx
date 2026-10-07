@@ -10,22 +10,26 @@ import Textarea from "@/components/common/Textarea";
 import {
   SMS_MODE_LABEL,
   SMS_RECIPIENT_LABEL,
+  SMS_SOURCE_LABEL,
   SMS_VARIABLE_SAMPLE,
 } from "@/lib/constants/sms/events";
 import {
   useAdminNotificationSettings,
+  useAdminSmsFieldList,
   useAdminSmsRuleCreate,
   useAdminSmsRuleDelete,
   useAdminSmsRuleTest,
   useAdminSmsRuleUpdate,
 } from "@/lib/services/admin/hook";
 import {
+  ISmsFieldCatalog,
   ISmsRule,
   ISmsTrigger,
+  SmsSource,
   SmsMode,
   SmsRecipient,
 } from "@/lib/services/admin/type";
-import { findUnknownVariables, renderSmsTemplate } from "@/lib/utils/smsTemplate";
+import { findUnknownVariables, isDynamicVariable, renderSmsTemplate } from "@/lib/utils/smsTemplate";
 import getDrawerPosition from "@/lib/utils/getDrawerPosition";
 import getDrawerWidth from "@/lib/utils/getDrawerWidth";
 
@@ -33,6 +37,46 @@ const MAX_LENGTH = 500;
 
 const fieldClass =
   "h-11 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm outline-none focus:border-error-500";
+
+/**
+ * Adds any field of the records a stage is about — the artist form's answers, the
+ * profile, the account, the request, a ticket, a payment … — not just the variables the
+ * stage declares. It picks and resets: the choice becomes a `source.key` placeholder
+ * through `onPick`.
+ */
+function FieldPicker({
+  label,
+  sources,
+  catalog,
+  onPick,
+}: Readonly<{
+  label: string;
+  sources: SmsSource[];
+  catalog: ISmsFieldCatalog;
+  onPick: (name: string) => void;
+}>) {
+  return (
+    <select
+      aria-label={label}
+      className={fieldClass}
+      value=""
+      onChange={(e) => {
+        if (e.target.value) onPick(e.target.value);
+      }}
+    >
+      <option value="">{label}</option>
+      {sources.map((source) => (
+        <optgroup key={source} label={SMS_SOURCE_LABEL[source]}>
+          {catalog[source].map((field) => (
+            <option key={field.key} value={`${source}.${field.key}`} title={field.forms?.join("، ")}>
+              {`${field.label} (${field.key})`}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  );
+}
 
 interface Props {
   open: boolean;
@@ -50,6 +94,7 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
   const { mutate: update, isPending: isUpdating } = useAdminSmsRuleUpdate();
   const { mutate: remove, isPending: isDeleting } = useAdminSmsRuleDelete();
   const { mutate: sendTest, isPending: isTesting } = useAdminSmsRuleTest();
+  const { data: fieldData } = useAdminSmsFieldList(open);
   // The test goes to the admin numbers, never to an applicant.
   const { data: notificationSettings } = useAdminNotificationSettings();
 
@@ -108,12 +153,42 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
 
   const variables = trigger.variables;
   const unknown = findUnknownVariables(body, variables);
+
+  // Picked fields: what exists, what the stage can fill, and what each is called.
+  const catalog = fieldData?.result;
+  const stageSources = (trigger.sources ?? []).filter((source) => (catalog?.[source]?.length ?? 0) > 0);
+  const canPick = Boolean(catalog) && stageSources.length > 0;
+  const fieldLabel = (name: string) => {
+    const dot = name.indexOf(".");
+    const source = name.slice(0, dot) as SmsSource;
+
+    return catalog?.[source]?.find((f) => f.key === name.slice(dot + 1))?.label;
+  };
+  const usedFields = [
+    ...new Set(
+      [...body.matchAll(/\{([^{}\s]+)\}/g)].map((m) => m[1]).concat(patternVariables).filter(isDynamicVariable),
+    ),
+  ];
+  const badFields = catalog
+    ? usedFields.filter(
+        (name) => !fieldLabel(name) || !(trigger.sources ?? []).includes(name.slice(0, name.indexOf(".")) as SmsSource),
+      )
+    : [];
+  const previewValues = {
+    ...SMS_VARIABLE_SAMPLE,
+    ...Object.fromEntries(usedFields.map((name) => [name, `«${fieldLabel(name) ?? name}»`])),
+  };
   const tooLong = body.length > MAX_LENGTH;
   const phoneList = customPhones.split(/[\s,،;]+/).filter(Boolean);
   const phonesMissing = recipient === "CUSTOM" && phoneList.length === 0;
   const patternInvalid = mode === "PATTERN" && !/^\d+$/.test(patternBodyId.trim());
   const canSave =
-    Boolean(body.trim()) && !tooLong && unknown.length === 0 && !phonesMissing && !patternInvalid;
+    Boolean(body.trim()) &&
+    !tooLong &&
+    unknown.length === 0 &&
+    badFields.length === 0 &&
+    !phonesMissing &&
+    !patternInvalid;
 
   // With no saved order the server fills the slots from the text's placeholders.
   const textSlots = [...new Set([...body.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))];
@@ -160,6 +235,8 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
       field.setSelectionRange(caret, caret);
     });
   };
+
+  const insertField = (name: string) => insertVariable(name);
 
   const moveSlot = (index: number, by: -1 | 1) =>
     setPatternVariables((previous) => {
@@ -324,6 +401,18 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
           </div>
         )}
 
+        <div className="flex flex-col gap-2">
+          <p className="font-p2-medium">افزودن فیلد (هر فیلدی از موضوع این مرحله و مدل‌های مرتبط با آن)</p>
+          {canPick && catalog ? (
+            <FieldPicker label="انتخاب فیلد…" sources={stageSources} catalog={catalog} onPick={insertField} />
+          ) : (
+            <p className="font-p2-regular text-gray-500">در این مرحله فیلد اضافه‌ای در دسترس نیست.</p>
+          )}
+          <p className="font-p2-regular text-gray-500">
+            مقدار فیلد در لحظه ارسال از اطلاعات واقعی خوانده می‌شود؛ اگر مقداری نداشته باشد «-» می‌رود.
+          </p>
+        </div>
+
         <div className="flex flex-col gap-1">
           <Textarea
             ref={textareaRef}
@@ -342,10 +431,16 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
           </p>
         )}
 
+        {badFields.length > 0 && (
+          <p className="font-p2-regular text-error-500">
+            {`فیلد ${badFields.map((n) => `{${n}}`).join("، ")} پیدا نشد یا در این مرحله در دسترس نیست؛ از فهرست «افزودن فیلد» انتخاب کنید.`}
+          </p>
+        )}
+
         <div className="flex flex-col gap-2">
           <p className="font-p2-medium">پیش‌نمایش</p>
           <p className="p-3 rounded-lg border border-gray-200 font-p1-regular whitespace-pre-wrap">
-            {renderSmsTemplate(body, SMS_VARIABLE_SAMPLE) || "—"}
+            {renderSmsTemplate(body, previewValues) || "—"}
           </p>
         </div>
 
@@ -374,6 +469,14 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
             )}
 
             <p className="font-p2-medium">ترتیب متغیرها در الگو ({"{0};{1};…"}) — مطابق متن الگو در پنل</p>
+            {canPick && catalog && (
+              <FieldPicker
+                label="+ فیلد به ترتیب الگو…"
+                sources={stageSources}
+                catalog={catalog}
+                onPick={(name) => setPatternVariables((previous) => [...previous, name])}
+              />
+            )}
             <div className="flex flex-wrap gap-2">
               {variables.map((variable) => (
                 <Button
@@ -389,7 +492,12 @@ const SmsRuleDrawer = ({ open, onClose, triggers, rule, presetTrigger }: Props) 
             {patternVariables.map((variable, index) => (
               <div key={`${variable}-${index}`} className="flex items-center gap-2">
                 <span className="font-p2-regular w-10 text-gray-500" dir="ltr">{`{${index}}`}</span>
-                <span className="font-p1-regular flex-1">{`{${variable}}`}</span>
+                <span className="font-p1-regular flex-1">
+                  <span dir="ltr">{`{${variable}}`}</span>
+                  {isDynamicVariable(variable) && fieldLabel(variable) && (
+                    <span className="mx-2 text-gray-500">{`(${fieldLabel(variable)})`}</span>
+                  )}
+                </span>
                 <Button variant="text" onClick={() => moveSlot(index, -1)} disabled={index === 0}>
                   <ArrowUp size={16} />
                 </Button>

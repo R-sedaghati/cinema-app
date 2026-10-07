@@ -23,3 +23,17 @@ test("substitutes known placeholders and leaves unknown ones visible", () => {
     "علی عزیز، {foo}",
   );
 });
+
+test("a picked form or profile field is never reported as unknown, and renders from its own name", () => {
+  assert.deepEqual(findUnknownVariables("{firstName} {form.city} {profile.email} {nope}", ["firstName"]), ["nope"]);
+  assert.equal(
+    renderSmsTemplate("{form.city} / {profile.email}", { "form.city": "تهران", "profile.email": "a@b.ir" }),
+    "تهران / a@b.ir",
+  );
+});
+
+test("fields of every record a stage is about count as picked, not unknown", () => {
+  const names = ["user.code", "request.trackingCode", "ticket.subject", "contact.status", "contactForm.company", "payment.amount", "artist.code"];
+  assert.deepEqual(findUnknownVariables(names.map((n) => `{${n}}`).join(" "), []), []);
+  assert.deepEqual(findUnknownVariables("{foo.bar} {userx.code}", []), ["foo.bar", "userx.code"]);
+});

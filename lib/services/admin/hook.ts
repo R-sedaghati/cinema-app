@@ -23,6 +23,7 @@ import {
   ISmsRule,
   ISmsRuleInput,
   ISmsTrigger,
+  ISmsFieldCatalog,
   ICrmUpdateRequest,
   IBannerListResponse,
   IBannerRetrieveResponse,
@@ -71,6 +72,7 @@ import {
   adminArtistList,
   adminAdminList,
   adminSmsTriggerList,
+  adminSmsFieldList,
   adminSmsRuleList,
   adminSmsRuleCreate,
   adminSmsRuleUpdate,
@@ -953,6 +955,19 @@ export const useAdminSmsTriggerList = () => {
     queryFn: () => adminSmsTriggerList(accessToken),
     enabled: Boolean(accessToken),
     staleTime: Infinity,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+  });
+};
+
+/** Every form field and profile field a message can carry. Read when the drawer opens. */
+export const useAdminSmsFieldList = (enabled = true) => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IRetriveResponse<ISmsFieldCatalog>>({
+    queryKey: ["smsFieldList"],
+    queryFn: () => adminSmsFieldList(accessToken),
+    enabled: Boolean(accessToken) && enabled,
     refetchInterval: false,
     refetchOnWindowFocus: false,
   });
