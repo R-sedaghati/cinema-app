@@ -6,6 +6,7 @@ import {
   IFormSchema,
   IRetriveResponse,
   ISupportItem,
+  LoginResponse,
 } from "../admin/type";
 
 export type UserLoginRequest = {
@@ -51,7 +52,15 @@ export interface IUserProfile {
   profileData: Record<string, unknown>;
   /** End of the paid registration year (ISO). Null = never paid; past = expired. */
   subscriptionExpiresAt: string | null;
+  /** The user's public code. */
+  code?: string | null;
+  createdAt?: string | null;
+  /** Changes whenever any of the above does. */
+  updatedAt?: string | null;
 }
+
+/** What a successful login answers with — the token and, with it, the user's own data. */
+export type IUserLoginResult = LoginResponse & { profile?: IUserProfile };
 
 export interface IUserCaategoryItem {
   createdAt: string | null;

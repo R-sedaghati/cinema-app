@@ -6,6 +6,7 @@ import { MobileCopyright } from "@/components/site/MobileCopyright";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import LoginDrawer from "@/components/login/LoginDrawer";
 import ProfileCompletionChecker from "@/components/login/ProfileCompletionChecker";
+import ProfileCacheSync from "@/components/site/ProfileCacheSync";
 import { PageProgressBar } from "@/components/site/PageProgressBar";
 import { PageBackground } from "@/components/site/PageBackground";
 import { TableColors } from "@/components/site/TableColors";
@@ -41,6 +42,7 @@ function MainLayout({
         <MobileBottomNav />
         <LoginDrawer />
         <ProfileCompletionChecker />
+        <ProfileCacheSync />
       </div>
       <Script
         id="goftino-widget"

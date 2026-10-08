@@ -140,15 +140,18 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
     [syncedFields, profileData],
   );
 
-  // The schema query refetches on an interval, so `syncedFields` gets a new identity
-  // every 30s. Without this guard the effect re-fires and silently refills fields the
-  // user deliberately cleared.
+  // Marks the first fill, which the loader below waits for.
   const [prefilledFor, setPrefilledFor] = useState<number | null>(null);
 
+  // Runs again whenever the profile changes: the first copy can be the one kept in
+  // localStorage, and the server's answer (or an edit made elsewhere) must replace what
+  // it filled in. That is safe to repeat because only fields whose profile value exists
+  // are touched — they are read-only, so the user cannot have changed them — and a value
+  // already in place is left alone, so a field the user cleared on purpose (one the
+  // profile has nothing for) is never refilled.
   useEffect(() => {
     if (!profileData || !syncedFields.length) return;
-    if (prefilledFor === (category?.id ?? null)) return;
-    setPrefilledFor(category?.id ?? null);
+    if (prefilledFor !== (category?.id ?? null)) setPrefilledFor(category?.id ?? null);
 
     const { setAnswer } = useArtistRegistrationStore.getState();
 
@@ -156,6 +159,9 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
       const value = profileValue(profileData, target);
 
       if (!value) continue;
+
+      // Already what the profile says: nothing to do (and no needless re-render).
+      if (useArtistRegistrationStore.getState().answers[key] === value) continue;
 
       // A present profile value locks its field read-only, so it always wins — even over a
       // hydrated draft carrying an older value the user could no longer edit.

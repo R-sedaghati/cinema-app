@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card } from "@dgshahr/ui-kit";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Button from "@/components/common/Button";
@@ -20,9 +21,16 @@ function ResultContent() {
   const params = useSearchParams();
   const router = useRouter();
   const reset = useArtistRegistrationStore((state) => state.reset);
+  const queryClient = useQueryClient();
   const copy = useFormCopy();
 
   const paid = params.get("status") === "success";
+
+  // A payment changes the account (subscription end, and whatever the form syncs into the
+  // profile), so the stored copy of the user's data is revalidated when the result opens.
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+  }, [queryClient]);
   const isSubscription = params.get("kind") === "subscription";
   const categoryId = Number(params.get("categoryId")) || null;
   const requestId = Number(params.get("requestId")) || null;

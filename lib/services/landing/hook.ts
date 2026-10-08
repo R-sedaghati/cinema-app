@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useInfiniteQuery,
   useMutation,
@@ -14,7 +15,6 @@ import {
   ISiteContentResponse,
   ISupportItem,
   ITutorialListResponse,
-  LoginResponse,
   ParamsArtistList,
 } from "../admin/type";
 import { AxiosError } from "axios";
@@ -42,6 +42,7 @@ import {
   UserCreateSupport,
   UserLoginRequest,
   UserUpdateProfile,
+  IUserLoginResult,
 } from "./type";
 import {
   getUserArtistDetail,
@@ -84,9 +85,10 @@ import {
   userWalletTransactions,
 } from "./api";
 import useAuthStore from "@/lib/stores/useAuthStore";
+import useProfileCache, { readCachedProfile } from "@/lib/stores/useProfileCache";
 
 export const useUserLogin = () =>
-  useMutation<IRetriveResponse<LoginResponse>, AxiosError, UserLoginRequest>({
+  useMutation<IRetriveResponse<IUserLoginResult>, AxiosError, UserLoginRequest>({
     mutationFn: userLogin,
   });
 
@@ -144,19 +146,55 @@ export const useUserProvinceList = (
   });
 };
 
+/**
+ * How long a copy of the profile is trusted before it is checked against the server again
+ * (on mount, on tab focus, on reconnect). Edits do not wait for this: every mutation that
+ * changes the profile invalidates it and the copy is refreshed at once.
+ */
+const PROFILE_STALE_MS = 60 * 1000;
+
+/**
+ * The signed-in user's own data. It is shown instantly from the copy kept in localStorage
+ * (see `useProfileCache`) — so the registration form can fill name, national code and the
+ * rest the moment it opens — and revalidated against the server in the background. Every
+ * real server answer replaces the stored copy.
+ *
+ * The copy is applied in an effect, not as `initialData`: localStorage does not exist while
+ * the page is rendered on the server, and reading it during render would not match the HTML.
+ */
 export const useUserProfile = () => {
   const { accessToken } = useAuthStore();
+  const queryClient = useQueryClient();
+  const queryKey = ["userProfile", accessToken];
 
-  // No polling: nothing outside this app edits the profile, and a background refetch
-  // landing mid-edit would reset the form the user is typing into.
+  useEffect(() => {
+    const cached = readCachedProfile(accessToken);
+
+    if (cached && !queryClient.getQueryData(["userProfile", accessToken])) {
+      // Shown now, but dated as ancient so it counts as stale: the profile is checked
+      // against the server on every page load, however recently the copy was saved. (The
+      // account can have changed on another device or by an admin since.) Only the answer
+      // of that check is trusted; the copy just spares the wait.
+      queryClient.setQueryData(["userProfile", accessToken], cached.profile, { updatedAt: 0 });
+    }
+  }, [accessToken, queryClient]);
+
   return useQuery<IUserProfile>({
     // Keyed by session: after logging out and in as someone else the previous account's
     // cached profile must not be served (it drove the wrong "complete your profile" prompt).
-    queryKey: ["userProfile", accessToken],
-    queryFn: () => userProfile(accessToken),
+    queryKey,
+    queryFn: async () => {
+      const profile = await userProfile(accessToken);
+      useProfileCache.getState().save(accessToken, profile);
+      return profile;
+    },
     enabled: Boolean(accessToken),
+    staleTime: PROFILE_STALE_MS,
     refetchOnReconnect: true,
-    refetchOnWindowFocus: false,
+    // Only refetches when the copy is older than staleTime, so coming back to the tab keeps
+    // it honest without a request on every focus. No polling: a refetch landing mid-edit
+    // would reset the form the user is typing into.
+    refetchOnWindowFocus: true,
   });
 };
 
@@ -198,11 +236,20 @@ export const useUserAtristRequests = (params: IPagination) => {
 
 export const useUpdateUserProfile = () => {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuthStore();
 
   return useMutation<IUserProfile, AxiosError, Partial<UserUpdateProfile>>({
     mutationFn: userUpdatePofile,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["userProfile"] }),
+    onSuccess: (profile) => {
+      // The answer is the whole of the new profile: show and store it at once, then
+      // revalidate against the server so nothing the API changed on top is missed.
+      if (profile?.id) {
+        useProfileCache.getState().save(accessToken, profile);
+        queryClient.setQueryData(["userProfile", accessToken], profile);
+      }
+
+      return queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+    },
   });
 };
 

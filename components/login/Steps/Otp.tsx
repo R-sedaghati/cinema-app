@@ -6,6 +6,8 @@ import useTimer from "@/lib/hooks/useTimer";
 import useWebOtp from "@/lib/hooks/useWebOtp";
 import { Pencil } from "lucide-react";
 import useAuthStore from "@/lib/stores/useAuthStore";
+import useProfileCache from "@/lib/stores/useProfileCache";
+import { useQueryClient } from "@tanstack/react-query";
 import { formatPhoneNumber } from "@/lib/utils/formatPhoneNumber";
 import Button from "@/components/common/Button";
 import { useUserLogin } from "@/lib/services/landing/hook";
@@ -21,6 +23,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
   const { setStep } = props;
   const { phoneNumber, login } = useAuthStore();
   const { close } = useLoginDrawerStore();
+  const queryClient = useQueryClient();
   const copy = useLandingCopy();
 
   const [isTimerEnded, setIsTimerEnded] = useState(false);
@@ -94,7 +97,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
       },
       {
         onSuccess: (res) => {
-          const { accessToken } = res?.result ?? {};
+          const { accessToken, profile } = res?.result ?? {};
           // `login` flips `isLoggedIn` unconditionally, so an empty token would persist a
           // session that 401s on every request.
           if (!accessToken) {
@@ -103,6 +106,12 @@ const OtpStep: FC<StepBaseProps> = (props) => {
           }
           toast.success(copy("loginSuccess"));
           login(accessToken, "", true);
+          // The login answer carries the user's own data: store it and show it right away,
+          // so the registration form and every other screen have it before the first request.
+          if (profile) {
+            useProfileCache.getState().save(accessToken, profile);
+            queryClient.setQueryData(["userProfile", accessToken], profile);
+          }
           // Stay on the current page: callers like the resume prompt re-render once logged in.
           close();
         },

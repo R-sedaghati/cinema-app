@@ -11,7 +11,6 @@ import {
   ISupportItem,
   ISupportMessage,
   ITutorialListResponse,
-  LoginResponse,
   ParamsArtistList,
 } from "../admin/type";
 import landingApi from "../landingAxiosInstance";
@@ -42,12 +41,13 @@ import {
   UserCreateSupport,
   UserLoginRequest,
   UserUpdateProfile,
+  IUserLoginResult,
 } from "./type";
 
 export const userLogin = async (
   payload: UserLoginRequest,
-): Promise<IRetriveResponse<LoginResponse>> => {
-  const res = await landingApi.post<IRetriveResponse<LoginResponse>>(
+): Promise<IRetriveResponse<IUserLoginResult>> => {
+  const res = await landingApi.post<IRetriveResponse<IUserLoginResult>>(
     "/user/login/",
     payload,
   );
@@ -141,8 +141,9 @@ export const profileFields = async () => {
 export const userUpdatePofile = async (
   payload: Partial<UserUpdateProfile>,
 ): Promise<IUserProfile> => {
-  const res = await landingApi.patch<IUserProfile>("/user/profile/", payload);
-  return res.data;
+  const res = await landingApi.patch<IUserProfile | { result: IUserProfile }>("/user/profile/", payload);
+  // The API answers inside the usual `{ result }` envelope; GET /user/profile does not.
+  return "result" in res.data ? res.data.result : res.data;
 };
 
 export const userCreateSupport = async (

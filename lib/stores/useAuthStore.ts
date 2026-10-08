@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import useProfileCache from "./useProfileCache";
 
 interface AuthState {
   accessToken: string;
@@ -36,12 +37,16 @@ const useAuthStore = create<AuthState>()(
           refreshToken,
           isLoggedIn: true,
         })),
-      logout: () =>
+      logout: () => {
+        // The copy of the user's data belongs to this login; it must not outlive it.
+        useProfileCache.getState().clear();
+
         set(() => ({
           accessToken: "",
           refreshToken: "",
           isLoggedIn: false,
-        })),
+        }));
+      },
     }),
     { name: "landing-auth-storage" },
   ),
