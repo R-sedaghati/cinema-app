@@ -14,7 +14,9 @@ const LoginDrawer = () => {
 
   return (
     <Drawer
+      className="site-drawer"
       header={{
+        containerClassName: "site-drawer-head",
         title: copy("loginTitle"),
         haveCloseIcon: true,
       }}

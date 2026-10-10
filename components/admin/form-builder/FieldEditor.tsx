@@ -106,6 +106,7 @@ export function FieldEditor({
   typeLocked,
   extraSelect,
   extraFlags,
+  notice,
   onDragStart,
   onDragEnd,
   onDragOverIndex,
@@ -123,6 +124,8 @@ export function FieldEditor({
   extraSelect?: ReactNode;
   /** Checkboxes next to "اجباری". */
   extraFlags?: ReactNode;
+  /** Shown under the key/label/type row — e.g. profile-link problems. */
+  notice?: ReactNode;
   onDragStart: () => void;
   onDragEnd: () => void;
   onDragOverIndex: (index: number) => void;
@@ -192,6 +195,8 @@ export function FieldEditor({
         />
         {extraSelect}
       </div>
+
+      {notice}
 
       <div className="grid md:grid-cols-2 gap-2">
         <Input

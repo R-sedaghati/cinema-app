@@ -24,13 +24,13 @@ const Success = ({ trackingCode, guest = false }: { trackingCode: string | null;
       </div>
 
       <div className="flex justify-center">
-        <div className="bg-emerald-600 text-white px-8 py-2 rounded-full text-base font-medium shadow-lg">
+        <div data-el="title" className="bg-emerald-600 text-white px-8 py-2 rounded-full text-base font-medium shadow-lg">
           <span style={copy.style("callSuccessTitle")}>{copy("callSuccessTitle")}</span>
         </div>
       </div>
 
       {/* Description */}
-      <p className="text-zinc-300 leading-8 text-sm max-w-md mx-auto">
+      <p data-el="body" className="text-zinc-300 leading-8 text-sm max-w-md mx-auto">
         {guest ? (
           <span style={copy.style("callSuccessGuestDesc")}>{copy("callSuccessGuestDesc")}</span>
         ) : (
@@ -40,7 +40,7 @@ const Success = ({ trackingCode, guest = false }: { trackingCode: string | null;
 
       {/* Tracking Code */}
       {trackingCode && (
-        <div className="text-zinc-400 text-sm">
+        <div data-el="meta" className="text-zinc-400 text-sm">
           <span style={copy.style("callSuccessTracking")}>{copy("callSuccessTracking")}</span>
           <span className="text-zinc-100 font-semibold mr-2">{trackingCode}</span>
         </div>
@@ -50,7 +50,7 @@ const Success = ({ trackingCode, guest = false }: { trackingCode: string | null;
       {!guest && <div>
         <Link href="/profile">
           <Button isFullWidth className="rounded-full!" leftIcon={<ChevronLeft />}>
-            <span style={copy.style("callSuccessCta")}>{copy("callSuccessCta")}</span>
+            <span data-el="button" style={copy.style("callSuccessCta")}>{copy("callSuccessCta")}</span>
           </Button>
         </Link>
       </div>}

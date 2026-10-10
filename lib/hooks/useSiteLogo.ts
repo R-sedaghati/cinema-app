@@ -1,6 +1,6 @@
 import { useUserSiteContent } from "@/lib/services/landing/hook";
 
-const DEFAULT_LOGO = "/assets/images/logo.svg";
+const DEFAULT_LOGO = "/assets/images/new-logo.jpg";
 
 /** Admin-uploaded logo, else the shipped one. `undefined` while site content loads,
  *  so the default never flashes before a custom logo. */

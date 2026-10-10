@@ -56,7 +56,7 @@ export function ProfileClient() {
           className="py-10 px-4 md:px-8"
         >
           <div className="flex flex-col gap-5 items-center text-center">
-            <p className="font-h4-bold">
+            <p data-el="title" className="font-h4-bold">
               <span style={landingCopy.style("regAuthGateTitle")}>
                 {landingCopy("regAuthGateTitle")}
               </span>
@@ -84,7 +84,7 @@ export function ProfileClient() {
               >
                 <ArrowRight size={22} />
               </button>
-              <span className="text-base font-semibold text-zinc-100">
+              <span data-el="title" className="text-base font-semibold text-zinc-100">
                 {active ? sectionLabels(active) : ""}
               </span>
             </div>

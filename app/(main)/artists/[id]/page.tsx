@@ -53,6 +53,7 @@ export default function ArtistDetailsPage() {
       <button
         type="button"
         onClick={() => router.back()}
+        data-el="link"
         className="relative mx-auto mb-6 flex w-full max-w-7xl cursor-pointer items-center gap-2 py-2 text-base text-zinc-300 sm:py-0 sm:text-sm transition-colors hover:text-zinc-50"
       >
         <ArrowRight className="size-6 sm:size-5" />
@@ -65,18 +66,18 @@ export default function ArtistDetailsPage() {
         </div>
         <div className="space-y-3 sm:space-y-4 lg:col-span-2">
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">
+            <h2 data-el="heading" className="text-lg sm:text-xl font-h1-regular text-error-500">
               <span style={copy.style("artistAboutTitle")}>
                 {copy("artistAboutTitle")}
               </span>
             </h2>
-            <p className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
+            <p data-el="body" className="mt-4 sm:mt-6 text-sm leading-8 text-zinc-300">
               {(aboutMe as string | undefined) ?? "—"}
             </p>
           </section>
 
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">
+            <h2 data-el="heading" className="text-lg sm:text-xl font-h1-regular text-error-500">
               <span style={copy.style("artistPhotosTitle")}>
                 {copy("artistPhotosTitle")}
               </span>
@@ -85,7 +86,7 @@ export default function ArtistDetailsPage() {
           </section>
 
           <section className="rounded-3xl border-2 border-zinc-800 bg-zinc-900/90 p-5 sm:p-8 shadow-2xl backdrop-blur">
-            <h2 className="text-lg sm:text-xl font-h1-regular text-error-500">
+            <h2 data-el="heading" className="text-lg sm:text-xl font-h1-regular text-error-500">
               <span style={copy.style("artistVideosTitle")}>
                 {copy("artistVideosTitle")}
               </span>

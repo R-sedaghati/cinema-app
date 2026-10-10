@@ -20,6 +20,7 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
   const input = (
     <div className="relative">
       <Search
+        data-el="icon"
         className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500"
         size={18}
       />
@@ -29,6 +30,7 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
         onChange={(e) => setSearch(toEnglishDigits(e.target.value))}
         onKeyDown={(e) => e.key === "Enter" && submit()}
         placeholder={copy("homeSearchPlaceholder")}
+        data-el="input"
         className="w-full rounded-2xl py-3.5 md:py-4 pr-10 pl-4 text-sm md:text-base outline-none focus:ring-1 focus:ring-error-500/60 border border-zinc-700/40 bg-zinc-900/60"
       />
     </div>
@@ -36,29 +38,29 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
 
   if (variant === "marquee") {
     return (
-      <div className="py-8 text-center md:py-14">
-        <h1 className="mx-auto max-w-2xl text-3xl font-bold leading-tight text-zinc-100 md:text-5xl">
+      <div data-el="root" className="py-8 text-center md:py-14">
+        <h1 data-el="title" className="mx-auto max-w-2xl text-3xl font-bold leading-tight text-zinc-100 md:text-5xl">
           <span style={copy.style("homeExploreKicker")}>{copy("homeExploreKicker")}</span>
         </h1>
-        <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-500 md:text-base">
+        <p data-el="subtitle" className="mx-auto mt-3 max-w-xl text-sm text-zinc-500 md:text-base">
           <span style={copy.style("homeExploreTitle")}>{copy("homeExploreTitle")}</span>
         </p>
-        <div className="mx-auto mt-6 max-w-xl md:mt-8">{input}</div>
+        <div data-el="search" className="mx-auto mt-6 max-w-xl md:mt-8">{input}</div>
       </div>
     );
   }
 
   return (
-    <div className="pt-5 md:pt-8 pb-3 md:pb-5 space-y-3 md:space-y-4">
-      <div>
-        <h1 className="text-xl md:text-3xl font-bold text-zinc-100">
+    <div data-el="root" className="pt-5 md:pt-8 pb-3 md:pb-5 space-y-3 md:space-y-4">
+      <div data-el="heading">
+        <h1 data-el="title" className="text-xl md:text-3xl font-bold text-zinc-100">
           <span style={copy.style("homeExploreKicker")}>{copy("homeExploreKicker")}</span>
         </h1>
-        <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
+        <p data-el="subtitle" className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
           <span style={copy.style("homeExploreTitle")}>{copy("homeExploreTitle")}</span>
         </p>
       </div>
-      <div className="md:w-131.5">{input}</div>
+      <div data-el="search" className="md:w-131.5">{input}</div>
     </div>
   );
 }

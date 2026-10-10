@@ -53,7 +53,7 @@ export default function MessagesList() {
   const hasMore = (data?.count ?? 0) > items.length;
 
   return (
-    <ContentCard title={copy("profileMessagesTitle")}>
+    <ContentCard title={<span style={copy.style("profileMessagesTitle")}>{copy("profileMessagesTitle")}</span>}>
       <div className="flex flex-col gap-3">
         {isPending &&
           ["sk-1", "sk-2", "sk-3"].map((k) => (
@@ -68,7 +68,7 @@ export default function MessagesList() {
           ))}
 
         {!isPending && items.length === 0 && (
-          <p className="py-8 text-center text-sm text-zinc-500">
+          <p data-el="body" className="py-8 text-center text-sm text-zinc-500">
             <span style={copy.style("profileMessagesEmpty")}>{copy("profileMessagesEmpty")}</span>
           </p>
         )}
@@ -89,7 +89,7 @@ export default function MessagesList() {
                   <span>{convertGregorianTimeToShamsiTime(item.createdAt)}</span>
                 </div>
 
-                <p className="text-sm leading-7 text-zinc-100 whitespace-pre-wrap">
+                <p data-el="body" className="text-sm leading-7 text-zinc-100 whitespace-pre-wrap">
                   {item.body}
                 </p>
 

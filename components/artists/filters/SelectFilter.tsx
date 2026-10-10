@@ -31,7 +31,7 @@ export function SelectFilter({
     // and a nested button is invalid HTML (React reports it as a hydration error).
     customInput: (isOpen: boolean) => (
       <Chip
-        label={descriptor.label}
+        label={<span data-el="chip">{descriptor.label}</span>}
         badgeNumber={values.length || undefined}
         filled={isOpen || values.length > 0}
         leftIcon={<ChevronDown className={chevronCn(isOpen)} />}

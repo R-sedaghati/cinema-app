@@ -71,7 +71,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
 
   return (
     <Drawer
+      className="site-drawer"
       header={{
+        containerClassName: "site-drawer-head",
         title: copy("completeProfileTitle"),
         haveCloseIcon: true,
       }}
@@ -81,7 +83,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
       onClose={onClose}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
-        <p className="text-sm text-zinc-400">
+        <p data-el="body" className="text-sm text-zinc-400">
           <span style={copy.style("completeProfileDesc")}>{copy("completeProfileDesc")}</span>
         </p>
 
@@ -111,7 +113,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
               >
                 <Camera className="h-4 w-4" />
                 <span style={copy.style("profileAvatarCta")}>
-                  {uploadAvatar.isPending ? "..." : copy("profileAvatarCta")}
+                  {uploadAvatar.isPending ? "..." : <span style={copy.style("profileAvatarCta")}>{copy("profileAvatarCta")}</span>}
                 </span>
                 <input
                   type="file"
@@ -152,7 +154,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
             className="w-full rounded-full!"
             isFullWidth
           >
-            <span style={copy.style("actionSave")}>{copy("actionSave")}</span>
+            <span data-el="button" style={copy.style("actionSave")}>{copy("actionSave")}</span>
           </Button>
           <Button
             type="button"
@@ -162,7 +164,7 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
             className="w-full rounded-full!"
             isFullWidth
           >
-            <span style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
+            <span data-el="button" style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
           </Button>
         </div>
       </form>

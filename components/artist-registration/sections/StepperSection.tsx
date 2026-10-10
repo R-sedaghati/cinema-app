@@ -40,7 +40,7 @@ const StepperSection: React.FC<Props> = ({
 }) => {
   if (variant === "compact") {
     return (
-      <p className="font-p2-medium text-zinc-400">
+      <p data-el="body" className="font-p2-medium text-zinc-400">
         <span style={copy.style("stepCounter")}>{copy("stepCounter", { n: activeStep + 1, total: totalSteps })}</span>
       </p>
     );
@@ -48,40 +48,42 @@ const StepperSection: React.FC<Props> = ({
 
   return (
     <Card wrapperClassName={isMobile ? "w-[95%]" : "w-3/4"} size={isMobile ? "small" : "medium"} className="py-4 px-(--form-pad)!">
-      <HorizontalStepper
-        activeStep={activeStep}
-        size="medium"
-        stepOrientation="horizontal"
-        classname={clsx("w-[95%] mx-auto scrollbar-hidden", isDesktop && "w-3/4")}
-      >
-        {hasChildren && (
-          <HorizontalStep
-            activeIcon={<LayoutGrid />}
-            icon={<LayoutGrid />}
-            subTitle={copy("stepCounter", { n: 1, total: totalSteps })}
-            title={copy("categoryStepTitle")}
-          />
-        )}
-        {steps.map((step, index) => {
-          const Icon = (step.icon && ICON_MAP[step.icon]) || UserRound;
-          const stepNumber = index + 1 + (hasChildren ? 1 : 0);
-          return (
+      <div data-el="stepper">
+        <HorizontalStepper
+          activeStep={activeStep}
+          size="medium"
+          stepOrientation="horizontal"
+          classname={clsx("w-[95%] mx-auto scrollbar-hidden", isDesktop && "w-3/4")}
+        >
+          {hasChildren && (
             <HorizontalStep
-              key={step.id}
-              activeIcon={<Icon />}
-              icon={<Icon />}
-              subTitle={copy("stepCounter", { n: stepNumber, total: totalSteps })}
-              title={step.title}
+              activeIcon={<LayoutGrid />}
+              icon={<LayoutGrid />}
+              subTitle={copy("stepCounter", { n: 1, total: totalSteps })}
+              title={copy("categoryStepTitle")}
             />
-          );
-        })}
-        <HorizontalStep
-          activeIcon={<CreditCard />}
-          icon={<CreditCard />}
-          subTitle={copy("finalStepLabel")}
-          title={copy("paymentStepTitle")}
-        />
-      </HorizontalStepper>
+          )}
+          {steps.map((step, index) => {
+            const Icon = (step.icon && ICON_MAP[step.icon]) || UserRound;
+            const stepNumber = index + 1 + (hasChildren ? 1 : 0);
+            return (
+              <HorizontalStep
+                key={step.id}
+                activeIcon={<Icon />}
+                icon={<Icon />}
+                subTitle={copy("stepCounter", { n: stepNumber, total: totalSteps })}
+                title={step.title}
+              />
+            );
+          })}
+          <HorizontalStep
+            activeIcon={<CreditCard />}
+            icon={<CreditCard />}
+            subTitle={copy("finalStepLabel")}
+            title={copy("paymentStepTitle")}
+          />
+        </HorizontalStepper>
+      </div>
     </Card>
   );
 };

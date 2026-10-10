@@ -11,5 +11,6 @@ export function PageLayoutMain(props: React.ComponentProps<"main">) {
   const { data } = useUserSiteContent();
   const { style, ...gates } = pageLayoutProps(resolvePageLayout(data?.result?.pageLayouts, pathname));
 
-  return <main {...gates} {...props} style={{ ...style, ...props.style }} />;
+  // `data-area` scopes the admin site-styles rules (`components/site/SiteStyles.tsx`) to this page.
+  return <main data-area={pathname.split("/")[1] || "home"} {...gates} {...props} style={{ ...style, ...props.style }} />;
 }

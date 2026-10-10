@@ -115,6 +115,7 @@ export function ArtistsSearchClient() {
           // to clear, back leaves for home — history may point off-site or nowhere.
           categoryId || activeFilterCount ? setCategory(null) : router.push("/")
         }
+        data-el="link"
         className="flex cursor-pointer items-center gap-2 py-2 text-base text-zinc-300 sm:py-0 sm:text-sm transition-colors hover:text-zinc-50"
       >
         <ArrowRight className="size-6 sm:size-5" />
@@ -122,8 +123,10 @@ export function ArtistsSearchClient() {
       </button>
 
       <div className="flex flex-col items-center justify-center gap-5">
-        <h1 className="text-[24px] ma:text-[32px] text-zinc-50 w-full text-center">
-          {categoryId ? copy("artistsTitle") : copy("artistsSubtitle")}
+        <h1 data-el="title" className="text-[24px] ma:text-[32px] text-zinc-50 w-full text-center">
+          <span style={copy.style(categoryId ? "artistsTitle" : "artistsSubtitle")}>
+            {categoryId ? copy("artistsTitle") : copy("artistsSubtitle")}
+          </span>
         </h1>
 
         <div className="relative md:w-131.5 w-full">
@@ -177,7 +180,7 @@ export function ArtistsSearchClient() {
                   onClick={() => setCategory(item.id)}
                   className="md:w-60 overflow-hidden w-36 h-20 relative px-4 pb-6 md:pb-0 md:pt-3 bg-zinc-900 rounded-2xl flex items-center gap-4 md:gap-0 md:justify-between border border-transparent hover:border-red-900 cursor-pointer"
                 >
-                  <p className="text-nowrap text-sm md:text-base z-1">
+                  <p data-el="tile" className="text-nowrap text-sm md:text-base z-1">
                     {toResumeName(item.faName)}
                   </p>
                   <MoveLeft className="text-error-500 z-1" />
@@ -198,7 +201,7 @@ export function ArtistsSearchClient() {
       {(categoryId || search) && (
         <div className="space-y-6">
           {!isPending && artists.length > 0 && (
-            <p className="text-sm text-zinc-500">
+            <p data-el="body" className="text-sm text-zinc-500">
               <span style={copy.style("artistsCount")}>
                 {copy("artistsCount", { count: total })}
               </span>
@@ -222,9 +225,11 @@ export function ArtistsSearchClient() {
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
               >
-                {isFetchingNextPage
-                  ? copy("artistsLoading")
-                  : copy("artistsLoadMore")}
+                <span data-el="button" style={copy.style(isFetchingNextPage ? "artistsLoading" : "artistsLoadMore")}>
+                  {isFetchingNextPage
+                    ? copy("artistsLoading")
+                    : copy("artistsLoadMore")}
+                </span>
               </Button>
             </div>
           )}

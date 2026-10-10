@@ -41,7 +41,8 @@ const DateField: React.FC<FieldProps> = ({ field, value, onChange }) => {
         position={getDrawerPosition()}
         width={getDrawerWidth(435)}
         maskClassName="!z-[99999999]"
-        header={{ title: field.label, haveCloseIcon: true }}
+        className="site-drawer"
+        header={{ title: field.label, haveCloseIcon: true, containerClassName: "site-drawer-head" }}
         footer={{ element: <Button className="w-full" onClick={confirm}>تایید</Button> }}
       >
         {draft && (

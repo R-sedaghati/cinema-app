@@ -33,6 +33,7 @@ export function MobileBottomNav() {
 
   return (
     <nav
+      data-area="mobileNav"
       className="fixed bottom-safe-6 left-1/2 z-40 -translate-x-1/2 lg:hidden"
       aria-label={copy("ariaBottomNav")}
     >
@@ -50,7 +51,7 @@ export function MobileBottomNav() {
                 className="flex flex-col items-center gap-1 rounded-full px-4 py-2 text-zinc-400 transition-colors hover:text-zinc-300"
               >
                 <Icon size={22} strokeWidth={1.5} />
-                <span className="text-xs font-medium">{item.label}</span>
+                <span data-el="label" className="text-xs font-medium">{item.label}</span>
               </button>
             );
           }
@@ -84,7 +85,7 @@ export function MobileBottomNav() {
                   </span>
                 )}
               </span>
-              <span className="text-xs font-medium">{item.label}</span>
+              <span data-el="label" data-active={active ? "" : undefined} className="text-xs font-medium">{item.label}</span>
             </Link>
           );
         })}

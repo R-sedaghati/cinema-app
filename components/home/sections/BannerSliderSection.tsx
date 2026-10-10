@@ -110,6 +110,7 @@ function BannerFrame({
       <div className="relative z-10 flex-1 md:max-w-xl">
         {slide.subtitle && (
           <p
+            data-el="subtitle"
             className={`text-error-400 font-medium mb-1 md:mb-2 ${compact ? "text-xs" : "text-sm md:text-base"}`}
             style={textStyle(slide.subtitleFontSize, slide.subtitleColor)}
           >
@@ -118,6 +119,7 @@ function BannerFrame({
         )}
         {slide.title && (
           <h2
+            data-el="title"
             className={`text-white font-bold ${compact ? "mb-2 text-lg md:text-2xl" : "mb-4 text-2xl md:mb-6 md:text-5xl"}`}
             style={textStyle(slide.titleFontSize, slide.titleColor)}
           >
@@ -127,6 +129,7 @@ function BannerFrame({
         {slide.ctaLabel && slide.ctaLink && (
           <Link
             href={slide.ctaLink}
+            data-el="button"
             className={`inline-flex items-center gap-1.5 rounded-full bg-error-500 font-semibold text-zinc-950 ${
               compact ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm md:px-6 md:py-3 md:text-base"
             }`}

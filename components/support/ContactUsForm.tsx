@@ -12,20 +12,21 @@ import {
 } from "@/lib/services/landing/hook";
 import { appendCustomAnswers, asFormField, contactFormOf } from "@/lib/constants/contactForm";
 import { EFormFieldType } from "@/lib/services/admin/type";
-import type { IFormStep } from "@/lib/services/admin/type";
+import type { IFormStep, ISiteContentContactForm } from "@/lib/services/admin/type";
 import { getStepErrors } from "@/lib/utils/validateFormStep";
 import { toast } from "react-toastify";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 
-const ContactUsForm = () => {
+/** `stored` overrides the saved form — the support builder previews its draft with it. */
+const ContactUsForm = ({ stored }: { stored?: ISiteContentContactForm | null }) => {
   const { mutate, isPending } = useCreateUserSupport();
   const { data } = useUserCategoryList({ page: 1, count: 30 });
   const { data: siteContent } = useUserSiteContent();
   const copy = useLandingCopy();
 
   const form = useMemo(
-    () => contactFormOf(siteContent?.result?.contactForm),
-    [siteContent],
+    () => contactFormOf(stored ?? siteContent?.result?.contactForm),
+    [stored, siteContent],
   );
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
@@ -103,9 +104,10 @@ const ContactUsForm = () => {
 
   return (
     <section className="flex flex-col w-full justify-center items-center">
-      <h3 className="text-4xl font-h1-regular mb-6">{form.title}</h3>
+      <h3 data-el="heading" className="text-4xl font-h1-regular mb-6">{form.title}</h3>
 
       <form
+        data-el="form"
         onSubmit={handleSubmit}
         className="flex flex-col mt-6 gap-7 border border-error-500/30 shadow-card rounded-4xl p-6 bg-zinc-900/40 w-full"
       >
@@ -152,7 +154,7 @@ const ContactUsForm = () => {
             className="rounded-full!"
             leftIcon={<ChevronLeft />}
           >
-            {form.submitLabel}
+            <span data-el="button">{form.submitLabel}</span>
           </Button>
         </div>
       </form>

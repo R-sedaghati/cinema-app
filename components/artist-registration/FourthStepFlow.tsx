@@ -43,6 +43,7 @@ const FourthStepFlow: React.FC<Props> = ({
   // 0 is a real answer — already subscribed, or the subscription is free — so it must
   // not be conflated with `undefined`, which means "not loaded yet".
   const isFree = registrationAmount === 0;
+  const submitKey = store.editId ? "editSubmitLabel" : isFree ? "freeSubmitLabel" : "submitLabel";
   const router = useRouter();
   const { mutate: create, isPending: isCreating } =
     useUserCreateArtistRequest();
@@ -172,7 +173,7 @@ const FourthStepFlow: React.FC<Props> = ({
               <div className="flex gap-2 items-center">
                 <div className="w-1 h-6 bg-error-500" />
                 <p className="font-h5-bold">
-                  {isFree ? copy("paymentFreeTitle") : copy("paymentTitle")}
+                  <span style={copy.style(isFree ? "paymentFreeTitle" : "paymentTitle")}>{isFree ? copy("paymentFreeTitle") : copy("paymentTitle")}</span>
                 </p>
               </div>
               {!isFree && <p className="font-p2-regular"><span style={copy.style("paymentNote")}>{copy("paymentNote")}</span></p>}
@@ -227,11 +228,7 @@ const FourthStepFlow: React.FC<Props> = ({
             size={isMobile ? "small" : "medium"}
             disabled={isPending}
           >
-            {store.editId
-              ? copy("editSubmitLabel")
-              : isFree
-                ? copy("freeSubmitLabel")
-                : copy("submitLabel")}
+            <span data-el="button" style={copy.style(submitKey)}>{copy(submitKey)}</span>
           </Button>
         </div>
       </div>

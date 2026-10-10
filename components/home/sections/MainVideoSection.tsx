@@ -29,7 +29,7 @@ export function MainVideoSection({ variant = "framed" }: { variant?: string }) {
             allowFullScreen
           />
         </div>
-        <p className="px-4 pt-2 text-xs text-zinc-500 md:text-sm">
+        <p data-el="title" className="px-4 pt-2 text-xs text-zinc-500 md:text-sm">
           {mainTutorial.title}
         </p>
       </section>
@@ -39,7 +39,7 @@ export function MainVideoSection({ variant = "framed" }: { variant?: string }) {
   return (
     <section>
       <div className="flex flex-col gap-3 rounded-2xl md:border md:border-zinc-800 md:bg-zinc-900/60 md:p-4">
-        <h2 className="text-sm md:text-lg font-semibold text-zinc-100">
+        <h2 data-el="title" className="text-sm md:text-lg font-semibold text-zinc-100">
           {mainTutorial.title}
         </h2>
         {player}

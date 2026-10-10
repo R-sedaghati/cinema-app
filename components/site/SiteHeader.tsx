@@ -76,7 +76,7 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-zinc-950/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
+      <header data-area="header" className="sticky top-0 z-50 bg-zinc-950/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center">
           {isMobile ? (
             <div className="flex min-w-0 flex-1 items-center justify-start">
@@ -90,7 +90,7 @@ export function SiteHeader() {
           ) : (
             <Link href="/" className="flex gap-2 items-center">
               <SiteLogo size={44} />
-              <span className="text-base font-semibold text-error-500 text-nowrap">
+              <span data-el="brand" className="text-base font-semibold text-error-500 text-nowrap">
                 <span style={copy.style("brandName")}>{copy("brandName")}</span>
               </span>
             </Link>
@@ -100,7 +100,7 @@ export function SiteHeader() {
             {isMobile && (
               <Link href="/" className="flex gap-1 items-center">
                 <SiteLogo size={60} />
-                <span className="text-xl font-semibold text-error-500 text-nowrap">
+                <span data-el="brand" className="text-xl font-semibold text-error-500 text-nowrap">
                   <span style={copy.style("brandName")}>{copy("brandName")}</span>
                 </span>
               </Link>
@@ -113,6 +113,8 @@ export function SiteHeader() {
                     key={item.href}
                     href={item.href}
                     onClick={() => resetRegistrationIfForms(item.href)}
+                    data-el="nav-link"
+                    data-active={active ? "" : undefined}
                     className={[
                       "rounded-full px-3 py-1.5 text-sm transition-colors text-nowrap border border-transparent",
                       active
@@ -120,7 +122,7 @@ export function SiteHeader() {
                         : "text-zinc-300 hover:bg-zinc-800/60 hover:border-zinc-700",
                     ].join(" ")}
                   >
-                    {copy(item.label)}
+                    <span style={copy.style(item.label)}>{copy(item.label)}</span>
                   </Link>
                 );
               })}
@@ -137,7 +139,7 @@ export function SiteHeader() {
                 rightIcon={<UserRound size={20} />}
                 className="rounded-full!"
               >
-                {isLoggedIn ? copy("navProfile") : copy("navLogin")}
+                <span data-el="button" style={copy.style(isLoggedIn ? "navProfile" : "navLogin")}>{isLoggedIn ? copy("navProfile") : copy("navLogin")}</span>
               </Button>
               {isLoggedIn && badgeTotal > 0 && (
                 <span className="absolute -top-1 -left-1 min-w-5 h-5 px-1 rounded-full bg-error-500 text-white text-xs flex items-center justify-center">
@@ -150,6 +152,7 @@ export function SiteHeader() {
         </div>
       </header>
       <div
+        data-area="header"
         className={[
           "fixed inset-0 z-50 lg:hidden transition-opacity duration-300 ease-out",
           sidebarOpen
@@ -182,7 +185,7 @@ export function SiteHeader() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex gap-1 items-center">
                 <SiteLogo size={40} />
-                <span className="text-xl font-semibold text-error-500 text-nowrap">
+                <span data-el="brand" className="text-xl font-semibold text-error-500 text-nowrap">
                   <span style={copy.style("brandName")}>{copy("brandName")}</span>
                 </span>
               </div>
@@ -207,6 +210,8 @@ export function SiteHeader() {
                       resetRegistrationIfForms(item.href);
                       handleClose();
                     }}
+                    data-el="menu-link"
+                    data-active={active ? "" : undefined}
                     className={[
                       "flex items-center justify-between rounded-xl px-4 py-3 text-zinc-300 transition-colors",
                       active

@@ -31,7 +31,7 @@ export function CategoryChips({
       <Chip
         clickable
         type="button"
-        label={toResumeName(parent?.faName) || copy("artistsCategoryLabel")}
+        label={<span data-el="chip">{toResumeName(parent?.faName) || copy("artistsCategoryLabel")}</span>}
         filled
         leftIcon={<X size={14} />}
         onClick={() => onSelect(null)}
@@ -42,7 +42,7 @@ export function CategoryChips({
           clickable
           type="button"
           key={child.id}
-          label={toResumeName(child.faName)}
+          label={<span data-el="chip">{toResumeName(child.faName)}</span>}
           filled={categoryId === child.id}
           // Clicking the active child steps back up to the parent.
           onClick={() => onSelect(categoryId === child.id ? parent.id : child.id)}

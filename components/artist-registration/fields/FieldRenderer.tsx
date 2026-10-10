@@ -38,7 +38,7 @@ const FieldRenderer: React.FC<FieldProps> = (props) => {
   return (
     <div className="flex flex-col gap-1">
       <Component {...props} />
-      <p className="font-p3-regular text-gray-500">{props.field.helpText}</p>
+      <p data-el="help" className="font-p3-regular text-gray-500">{props.field.helpText}</p>
     </div>
   );
 };
