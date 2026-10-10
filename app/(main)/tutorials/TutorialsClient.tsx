@@ -3,56 +3,70 @@
 
 import { useUserTutorialList } from "@/lib/services/landing/hook";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import BackLinkSection from "@/components/artist-registration/sections/BackLinkSection";
+import { useFormCopy } from "@/lib/hooks/useFormCopy";
 
 export function TutorialsClient() {
+  const fromCopy = useFormCopy();
+
   const { data } = useUserTutorialList();
   const tutorials = data?.result ?? [];
   const copy = useLandingCopy();
 
   return (
-    <div className="flex flex-col gap-10 md:pb-28">
-      <h3 className="font-h1-regular text-4xl text-center"><span style={copy.style("tutorialsTitle")}>{copy("tutorialsTitle")}</span></h3>
+    <>
+      <BackLinkSection copy={fromCopy} />
 
-      {tutorials.length === 0 && (
-        <p className="text-center text-zinc-500">
-          <span style={copy.style("tutorialsEmpty")}>{copy("tutorialsEmpty")}</span>
-        </p>
-      )}
+      <div className="flex flex-col gap-10 md:pb-28">
+        <h3 className="font-h1-regular text-4xl text-center">
+          <span style={copy.style("tutorialsTitle")}>
+            {copy("tutorialsTitle")}
+          </span>
+        </h3>
 
-      <div className="flex flex-col gap-10">
-        {tutorials.map((tutorial) => (
-          <div
-            key={tutorial.id}
-            className="flex flex-col gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 md:p-6"
-          >
-            {tutorial.thumbnail && (
-              <div className="relative w-full h-48 md:h-72 rounded-xl overflow-hidden bg-gray-100">
-                <img
-                  src={tutorial.thumbnail}
-                  alt={tutorial.title}
-                  className="absolute inset-0 h-full w-full object-cover"
+        {tutorials.length === 0 && (
+          <p className="text-center text-zinc-500">
+            <span style={copy.style("tutorialsEmpty")}>
+              {copy("tutorialsEmpty")}
+            </span>
+          </p>
+        )}
+
+        <div className="flex flex-col gap-10">
+          {tutorials.map((tutorial) => (
+            <div
+              key={tutorial.id}
+              className="flex flex-col gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 md:p-6"
+            >
+              {tutorial.thumbnail && (
+                <div className="relative w-full h-48 md:h-72 rounded-xl overflow-hidden bg-gray-100">
+                  <img
+                    src={tutorial.thumbnail}
+                    alt={tutorial.title}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                </div>
+              )}
+
+              <h4 className="text-lg md:text-xl font-semibold text-zinc-100">
+                {tutorial.title}
+              </h4>
+
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden">
+                <iframe
+                  src={tutorial.videoUrl}
+                  className="absolute inset-0 w-full h-full"
+                  allowFullScreen
                 />
               </div>
-            )}
 
-            <h4 className="text-lg md:text-xl font-semibold text-zinc-100">
-              {tutorial.title}
-            </h4>
-
-            <div className="relative w-full aspect-video rounded-xl overflow-hidden">
-              <iframe
-                src={tutorial.videoUrl}
-                className="absolute inset-0 w-full h-full"
-                allowFullScreen
-              />
+              <p className="text-sm md:text-base text-zinc-400 whitespace-pre-line">
+                {tutorial.content}
+              </p>
             </div>
-
-            <p className="text-sm md:text-base text-zinc-400 whitespace-pre-line">
-              {tutorial.content}
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -14,11 +14,24 @@ const COUNT: Record<string, number> = {
   text: 8,
 };
 
+const getAparatEmbedUrl = (videoUrl?: string) => {
+  if (!videoUrl) return undefined;
+
+  const match = videoUrl.match(/\/videohash\/([^/]+)/);
+
+  if (!match) return undefined;
+
+  return `https://www.aparat.com/video/video/embed/videohash/${match[1]}/vt/frame`;
+};
+
 export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
   const { data } = useUserTutorialList();
   const copy = useLandingCopy();
   const isRail = variant === "rail";
-  const tutorials = (data?.result ?? []).slice(0, COUNT[variant] ?? PREVIEW_COUNT);
+  const tutorials = (data?.result ?? []).slice(
+    0,
+    COUNT[variant] ?? PREVIEW_COUNT,
+  );
 
   if (tutorials.length === 0) return null;
 
@@ -31,12 +44,20 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
         isRail ? "w-56 shrink-0 md:w-72" : ""
       }`}
     >
-      <div className="relative aspect-video w-full bg-zinc-800">
-        {tutorial.thumbnail && (
+      <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
+        {tutorial.thumbnail ? (
           <img
             src={tutorial.thumbnail}
             alt={tutorial.title}
             className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <iframe
+            src={getAparatEmbedUrl(tutorial.videoUrl)}
+            title={tutorial.title}
+            className="absolute inset-0 h-full w-full"
+            allowFullScreen
+            loading="lazy"
           />
         )}
       </div>
@@ -52,10 +73,14 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
         className={`mb-3 flex items-center justify-between md:mb-4 ${isRail ? "px-4" : ""}`}
       >
         <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
-          <span style={copy.style("tutorialsSectionTitle")}>{copy("tutorialsSectionTitle")}</span>
+          <span style={copy.style("tutorialsSectionTitle")}>
+            {copy("tutorialsSectionTitle")}
+          </span>
         </h2>
         <Link href="/tutorials" className="text-xs text-error-500 md:text-sm">
-          <span style={copy.style("tutorialsSectionCta")}>{copy("tutorialsSectionCta")}</span>
+          <span style={copy.style("tutorialsSectionCta")}>
+            {copy("tutorialsSectionCta")}
+          </span>
         </Link>
       </div>
 
@@ -100,7 +125,12 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
           <div className="flex w-max gap-3 px-4 pb-1 md:gap-4">{cards}</div>
         </div>
       ) : (
-        <div data-card-grid className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">{cards}</div>
+        <div
+          data-card-grid
+          className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
+        >
+          {cards}
+        </div>
       )}
     </section>
   );
