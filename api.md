@@ -362,7 +362,7 @@ interface SiteContent {
   support: {
     title: string;
     description: string;
-    items: { title: string; detail: string; footerText: string; buttonValue: string }[]; // exactly 3, fixed order (phone, email, telegram)
+    items: { title: string; detail: string; footerText: string; buttonValue: string; image?: string }[]; // any count; shipped icons (phone, email, telegram) cycle when `image` is absent. `image`: full URL on read, storage path (or URL, stripped) on write
     fontSize?: number | null;
     color?: string | null;
   };
@@ -398,6 +398,9 @@ interface SiteContent {
   // same, for the artist-registration page, keyed by
   // `lib/constants/registrationSections.ts` and set in `/admin/registration-builder`.
   registrationSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number; styles?: Record<string, string> }[] | null;
+  // Support page sections, same shape; keys `intro`/`cards`/`contactForm` from
+  // `lib/constants/supportSections.ts`, set in `/admin/support-builder`.
+  supportSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number; styles?: Record<string, string> }[] | null;
   // per-page backgrounds, set in `/admin/page-backgrounds`. Keyed by the frontend
   // catalog `lib/constants/pageBackgrounds.ts` (first path segment, `home` for `/`,
   // `default` for every page without its own entry). `color` is `#rrggbb`; `image`
@@ -417,6 +420,11 @@ interface SiteContent {
   }> | null;
   // site-wide table colors, set in `/admin/page-backgrounds`. Each `#rrggbb`; unknown
   // keys and non-hex values are dropped. Absent key = theme default.
+  // per-area text styles for the public site, set in `/admin/site-styles`. Keyed by the frontend
+  // `SITE_STYLE_AREAS` (`header`, `footer`, `mobileNav`, `artists`, `about`, `faq`, `support`, `terms`,
+  // `tutorials`, `artist-registration`, `profile`, `drawer`, `toast`); each value is a `styles` map with the same rules as
+  // `homeSections[].styles`. Invalid areas/entries dropped; omit to leave unchanged.
+  siteStyles?: Record<string, Record<string, string>>;
   tableColors?: { headerBg?: string; headerText?: string; rowBg?: string; rowText?: string; border?: string } | null;
   uploadLimits: { imageMb: number; videoMb: number }; // per-file caps in MB (defaults 10/100, max 200); enforced by /user/avatar and /user/upload/* (413 when exceeded)
   // Admin-uploaded logo/favicon: public URLs on read, storage paths on write (upload via

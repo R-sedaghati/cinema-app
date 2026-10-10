@@ -9,6 +9,7 @@ const PromptSection: React.FC<{ copy: CopyFn; variant?: string }> = ({
   variant,
 }) => (
   <p
+    data-el="title"
     className={clsx(
       "font-h4-bold",
       isDesktop && "font-h3-bold",

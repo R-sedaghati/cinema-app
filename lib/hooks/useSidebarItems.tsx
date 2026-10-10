@@ -16,6 +16,7 @@ import {
   Settings,
   MessageSquare,
   Wallpaper,
+  Type,
   Activity,
   Bell,
   FileText,
@@ -133,6 +134,12 @@ export const useSidebarItems = (): {
         active: pathname.startsWith("/admin/registration-builder"),
       },
       {
+        icon: <LayoutTemplate />,
+        title: "صفحه‌ساز صفحه پشتیبانی",
+        link: "/admin/support-builder",
+        active: pathname.startsWith("/admin/support-builder"),
+      },
+      {
         icon: <UserCog />,
         title: "فیلدهای پروفایل کاربر",
         link: "/admin/profile-fields",
@@ -143,6 +150,12 @@ export const useSidebarItems = (): {
         title: "ظاهر صفحات",
         link: "/admin/page-backgrounds",
         active: pathname.startsWith("/admin/page-backgrounds"),
+      },
+      {
+        icon: <Type />,
+        title: "اندازه و رنگ متن‌ها",
+        link: "/admin/site-styles",
+        active: pathname.startsWith("/admin/site-styles"),
       },
       {
         icon: <TableOfContents />,

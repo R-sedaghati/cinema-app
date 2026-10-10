@@ -25,10 +25,10 @@ export function CtaCardsSection({ variant = "cards" }: { variant?: string }) {
             className="flex items-center justify-between gap-4 py-4 transition-colors hover:bg-zinc-900/40"
           >
             <div>
-              <p className="text-sm font-semibold text-zinc-100 md:text-base">
+              <p data-el="card-title" className="text-sm font-semibold text-zinc-100 md:text-base">
                 {copy(card.title)}
               </p>
-              <p className="mt-0.5 text-xs text-zinc-500 md:text-sm">
+              <p data-el="card-text" className="mt-0.5 text-xs text-zinc-500 md:text-sm">
                 {copy(card.subtitle)}
               </p>
             </div>
@@ -49,10 +49,10 @@ export function CtaCardsSection({ variant = "cards" }: { variant?: string }) {
             href={card.href}
             className="flex flex-col gap-1 p-5 transition-colors hover:bg-zinc-900 md:p-6"
           >
-            <p className="text-sm font-semibold text-zinc-100 md:text-base">
+            <p data-el="card-title" className="text-sm font-semibold text-zinc-100 md:text-base">
               {copy(card.title)}
             </p>
-            <p className="text-xs text-zinc-500 md:text-sm">{copy(card.subtitle)}</p>
+            <p data-el="card-text" className="text-xs text-zinc-500 md:text-sm">{copy(card.subtitle)}</p>
           </Link>
         ))}
       </div>
@@ -69,10 +69,10 @@ export function CtaCardsSection({ variant = "cards" }: { variant?: string }) {
           className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/60 px-4 py-4 md:px-6 md:py-6 hover:border-error-500/40 transition-colors group active:scale-[.99]"
         >
           <div>
-            <p className="text-sm md:text-base font-semibold text-zinc-100">
+            <p data-el="card-title" className="text-sm md:text-base font-semibold text-zinc-100">
               {copy(card.title)}
             </p>
-            <p className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
+            <p data-el="card-text" className="text-xs md:text-sm text-zinc-500 mt-0.5 md:mt-1">
               {copy(card.subtitle)}
             </p>
           </div>

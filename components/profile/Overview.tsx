@@ -67,7 +67,7 @@ export default function Overview() {
   };
 
   return (
-    <ContentCard title={copy("profileOverviewTitle")}>
+    <ContentCard title={<span style={copy.style("profileOverviewTitle")}>{copy("profileOverviewTitle")}</span>}>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-8 rounded-xl border-2 border-zinc-700/60 bg-gray-100/60 p-4 backdrop-blur-sm"
@@ -88,7 +88,7 @@ export default function Overview() {
             <div className="flex flex-col gap-1">
               <label className="cursor-pointer text-sm text-error-500">
                 <span style={copy.style("profileAvatarCta")}>
-                  {uploadAvatar.isPending ? "..." : copy("profileAvatarCta")}
+                  {uploadAvatar.isPending ? "..." : <span style={copy.style("profileAvatarCta")}>{copy("profileAvatarCta")}</span>}
                 </span>
                 <input
                   type="file"

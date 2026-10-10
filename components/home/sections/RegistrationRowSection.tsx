@@ -38,13 +38,14 @@ export function RegistrationRowSection({
     <div
       className={`mb-3 flex items-center justify-between md:mb-4 ${padded ? "px-4" : ""}`}
     >
-      <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
+      <h2 data-el="title" className="text-sm font-semibold text-zinc-100 md:text-lg">
         <span style={copy.style("homeRegistrationTitle")}>
           {copy("homeRegistrationTitle")}
         </span>
       </h2>
       <Link
         href="/artist-registration"
+        data-el="link"
         className="text-xs text-error-500 md:text-sm"
       >
         <span style={copy.style("homeRegistrationCta")}>
@@ -67,11 +68,11 @@ export function RegistrationRowSection({
               className="flex w-full items-center justify-between gap-3 py-3 text-right transition-colors hover:bg-zinc-900/60"
             >
               <span className="flex flex-col">
-                <span className="text-sm font-medium text-zinc-100 md:text-base">
+                <span data-el="card-title" className="text-sm font-medium text-zinc-100 md:text-base">
                   {cat.faName}
                 </span>
                 {cat.description && (
-                  <span className="text-xs text-zinc-500">
+                  <span data-el="card-text" className="text-xs text-zinc-500">
                     {cat.description}
                   </span>
                 )}
@@ -94,6 +95,7 @@ export function RegistrationRowSection({
             <button
               key={cat.id}
               onClick={() => onPick(cat.id, cat.faName)}
+              data-el="card-title"
               className="rounded-full border border-zinc-800 px-3 py-1.5 text-sm text-zinc-200 transition-colors hover:border-error-500/40 hover:text-error-400 active:scale-[.98] md:px-4 md:py-2"
             >
               {cat.faName}
@@ -114,6 +116,7 @@ export function RegistrationRowSection({
             <button
               key={cat.id}
               onClick={() => onPick(cat.id, cat.faName)}
+              data-el="card-title"
               className="mb-1.5 block w-full break-inside-avoid truncate text-right text-sm text-zinc-200 transition-colors hover:text-error-400 md:text-base"
             >
               {cat.faName}
@@ -146,7 +149,7 @@ export function RegistrationRowSection({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-3 text-right">
-                <p className="text-sm font-semibold leading-tight text-white md:text-base">
+                <p data-el="card-title" className="text-sm font-semibold leading-tight text-white md:text-base">
                   {cat.faName}
                 </p>
               </div>
@@ -176,10 +179,10 @@ export function RegistrationRowSection({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-right">
-                <p className="text-sm md:text-lg font-semibold text-white leading-tight">
+                <p data-el="card-title" className="text-sm md:text-lg font-semibold text-white leading-tight">
                   {cat.faName}
                 </p>
-                <span className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
+                <span data-el="card-text" className="inline-flex items-center gap-1 text-xs md:text-sm text-error-400 mt-1.5">
                   <span style={copy.style("homeRegistrationCta")}>
                     {copy("homeRegistrationCta")}
                   </span>

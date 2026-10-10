@@ -20,6 +20,7 @@ import {
 import { EFormFieldType } from "@/lib/services/admin/type";
 import type { IFormStep } from "@/lib/services/admin/type";
 import { getStepErrors } from "@/lib/utils/validateFormStep";
+import { profilePrefillValue } from "@/lib/utils/profilePrefill";
 import { toast } from "react-toastify";
 import React, { useMemo, useState } from "react";
 
@@ -66,9 +67,22 @@ const CallDetail = ({
       ) as Record<string, string>,
     [profile],
   );
+  // Any other field whose key names a profile value (email, phone, a custom profile key, …)
+  // starts out filled from the account but stays editable.
+  const defaults = useMemo<Record<string, unknown>>(
+    () =>
+      profile
+        ? Object.fromEntries(
+            form.fields
+              .map((f) => [f.key, profilePrefillValue(profile, f.key)] as const)
+              .filter(([, value]) => value !== null),
+          )
+        : {},
+    [form, profile],
+  );
   const answers = useMemo<Record<string, unknown>>(
-    () => ({ ...saved, ...typed, ...locked }),
-    [locked, saved, typed],
+    () => ({ ...defaults, ...saved, ...typed, ...locked }),
+    [defaults, locked, saved, typed],
   );
 
   const submit = () => {
@@ -116,8 +130,8 @@ const CallDetail = ({
 
   return (
     <div className="w-full space-y-6">
-      <h3 className="text-zinc-100 text-lg text-center">{form.title}</h3>
-      <p className="text-zinc-300 leading-8 text-sm text-center">
+      <h3 data-el="title" className="text-zinc-100 text-lg text-center">{form.title}</h3>
+      <p data-el="body" className="text-zinc-300 leading-8 text-sm text-center">
         <span style={copy.style("callFormDesc")}>{copy("callFormDesc")}</span>
       </p>
       {form.fields.map((field, index) => (
@@ -139,7 +153,7 @@ const CallDetail = ({
           variant="outline"
           onClick={() => setOpen(false)}
         >
-          <span style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
+          <span data-el="button" style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
         </Button>
         <Button
           onClick={submit}
@@ -147,7 +161,9 @@ const CallDetail = ({
           className="flex-1 rounded-full!"
           isFullWidth
         >
-          {isPending ? copy("callSubmitting") : form.submitLabel}
+          <span data-el="button" style={isPending ? copy.style("callSubmitting") : undefined}>
+            {isPending ? copy("callSubmitting") : form.submitLabel}
+          </span>
         </Button>
       </div>
     </div>

@@ -11,11 +11,12 @@ export default function TermsPage() {
 
   return (
     <div data-page className="relative mx-auto max-w-6xl px-4 py-10 text-right">
-      <h3 className="text-4xl font-h1-regular mb-10">
+      <h3 data-el="title" className="text-4xl font-h1-regular mb-10">
         {terms?.title ?? copy("termsDefaultTitle")}
       </h3>
 
       <div
+        data-el="body"
         className="relative backdrop-blur-sm border-2 border-error-500/30 shadow-card text-xl rounded-4xl p-5 md:p-20 bg-zinc-900/40 w-full whitespace-pre-line"
         style={textStyle(terms?.fontSize, terms?.color)}
       >

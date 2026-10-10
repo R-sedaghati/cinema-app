@@ -16,7 +16,9 @@ const SuccessDrawer = ({
 }) => {
   return (
     <Drawer
+      className="site-drawer"
       header={{
+        containerClassName: "site-drawer-head",
         haveCloseIcon: true,
       }}
       width={getDrawerWidth(420)}

@@ -63,7 +63,7 @@ export function ArtistFilterBar({
         <Chip
           clickable
           type="button"
-          label={copy("artistsClearFilters")}
+          label={<span data-el="chip" style={copy.style("artistsClearFilters")}>{copy("artistsClearFilters")}</span>}
           leftIcon={<X size={14} />}
           onClick={onClear}
         />

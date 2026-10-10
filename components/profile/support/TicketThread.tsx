@@ -30,7 +30,7 @@ function Bubble({
           <span className="text-zinc-300">{author}</span>
           <span>{convertGregorianTimeToShamsiTime(createdAt)}</span>
         </div>
-        <p className="text-sm leading-7 text-zinc-100 whitespace-pre-wrap break-words">{body}</p>
+        <p data-el="body" className="text-sm leading-7 text-zinc-100 whitespace-pre-wrap break-words">{body}</p>
       </div>
     </div>
   );
@@ -65,7 +65,7 @@ export default function TicketThread({ id, onBack }: Readonly<{ id: number; onBa
         className="p-0! text-sm self-start"
         onClick={onBack}
       >
-        {copy("profileSupportBack")}
+        <span style={copy.style("profileSupportBack")}>{copy("profileSupportBack")}</span>
       </Button>
 
       {isPending && <div className="animate-pulse h-24 rounded-2xl bg-zinc-900/70" />}
@@ -73,7 +73,7 @@ export default function TicketThread({ id, onBack }: Readonly<{ id: number; onBa
       {ticket && (
         <>
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-base text-zinc-50">
+            <h3 data-el="card-title" className="text-base text-zinc-50">
               {ticket.subject} <span className="text-xs text-zinc-500">#{ticket.id}</span>
             </h3>
             <SupportStatusPill status={ticket.status} />
@@ -98,7 +98,7 @@ export default function TicketThread({ id, onBack }: Readonly<{ id: number; onBa
           </div>
 
           {ticket.status === ESupportStatus.CLOSED ? (
-            <p className="py-4 text-center text-sm text-zinc-500">{copy("profileSupportClosed")}</p>
+            <p data-el="body" className="py-4 text-center text-sm text-zinc-500"><span style={copy.style("profileSupportClosed")}>{copy("profileSupportClosed")}</span></p>
           ) : (
             <form onSubmit={handleSend} className="flex flex-col gap-3">
               <Textarea
@@ -114,7 +114,7 @@ export default function TicketThread({ id, onBack }: Readonly<{ id: number; onBa
                 disabled={isSending || !body.trim()}
                 className="rounded-full! self-end"
               >
-                {copy("profileSupportSend")}
+                <span style={copy.style("profileSupportSend")}>{copy("profileSupportSend")}</span>
               </Button>
             </form>
           )}

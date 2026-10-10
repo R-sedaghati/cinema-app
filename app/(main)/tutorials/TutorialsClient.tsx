@@ -18,14 +18,14 @@ export function TutorialsClient() {
       <BackLinkSection copy={fromCopy} />
 
       <div className="flex flex-col gap-10 md:pb-28">
-        <h3 className="font-h1-regular text-4xl text-center">
+        <h3 data-el="title" className="font-h1-regular text-4xl text-center">
           <span style={copy.style("tutorialsTitle")}>
             {copy("tutorialsTitle")}
           </span>
         </h3>
 
         {tutorials.length === 0 && (
-          <p className="text-center text-zinc-500">
+          <p data-el="body" className="text-center text-zinc-500">
             <span style={copy.style("tutorialsEmpty")}>
               {copy("tutorialsEmpty")}
             </span>
@@ -48,7 +48,7 @@ export function TutorialsClient() {
                 </div>
               )}
 
-              <h4 className="text-lg md:text-xl font-semibold text-zinc-100">
+              <h4 data-el="card-title" className="text-lg md:text-xl font-semibold text-zinc-100">
                 {tutorial.title}
               </h4>
 
@@ -60,7 +60,7 @@ export function TutorialsClient() {
                 />
               </div>
 
-              <p className="text-sm md:text-base text-zinc-400 whitespace-pre-line">
+              <p data-el="card-text" className="text-sm md:text-base text-zinc-400 whitespace-pre-line">
                 {tutorial.content}
               </p>
             </div>

@@ -37,7 +37,7 @@ export default function MenuSection({
               <span className={activeItem ? "text-zinc-100" : "text-zinc-400"}>
                 {s.icon}
               </span>
-              <span className="text-sm text-right">{s.label}</span>
+              <span data-el="menu-link" className="text-sm text-right">{s.label}</span>
             </div>
             <div className="flex items-center gap-2">
               {Boolean(s.badge) && (

@@ -35,3 +35,21 @@ test("cleanStyles drops keys/values that could break out of a rule", () => {
   );
   assert.equal(cleanStyles(["#000000"]), undefined);
 });
+
+test("style catalogs: keys unique per area/section, every selector scoped", async () => {
+  const { SITE_STYLE_AREAS } = await import("../constants/siteStyles.ts");
+  const { HOME_SECTIONS } = await import("../constants/homeSections.ts");
+  const { SUPPORT_SECTIONS } = await import("../constants/supportSections.ts");
+  const catalogs: [string, IStyleField[] | undefined][] = [
+    ...Object.entries(SITE_STYLE_AREAS).map(([k, a]) => [k, a.fields] as [string, IStyleField[]]),
+    ...Object.entries(HOME_SECTIONS).map(([k, s]) => [k, s.styles] as [string, IStyleField[] | undefined]),
+    ...Object.entries(SUPPORT_SECTIONS).map(([k, s]) => [k, s.styles] as [string, IStyleField[] | undefined]),
+  ];
+  for (const [name, fields = []] of catalogs) {
+    const keys = fields.flatMap((f) => (f.responsive ? [f.key, `${f.key}-md`] : [f.key]));
+    assert.equal(new Set(keys).size, keys.length, `duplicate style key in ${name}`);
+    for (const f of fields) {
+      for (const sel of Object.keys(f.css)) assert.ok(!sel.includes(","), `${name}.${f.key}: comma selector escapes scope`);
+    }
+  }
+});

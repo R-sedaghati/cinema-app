@@ -32,9 +32,10 @@ const Benefits = () => {
             height={160}
           />
 
-          <h5 className="font-h3-bold text-white">{item.title}</h5>
+          <h5 data-el="card-title" className="font-h3-bold text-white">{item.title}</h5>
 
           <div
+            data-el="card-text"
             className="font-p1-regular text-zinc-400 text-base whitespace-pre-line"
             style={textStyle(fontSize, color)}
           >

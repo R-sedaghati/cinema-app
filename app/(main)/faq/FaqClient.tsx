@@ -10,7 +10,7 @@ export function FaqClient() {
 
   return (
     <div className="flex relative flex-col justify-center items-center gap-10 md:pb-28">
-      <h3 className="font-h1-regular text-4xl"><span style={copy.style("faqPageTitle")}>{copy("faqPageTitle")}</span></h3>
+      <h3 data-el="title" className="font-h1-regular text-4xl"><span style={copy.style("faqPageTitle")}>{copy("faqPageTitle")}</span></h3>
       <AccordionGroup className="gap-4" defaultActiveKey={"f1"}>
         {data?.result?.map((item) => (
           <AccordionItem
@@ -19,9 +19,9 @@ export function FaqClient() {
             className="bg-secondary-black! rounded-lg border border-zinc-700 [&>div:nth-child(3)]:bg-transparent"
             titleClassName="text-error-500! text-right!"
             contentClassName="text-zinc-100!"
-            title={item.question}
+            title={<span data-el="question">{item.question}</span>}
           >
-            {item.answer}
+            <div data-el="answer">{item.answer}</div>
           </AccordionItem>
         ))}
       </AccordionGroup>

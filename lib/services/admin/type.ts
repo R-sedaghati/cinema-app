@@ -625,6 +625,8 @@ export interface ISiteContentSupportItem {
   detail: string;
   footerText: string;
   buttonValue: string;
+  /** Card image URL on read, bare storage path on write; absent = the shipped icon. */
+  image?: string;
 }
 
 /** One field of the admin-editable support contact form. */
@@ -699,6 +701,8 @@ export interface ISiteContent {
    * shipped catalog order" — see `lib/utils/resolveRegistrationSections.ts`.
    */
   registrationSections?: ISectionConfig[] | null;
+  /** Support page sections, keyed by `lib/constants/supportSections.ts`; same convention. */
+  supportSections?: ISectionConfig[] | null;
   /**
    * Per-page backgrounds, keyed by `lib/constants/pageBackgrounds.ts`; `default`
    * covers pages without their own entry. Empty/absent = the stock gradient.
@@ -710,6 +714,8 @@ export interface ISiteContent {
    */
   pageLayouts?: Record<string, IPageLayout> | null;
   /** Site-wide table colors, `#rrggbb` each; absent = theme default. */
+  /** Per-area text styles for the public site, keyed by `SITE_STYLE_AREAS`. */
+  siteStyles?: Record<string, Record<string, string>> | null;
   tableColors?: ITableColors | null;
   /** Per-file upload caps in MB; the API always returns both, defaults filled in. */
   uploadLimits?: IUploadLimits | null;

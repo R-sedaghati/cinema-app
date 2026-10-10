@@ -1,9 +1,11 @@
+import BackLinkSection from "@/components/artist-registration/sections/BackLinkSection";
 import Description from "@/components/about/Description";
 import Benefits from "@/components/about/Benefits";
 
 export default function AboutPage() {
   return (
     <div data-page data-page-stack className="relative flex flex-col gap-10 mx-auto max-w-6xl px-4 py-10">
+      <BackLinkSection />
       <Description />
       <Benefits />
       <div

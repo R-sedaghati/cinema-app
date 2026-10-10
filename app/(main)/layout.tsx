@@ -9,6 +9,7 @@ import ProfileCompletionChecker from "@/components/login/ProfileCompletionChecke
 import { PageProgressBar } from "@/components/site/PageProgressBar";
 import { PageBackground } from "@/components/site/PageBackground";
 import { TableColors } from "@/components/site/TableColors";
+import { SiteStyles } from "@/components/site/SiteStyles";
 import { PageLayoutMain } from "@/components/site/PageLayoutMain";
 import "../globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -30,13 +31,16 @@ function MainLayout({
       <PageProgressBar />
       <PageBackground />
       <TableColors />
+      <SiteStyles />
       <div className="flex min-h-dvh flex-col  text-zinc-100 antialiased">
         <SiteHeader />
         <PageLayoutMain className="flex-1 md:mt-10 pb-safe-24 lg:pb-8 overflow-hidden">{children}</PageLayoutMain>
         <div className="hidden lg:block"><SiteFooter /></div>
         {/* ponytail: mobile has no footer, only the copyright line matters there */}
-        <p className="lg:hidden px-4 pt-6 pb-safe-28 text-center text-xs text-zinc-500">
+        <p data-area="footer" className="lg:hidden px-4 pt-6 pb-safe-28 text-center text-xs text-zinc-500">
+          <span data-el="copyright">
           <MobileCopyright />
+          </span>
         </p>
         <MobileBottomNav />
         <LoginDrawer />

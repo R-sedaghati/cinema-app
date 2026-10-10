@@ -116,7 +116,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
   return (
     <>
       <div className="flex flex-col items-start gap-2">
-        <h6 className="ss02 font-h6-bold flex flex-wrap gap-1.5 text-gray-600">
+        <h6 data-el="body" className="ss02 font-h6-bold flex flex-wrap gap-1.5 text-gray-600">
           <span style={copy.style("loginOtpPrefix")}>{copy("loginOtpPrefix")}</span>{" "}
           <span dir="ltr" className="inline-block text-left">
             {formatPhoneNumber(phoneNumber)}
@@ -130,7 +130,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
           rightIcon={<Pencil />}
           onClick={() => setStep("phoneNumber")}
         >
-          <span style={copy.style("loginOtpChangeNumber")}>{copy("loginOtpChangeNumber")}</span>
+          <span data-el="link" style={copy.style("loginOtpChangeNumber")}>{copy("loginOtpChangeNumber")}</span>
         </Button>
       </div>
       <OtpInput
@@ -152,12 +152,12 @@ const OtpStep: FC<StepBaseProps> = (props) => {
             size="small"
             onClick={resendOtp}
           >
-            <span style={copy.style("loginOtpResend")}>{copy("loginOtpResend")}</span>
+            <span data-el="link" style={copy.style("loginOtpResend")}>{copy("loginOtpResend")}</span>
           </Button>
         ) : (
           <>
-            <h6 className="text-gray-700 ss02 font-h6-bold">{remainingTime}</h6>
-            <span className="font-button-small text-primary-600/40">
+            <h6 data-el="meta" className="text-gray-700 ss02 font-h6-bold">{remainingTime}</h6>
+            <span data-el="meta" className="font-button-small text-primary-600/40">
               <span style={copy.style("loginOtpCountdown")}>{copy("loginOtpCountdown")}</span>
             </span>
           </>
@@ -170,7 +170,7 @@ const OtpStep: FC<StepBaseProps> = (props) => {
         isLoading={isPending}
         onClick={() => handleSubmit()}
       >
-        <span style={copy.style("loginOtpSubmit")}>{copy("loginOtpSubmit")}</span>
+        <span data-el="button" style={copy.style("loginOtpSubmit")}>{copy("loginOtpSubmit")}</span>
       </Button>
       <TermsNotice />
     </>

@@ -27,12 +27,12 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
       <div
         className={`mb-3 flex items-center justify-between md:mb-4 ${isRail ? "px-4" : ""}`}
       >
-        <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
+        <h2 data-el="title" className="text-sm font-semibold text-zinc-100 md:text-lg">
           <span style={copy.style("homeArtistsTitle")}>
             {copy("homeArtistsTitle")}
           </span>
         </h2>
-        <Link href="/artists" className="text-xs text-error-500 md:text-sm">
+        <Link href="/artists" data-el="link" className="text-xs text-error-500 md:text-sm">
           <span style={copy.style("homeArtistsCta")}>
             {copy("homeArtistsCta")}
           </span>
@@ -42,7 +42,7 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
       {isLoading ? (
         <Skeleton variant={variant} />
       ) : artists.length === 0 ? (
-        <Empty message={copy("homeEmptyArtists")} />
+        <Empty message={<span style={copy.style("homeEmptyArtists")}>{copy("homeEmptyArtists")}</span>} />
       ) : variant === "castlist" ? (
         <CastList artists={artists} />
       ) : variant === "tiles" ? (
@@ -110,17 +110,17 @@ function CastList({ artists }: { artists: IArtistItem[] }) {
                 />
               )}
             </div>
-            <span className="min-w-0 flex-1 truncate text-sm font-medium text-zinc-100 md:text-base">
+            <span data-el="card-title" className="min-w-0 flex-1 truncate text-sm font-medium text-zinc-100 md:text-base">
               {primary}
             </span>
             {name && craft && (
-              <span className="shrink-0 text-xs text-zinc-400 md:text-sm">
+              <span data-el="card-text" className="shrink-0 text-xs text-zinc-400 md:text-sm">
                 {craft}
               </span>
             )}
             {typeof artist.answers?.city === "string" &&
               artist.answers.city && (
-                <span className="hidden shrink-0 text-xs text-zinc-600 md:inline md:text-sm">
+                <span data-el="card-meta" className="hidden shrink-0 text-xs text-zinc-600 md:inline md:text-sm">
                   {artist.answers.city as string}
                 </span>
               )}
@@ -159,7 +159,7 @@ function ArtistTile({ artist }: { artist: IArtistItem }) {
           </div>
         )}
       </div>
-      <span className="w-full truncate text-xs text-zinc-300 md:text-sm">
+      <span data-el="card-title" className="w-full truncate text-xs text-zinc-300 md:text-sm">
         {name || toResumeName(artist.categories?.[0]?.faName)}
       </span>
     </Link>
@@ -182,9 +182,9 @@ function TextList({ artists }: { artists: IArtistItem[] }) {
               href={`/artists/${artist.id}`}
               className="flex items-baseline gap-2 text-sm text-zinc-200 hover:text-error-400 md:text-base"
             >
-              <span className="truncate">{name || craft}</span>
+              <span data-el="card-title" className="truncate">{name || craft}</span>
               {name && craft && (
-                <span className="shrink-0 text-xs text-zinc-600">{craft}</span>
+                <span data-el="card-text" className="shrink-0 text-xs text-zinc-600">{craft}</span>
               )}
             </Link>
           </li>
@@ -250,7 +250,7 @@ function Skeleton({ variant }: { variant: string }) {
   );
 }
 
-function Empty({ message }: { message: string }) {
+function Empty({ message }: { message: React.ReactNode }) {
   return (
     <div className="py-16 text-center">
       <img
@@ -260,7 +260,7 @@ function Empty({ message }: { message: string }) {
         height={72}
         className="mx-auto mb-4 opacity-30"
       />
-      <p className="text-sm text-zinc-500">{message}</p>
+      <p data-el="card-meta" className="text-sm text-zinc-500">{message}</p>
     </div>
   );
 }
@@ -291,18 +291,18 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
         )}
       </div>
 
-      <p className="truncate text-sm font-semibold leading-tight text-zinc-100 transition-colors group-hover:text-error-400 md:text-base">
+      <p data-el="card-title" className="truncate text-sm font-semibold leading-tight text-zinc-100 transition-colors group-hover:text-error-400 md:text-base">
         {artist.user.firstName} {artist.user.lastName}
       </p>
 
       <div className="mt-1.5 flex flex-col gap-1 md:mt-2">
         {artist.categories?.[0] && (
-          <span className="inline-block w-fit rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400 md:px-2.5 md:py-1 md:text-sm">
+          <span data-el="card-text" className="inline-block w-fit rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400 md:px-2.5 md:py-1 md:text-sm">
             {toResumeName(artist.categories[0].faName)}
           </span>
         )}
         {typeof artist.answers?.city === "string" && artist.answers.city && (
-          <span className="text-xs text-zinc-600 md:text-sm">
+          <span data-el="card-meta" className="text-xs text-zinc-600 md:text-sm">
             {artist.answers.city as string}
           </span>
         )}

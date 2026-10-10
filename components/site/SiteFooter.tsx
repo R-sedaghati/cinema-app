@@ -30,19 +30,19 @@ export function SiteFooter() {
   const phoneHref = `tel:${toEnglishDigits(phone).replace(/\s/g, "")}`;
 
   return (
-    <footer className="bg-zinc-950/40 text-white">
+    <footer data-area="footer" className="bg-zinc-950/40 text-white">
       <div className="mx-auto max-w-7xl px-6 py-16 flex flex-col gap-14">
         {/* top */}
         <div className="flex flex-col md:flex-row gap-5 justify-between items-center">
           <div className="flex gap-2 items-center">
             <SiteLogo size={60} />
-            <h3 className="text-3xl text-error-500 font-extrabold">
+            <h3 data-el="brand" className="text-3xl text-error-500 font-extrabold">
               <span style={copy.style("brandName")}>{copy("brandName")}</span>
             </h3>
           </div>
           <div className="flex items-center font-bold gap-6 text-zinc-400 text-sm">
             {phone && (
-              <span className="tracking-wider ss02">
+              <span data-el="info" className="tracking-wider ss02">
                 <span style={copy.style("footerPhoneLabel")}>{copy("footerPhoneLabel")}</span> {phone}
               </span>
             )}
@@ -69,29 +69,29 @@ export function SiteFooter() {
 
         {/* mid */}
         <nav className="flex flex-col font-bold gap-4 text-sm text-zinc-300">
-          <Link href="/artists" className="hover:text-white transition-colors">
+          <Link href="/artists" data-el="link" className="hover:text-white transition-colors">
             <span style={copy.style("footerArtists")}>{copy("footerArtists")}</span>
           </Link>
-          <Link href="/about" className="hover:text-white transition-colors">
+          <Link href="/about" data-el="link" className="hover:text-white transition-colors">
             <span style={copy.style("footerAbout")}>{copy("footerAbout")}</span>
           </Link>
-          <Link href="/contact" className="hover:text-white transition-colors">
+          <Link href="/contact" data-el="link" className="hover:text-white transition-colors">
             <span style={copy.style("footerContact")}>{copy("footerContact")}</span>
           </Link>
-          <Link href="/faq" className="hover:text-white transition-colors">
+          <Link href="/faq" data-el="link" className="hover:text-white transition-colors">
             <span style={copy.style("footerFaq")}>{copy("footerFaq")}</span>
           </Link>
-          <Link href="/support" className="hover:text-white transition-colors">
+          <Link href="/support" data-el="link" className="hover:text-white transition-colors">
             <span style={copy.style("footerSupport")}>{copy("footerSupport")}</span>
           </Link>
-          <Link href="/terms" className="hover:text-white transition-colors">
+          <Link href="/terms" data-el="link" className="hover:text-white transition-colors">
             <span style={copy.style("footerTerms")}>{copy("footerTerms")}</span>
           </Link>
         </nav>
         {/* bottom */}
         <div className="flex flex-col md:flex-row justify-between gap-5 items-center">
           <div className="flex flex-col items-start justify-center gap-8">
-            <h3 className="text-xl font-semibold text-white">
+            <h3 data-el="title" className="text-xl font-semibold text-white">
               <span style={copy.style("footerAppDownload")}>{copy("footerAppDownload")}</span>
             </h3>
 
@@ -132,7 +132,7 @@ export function SiteFooter() {
           )}
         </div>
 
-        <p className="border-t border-zinc-800 pt-6 text-center text-xs text-zinc-500">
+        <p data-el="copyright" className="border-t border-zinc-800 pt-6 text-center text-xs text-zinc-500">
           {copyright}
         </p>
       </div>

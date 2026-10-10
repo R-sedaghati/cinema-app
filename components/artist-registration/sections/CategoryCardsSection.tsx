@@ -72,10 +72,10 @@ function CategoryCard({
       )}
     >
       <div className="flex flex-col items-start gap-1 z-10">
-        <p className="text-nowrap text-sm md:text-base">{item.title}</p>
+        <p data-el="card-title" className="text-nowrap text-sm md:text-base">{item.title}</p>
         <MatchHint item={item} copy={copy} className="text-[10px] md:text-xs text-error-400" />
         {item.existingRequestId && (
-          <span className="text-[10px] md:text-xs text-zinc-400">
+          <span data-el="card-meta" className="text-[10px] md:text-xs text-zinc-400">
             <span style={copy.style("alreadyRegistered")}>{copy("alreadyRegistered")}</span>
           </span>
         )}
@@ -102,7 +102,7 @@ const CategoryCardsSection: React.FC<Props> = ({ items, copy, variant, onSelect 
       {shown.length ? (
         <CategoryCards items={shown} copy={copy} variant={variant} onSelect={onSelect} />
       ) : (
-        <p className="text-sm text-zinc-400">
+        <p data-el="body" className="text-sm text-zinc-400">
           <span style={copy.style("categorySearchEmpty")}>{copy("categorySearchEmpty")}</span>
         </p>
       )}
@@ -177,12 +177,12 @@ const CategoryCards: React.FC<Props> = ({ items, copy, variant, onSelect }) => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3 text-right">
               <div className="flex flex-col items-start gap-0.5">
-                <p className="text-sm font-semibold leading-tight text-white md:text-base">
+                <p data-el="card-title" className="text-sm font-semibold leading-tight text-white md:text-base">
                   {item.title}
                 </p>
                 <MatchHint item={item} copy={copy} className="text-[10px] text-error-400 md:text-xs" />
                 {item.existingRequestId && (
-                  <span className="text-[10px] text-zinc-300 md:text-xs">
+                  <span data-el="card-meta" className="text-[10px] text-zinc-300 md:text-xs">
                     <span style={copy.style("alreadyRegistered")}>{copy("alreadyRegistered")}</span>
                   </span>
                 )}

@@ -39,27 +39,27 @@ export default function ArtistCard({
           <div className="w-full h-full bg-zinc-800" />
         )}
       </div>
-      <div className="text-base font-semibold text-zinc-100 group-hover:text-red-300 mb-2">
+      <div data-el="card-title" className="text-base font-semibold text-zinc-100 group-hover:text-red-300 mb-2">
         {artist?.user?.code ?? "-----"}
       </div>
       <div className="mt-2 flex flex-wrap gap-2 text-xs">
-        <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
+        <span data-el="card-meta" className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {toResumeName(artist?.categories?.at(0)?.faName)}
         </span>
         {genderText && (
-          <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
+          <span data-el="card-meta" className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
             {genderText}
           </span>
         )}
-        <span className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
+        <span data-el="card-meta" className="rounded-full bg-zinc-500 px-2 py-1 text-zinc-100 ring-1 ring-zinc-800">
           {cityText ?? ""}
         </span>
       </div>
-      <p className="mt-4 mb-3 line-clamp-2 text-sm leading-7 text-zinc-400">
+      <p data-el="card-text" className="mt-4 mb-3 line-clamp-2 text-sm leading-7 text-zinc-400">
         {artist?.answers?.aboutMe as string | undefined}
       </p>
       <div className="flex items-center justify-end">
-        <p className="text-error-500 font-p2-medium"><span style={copy.style("artistsCardCta")}>{copy("artistsCardCta")}</span></p>
+        <p data-el="card-link" className="text-error-500 font-p2-medium"><span style={copy.style("artistsCardCta")}>{copy("artistsCardCta")}</span></p>
         <ArrowLeft className="text-error-500 self-start mx-1.5" />
       </div>
     </Link>

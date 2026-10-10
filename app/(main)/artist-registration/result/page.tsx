@@ -107,8 +107,8 @@ function ResultContent() {
             <XCircle className="text-error-500" size={64} />
           )}
 
-          <p className="font-h4-bold">{title}</p>
-          <p className="font-p1-regular text-gray-600 whitespace-pre-line">{description}</p>
+          <p data-el="title" className="font-h4-bold">{title}</p>
+          <p data-el="body" className="font-p1-regular text-gray-600 whitespace-pre-line">{description}</p>
 
           <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto mt-3">
             <Button
@@ -118,7 +118,9 @@ function ResultContent() {
               isLoading={isRetrying}
               disabled={isRetrying}
             >
-              {isSuccess ? copy("successCta") : copy("failCta")}
+              <span data-el="button" style={copy.style(isSuccess ? "successCta" : "failCta")}>
+                {isSuccess ? copy("successCta") : copy("failCta")}
+              </span>
             </Button>
             <Button
               variant="outline"
@@ -126,7 +128,7 @@ function ResultContent() {
               isFullWidth={isMobile}
               onClick={() => router.push("/")}
             >
-              <span style={copy.style("homeCta")}>{copy("homeCta")}</span>
+              <span data-el="button" style={copy.style("homeCta")}>{copy("homeCta")}</span>
             </Button>
           </div>
         </div>

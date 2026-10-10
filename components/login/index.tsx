@@ -26,7 +26,7 @@ const LoginForm: FC = () => {
 
   return (
     <div className="w-full z-10">
-      <h3 className="w-full text-center font-h1-regular text-error-500 mb-2">
+      <h3 data-el="title" className="w-full text-center font-h1-regular text-error-500 mb-2">
         <span style={copy.style("brandName")}>{copy("brandName")}</span>
       </h3>
       {step === "phoneNumber" && <PhoneNumberStep {...StepsProps} />}

@@ -14,7 +14,7 @@ export default function LogoutCard() {
   const copy = useLandingCopy();
 
   return (
-    <ContentCard title={copy("profileLogoutTitle")}>
+    <ContentCard title={<span style={copy.style("profileLogoutTitle")}>{copy("profileLogoutTitle")}</span>}>
       <Button
         onClick={() => {
           logout();

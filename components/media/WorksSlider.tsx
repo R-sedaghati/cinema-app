@@ -94,7 +94,7 @@ export function WorksSlider({
                 />
               ) : (
                 <div className="grid h-full place-items-center text-xs font-semibold text-zinc-200">
-                  {variant === "photo" ? copy("artistWorkPhoto") : copy("artistWorkVideo")}
+                  <span style={copy.style(variant === "photo" ? "artistWorkPhoto" : "artistWorkVideo")}>{variant === "photo" ? copy("artistWorkPhoto") : copy("artistWorkVideo")}</span>
                 </div>
               )}
             </div>

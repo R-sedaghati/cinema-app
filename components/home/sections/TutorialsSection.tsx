@@ -61,7 +61,7 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
           />
         )}
       </div>
-      <p className="line-clamp-2 px-3 pb-3 text-xs font-medium text-zinc-100 md:text-sm">
+      <p data-el="card-title" className="line-clamp-2 px-3 pb-3 text-xs font-medium text-zinc-100 md:text-sm">
         {tutorial.title}
       </p>
     </Link>
@@ -72,12 +72,12 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
       <div
         className={`mb-3 flex items-center justify-between md:mb-4 ${isRail ? "px-4" : ""}`}
       >
-        <h2 className="text-sm font-semibold text-zinc-100 md:text-lg">
+        <h2 data-el="title" className="text-sm font-semibold text-zinc-100 md:text-lg">
           <span style={copy.style("tutorialsSectionTitle")}>
             {copy("tutorialsSectionTitle")}
           </span>
         </h2>
-        <Link href="/tutorials" className="text-xs text-error-500 md:text-sm">
+        <Link href="/tutorials" data-el="link" className="text-xs text-error-500 md:text-sm">
           <span style={copy.style("tutorialsSectionCta")}>
             {copy("tutorialsSectionCta")}
           </span>
@@ -101,7 +101,7 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
                   />
                 )}
               </div>
-              <p className="line-clamp-2 flex-1 text-xs font-medium text-zinc-100 md:text-sm">
+              <p data-el="card-title" className="line-clamp-2 flex-1 text-xs font-medium text-zinc-100 md:text-sm">
                 {tutorial.title}
               </p>
             </Link>
@@ -113,6 +113,7 @@ export function TutorialsSection({ variant = "grid" }: { variant?: string }) {
             <li key={tutorial.id} className="mb-1.5 break-inside-avoid">
               <Link
                 href="/tutorials"
+                data-el="card-title"
                 className="block truncate text-sm text-zinc-200 hover:text-error-400 md:text-base"
               >
                 {tutorial.title}

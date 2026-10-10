@@ -22,6 +22,8 @@ interface Props {
   onPrevious: () => void;
 }
 
+const LOCKED_HINT = "از حساب کاربری شما پر شده و در این فرم قابل تغییر نیست.";
+
 const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, lockedKeys, copy, onNext, onPrevious }) => {
   const store = useArtistRegistrationStore();
 
@@ -45,16 +47,27 @@ const DynamicFormStep: React.FC<Props> = ({ step, provinceKey, lockedKeys, copy,
           <p className="font-p2-medium text-gray-700">{step.description}</p>
         )}
 
-        {sortedFields.map((field) => (
-          <FieldRenderer
-            key={field.id}
-            field={field}
-            value={store.answers[field.key]}
-            provinceKey={provinceKey}
-            disabled={lockedKeys?.has(field.key)}
-            onChange={(value) => store.setAnswer(field.key, value)}
-          />
-        ))}
+        {sortedFields.map((field) => {
+          const locked = Boolean(lockedKeys?.has(field.key));
+          return (
+            <FieldRenderer
+              key={field.id}
+              // A read-only field with no word of why reads as broken; say where it comes from.
+              field={
+                locked
+                  ? {
+                      ...field,
+                      helpText: [field.helpText, LOCKED_HINT].filter(Boolean).join(" — "),
+                    }
+                  : field
+              }
+              value={store.answers[field.key]}
+              provinceKey={provinceKey}
+              disabled={locked}
+              onChange={(value) => store.setAnswer(field.key, value)}
+            />
+          );
+        })}
 
         <div className="flex justify-end gap-3 mt-5">
           <Button

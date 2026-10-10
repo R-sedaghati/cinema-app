@@ -64,7 +64,7 @@ export default function FormsList() {
   const items = data?.result ?? [];
 
   return (
-    <ContentCard title={copy("profileFormsTitle")}>
+    <ContentCard title={<span style={copy.style("profileFormsTitle")}>{copy("profileFormsTitle")}</span>}>
       {/* Mobile card list */}
       <div className="flex flex-col gap-3 md:hidden">
         {isPending &&
@@ -83,7 +83,7 @@ export default function FormsList() {
           ))}
 
         {!isPending && items.length === 0 && (
-          <p className="py-8 text-center text-sm text-zinc-500">
+          <p data-el="body" className="py-8 text-center text-sm text-zinc-500">
             <span style={copy.style("profileFormsEmpty")}>{copy("profileFormsEmpty")}</span>
           </p>
         )}
@@ -95,7 +95,7 @@ export default function FormsList() {
               className="rounded-2xl bg-zinc-900/70 border border-zinc-800/60 px-4 py-4 flex flex-col gap-3"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className="font-medium text-zinc-100 leading-snug">
+                <span data-el="card-title" className="font-medium text-zinc-100 leading-snug">
                   {formName(item) ||
                     `${item.user.firstName} ${item.user.lastName}`}
                 </span>

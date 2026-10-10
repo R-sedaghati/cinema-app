@@ -4,8 +4,9 @@ import {
   useUserProfile,
   useUserSiteContent,
 } from "@/lib/services/landing/hook";
-import { IUserCategoryResponse, IUserProfile } from "@/lib/services/landing/type";
-import { EFormFieldType, SyncToUserField } from "@/lib/services/admin/type";
+import { IUserCategoryResponse } from "@/lib/services/landing/type";
+import { EFormFieldType } from "@/lib/services/admin/type";
+import { isBlankAnswer, profilePrefillValue } from "@/lib/utils/profilePrefill";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
@@ -34,27 +35,6 @@ interface ArtistProps {
   onPrevious: () => void;
   onGoToStep: (step: number) => void;
 }
-
-/** Profile targets backed by a `users` column; any other target is a custom profile key. */
-const COLUMN_TARGETS = new Set(["firstName", "lastName", "email", "nationalCode"]);
-
-/**
- * The profile value a `syncToUserField` target prefills from, or `null` when there is
- * nothing safe to prefill. `avatar` is deliberately excluded: the profile exposes a
- * presigned URL while an IMAGE answer holds the storage key, so prefilling one would
- * write the URL back into `avatar_path` on submit. Avatar sync stays one-way, form → account.
- */
-const profileValue = (
-  profile: IUserProfile,
-  target: SyncToUserField,
-): unknown => {
-  if (target === "avatar") return null;
-  if (target === "phoneNumber") return profile.phone_number;
-  if (COLUMN_TARGETS.has(target)) return profile[target as keyof IUserProfile];
-
-  const value = profile.profileData?.[target];
-  return value === "" || (Array.isArray(value) && !value.length) ? null : value ?? null;
-};
 
 const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   category,
@@ -111,14 +91,17 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   // of what it already knows, so those answers start out prefilled from it. Running here
   // (rather than in ArtistRegistrationPageContent) means it also runs after edit-mode
   // hydration, so a hydrated answer is already in the store and wins below.
-  const syncedFields = useMemo(
+  // Unwired fields whose key names a profile value (`email`, `phone`, `fullName`, a custom
+  // profile key, …) are prefilled too, as an editable default — forms built before the
+  // form-builder link existed would otherwise start empty for a known account.
+  const prefillFields = useMemo(
     () =>
       steps
         .flatMap((step) => step.fields)
-        .filter((field) => field.syncToUserField)
         .map((field) => ({
           key: field.key,
-          target: field.syncToUserField as SyncToUserField,
+          source: field.syncToUserField || field.key,
+          synced: Boolean(field.syncToUserField),
         })),
     [steps],
   );
@@ -129,39 +112,41 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   const lockedKeys = useMemo(
     () =>
       new Set(
-        syncedFields
+        prefillFields
           .filter(
-            ({ target }) =>
-              target === "phoneNumber" ||
-              (profileData && profileValue(profileData, target)),
+            ({ source, synced }) =>
+              synced &&
+              (source === "phoneNumber" ||
+                (profileData && profilePrefillValue(profileData, source))),
           )
           .map(({ key }) => key),
       ),
-    [syncedFields, profileData],
+    [prefillFields, profileData],
   );
 
-  // The schema query refetches on an interval, so `syncedFields` gets a new identity
+  // The schema query refetches on an interval, so `prefillFields` gets a new identity
   // every 30s. Without this guard the effect re-fires and silently refills fields the
   // user deliberately cleared.
   const [prefilledFor, setPrefilledFor] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!profileData || !syncedFields.length) return;
+    if (!profileData || !prefillFields.length) return;
     if (prefilledFor === (category?.id ?? null)) return;
     setPrefilledFor(category?.id ?? null);
 
-    const { setAnswer } = useArtistRegistrationStore.getState();
+    const { answers, setAnswer } = useArtistRegistrationStore.getState();
 
-    for (const { key, target } of syncedFields) {
-      const value = profileValue(profileData, target);
+    for (const { key, source, synced } of prefillFields) {
+      const value = profilePrefillValue(profileData, source);
 
       if (!value) continue;
 
-      // A present profile value locks its field read-only, so it always wins — even over a
-      // hydrated draft carrying an older value the user could no longer edit.
-      setAnswer(key, value);
+      // A present synced value locks its field read-only, so it always wins — even over a
+      // hydrated draft carrying an older value the user could no longer edit. A key-matched
+      // default stays editable, so a draft or saved answer keeps priority over it.
+      if (synced || isBlankAnswer(answers[key])) setAnswer(key, value);
     }
-  }, [syncedFields, profileData, category?.id, prefilledFor]);
+  }, [prefillFields, profileData, category?.id, prefilledFor]);
 
   useEffect(() => {
     if (data && !hasChildren && flowStep === 0) {
@@ -182,7 +167,7 @@ const AtristRegistrationFlow: React.FC<ArtistProps> = ({
   const isPrefillPending =
     isProfileLoading ||
     (Boolean(profileData) &&
-      syncedFields.length > 0 &&
+      prefillFields.length > 0 &&
       prefilledFor !== (category?.id ?? null));
 
   if (isLoading || isSchemaLoading || isPrefillPending) {

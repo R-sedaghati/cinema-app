@@ -1,5 +1,5 @@
 import type { LandingCopyKey } from "./landingCopy";
-import type { IStyleField } from "../utils/sectionStyles.ts";
+import { textElements, type IStyleField } from "../utils/sectionStyles.ts";
 
 const T = "عنوان";
 const ST = "زیرعنوان";
@@ -99,6 +99,12 @@ export interface HomeSectionMeta {
   variants: { key: string; admin: string }[];
 }
 
+const TITLE: [string, string, string, boolean?] = ["عنوان بخش", "title", "[data-el=title]"];
+const LINK: [string, string, string, boolean?] = ["لینک «مشاهده همه»", "link", "[data-el=link]", true];
+const CARD_TITLE: [string, string, string, boolean?] = ["عنوان کارت", "card-title", "[data-el=card-title]", true];
+const CARD_TEXT: [string, string, string, boolean?] = ["متن کارت", "card-text", "[data-el=card-text]"];
+const CARD_META: [string, string, string, boolean?] = ["متن فرعی کارت", "card-meta", "[data-el=card-meta]"];
+
 const CATALOG = {
   bannerSlider: {
     hasCards: true,
@@ -108,6 +114,7 @@ const CATALOG = {
       { key: "filmstrip", admin: "نوار فیلم" },
     ],
     admin: "اسلایدر بنر",
+    styles: textElements([["عنوان اسلاید", "title", "[data-el=title]"], ["زیرعنوان اسلاید", "subtitle", "[data-el=subtitle]"], ["دکمه اسلاید", "button", "[data-el=button]"]]),
     fullBleed: true,
     copyKeys: [],
     manageLink: "/admin/sliders",
@@ -147,6 +154,7 @@ const CATALOG = {
     ],
     fullBleed: false,
     admin: "ویدیو اصلی",
+    styles: textElements([TITLE]),
     copyKeys: [],
     manageLink: "/admin/tutorials",
     manageLabel: "مدیریت آموزش‌ها",
@@ -162,6 +170,7 @@ const CATALOG = {
     ],
     fullBleed: false,
     admin: "میانبر ثبت‌نام هنرمند",
+    styles: textElements([TITLE, LINK, CARD_TITLE, CARD_TEXT]),
     copyKeys: ["homeRegistrationTitle", "homeRegistrationCta"],
   },
   artistGrid: {
@@ -175,6 +184,7 @@ const CATALOG = {
     ],
     fullBleed: false,
     admin: "لیست هنرمندان",
+    styles: textElements([TITLE, LINK, CARD_TITLE, CARD_TEXT, CARD_META]),
     copyKeys: ["homeArtistsTitle", "homeArtistsCta", "homeEmptyArtists"],
   },
   tutorials: {
@@ -187,6 +197,7 @@ const CATALOG = {
     ],
     fullBleed: false,
     admin: "بخش آموزش‌ها",
+    styles: textElements([TITLE, LINK, CARD_TITLE]),
     copyKeys: ["tutorialsSectionTitle", "tutorialsSectionCta"],
     manageLink: "/admin/tutorials",
     manageLabel: "مدیریت آموزش‌ها",
@@ -200,6 +211,7 @@ const CATALOG = {
     ],
     fullBleed: false,
     admin: "کارت‌های پشتیبانی، آموزش و سوالات",
+    styles: textElements([CARD_TITLE, CARD_TEXT]),
     copyKeys: [
       "homeSupportTitle",
       "homeSupportSubtitle",

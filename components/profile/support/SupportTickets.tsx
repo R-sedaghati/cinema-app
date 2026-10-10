@@ -72,10 +72,10 @@ function NewTicketForm({ onDone }: Readonly<{ onDone: () => void }>) {
       />
       <div className="flex gap-3 justify-end">
         <Button type="button" variant="text" onClick={onDone} disabled={isPending}>
-          {copy("profileSupportCancel")}
+          <span style={copy.style("profileSupportCancel")}>{copy("profileSupportCancel")}</span>
         </Button>
         <Button type="submit" isLoading={isPending} disabled={isPending} className="rounded-full!">
-          {copy("profileSupportSubmit")}
+          <span style={copy.style("profileSupportSubmit")}>{copy("profileSupportSubmit")}</span>
         </Button>
       </div>
     </form>
@@ -93,17 +93,17 @@ export default function SupportTickets() {
 
   if (typeof view === "number") {
     return (
-      <ContentCard title={copy("profileSupportTitle")}>
+      <ContentCard title={<span style={copy.style("profileSupportTitle")}>{copy("profileSupportTitle")}</span>}>
         <TicketThread id={view} onBack={() => setView("list")} />
       </ContentCard>
     );
   }
 
   return (
-    <ContentCard title={copy("profileSupportTitle")}>
+    <ContentCard title={<span style={copy.style("profileSupportTitle")}>{copy("profileSupportTitle")}</span>}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col md:flex-row gap-3 md:items-center justify-between">
-          <p className="text-sm leading-7 text-zinc-300">
+          <p data-el="body" className="text-sm leading-7 text-zinc-300">
             <span style={copy.style("profileSupportDesc")}>{copy("profileSupportDesc")}</span>
           </p>
           {view === "list" && (
@@ -112,7 +112,7 @@ export default function SupportTickets() {
               className="rounded-full! shrink-0 self-start md:self-auto"
               onClick={() => setView("new")}
             >
-              {copy("profileSupportNew")}
+              <span style={copy.style("profileSupportNew")}>{copy("profileSupportNew")}</span>
             </Button>
           )}
         </div>
@@ -133,7 +133,7 @@ export default function SupportTickets() {
               ))}
 
             {!isPending && items.length === 0 && (
-              <p className="py-8 text-center text-sm text-zinc-500">{copy("profileSupportEmpty")}</p>
+              <p data-el="body" className="py-8 text-center text-sm text-zinc-500"><span style={copy.style("profileSupportEmpty")}>{copy("profileSupportEmpty")}</span></p>
             )}
 
             {!isPending &&
@@ -145,8 +145,8 @@ export default function SupportTickets() {
                   className="text-start rounded-2xl bg-zinc-900/70 border border-zinc-800/60 hover:border-zinc-600 transition-colors px-4 py-4 flex items-center justify-between gap-3"
                 >
                   <div className="flex flex-col gap-2 min-w-0">
-                    <span className="text-sm text-zinc-100 truncate">{item.subject}</span>
-                    <span className="text-xs text-zinc-500">
+                    <span data-el="card-title" className="text-sm text-zinc-100 truncate">{item.subject}</span>
+                    <span data-el="card-meta" className="text-xs text-zinc-500">
                       #{item.id} · {convertGregorianTimeToShamsiTime(item.createdAt)}
                     </span>
                   </div>
@@ -163,7 +163,7 @@ export default function SupportTickets() {
                 className="text-sm self-center"
                 onClick={() => setPagination((state) => ({ ...state, count: state.count + 20 }))}
               >
-                {copy("actionMore")}
+                <span style={copy.style("actionMore")}>{copy("actionMore")}</span>
               </Button>
             )}
           </div>

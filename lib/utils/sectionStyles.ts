@@ -71,3 +71,17 @@ export function sectionCss(
   }
   return out.join("\n");
 }
+
+/** Font size (mobile/desktop) + color for one element, grouped under `group`.
+ *  `hover` adds a hover-color field. Keys: `${key}-size`, `${key}-color`, `${key}-hover`. */
+export const textFields = (group: string, key: string, sel: string, hover = false): IStyleField[] => [
+  { group, key: `${key}-size`, label: "اندازه فونت", type: "px", responsive: true, css: { [sel]: "font-size:$" } },
+  { group, key: `${key}-color`, label: "رنگ", type: "color", css: { [sel]: "color:$" } },
+  ...(hover
+    ? [{ group, key: `${key}-hover`, label: "رنگ هنگام هاور", type: "color" as const, css: { [`${sel}:hover`]: "color:$" } }]
+    : []),
+];
+
+/** `[label, key, selector, hover?]` rows → fields; the common shape of a styles catalog. */
+export const textElements = (rows: [string, string, string, boolean?][]): IStyleField[] =>
+  rows.flatMap(([group, key, sel, hover]) => textFields(group, key, sel, hover));

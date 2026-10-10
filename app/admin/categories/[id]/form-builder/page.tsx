@@ -28,6 +28,8 @@ import {
   fieldErrorMessage,
   parseOptions,
 } from "@/components/admin/form-builder/FieldEditor";
+import { ProfileLinkNotice, ProfileLinkSummary } from "@/components/admin/form-builder/ProfileLinkNotice";
+import { profileLinkIssues } from "@/lib/utils/profileLinkIssues";
 import { useQueryClient } from "@tanstack/react-query";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { Button, Card, Checkbox, Divider, Select } from "@dgshahr/ui-kit";
@@ -75,10 +77,12 @@ const GENDER_FIELD = {
 
 function FieldRow({
   field,
+  allFields,
   onChanged,
   ...drag
 }: {
   field: IFormField;
+  allFields: IFormField[];
   index: number;
   isDragging: boolean;
   showDropLine: boolean;
@@ -108,6 +112,11 @@ function FieldRow({
       field={field}
       onPatch={patch}
       onDelete={() => remove(field.id, { onSuccess: onChanged })}
+      notice={
+        <ProfileLinkNotice
+          issues={profileLinkIssues(field, allFields, profileFields?.result ?? null)}
+        />
+      }
       extraSelect={
         <Select
           inputProps={{ labelContent: "همگام‌سازی با پروفایل کاربر" }}
@@ -130,6 +139,7 @@ function FieldRow({
 
 function StepCard({
   step,
+  allFields,
   hasGender,
   isFirst,
   isLast,
@@ -143,6 +153,7 @@ function StepCard({
   onFieldDrop,
 }: {
   step: IFormStep;
+  allFields: IFormField[];
   hasGender: boolean;
   isFirst: boolean;
   isLast: boolean;
@@ -291,6 +302,7 @@ function StepCard({
             <FieldRow
               key={field.id}
               field={field}
+              allFields={allFields}
               index={index}
               isDragging={draggingFieldId === field.id}
               showDropLine={dropIndex === index}
@@ -381,6 +393,7 @@ function FormBuilder() {
   const { mutate: createStep } = useAdminCreateFormStep();
   const { mutate: updateStep } = useAdminUpdateFormStep();
   const { mutateAsync: updateField } = useAdminUpdateFormField();
+  const { data: profileFields } = useAdminProfileFields();
 
   const [newStepTitle, setNewStepTitle] = useState("");
   const [dragging, setDragging] = useState<{ fieldId: number; fromStepId: number } | null>(null);
@@ -402,6 +415,7 @@ function FormBuilder() {
   const steps = [...(schemaData?.result?.steps ?? [])].sort((a, b) => a.order - b.order);
   // `key` is form-wide, so the prebuilt gender field is offered only while no step holds one.
   const hasGender = steps.some((s) => s.fields.some((f) => f.key === GENDER_FIELD.key));
+  const allFields = steps.flatMap((s) => s.fields);
 
   const handleAddStep = () => {
     if (!newStepTitle.trim()) {
@@ -509,10 +523,13 @@ function FormBuilder() {
       <Divider className="mb-5" color="gray" size="thin" type="horizontal" />
 
       <div className="flex flex-col gap-5 pt-6 px-4 h-full bg-gray-100">
+        <ProfileLinkSummary fields={allFields} profileFields={profileFields?.result ?? null} />
+
         {steps.map((step, index) => (
           <StepCard
             key={step.id}
             step={step}
+            allFields={allFields}
             hasGender={hasGender}
             isFirst={index === 0}
             isLast={index === steps.length - 1}

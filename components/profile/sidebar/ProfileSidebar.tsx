@@ -157,11 +157,11 @@ export default function ProfileSidebar({
             </div>
           )}
           <div className="flex flex-col gap-2 items-start">
-            <h2 className="text-base text-zinc-100">{`${data?.firstName} ${data?.lastName}`}</h2>
+            <h2 data-el="title" className="text-base text-zinc-100">{`${data?.firstName} ${data?.lastName}`}</h2>
             <span dir="ltr" className="text-sm text-zinc-400">
               {data?.phone_number ?? ""}
             </span>
-            <p className="text-sm text-zinc-400 truncate">{data?.email}</p>
+            <p data-el="card-meta" className="text-sm text-zinc-400 truncate">{data?.email}</p>
             <SubscriptionBadge expiresAt={data?.subscriptionExpiresAt} />
           </div>
         </div>
