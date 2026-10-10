@@ -2,6 +2,7 @@
 
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { useUserSiteContent } from "@/lib/services/landing/hook";
+import BackLinkSection from "@/components/artist-registration/sections/BackLinkSection";
 import { textStyle } from "@/lib/utils/fontSize";
 
 export default function TermsPage() {
@@ -11,6 +12,7 @@ export default function TermsPage() {
 
   return (
     <div data-page className="relative mx-auto max-w-6xl px-4 py-10 text-right">
+      <BackLinkSection />
       <h3 data-el="title" className="text-4xl font-h1-regular mb-10">
         {terms?.title ?? copy("termsDefaultTitle")}
       </h3>
