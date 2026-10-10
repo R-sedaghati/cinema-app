@@ -17,3 +17,19 @@
   [data-pl-gap-d] [data-page-stack] { display: flex; flex-direction: column; gap: var(--pl-gap-d); }
   [data-pl-gap-d] [data-page-stack] > * { margin-block: 0; }
 }
+
+/* Home page (`components/home/HomeSections.tsx`): sections are full-width bands, so
+   the layout's width/sides apply inside each band and the gap becomes band padding —
+   a band's background then fills the whole section. Section padding (inline) still wins. */
+[data-pl-w] [data-home-inner] { max-width: var(--pl-w); }
+[data-pl-x] [data-home-inner] { padding-inline: var(--pl-x); }
+[data-pl-gap] [data-home-band]:not([data-bleed]) { padding-block: calc(var(--pl-gap) / 2); }
+[data-pl-t] [data-home-band]:first-child { padding-top: var(--pl-t); }
+[data-pl-b] [data-home-band]:last-child { padding-bottom: var(--pl-b); }
+
+@media (min-width: 768px) {
+  [data-pl-x-d] [data-home-inner] { padding-inline: var(--pl-x-d); }
+  [data-pl-gap-d] [data-home-band]:not([data-bleed]) { padding-block: calc(var(--pl-gap-d) / 2); }
+  [data-pl-t-d] [data-home-band]:first-child { padding-top: var(--pl-t-d); }
+  [data-pl-b-d] [data-home-band]:last-child { padding-bottom: var(--pl-b-d); }
+}

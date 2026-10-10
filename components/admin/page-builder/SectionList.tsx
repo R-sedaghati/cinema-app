@@ -8,12 +8,15 @@ import { VariantGlyph } from "./VariantGlyph";
 import { SpacingBox } from "@/components/admin/SpacingBox";
 import ColorInput from "@/components/admin/ColorInput";
 import { useAdminUploadBannerImage } from "@/lib/services/admin/hook";
+import type { IStyleField } from "@/lib/utils/sectionStyles";
+import { StyleFields } from "./StyleFields";
 
 /** The slice of a page's section catalog this list renders. */
 export interface ISectionListEntry {
   admin: string;
   variants: { key: string; admin: string }[];
   hasCards?: boolean;
+  styles?: IStyleField[];
 }
 
 interface ISizeField {
@@ -293,6 +296,14 @@ export function SectionList<K extends string>({
                     </label>
                   )}
                 </div>
+
+                {meta.styles && (
+                  <StyleFields
+                    fields={meta.styles}
+                    values={section.styles}
+                    onChange={(styles) => patch(section.key, { styles })}
+                  />
+                )}
 
                 {renderExtra?.(section.key)}
               </div>

@@ -15,19 +15,23 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
 
   if (variant === "tiles") {
     return (
-      <div data-card-grid className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
+      <div data-card-grid data-el="items" data-grid className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
         <button
           onClick={() => router.push("/artists")}
           data-card
+          data-el="item"
+          data-all
+          data-pad
           className="flex aspect-square flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900/60 text-xs font-medium text-zinc-300 transition-colors hover:border-error-500/40 md:text-sm"
         >
-          <span style={copy.style("homeAllLabel")}>{copy("homeAllLabel")}</span>
+          <span data-el="item-name" style={copy.style("homeAllLabel")}>{copy("homeAllLabel")}</span>
         </button>
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => router.push(`/artists?category=${cat.id}`)}
             data-card
+            data-el="item"
             className="group relative aspect-square overflow-hidden rounded-2xl"
           >
             <img
@@ -36,7 +40,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-black/10" />
-            <span className="absolute inset-x-0 bottom-0 p-2 text-xs font-medium text-zinc-100 md:text-sm">
+            <span data-el="item-name" data-pad className="absolute inset-x-0 bottom-0 p-2 text-xs font-medium text-zinc-100 md:text-sm">
               {toResumeName(cat.faName)}
             </span>
           </button>
@@ -47,22 +51,27 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
 
   return (
     <div className="overflow-x-auto md:overflow-visible scrollbar-hidden pb-1">
-      <div className="flex gap-2 w-max md:w-auto md:flex-wrap">
+      <div data-el="items" className="flex gap-2 w-max md:w-auto md:flex-wrap">
         <button
           onClick={() => router.push("/artists")}
+          data-el="item"
+          data-all
+          data-pad
           className="rounded-full px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
         >
-          <span style={copy.style("homeAllLabel")}>{copy("homeAllLabel")}</span>
+          <span data-el="item-name" style={copy.style("homeAllLabel")}>{copy("homeAllLabel")}</span>
         </button>
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => router.push(`/artists?category=${cat.id}`)}
+            data-el="item"
+            data-pad
             className="flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 md:px-5 md:py-2.5 text-xs md:text-sm font-medium transition-colors whitespace-nowrap bg-zinc-800 text-zinc-400 hover:text-zinc-200"
           >
-            <span>{toResumeName(cat.faName)}</span>
+            <span data-el="item-name">{toResumeName(cat.faName)}</span>
             {cat.description && (
-              <span className="text-[10px] md:text-xs font-normal text-zinc-500">
+              <span data-el="item-desc" className="text-[10px] md:text-xs font-normal text-zinc-500">
                 {cat.description}
               </span>
             )}

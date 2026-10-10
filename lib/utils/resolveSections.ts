@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { toStoragePath } from "./toStoragePath.ts";
+import { cleanStyles } from "./sectionStyles.ts";
 
 /** The stored shape of one section, as it lives in `SiteContent`. */
 export interface ISectionConfig {
@@ -25,6 +26,8 @@ export interface ISectionConfig {
   backgroundImage?: string;
   /** 0–90, % black over the image; absent = 50. */
   backgroundOverlay?: number;
+  /** Per-element style overrides, see `sectionStyles.ts`. */
+  styles?: Record<string, string>;
 }
 
 export interface IResolvedSection<K extends string> {
@@ -43,6 +46,7 @@ export interface IResolvedSection<K extends string> {
   background?: string;
   backgroundImage?: string;
   backgroundOverlay?: number;
+  styles?: Record<string, string>;
 }
 
 export const SIZE_KEYS = ["width", "height", "maxWidth", "minHeight", "cardWidth", "cardHeight"] as const;
@@ -165,12 +169,14 @@ export function orderedSections<K extends string>(
   for (const entry of config ?? []) {
     if (!entry || !isKnown(entry.key) || seen.has(entry.key)) continue;
     seen.add(entry.key);
+    const styles = cleanStyles(entry.styles);
     ordered.push({
       key: entry.key,
       hidden: entry.hidden === true,
       variant: resolveVariant(entry.key, entry.variant),
       ...sizesOf(entry),
       ...backgroundOf(entry),
+      ...(styles && { styles }),
     });
   }
 

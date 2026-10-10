@@ -391,10 +391,13 @@ interface SiteContent {
   // `background`: section bg color, strict `#rrggbb` (anything else dropped); absent = transparent.
   // `backgroundImage`: bare storage path on write (from `POST /admin/upload/image`), public URL on read;
   // `backgroundOverlay`: 0–90 % black over it (absent = 50), kept only with an image.
-  homeSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number }[] | null;
+  // `styles`: per-element overrides, `{ "title-size": "24", "title-size-md": "40", "item-bg": "#1a1a1a", "align": "center" }`.
+  // Keys kebab-case (`-md` suffix = desktop ≥768px), values `#rrggbb` | unsigned integer | `start|center|end`;
+  // anything else dropped. Which keys a section reads is the frontend catalog (`lib/constants/homeSections.ts`).
+  homeSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number; styles?: Record<string, string> }[] | null;
   // same, for the artist-registration page, keyed by
   // `lib/constants/registrationSections.ts` and set in `/admin/registration-builder`.
-  registrationSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number }[] | null;
+  registrationSections?: { key: string; hidden: boolean; variant?: string; width?: number; height?: number; maxWidth?: number; minHeight?: number; cardWidth?: number; cardHeight?: number; paddingTop?: number; paddingBottom?: number; paddingX?: number; background?: string; backgroundImage?: string; backgroundOverlay?: number; styles?: Record<string, string> }[] | null;
   // per-page backgrounds, set in `/admin/page-backgrounds`. Keyed by the frontend
   // catalog `lib/constants/pageBackgrounds.ts` (first path segment, `home` for `/`,
   // `default` for every page without its own entry). `color` is `#rrggbb`; `image`
