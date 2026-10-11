@@ -235,6 +235,12 @@ export function SectionList<K extends string>({
                   onChange={(color) => patch(section.key, { background: color ?? undefined })}
                 />
 
+                <ColorInput
+                  label="رنگ حاشیه بخش"
+                  value={section.borderColor}
+                  onChange={(color) => patch(section.key, { borderColor: color ?? undefined })}
+                />
+
                 <div className="flex flex-col gap-2">
                   <span className="text-sm">تصویر پس‌زمینه بخش</span>
                   <div className="flex items-center gap-3">
