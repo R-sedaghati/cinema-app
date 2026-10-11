@@ -101,12 +101,13 @@ test("section spacing keeps 0–200 (0 included) and becomes inline padding", ()
 
 test("section background keeps hex only and lands in the box style", () => {
   const [good, bad] = orderedSections({ a: { variants: [] }, b: { variants: [] } }, [
-    { key: "a", hidden: false, background: "#112233" },
-    { key: "b", hidden: false, background: "url(x)" },
+    { key: "a", hidden: false, background: "#112233", borderColor: "#445566" },
+    { key: "b", hidden: false, background: "url(x)", borderColor: "red;x" },
   ]);
   assert.equal(good.background, "#112233");
   assert.equal(bad.background, undefined);
-  assert.deepEqual(sectionBoxProps(good).style, { backgroundColor: "#112233" });
+  assert.equal(bad.borderColor, undefined);
+  assert.deepEqual(sectionBoxProps(good).style, { backgroundColor: "#112233", border: "1px solid #445566" });
 });
 
 test("section background image: quote-free URLs only, overlay layered, path on save", () => {
