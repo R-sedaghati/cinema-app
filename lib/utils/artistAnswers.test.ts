@@ -17,17 +17,17 @@ test("pickAnswer prefers the English convention key then Persian aliases", () =>
 });
 
 test("displayAnswer unwraps option objects and skips empties", () => {
-  assert.equal(displayAnswer({ label: "مرد", value: "MAN" }), "مرد");
+  assert.equal(displayAnswer({ label: "آقا", value: "MAN" }), "آقا");
   assert.equal(displayAnswer({ name: "تهران" }), "تهران");
   assert.equal(displayAnswer(""), undefined);
   assert.equal(displayAnswer(["a", "b"]), "a، b");
 });
 
 test("displayGender maps MAN/WOMAN and Persian labels", () => {
-  const labels = { man: "مرد", woman: "زن" };
-  assert.equal(displayGender("MAN", labels), "مرد");
-  assert.equal(displayGender("woman", labels), "زن");
-  assert.equal(displayGender("مرد", labels), "مرد");
-  assert.equal(displayGender({ value: "MAN", label: "مرد" }, labels), "مرد");
+  const labels = { man: "آقا", woman: "خانم" };
+  assert.equal(displayGender("MAN", labels), "آقا");
+  assert.equal(displayGender("woman", labels), "خانم");
+  assert.equal(displayGender("آقا", labels), "آقا");
+  assert.equal(displayGender({ value: "MAN", label: "آقا" }, labels), "آقا");
   assert.equal(displayGender(undefined, labels), undefined);
 });
