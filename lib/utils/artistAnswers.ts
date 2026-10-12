@@ -54,8 +54,9 @@ export const displayGender = (
   const raw = displayAnswer(value);
   if (!raw) return undefined;
   const upper = raw.trim().toUpperCase();
-  if (upper === "MAN" || upper === "MALE" || raw === "مرد") return labels.man;
-  if (upper === "WOMAN" || upper === "FEMALE" || raw === "زن")
+  if (upper === "MAN" || upper === "MALE" || raw === "آقا" || raw === "مرد")
+    return labels.man;
+  if (upper === "WOMAN" || upper === "FEMALE" || raw === "خانم" || raw === "زن")
     return labels.woman;
   return raw;
 };

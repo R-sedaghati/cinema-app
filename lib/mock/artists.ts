@@ -1,1 +1,1 @@
-export type Gender = "زن" | "مرد" | "سایر";
+export type Gender = "خانم" | "آقا" | "سایر";

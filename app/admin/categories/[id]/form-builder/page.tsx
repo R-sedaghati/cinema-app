@@ -70,8 +70,8 @@ const GENDER_FIELD = {
   label: "جنسیت",
   type: EFormFieldType.RADIO,
   options: [
-    { label: "مرد", value: EArtistGender.MAN },
-    { label: "زن", value: EArtistGender.WOMAN },
+    { label: "آقا", value: EArtistGender.MAN },
+    { label: "خانم", value: EArtistGender.WOMAN },
   ],
 };
 

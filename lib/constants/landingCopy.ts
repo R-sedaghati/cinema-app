@@ -240,8 +240,8 @@ export const LANDING_COPY = {
   labelLoading: { group: "فیلدهای مشترک", admin: "متن در حال بارگذاری", value: "در حال بارگذاری..." },
   labelFree: { group: "فیلدهای مشترک", admin: "متن رایگان", value: "رایگان" },
   labelCurrency: { group: "فیلدهای مشترک", admin: "واحد پول", value: "تومان" },
-  labelGenderMan: { group: "فیلدهای مشترک", admin: "جنسیت مرد", value: "مرد" },
-  labelGenderWoman: { group: "فیلدهای مشترک", admin: "جنسیت زن", value: "زن" },
+  labelGenderMan: { group: "فیلدهای مشترک", admin: "جنسیت آقا", value: "آقا" },
+  labelGenderWoman: { group: "فیلدهای مشترک", admin: "جنسیت خانم", value: "خانم" },
   saveSuccess: { group: "فیلدهای مشترک", admin: "پیام ذخیره موفق", value: "با موفقیت تغییر کرد" },
 
   // --- جستجوی هنرمندان (فیلترها) ---

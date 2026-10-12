@@ -719,8 +719,8 @@ export interface ISiteContent {
   tableColors?: ITableColors | null;
   /** Per-file upload caps in MB; the API always returns both, defaults filled in. */
   uploadLimits?: IUploadLimits | null;
-  /** Public URLs on read, storage paths on write; absent = shipped logo/favicon. */
-  branding?: { logo?: string; favicon?: string } | null;
+  /** Public URLs on read, storage paths on write; absent = shipped logo/favicon/app icon. */
+  branding?: { logo?: string; favicon?: string; appIcon?: string } | null;
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;
