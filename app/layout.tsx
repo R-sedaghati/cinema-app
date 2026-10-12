@@ -9,10 +9,12 @@ export const metadata: Metadata = {
   title: "آرشیو هنر",
   description: "آرشیو هنر",
   // Backend redirects to the admin-uploaded favicon, else public/favicon-default.ico.
-  icons: { icon: "/api/favicon", apple: "/api/favicon" },
+  icons: { icon: "/api/favicon", apple: "/api/app-icon" },
+  appleWebApp: { capable: true, title: "آرشیو هنر", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
+  themeColor: "#d89a2b",
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,

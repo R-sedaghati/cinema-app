@@ -429,8 +429,8 @@ interface SiteContent {
   tableColors?: { headerBg?: string; headerText?: string; rowBg?: string; rowText?: string; border?: string } | null;
   uploadLimits: { imageMb: number; videoMb: number }; // per-file caps in MB (defaults 10/100, max 200); enforced by /user/avatar and /user/upload/* (413 when exceeded)
   // Admin-uploaded logo/favicon: public URLs on read, storage paths on write (upload via
-  // POST /admin/upload/image). Absent key = shipped `/assets/images/logo.svg` / `/favicon-default.ico`.
-  branding: { logo?: string; favicon?: string };
+  // POST /admin/upload/image). Absent key = shipped `/assets/images/logo.svg` / `/favicon-default.ico` / `/app-icon-default.png`.
+  branding: { logo?: string; favicon?: string; appIcon?: string };
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -1831,6 +1831,9 @@ Update about-us text.
 
 ### `GET /favicon`
 302 to the admin-uploaded favicon URL, else to `/favicon-default.ico`. `Cache-Control: public, max-age=300`. Used as `<link rel="icon">` by the root layout.
+
+### `GET /app-icon`
+302 to the admin-uploaded PWA app icon (`branding.appIcon`), else to `/app-icon-default.png`. `Cache-Control: public, max-age=300`. Used by `app/manifest.ts` and as `apple-touch-icon`.
 
 ### `GET /admin/site-content/`
 Get site-content (see `GET /site-content/` above for shape). Admin auth.

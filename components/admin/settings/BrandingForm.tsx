@@ -12,11 +12,12 @@ import {
 } from "@/lib/services/admin/hook";
 import { toStoragePath } from "@/lib/utils/toStoragePath";
 
-type Slot = "logo" | "favicon";
+type Slot = "logo" | "favicon" | "appIcon";
 
 const SLOTS: { key: Slot; label: string; fallback: string }[] = [
   { key: "logo", label: "لوگو (هدر، فوتر و پنل ادمین)", fallback: "/assets/images/logo.svg" },
   { key: "favicon", label: "آیکون تب مرورگر (favicon)", fallback: "/favicon-default.ico" },
+  { key: "appIcon", label: "آیکون اپ نصبی (PWA) — PNG مربع ۵۱۲×۵۱۲", fallback: "/app-icon-default.png" },
 ];
 
 const TYPES = ["image/png", "image/svg+xml", "image/webp", "image/jpeg", "image/x-icon", "image/vnd.microsoft.icon"];
@@ -38,10 +39,16 @@ const BrandingForm = () => {
     if (saved) setBranding(saved);
   }, [saved]);
 
-  const handleFile = (key: Slot, file?: File) => {
+  const handleFile = async (key: Slot, file?: File) => {
     if (!file) return;
     if (!TYPES.includes(file.type)) return toast.error("فرمت مجاز: PNG، SVG، WEBP، JPG، ICO");
     if (file.size > MAX_BYTES) return toast.error("حداکثر حجم ۱ مگابایت است");
+    // Browsers refuse to install the PWA with a non-square or small icon.
+    if (key === "appIcon") {
+      if (file.type !== "image/png") return toast.error("آیکون اپ باید PNG باشد");
+      const { width, height } = await createImageBitmap(file);
+      if (width !== height || width < 192) return toast.error("آیکون اپ باید مربع و حداقل ۱۹۲ پیکسل باشد (۵۱۲ پیشنهادی)");
+    }
 
     setUploading(key);
     upload(file, {
