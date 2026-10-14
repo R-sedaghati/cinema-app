@@ -1,4 +1,4 @@
-package com.archive.cinema;
+package ir.archive.honar;
 
 import com.getcapacitor.BridgeActivity;
 

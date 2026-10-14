@@ -14,7 +14,7 @@ No test suite configured.
 
 ## Architecture
 
-**Next.js 16 App Router** project for ArchiveHonar — a cinema artists registry. Persian/RTL UI (`lang="fa" dir="rtl"`). Capacitor configured for mobile (`com.archive.cinema`).
+**Next.js 16 App Router** project for ArchiveHonar — a cinema artists registry. Persian/RTL UI (`lang="fa" dir="rtl"`). Capacitor configured for mobile (`ir.archive.honar`).
 
 ### Route structure
 
@@ -27,10 +27,10 @@ Two separate route trees with separate layouts:
 
 Two Axios instances with separate auth:
 
-| File | Instance | Auth store | Used by |
-|------|----------|------------|---------|
-| `landingAxiosInstance.ts` | `landingApi` | `useAuthStore` | landing/* |
-| `axiosInstance.ts` | `api` (admin) | `useAdminAuthStore` | admin/* |
+| File                      | Instance      | Auth store          | Used by    |
+| ------------------------- | ------------- | ------------------- | ---------- |
+| `landingAxiosInstance.ts` | `landingApi`  | `useAuthStore`      | landing/\* |
+| `axiosInstance.ts`        | `api` (admin) | `useAdminAuthStore` | admin/\*   |
 
 Each domain (`landing/`, `admin/`) has three files: `api.ts` (raw functions), `hook.ts` (TanStack Query wrappers), `type.ts` (TypeScript types).
 
