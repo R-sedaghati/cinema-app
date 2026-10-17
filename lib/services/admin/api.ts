@@ -32,6 +32,9 @@ import {
   ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
+  IShortLinkItem,
+  IShortLinkListResponse,
+  IShortLinkPayload,
   IFormFieldRetrieveResponse,
   IProfileField,
   IProfileFieldRequest,
@@ -1062,5 +1065,51 @@ export const adminProfileUpdate = async (
     payload,
     { headers: { Authorization: accessToken } },
   );
+  return data;
+};
+
+// ponytail: one page of 50 (backend max); add paging if links ever outgrow it.
+export const adminShortLinkList = async (accessToken: string) => {
+  const { data } = await api.get<IShortLinkListResponse>("/admin/short-links", {
+    params: { count: 50 },
+    headers: { Authorization: accessToken },
+  });
+
+  return data;
+};
+
+export const adminShortLinkCreate = async (
+  payload: IShortLinkPayload,
+  accessToken: string,
+) => {
+  const { data } = await api.post<IRetriveResponse<IShortLinkItem>>(
+    "/admin/short-links",
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminShortLinkUpdate = async (
+  id: number,
+  payload: IShortLinkPayload,
+  accessToken: string,
+) => {
+  const { data } = await api.patch<IRetriveResponse<IShortLinkItem>>(
+    `/admin/short-links/${id}`,
+    payload,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
+export const adminShortLinkDelete = async (id: number, accessToken: string) => {
+  const { data } = await api.delete<IRetriveResponse<null>>(
+    `/admin/short-links/${id}`,
+    { headers: { Authorization: accessToken } },
+  );
+
   return data;
 };

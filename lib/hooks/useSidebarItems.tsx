@@ -22,6 +22,7 @@ import {
   FileText,
   Receipt,
   UserCog,
+  Link,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -174,6 +175,12 @@ export const useSidebarItems = (): {
         title: "مدیریت آموزش‌ها",
         link: "/admin/tutorials",
         active: pathname.startsWith("/admin/tutorials"),
+      },
+      {
+        icon: <Link />,
+        title: "لینک‌های کوتاه",
+        link: "/admin/short-links",
+        active: pathname.startsWith("/admin/short-links"),
       },
       {
         icon: <MessageSquare />,

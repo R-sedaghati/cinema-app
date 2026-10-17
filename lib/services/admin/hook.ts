@@ -37,6 +37,8 @@ import {
   ICreateFormStepRequest,
   IFaqItem,
   IFaqListResponse,
+  IShortLinkListResponse,
+  IShortLinkPayload,
   IFormSchemaRetrieveResponse,
   IProvinceListResponse,
   IRetriveResponse,
@@ -104,6 +106,10 @@ import {
   adminFaqDelete,
   adminFaqList,
   adminFaqUpdate,
+  adminShortLinkList,
+  adminShortLinkCreate,
+  adminShortLinkUpdate,
+  adminShortLinkDelete,
   adminGetFormSchema,
   adminLogin,
   adminProvinceList,
@@ -1003,5 +1009,43 @@ export const useAdminProfileUpdate = () => {
     mutationFn: (payload: IUpdateAdminProfileRequest) =>
       adminProfileUpdate(payload, accessToken),
     onSuccess: (response) => queryClient.setQueryData(["adminProfile"], response),
+  });
+};
+
+export const useAdminShortLinkList = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useQuery<IShortLinkListResponse>({
+    queryKey: ["adminShortLinkList"],
+    queryFn: () => adminShortLinkList(accessToken),
+    refetchInterval: 30 * 1000,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// Create when id is null, otherwise update.
+export const useAdminShortLinkSave = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...payload }: IShortLinkPayload & { id: number | null }) =>
+      id === null
+        ? adminShortLinkCreate(payload, accessToken)
+        : adminShortLinkUpdate(id, payload, accessToken),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["adminShortLinkList"] }),
+  });
+};
+
+export const useAdminShortLinkDelete = () => {
+  const { accessToken } = useAdminAuthStore();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => adminShortLinkDelete(id, accessToken),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["adminShortLinkList"] }),
   });
 };

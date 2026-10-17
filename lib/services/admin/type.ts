@@ -1059,3 +1059,14 @@ export interface IAdminPayment {
   /** The ui-kit Table constrains its row type to an index-signature record. */
   [key: string]: unknown;
 }
+
+export interface IShortLinkItem {
+  id: number;
+  slug: string;
+  targetUrl: string;
+  createdAt: string | null;
+}
+
+export type IShortLinkListResponse = IBasePaginateResponse<IShortLinkItem>;
+
+export type IShortLinkPayload = Pick<IShortLinkItem, "slug" | "targetUrl">;
