@@ -342,6 +342,13 @@ List FAQs.
 
 ---
 
+### `GET /short-links/:slug/`
+Resolve a short link. Used server-side by `app/[slug]/page.tsx`, which redirects `archivehonar.ir/<slug>` to the target.
+
+**Response:** `ApiResponse<{ targetUrl: string }>` · 404 if unknown
+
+---
+
 ### `GET /about-us/`
 Get about-us content.
 
@@ -1758,6 +1765,40 @@ data and they are the money audit trail.
 
 **Response:** `ApiResponse<null>` — `400` if there is no such live user, `403` if the
 caller is not a super admin.
+
+---
+
+### `GET /admin/short-links/`
+List short links, newest first. Paginated (`count` ≤ 50).
+
+**Response:** `ApiResponse<ShortLink[]>` where `ShortLink = { id, slug, targetUrl, createdAt, updatedAt }`
+
+---
+
+### `POST /admin/short-links/`
+Create short link.
+
+**Body:**
+```json
+{ "slug": "festival-2026", "targetUrl": "https://example.com" }
+```
+`slug`: lowercased, `a-z 0-9 -`, 1-64 chars, not a reserved top-level path (`admin`, `artists`, `faq`, … see `backend/services/shortLink.ts`). `targetUrl`: `http(s)://…` or a path starting `/`. Invalid → 400 `invalid slug…`/`invalid targetUrl…`; taken → 400 `slug already exists`.
+
+**Response:** `ApiResponse<ShortLink>` (201)
+
+---
+
+### `PATCH /admin/short-links/:id/`
+Update short link. Same validation as create.
+
+**Body:** `{ slug?: string; targetUrl?: string }`
+
+**Response:** `ApiResponse<ShortLink>`
+
+---
+
+### `DELETE /admin/short-links/:id/`
+Delete short link (hard delete; slug becomes reusable).
 
 ---
 
