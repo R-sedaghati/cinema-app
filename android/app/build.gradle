@@ -10,7 +10,7 @@ android {
     namespace = "ir.archive.honar"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "ir.archive.honar"
+        applicationId "com.archive.cinema"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2
