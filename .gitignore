@@ -9,6 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+# pnpm only — no npm lockfile
+/package-lock.json
 
 /backend
 # testing
