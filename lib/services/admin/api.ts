@@ -832,6 +832,19 @@ export const adminUploadBannerImage = async (
   return data;
 };
 
+/** Download-page app file (apk/aab/ipa), sent as-is. */
+export const adminUploadFile = async (file: File, accessToken: string) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post<{ path: string; url?: string }>(
+    "/admin/upload/file",
+    form,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
 export const adminTutorialList = async (
   params: Partial<ParamsTutorialList> | undefined,
   accessToken: string,

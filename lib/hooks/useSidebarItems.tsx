@@ -23,6 +23,7 @@ import {
   Receipt,
   UserCog,
   Link,
+  Download,
 } from "lucide-react";
 
 type SidebarChild = {
@@ -139,6 +140,12 @@ export const useSidebarItems = (): {
         title: "صفحه‌ساز صفحه پشتیبانی",
         link: "/admin/support-builder",
         active: pathname.startsWith("/admin/support-builder"),
+      },
+      {
+        icon: <Download />,
+        title: "صفحه‌ساز صفحه دانلود اپ",
+        link: "/admin/download-builder",
+        active: pathname.startsWith("/admin/download-builder"),
       },
       {
         icon: <UserCog />,

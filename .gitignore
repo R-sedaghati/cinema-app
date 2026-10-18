@@ -25,6 +25,7 @@
 
 # misc
 .DS_Store
+assets/logo-source.png
 *.pem
 
 # debug

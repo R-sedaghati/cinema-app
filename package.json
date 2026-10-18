@@ -9,6 +9,7 @@
     "lint": "eslint",
     "cap:sync": "npx cap sync",
     "cap:android": "npx cap open android",
+    "cap:icons": "python3 scripts/generate-android-icons.py",
     "test": "node --experimental-transform-types --test \"lib/**/*.test.ts\""
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/qs": "^6.15.1",
