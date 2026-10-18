@@ -438,6 +438,29 @@ interface SiteContent {
   // Admin-uploaded logo/favicon: public URLs on read, storage paths on write (upload via
   // POST /admin/upload/image). Absent key = shipped `/assets/images/logo.svg` / `/favicon-default.ico` / `/app-icon-default.png`.
   branding: { logo?: string; favicon?: string; appIcon?: string };
+  // `/download` page built in `/admin/download-builder`. Image/iconImage/backgroundImage/file are
+  // storage paths on write (from POST /admin/upload/image or /admin/upload/file; echoed URLs are
+  // stripped back to paths), public URLs on read. Colors `#rrggbb`, sizes px integers; invalid
+  // values dropped (backend `services/downloadPage.ts`). `href` only http(s), `/path`, tel:, mailto:,
+  // intent://, bazaar://, myket://, market://. Max 30 sections × 30 elements.
+  // Sections and every element also take `variant?: string` (`^[a-z-]{1,20}$`), a preset look key from
+  // frontend `lib/constants/downloadVariants.ts`; unknown/absent = the default look.
+  downloadPage: {
+    sections: {
+      id: string; hidden?: boolean; layout: "column" | "row"; align?: "start" | "center" | "end";
+      gap?: number; paddingY?: number; paddingX?: number; radius?: number; // 0–200
+      maxWidth?: number; // 320–2400
+      background?: string; borderColor?: string; borderWidth?: number; // 0–20
+      backgroundImage?: string; backgroundOverlay?: number; // 0–90
+      elements: (
+        | { id: string; type: "heading" | "text"; text: string; fontSize?: number; color?: string; weight?: number; align?: "start" | "center" | "end" }
+        | { id: string; type: "image"; image: string; width?: number; radius?: number; href?: string }
+        | { id: string; type: "button"; label: string; icon?: string /* DOWNLOAD_ICONS key */; iconImage?: string;
+            href?: string; file?: string /* wins over href */; fontSize?: number; color?: string; background?: string;
+            borderColor?: string; borderWidth?: number; radius?: number; paddingX?: number; paddingY?: number; fullWidth?: boolean }
+      )[];
+    }[];
+  };
   // field definition of the support contact form; null/absent = the default
   // form in `lib/constants/contactForm.ts`
   contactForm?: {
@@ -1884,7 +1907,7 @@ Get site-content (see `GET /site-content/` above for shape). Admin auth.
 ---
 
 ### `PATCH /admin/site-content/:id/`
-Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`, `branding`) may be sent independently; unspecified keys are left unchanged.
+Partial update of site-content. Single row, `id` hardcoded to `1`. Any top-level key (`benefits`, `support`, `terms`, `footer`, `landing`, `contactForm`, `resumeRequestForm`, `uploadLimits`, `branding`, `downloadPage`) may be sent independently; unspecified keys are left unchanged.
 
 **Body:** `Partial<Omit<SiteContent, "id">>`
 
@@ -1961,6 +1984,20 @@ Upload a banner image. **Auth required.** `multipart/form-data`
 ```
 
 `url` is for previewing before save only. The returned `path` is sent back in the `image` field of `POST`/`PATCH /admin/banners/`; it's resolved to a full URL when the banner is read via `GET /banners/` or `GET /admin/banners/:id/`.
+
+---
+
+### `POST /admin/upload/file`
+Upload an app package for the download page. **Auth required.** `multipart/form-data`
+
+**Form field:** `file` — `.apk`, `.aab` or `.ipa` only (400 otherwise); up to 200MB.
+
+**Response:**
+```json
+{ "path": "downloads/{uuid}.{ext}", "url": "https://storage.archivehonar.ir/downloads/{uuid}.{ext}" }
+```
+
+Send `path` (or `url`) in a `downloadPage` button's `file` field.
 
 ---
 

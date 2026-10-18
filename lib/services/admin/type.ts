@@ -721,6 +721,73 @@ export interface ISiteContent {
   uploadLimits?: IUploadLimits | null;
   /** Public URLs on read, storage paths on write; absent = shipped logo/favicon/app icon. */
   branding?: { logo?: string; favicon?: string; appIcon?: string } | null;
+  /** Admin-built `/download` page; image/icon/file fields are URLs on read, paths on write. */
+  downloadPage?: IDownloadPage | null;
+}
+
+export type DownloadAlign = "start" | "center" | "end";
+
+/** Colors `#rrggbb`, sizes px; absent = the renderer's default. */
+export type IDownloadElement =
+  | {
+      id: string;
+      type: "heading" | "text";
+      /** Preset look key (`TEXT_VARIANTS`); unknown = plain. */
+      variant?: string;
+      text: string;
+      fontSize?: number;
+      color?: string;
+      weight?: number;
+      align?: DownloadAlign;
+    }
+  | { id: string; type: "image"; image: string; variant?: string; width?: number; radius?: number; href?: string }
+  | {
+      id: string;
+      type: "button";
+      label: string;
+      /** Preset look key (`BUTTON_VARIANTS`); unknown = filled. */
+      variant?: string;
+      /** Key of `DOWNLOAD_ICONS`. */
+      icon?: string;
+      iconImage?: string;
+      href?: string;
+      /** Uploaded app file; wins over `href`. */
+      file?: string;
+      fontSize?: number;
+      color?: string;
+      background?: string;
+      borderColor?: string;
+      borderWidth?: number;
+      radius?: number;
+      paddingX?: number;
+      paddingY?: number;
+      fullWidth?: boolean;
+    };
+
+export type DownloadElementType = IDownloadElement["type"];
+
+export interface IDownloadSection {
+  id: string;
+  hidden?: boolean;
+  /** Preset look key (`SECTION_VARIANTS`); unknown = plain. `split` = two columns. */
+  variant?: string;
+  layout: "column" | "row";
+  align?: DownloadAlign;
+  gap?: number;
+  paddingY?: number;
+  paddingX?: number;
+  radius?: number;
+  maxWidth?: number;
+  background?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  backgroundImage?: string;
+  backgroundOverlay?: number;
+  elements: IDownloadElement[];
+}
+
+export interface IDownloadPage {
+  sections: IDownloadSection[];
 }
 
 export type ISiteContentResponse = IRetriveResponse<ISiteContent>;

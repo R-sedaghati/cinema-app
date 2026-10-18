@@ -143,6 +143,7 @@ import {
   adminUpdateFormField,
   adminUpdateFormStep,
   adminUploadBannerImage,
+  adminUploadFile,
   adminUploadTutorialThumbnail,
   adminUserRequest,
   adminUserDetail,
@@ -827,6 +828,14 @@ export const useAdminUploadBrandImage = () => {
 
   return useMutation({
     mutationFn: (file: File) => adminUploadBannerImage(file, accessToken, true),
+  });
+};
+
+export const useAdminUploadFile = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (file: File) => adminUploadFile(file, accessToken),
   });
 };
 
