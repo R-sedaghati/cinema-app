@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import type { CSSProperties } from "react";
-import type { DownloadAlign, IDownloadElement, IDownloadPage, IDownloadSection } from "@/lib/services/admin/type";
+import type { DownloadAlign, DownloadDevice, IDownloadElement, IDownloadPage, IDownloadSection } from "@/lib/services/admin/type";
 import { DOWNLOAD_ICONS } from "@/lib/constants/downloadIcons";
 import {
   BUTTON_VARIANTS,
@@ -12,12 +12,21 @@ import {
 
 const FLEX: Record<DownloadAlign, string> = { start: "flex-start", center: "center", end: "flex-end" };
 
+/** Device-only visibility, by the page container's width (768px) rather than the
+ *  viewport, so the builder's fixed-width preview box shows the right result. */
+const DEVICE_CLASS: Record<DownloadDevice, string> = {
+  mobile: "@3xl/page:hidden",
+  desktop: "@max-3xl/page:hidden",
+};
+const deviceClass = (device?: DownloadDevice) => (device ? DEVICE_CLASS[device] : "");
+
 const px = (value?: number) => (value === undefined ? undefined : `${value}px`);
 
 const border = (width?: number, color?: string): CSSProperties =>
   color || width ? { border: `${width ?? 1}px solid ${color ?? "currentColor"}` } : {};
 
 function Element({ element, align }: { element: IDownloadElement; align: DownloadAlign }) {
+  const shown = deviceClass(element.device);
   switch (element.type) {
     case "heading":
     case "text": {
@@ -26,7 +35,7 @@ function Element({ element, align }: { element: IDownloadElement; align: Downloa
       const size = variant.size ?? (element.type === "heading" ? "text-3xl" : "text-base");
       return (
         <Tag
-          className={`w-full whitespace-pre-line ${size} ${element.type === "heading" ? "font-extrabold" : "leading-8"} ${variant.className}`}
+          className={`w-full whitespace-pre-line ${shown} ${size} ${element.type === "heading" ? "font-extrabold" : "leading-8"} ${variant.className}`}
           style={{
             fontSize: px(element.fontSize),
             color: element.color,
@@ -44,11 +53,11 @@ function Element({ element, align }: { element: IDownloadElement; align: Downloa
         <img
           src={element.image}
           alt=""
-          className={`block h-auto max-w-full ${variantOf(IMAGE_VARIANTS, element.variant).className}`}
+          className={`block h-auto max-w-full ${element.href ? "" : shown} ${variantOf(IMAGE_VARIANTS, element.variant).className}`}
           style={{ width: px(element.width), borderRadius: px(element.radius) }}
         />
       );
-      return element.href ? <a href={element.href}>{img}</a> : img;
+      return element.href ? <a href={element.href} className={shown}>{img}</a> : img;
     }
     case "button": {
       const href = element.file ?? element.href;
@@ -60,7 +69,7 @@ function Element({ element, align }: { element: IDownloadElement; align: Downloa
           download={element.file ? "" : undefined}
           target={external ? "_blank" : undefined}
           rel={external ? "noopener noreferrer" : undefined}
-          className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-bold transition hover:opacity-90 ${variantOf(BUTTON_VARIANTS, element.variant).className} ${element.fullWidth ? "w-full" : ""}`}
+          className={`${shown} inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-bold transition hover:opacity-90 ${variantOf(BUTTON_VARIANTS, element.variant).className} ${element.fullWidth ? "w-full" : ""}`}
           style={{
             fontSize: px(element.fontSize),
             color: element.color,
@@ -90,7 +99,7 @@ function Section({ section }: { section: IDownloadSection }) {
 
   return (
     <section
-      className={`@container mx-auto w-full max-w-[960px] overflow-hidden px-4 py-8 ${variant.className}`}
+      className={`${deviceClass(section.device)} @container mx-auto w-full max-w-[960px] overflow-hidden px-4 py-8 ${variant.className}`}
       style={{
         maxWidth: px(section.maxWidth),
         paddingBlock: px(section.paddingY),
@@ -129,14 +138,24 @@ export function DownloadSections({ page }: { page?: IDownloadPage | null }) {
   const sections = (page?.sections ?? []).filter((s) => !s.hidden);
 
   if (!sections.length) {
+    // ponytail: empty page ignores `device` — nothing to hide.
     return <p className="py-20 text-center text-gray-400">به‌زودی لینک دانلود اپلیکیشن اینجا قرار می‌گیرد.</p>;
   }
 
+  const device = page?.device;
+
   return (
-    <div className="flex flex-col gap-6 py-6">
-      {sections.map((section) => (
-        <Section key={section.id} section={section} />
-      ))}
+    <div className="@container/page">
+      <div className={`flex flex-col gap-6 py-6 ${deviceClass(device)}`}>
+        {sections.map((section) => (
+          <Section key={section.id} section={section} />
+        ))}
+      </div>
+      {device && (
+        <p className={`py-20 text-center text-gray-400 ${deviceClass(device === "mobile" ? "desktop" : "mobile")}`}>
+          {device === "mobile" ? "این صفحه را در موبایل باز کنید." : "این صفحه را در کامپیوتر باز کنید."}
+        </p>
+      )}
     </div>
   );
 }

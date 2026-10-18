@@ -445,7 +445,10 @@ interface SiteContent {
   // intent://, bazaar://, myket://, market://. Max 30 sections × 30 elements.
   // Sections and every element also take `variant?: string` (`^[a-z-]{1,20}$`), a preset look key from
   // frontend `lib/constants/downloadVariants.ts`; unknown/absent = the default look.
+  // The page, sections and every element also take `device?: "mobile" | "desktop"` (show only below /
+  // from 768px; absent = everywhere). A page-level device shows a short notice on the other device.
   downloadPage: {
+    device?: "mobile" | "desktop";
     sections: {
       id: string; hidden?: boolean; layout: "column" | "row"; align?: "start" | "center" | "end";
       gap?: number; paddingY?: number; paddingX?: number; radius?: number; // 0–200

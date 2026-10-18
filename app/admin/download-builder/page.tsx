@@ -13,6 +13,7 @@ import {
 } from "@/lib/services/admin/hook";
 import type {
   DownloadAlign,
+  DownloadDevice,
   DownloadElementType,
   IDownloadElement,
   IDownloadPage,
@@ -130,6 +131,47 @@ function AlignPicker({
               }`}
           >
             {a.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const DEVICE_OPTIONS: { value?: DownloadDevice; label: string }[] = [
+  { label: "همه دستگاه‌ها" },
+  { value: "mobile", label: "فقط موبایل" },
+  { value: "desktop", label: "فقط دسکتاپ" },
+];
+
+const DEVICE_TAG: Record<DownloadDevice, string> = { mobile: " · موبایل", desktop: " · دسکتاپ" };
+const deviceTag = (device?: DownloadDevice) => (device ? DEVICE_TAG[device] : "");
+
+/** Where it shows: below 768px (mobile), from 768px (desktop), or both. */
+function DevicePicker({
+  label = "نمایش در",
+  value,
+  onChange,
+}: {
+  label?: string;
+  value?: DownloadDevice;
+  onChange: (value: DownloadDevice | undefined) => void;
+}) {
+  return (
+    <div className="col-span-2 flex flex-col gap-1">
+      <span className="text-sm">{label}</span>
+      <div className="flex flex-wrap gap-1">
+        {DEVICE_OPTIONS.map((o) => (
+          <button
+            key={o.label}
+            type="button"
+            onClick={() => onChange(o.value)}
+            className={`rounded-lg border px-2.5 py-1 text-xs ${value === o.value
+                ? "border-primary-500 bg-primary-50 text-primary-700"
+                : "border-gray-200 text-gray-600 hover:border-gray-300"
+              }`}
+          >
+            {o.label}
           </button>
         ))}
       </div>
@@ -283,6 +325,7 @@ function ElementFields({
       return (
         <div className="grid grid-cols-2 gap-2">
           <VariantPicker catalog={TEXT_VARIANTS} value={element.variant} onChange={(variant) => onChange({ variant })} />
+          <DevicePicker value={element.device} onChange={(device) => onChange({ device })} />
           <div className="col-span-2">
             <Textarea
               labelContent="متن"
@@ -321,6 +364,7 @@ function ElementFields({
       return (
         <div className="grid grid-cols-2 gap-2">
           <VariantPicker catalog={IMAGE_VARIANTS} value={element.variant} onChange={(variant) => onChange({ variant })} />
+          <DevicePicker value={element.device} onChange={(device) => onChange({ device })} />
           <UploadField label="تصویر" value={element.image || undefined} onChange={(image) => onChange({ image: image ?? "" })} />
           {!element.image && <p className="col-span-2 text-xs text-error-500">بدون تصویر، این المان ذخیره نمی‌شود.</p>}
           <NumField label="عرض (px)" min={16} value={element.width} onChange={(width) => onChange({ width })} />
@@ -340,6 +384,7 @@ function ElementFields({
       return (
         <div className="grid grid-cols-2 gap-2">
           <VariantPicker catalog={BUTTON_VARIANTS} value={element.variant} onChange={(variant) => onChange({ variant })} />
+          <DevicePicker value={element.device} onChange={(device) => onChange({ device })} />
           <div className="col-span-2">
             <Input labelContent="متن دکمه" value={element.label} onChange={(e) => onChange({ label: e.target.value })} />
           </div>
@@ -425,6 +470,7 @@ function SectionFields({
     <fieldset className="grid grid-cols-2 gap-2 rounded-lg border border-gray-100 p-2">
       <legend className="px-1 text-sm text-gray-600">ظاهر بخش</legend>
       <VariantPicker catalog={SECTION_VARIANTS} value={section.variant} onChange={(variant) => onChange({ variant })} />
+      <DevicePicker value={section.device} onChange={(device) => onChange({ device })} />
       <div className="col-span-2 flex flex-col gap-1">
         <span className="text-sm">چیدمان المان‌ها</span>
         <div className="flex gap-2">
@@ -480,6 +526,7 @@ function DownloadBuilder() {
   const { mutate: save, isPending } = useAdminSiteContentUpdate();
 
   const [sections, setSections] = useState<IDownloadSection[]>([]);
+  const [pageDevice, setPageDevice] = useState<DownloadDevice | undefined>();
   const [dirty, setDirty] = useState(false);
   const [device, setDevice] = useState(DEVICES[0].width);
 
@@ -487,6 +534,7 @@ function DownloadBuilder() {
   useEffect(() => {
     if (!data?.result || dirty) return;
     setSections(data.result.downloadPage?.sections ?? []);
+    setPageDevice(data.result.downloadPage?.device);
   }, [data, dirty]);
 
   const update = (next: IDownloadSection[]) => {
@@ -499,7 +547,7 @@ function DownloadBuilder() {
     editSection(si, { elements: fn(sections[si].elements) });
 
   const handleSave = () => {
-    const downloadPage: IDownloadPage = { sections };
+    const downloadPage: IDownloadPage = { device: pageDevice, sections };
     save(
       { downloadPage },
       {
@@ -533,10 +581,20 @@ function DownloadBuilder() {
 
       <div className="grid items-start gap-5 lg:grid-cols-[400px_1fr]">
         <Card className="flex flex-col gap-3 p-3">
+          <div className="grid grid-cols-2 rounded-lg border border-gray-200 p-2">
+            <DevicePicker
+              label="نمایش کل صفحه در (دستگاه دیگر پیام کوتاهی می‌بیند)"
+              value={pageDevice}
+              onChange={(device) => {
+                setPageDevice(device);
+                setDirty(true);
+              }}
+            />
+          </div>
           {sections.map((section, si) => (
             <details key={section.id} className="flex flex-col gap-2 rounded-lg border border-gray-200 p-2" open>
               <Toolbar
-                title={`بخش ${si + 1}`}
+                title={`بخش ${si + 1}${deviceTag(section.device)}`}
                 hidden={section.hidden}
                 onToggleHidden={() => editSection(si, { hidden: !section.hidden || undefined })}
                 onUp={() => update(move(sections, si, -1))}
@@ -549,7 +607,7 @@ function DownloadBuilder() {
                 {section.elements.map((element, ei) => (
                   <details key={element.id} className="rounded-lg border border-gray-100 bg-gray-50 p-2">
                     <Toolbar
-                      title={`${ELEMENT_LABELS[element.type]}${"text" in element && element.text ? ` — ${element.text.slice(0, 24)}` : "label" in element ? ` — ${element.label}` : ""}`}
+                      title={`${ELEMENT_LABELS[element.type]}${"text" in element && element.text ? ` — ${element.text.slice(0, 24)}` : "label" in element ? ` — ${element.label}` : ""}${deviceTag(element.device)}`}
                       onUp={() => editElements(si, (els) => move(els, ei, -1))}
                       onDown={() => editElements(si, (els) => move(els, ei, 1))}
                       onDelete={() => editElements(si, (els) => els.filter((_, i) => i !== ei))}
@@ -616,7 +674,7 @@ function DownloadBuilder() {
               style={{ width: device }}
               className="pointer-events-none mx-auto select-none text-zinc-100"
             >
-              <DownloadSections page={{ sections }} />
+              <DownloadSections page={{ device: pageDevice, sections }} />
             </div>
           </div>
         </Card>
