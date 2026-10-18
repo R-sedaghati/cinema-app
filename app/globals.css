@@ -185,3 +185,12 @@ img {
   min-height: 0;
 }
 
+
+/* Goftino's widget iframe is a fixed 300x207 box at z-index 2e9 in the bottom
+   corner; on mobile its transparent area swallows taps on MobileBottomNav.
+   Lift it above the nav (nav sits at bottom-safe-6, ~4.5rem tall). */
+@media (width < 64rem) {
+  #goftino_w {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem) !important;
+  }
+}
