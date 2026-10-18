@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "ir.archive.honar",
-  appName: "ArchiveHonar",
+  appId: "archive.honar",
+  appName: "آرشیوهنر",
   webDir: "public",
   server: {
     url: "https://archivehonar.ir",
