@@ -236,6 +236,12 @@ export function SectionList<K extends string>({
                 />
 
                 <ColorInput
+                  label="رنگ متن بخش"
+                  value={section.color}
+                  onChange={(color) => patch(section.key, { color: color ?? undefined })}
+                />
+
+                <ColorInput
                   label="رنگ حاشیه بخش"
                   value={section.borderColor}
                   onChange={(color) => patch(section.key, { borderColor: color ?? undefined })}

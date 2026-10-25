@@ -37,7 +37,7 @@ export function BannerSliderSection({ variant = "slider" }: { variant?: string }
 
   if (variant === "still") {
     return (
-      <div className="h-60 md:h-[27.6rem]">
+      <div data-el="banner" className="h-60 md:h-[27.6rem]">
         <BannerFrame slide={banners[0]} index={0} />
       </div>
     );
@@ -52,7 +52,7 @@ export function BannerSliderSection({ variant = "slider" }: { variant?: string }
           aria-hidden
         />
         <div className="overflow-x-auto scrollbar-hidden">
-          <div className="flex w-max gap-1 px-1 py-1">
+          <div data-el="strip" className="flex w-max gap-1 px-1 py-1">
             {banners.map((slide, index) => (
               <div
                 key={slide.id}
@@ -80,6 +80,7 @@ export function BannerSliderSection({ variant = "slider" }: { variant?: string }
         autoplay={{ delay: 3500, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         loop
+        data-el="banner"
         className="application-banner h-60 md:h-[27.6rem] overflow-hidden"
       >
         {banners.map((slide, index) => (
@@ -103,11 +104,12 @@ function BannerFrame({
 }) {
   return (
     <div
+      data-el="frame"
       className={`relative h-full w-full bg-linear-to-bl ${BANNER_GRADIENTS[index % BANNER_GRADIENTS.length]} flex items-center overflow-hidden ${
         compact ? "px-4 md:px-6" : "px-6 md:px-16"
       }`}
     >
-      <div className="relative z-10 flex-1 md:max-w-xl">
+      <div data-el="content" className="relative z-10 flex-1 md:max-w-xl">
         {slide.subtitle && (
           <p
             data-el="subtitle"
@@ -140,7 +142,7 @@ function BannerFrame({
           </Link>
         )}
       </div>
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
+      <div data-el="image" className="absolute inset-0 opacity-30 pointer-events-none">
         {/* ponytail: plain img — banner hosts vary and the Capacitor WebView has no Next optimizer */}
         <img
           src={slide.image}

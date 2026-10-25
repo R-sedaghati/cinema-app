@@ -8,10 +8,11 @@ import { resolvePageBackground } from "@/lib/utils/pageBackground";
  * Admin-set page background, painted as a fixed layer behind the page. Renders
  * nothing when unset, so the body gradient in `globals.css` shows through.
  */
-export function PageBackground() {
+/** `path` stands in for the URL where the page renders elsewhere (the page-builder preview). */
+export function PageBackground({ path }: { path?: string }) {
   const pathname = usePathname();
   const { data } = useUserSiteContent();
-  const bg = resolvePageBackground(data?.result?.pageBackgrounds, pathname);
+  const bg = resolvePageBackground(data?.result?.pageBackgrounds, path ?? pathname);
 
   if (!bg) return null;
 

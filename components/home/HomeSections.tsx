@@ -11,7 +11,7 @@ import { sectionCss } from "@/lib/utils/sectionStyles";
  * The home page body: full-bleed sections first, the rest after. Every section is
  * a full-width band — background and padding sit on the band so the color reaches
  * the screen edges; the content column (max-w-6xl + page-layout width/sides) and
- * size overrides sit on the inner box. Gaps between sections are band padding,
+ * size overrides (and side padding) sit on the inner box. Gaps between sections are band padding,
  * not margins, so no unpainted strip shows between two colored bands.
  * Shared by the public page and the page-builder preview iframe.
  */
@@ -26,7 +26,9 @@ export function HomeSections({
   const render = (section: IResolvedHomeSection) => {
     const Section = HOME_SECTION_COMPONENTS[section.key];
     const meta = HOME_SECTIONS[section.key];
-    const { width, height, maxWidth, minHeight, ...band } = section;
+    // Side padding is the inner column's `--home-px` (replaces its 1rem, and full-bleed
+    // children cancel it), not band padding that would add to it.
+    const { width, height, maxWidth, minHeight, paddingX, ...band } = section;
     const css = sectionCss(`[data-section="${section.key}"]`, meta.styles, section.styles);
 
     return (
@@ -42,8 +44,12 @@ export function HomeSections({
         {css && <style>{css}</style>}
         <div
           data-home-inner={meta.fullBleed ? undefined : ""}
-          className={meta.fullBleed ? undefined : "mx-auto max-w-6xl px-4"}
-          style={sectionBoxProps({ width, height, maxWidth, minHeight }).style}
+          className={meta.fullBleed ? undefined : "mx-auto max-w-6xl px-[var(--home-px,1rem)]"}
+          style={{
+            ...sectionBoxProps({ width, height, maxWidth, minHeight }).style,
+            ...(paddingX !== undefined &&
+              (meta.fullBleed ? { paddingInline: paddingX } : ({ "--home-px": `${paddingX}px` } as React.CSSProperties))),
+          }}
         >
           <Section variant={section.variant} />
         </div>

@@ -717,6 +717,8 @@ export interface ISiteContent {
   /** Per-area text styles for the public site, keyed by `SITE_STYLE_AREAS`. */
   siteStyles?: Record<string, Record<string, string>> | null;
   tableColors?: ITableColors | null;
+  /** Site palette, see `lib/utils/themeColors.ts`. */
+  themeColors?: Record<string, string> | null;
   /** Per-file upload caps in MB; the API always returns both, defaults filled in. */
   uploadLimits?: IUploadLimits | null;
   /** Public URLs on read, storage paths on write; absent = shipped logo/favicon/app icon. */

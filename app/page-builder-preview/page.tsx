@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HomeSections } from "@/components/home/HomeSections";
+import { PageBackground } from "@/components/site/PageBackground";
+import { ThemeColors } from "@/components/site/ThemeColors";
 import { LandingCopyDraftProvider } from "@/lib/hooks/useLandingCopy";
 import { PREVIEW_DRAFT, PREVIEW_READY } from "@/lib/constants/pageBuilderPreview";
 import type { IResolvedHomeSection } from "@/lib/utils/resolveHomeSections";
@@ -33,6 +35,9 @@ export default function PageBuilderPreview() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Saved page background + palette, so the preview matches the live home page. */}
+      <PageBackground path="/" />
+      <ThemeColors />
       <LandingCopyDraftProvider value={draft.landing}>
         {/* pointer-events-none: the real sections navigate — the preview must stay put. */}
         <div

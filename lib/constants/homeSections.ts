@@ -24,6 +24,8 @@ const SEARCH_HEADER_STYLES: IStyleField[] = [
       "[data-el=search]": "margin-inline:$m",
     },
   },
+  { group: LAYOUT, key: "pad-top", label: "فاصله بالای بخش", type: "px", responsive: true, css: { "[data-el=root]": "padding-top:$" } },
+  { group: LAYOUT, key: "pad-bottom", label: "فاصله پایین بخش", type: "px", responsive: true, css: { "[data-el=root]": "padding-bottom:$" } },
   { group: LAYOUT, key: "title-gap", label: "فاصله عنوان تا زیرعنوان", type: "px", responsive: true, css: { "[data-el=subtitle]": "margin-top:$" } },
   {
     group: LAYOUT, key: "search-gap", label: "فاصله متن تا جستجو", type: "px", responsive: true,
@@ -40,6 +42,51 @@ const SEARCH_HEADER_STYLES: IStyleField[] = [
   { group: BOX, key: "input-focus", label: "رنگ حاشیه هنگام تایپ", type: "color", css: { "[data-el=input]:focus": "--tw-ring-color:$" } },
   { group: ICON, key: "icon-size", label: "اندازه", type: "px", css: { "[data-el=icon]": "width:$;height:$" } },
   { group: ICON, key: "icon-color", label: "رنگ", type: "color", css: { "[data-el=icon]": "color:$" } },
+  { group: ICON, key: "icon-inset", label: "فاصله از لبه کادر", type: "px", css: { "[data-el=icon]": "right:$" } },
+  { group: BOX, key: "input-pad", label: "فاصله متن از لبه (سمت آیکون)", type: "px", responsive: true, css: { "[data-el=input]": "padding-right:$" } },
+];
+
+const SLIDE = "اسلاید";
+const SLIDE_SPACE = "فاصله‌های متن اسلاید";
+const BTN = "دکمه اسلاید";
+const DOTS = "نقطه‌های اسلایدر";
+
+/** `data-el` hooks live in `components/home/sections/BannerSliderSection.tsx`. Per-slide
+ *  font size/color set in /admin/sliders are inline and win over these. */
+const BANNER_STYLES: IStyleField[] = [
+  ...textElements([["عنوان اسلاید", "title", "[data-el=title]"], ["زیرعنوان اسلاید", "subtitle", "[data-el=subtitle]"], ["متن دکمه اسلاید", "button", "[data-el=button]"]]),
+  { group: SLIDE, key: "banner-height", label: "ارتفاع بنر", type: "px", responsive: true, css: { "[data-el=banner]": "height:$" } },
+  { group: SLIDE, key: "frame-pad-x", label: "فاصله متن از لبه‌ها", type: "px", responsive: true, css: { "[data-el=frame]": "padding-inline:$" } },
+  { group: SLIDE, key: "frame-bg", label: "رنگ پس‌زمینه اسلاید", type: "color", css: { "[data-el=frame]": "background-image:none;background-color:$" } },
+  { group: SLIDE, key: "content-width", label: "عرض بیشینه متن", type: "px", responsive: true, css: { "[data-el=content]": "max-width:$" } },
+  { group: SLIDE, key: "strip-gap", label: "فاصله بین فریم‌ها (نوار فیلم)", type: "px", responsive: true, css: { "[data-el=strip]": "gap:$" } },
+  { group: SLIDE_SPACE, key: "subtitle-gap", label: "فاصله زیرعنوان تا عنوان", type: "px", responsive: true, css: { "[data-el=subtitle]": "margin-bottom:$" } },
+  { group: SLIDE_SPACE, key: "title-gap", label: "فاصله عنوان تا دکمه", type: "px", responsive: true, css: { "[data-el=title]": "margin-bottom:$" } },
+  { group: BTN, key: "button-bg", label: "رنگ پس‌زمینه", type: "color", css: { "[data-el=button]": "background-color:$" } },
+  { group: BTN, key: "button-radius", label: "گردی گوشه", type: "px", css: { "[data-el=button]": "border-radius:$" } },
+  { group: BTN, key: "button-pad-x", label: "فاصله داخلی افقی", type: "px", responsive: true, css: { "[data-el=button]": "padding-inline:$" } },
+  { group: BTN, key: "button-pad-y", label: "فاصله داخلی عمودی", type: "px", responsive: true, css: { "[data-el=button]": "padding-block:$" } },
+  { group: DOTS, key: "dot-color", label: "رنگ نقطه فعال", type: "color", css: { ".swiper-pagination-bullet.swiper-pagination-bullet-active": "background:$" } },
+  { group: DOTS, key: "dot-idle", label: "رنگ نقطه‌های دیگر", type: "color", css: { ".swiper-pagination-bullet:not(.swiper-pagination-bullet-active)": "background:$" } },
+  { group: DOTS, key: "dot-size", label: "اندازه نقطه", type: "px", css: { "[data-el=banner]": "--swiper-pagination-bullet-size:$" } },
+  { group: DOTS, key: "dot-gap", label: "فاصله بین نقطه‌ها", type: "px", css: { "[data-el=banner]": "--swiper-pagination-bullet-horizontal-gap:$" } },
+  { group: DOTS, key: "dot-bottom", label: "فاصله از پایین", type: "px", responsive: true, css: { "[data-el=banner]": "--swiper-pagination-bottom:$" } },
+];
+
+const VIDEO_TITLE = "عنوان ویدیو";
+const VIDEO = "قاب ویدیو";
+
+/** `data-el` hooks live in `components/home/sections/MainVideoSection.tsx`. */
+const VIDEO_STYLES: IStyleField[] = [
+  ...textElements([[VIDEO_TITLE, "title", "[data-el=title]"]]),
+  { group: VIDEO_TITLE, key: "title-weight", label: "ضخامت فونت", type: "weight", css: { "[data-el=title]": "font-weight:$" } },
+  { group: VIDEO_TITLE, key: "title-gap", label: "فاصله عنوان و ویدیو", type: "px", responsive: true, css: { "[data-el=frame]": "gap:$", "p[data-el=title]": "padding-top:$" } },
+  { group: VIDEO_TITLE, key: "title-pad-x", label: "فاصله افقی عنوان (تمام‌عرض)", type: "px", responsive: true, css: { "p[data-el=title]": "padding-inline:$" } },
+  { group: VIDEO, key: "player-radius", label: "گردی گوشه ویدیو", type: "px", css: { "[data-el=player]": "border-radius:$" } },
+  { group: VIDEO, key: "frame-bg", label: "رنگ پس‌زمینه قاب (قاب‌دار)", type: "color", css: { "[data-el=frame]": "background-color:$" } },
+  { group: VIDEO, key: "frame-border", label: "رنگ حاشیه قاب", type: "color", css: { "[data-el=frame]": "border:1px solid $" } },
+  { group: VIDEO, key: "frame-pad", label: "فاصله داخلی قاب", type: "px", responsive: true, css: { "[data-el=frame]": "padding:$" } },
+  { group: VIDEO, key: "frame-radius", label: "گردی گوشه قاب", type: "px", css: { "[data-el=frame]": "border-radius:$" } },
 ];
 
 const ITEM = "[data-el=item]:not([data-all])";
@@ -63,6 +110,7 @@ const CATEGORY_STYLES: IStyleField[] = [
   { group: SHAPE, key: "desc-size", label: "اندازه فونت توضیح", type: "px", responsive: true, css: { "[data-el=item-desc]": "font-size:$" } },
   { group: SHAPE, key: "desc-color", label: "رنگ توضیح", type: "color", css: { "[data-el=item-desc]": "color:$" } },
   { group: SPACE, key: "gap", label: "فاصله بین آیتم‌ها", type: "px", responsive: true, css: { "[data-el=items]": "gap:$" } },
+  { group: SPACE, key: "pad-bottom", label: "فاصله پایین ردیف", type: "px", responsive: true, css: { "[data-el=root]": "padding-bottom:$" } },
   { group: SPACE, key: "cols", label: "تعداد ستون (فقط کاشی)", type: "count", responsive: true, css: { "[data-el=items][data-grid]": "grid-template-columns:$" } },
   { group: ALL, key: "all-bg", label: "پس‌زمینه", type: "color", css: { "[data-all]": "background-color:$" } },
   { group: ALL, key: "all-color", label: "رنگ متن", type: "color", css: { "[data-all] [data-el=item-name]": "color:$" } },
@@ -114,7 +162,7 @@ const CATALOG = {
       { key: "filmstrip", admin: "نوار فیلم" },
     ],
     admin: "اسلایدر بنر",
-    styles: textElements([["عنوان اسلاید", "title", "[data-el=title]"], ["زیرعنوان اسلاید", "subtitle", "[data-el=subtitle]"], ["دکمه اسلاید", "button", "[data-el=button]"]]),
+    styles: BANNER_STYLES,
     fullBleed: true,
     copyKeys: [],
     manageLink: "/admin/sliders",
@@ -154,7 +202,7 @@ const CATALOG = {
     ],
     fullBleed: false,
     admin: "ویدیو اصلی",
-    styles: textElements([TITLE]),
+    styles: VIDEO_STYLES,
     copyKeys: [],
     manageLink: "/admin/tutorials",
     manageLabel: "مدیریت آموزش‌ها",

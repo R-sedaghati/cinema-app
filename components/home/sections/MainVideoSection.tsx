@@ -9,7 +9,7 @@ export function MainVideoSection({ variant = "framed" }: { variant?: string }) {
   if (!mainTutorial) return null;
 
   const player = (
-    <div className="relative w-full aspect-video overflow-hidden rounded-xl">
+    <div data-el="player" className="relative w-full aspect-video overflow-hidden rounded-xl">
       <iframe
         src={mainTutorial.videoUrl}
         className="absolute inset-0 h-full w-full"
@@ -21,8 +21,9 @@ export function MainVideoSection({ variant = "framed" }: { variant?: string }) {
   // Edge-to-edge: the video leads and the title reads as its caption.
   if (variant === "bleed") {
     return (
-      <section className="-mx-4">
-        <div className="aspect-video w-full">
+      // Cancels the inner column's side padding (`--home-px`, see HomeSections).
+      <section className="-mx-[var(--home-px,1rem)]">
+        <div data-el="player" className="aspect-video w-full overflow-hidden">
           <iframe
             src={mainTutorial.videoUrl}
             className="h-full w-full"
@@ -38,7 +39,7 @@ export function MainVideoSection({ variant = "framed" }: { variant?: string }) {
 
   return (
     <section>
-      <div className="flex flex-col gap-3 rounded-2xl md:border md:border-zinc-800 md:bg-zinc-900/60 md:p-4">
+      <div data-el="frame" className="flex flex-col gap-3 rounded-2xl md:border md:border-zinc-800 md:bg-zinc-900/60 md:p-4">
         <h2 data-el="title" className="text-sm md:text-lg font-semibold text-zinc-100">
           {mainTutorial.title}
         </h2>

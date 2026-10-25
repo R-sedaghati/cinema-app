@@ -16,6 +16,7 @@ import ColorInput from "@/components/admin/ColorInput";
 import { SpacingBox, type SpacingValues } from "@/components/admin/SpacingBox";
 import { cleanPageLayout, type IPageLayout } from "@/lib/utils/pageLayout";
 import { TABLE_COLOR_LABELS, type ITableColors } from "@/lib/utils/tableColors";
+import { THEME_COLORS } from "@/lib/utils/themeColors";
 import Link from "next/link";
 import withNoSSR from "@/lib/utils/withNoSSR";
 
@@ -62,6 +63,7 @@ function PageBackgrounds() {
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const [layouts, setLayouts] = useState<Record<string, IPageLayout>>({});
   const [tableColors, setTableColors] = useState<ITableColors>({});
+  const [themeColors, setThemeColors] = useState<Record<string, string>>({});
   const [device, setDevice] = useState<Device>("mobile");
   const [dirty, setDirty] = useState(false);
 
@@ -71,6 +73,7 @@ function PageBackgrounds() {
     setBackgrounds({ ...(data.result.pageBackgrounds ?? {}) });
     setLayouts({ ...(data.result.pageLayouts ?? {}) });
     setTableColors({ ...(data.result.tableColors ?? {}) });
+    setThemeColors({ ...(data.result.themeColors ?? {}) });
   }, [data, dirty]);
 
   const patch = (key: string, change: Partial<IPageBackground>) => {
@@ -135,7 +138,7 @@ function PageBackgrounds() {
     );
 
     save(
-      { pageBackgrounds, pageLayouts, tableColors },
+      { pageBackgrounds, pageLayouts, tableColors, themeColors },
       {
         onSuccess: () => {
           setDirty(false);
@@ -174,6 +177,44 @@ function PageBackgrounds() {
           {isPending ? "در حال ذخیره..." : "ذخیره"}
         </Button>
       </div>
+
+      <Card className="flex flex-col gap-3 p-3">
+        <div>
+          <p className="text-sm font-medium">پالت رنگ سایت (همه صفحات)</p>
+          <p className="mt-1 text-xs text-gray-500">
+            هر رنگ همه جاهایی از سایت را که از آن استفاده می‌کنند تغییر می‌دهد. خالی = رنگ پیش‌فرض (نمونه کنار هر رنگ).
+          </p>
+        </div>
+        {[...new Set(THEME_COLORS.map((c) => c.group))].map((group) => (
+          <div key={group} className="flex flex-col gap-2 border-t border-gray-100 pt-3">
+            <p className="text-sm text-gray-700">{group}</p>
+            <div className="flex flex-wrap gap-4">
+              {THEME_COLORS.filter((c) => c.group === group).map((c) => (
+                <div key={c.key} className="flex items-end gap-1.5">
+                  <span
+                    title="پیش‌فرض"
+                    className="mb-2.5 size-5 shrink-0 rounded border border-gray-300"
+                    style={{ backgroundColor: c.value }}
+                  />
+                  <ColorInput
+                    label={c.label}
+                    value={themeColors[c.key]}
+                    onChange={(color) => {
+                      setThemeColors((prev) => {
+                        const next = { ...prev };
+                        if (color) next[c.key] = color;
+                        else delete next[c.key];
+                        return next;
+                      });
+                      setDirty(true);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </Card>
 
       <Card className="flex flex-col gap-3 p-3">
         <p className="text-sm font-medium">رنگ جدول‌ها (همه صفحات)</p>

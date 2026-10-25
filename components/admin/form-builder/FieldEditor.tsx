@@ -104,6 +104,7 @@ export function FieldEditor({
   onDelete,
   keyLocked,
   typeLocked,
+  requiredLocked,
   extraSelect,
   extraFlags,
   notice,
@@ -120,6 +121,8 @@ export function FieldEditor({
   onDelete?: () => void;
   keyLocked?: boolean;
   typeLocked?: boolean;
+  /** Hides the "required" toggle for a field that can never be required. */
+  requiredLocked?: boolean;
   /** Fourth cell of the key/label/type row. */
   extraSelect?: ReactNode;
   /** Checkboxes next to "اجباری". */
@@ -279,11 +282,13 @@ export function FieldEditor({
 
       <div className="flex justify-between items-center">
         <div className="flex gap-4 items-center">
-          <Checkbox
-            label="اجباری"
-            checked={field.required}
-            onChange={(e) => onPatch({ required: e.target.checked })}
-          />
+          {!requiredLocked && (
+            <Checkbox
+              label="اجباری"
+              checked={field.required}
+              onChange={(e) => onPatch({ required: e.target.checked })}
+            />
+          )}
           {extraFlags}
           {IMAGE_TYPES.has(field.type) && !typeLocked && (
             <Checkbox

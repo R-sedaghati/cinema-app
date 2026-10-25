@@ -2,6 +2,7 @@
 
 import { SUPPORT_SECTIONS, type SupportSectionKey } from "@/lib/constants/supportSections";
 import type { ISiteContent, ISiteContentContactForm } from "@/lib/services/admin/type";
+import type { CSSProperties } from "react";
 import { sectionBoxProps, type IResolvedSection } from "@/lib/utils/resolveSections";
 import { sectionCss } from "@/lib/utils/sectionStyles";
 import ContactUsForm from "./ContactUsForm";
@@ -23,7 +24,9 @@ export function SupportSections({
   contactForm?: ISiteContentContactForm | null;
 }) {
   return sections.map((section) => {
-    const { width, height, maxWidth, minHeight, ...band } = section;
+    // Side padding is the inner column's `--home-px` (replaces its 1rem, and full-bleed
+    // children cancel it), not band padding that would add to it.
+    const { width, height, maxWidth, minHeight, paddingX, ...band } = section;
     const css = sectionCss(`[data-section="${section.key}"]`, SUPPORT_SECTIONS[section.key].styles, section.styles);
 
     return (
@@ -37,8 +40,11 @@ export function SupportSections({
         {css && <style>{css}</style>}
         <div
           data-home-inner=""
-          className="mx-auto max-w-6xl px-4"
-          style={sectionBoxProps({ width, height, maxWidth, minHeight }).style}
+          className="mx-auto max-w-6xl px-[var(--home-px,1rem)]"
+          style={{
+            ...sectionBoxProps({ width, height, maxWidth, minHeight }).style,
+            ...(paddingX !== undefined && ({ "--home-px": `${paddingX}px` } as CSSProperties)),
+          }}
         >
           {section.key === "intro" && <SupportIntro support={support} variant={section.variant} />}
           {section.key === "cards" && <SupportCards support={support} variant={section.variant} />}
