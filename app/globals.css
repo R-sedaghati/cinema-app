@@ -62,8 +62,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-secondary-black: #344851;
   --font-sans: var(--font-dana);
-  --shadow-card:
-    0 10px 30px rgb(0 0 0 / 0.18),
+  --shadow-card: 0 10px 30px rgb(0 0 0 / 0.18),
     0 0 24px rgb(var(--dgs-color-primary-500) / 0.08);
 
   /* remap built-in red/rose to amber so hardcoded text-red-* / text-rose-* in components render gold */
@@ -146,7 +145,10 @@ a {
   scrollbar-color: #8b6d2d transparent;
 }
 
-button, a, [role="button"], label {
+button,
+a,
+[role="button"],
+label {
   touch-action: manipulation;
 }
 
@@ -183,14 +185,4 @@ img {
    so long forms overflow the clipped mask instead of scrolling. */
 .dgsuikit\:overflow-y-auto {
   min-height: 0;
-}
-
-
-/* Goftino's widget iframe is a fixed 300x207 box at z-index 2e9 in the bottom
-   corner; on mobile its transparent area swallows taps on MobileBottomNav.
-   Lift it above the nav (nav sits at bottom-safe-6, ~4.5rem tall). */
-@media (width < 64rem) {
-  #goftino_w {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem) !important;
-  }
 }
