@@ -9,6 +9,7 @@ import ProfileCompletionChecker from "@/components/login/ProfileCompletionChecke
 import { PageProgressBar } from "@/components/site/PageProgressBar";
 import { PageBackground } from "@/components/site/PageBackground";
 import { TableColors } from "@/components/site/TableColors";
+import { ThemeColors } from "@/components/site/ThemeColors";
 import { SiteStyles } from "@/components/site/SiteStyles";
 import { PageLayoutMain } from "@/components/site/PageLayoutMain";
 import "../globals.css";
@@ -31,6 +32,7 @@ function MainLayout({
       <PageProgressBar />
       <PageBackground />
       <TableColors />
+      <ThemeColors />
       <SiteStyles />
       <div className="flex min-h-dvh flex-col  text-zinc-100 antialiased">
         <SiteHeader />

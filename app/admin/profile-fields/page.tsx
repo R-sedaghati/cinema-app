@@ -18,6 +18,7 @@ import {
 } from "@/components/admin/form-builder/FieldEditor";
 import Input from "@/components/common/Input";
 import withNoSSR from "@/lib/utils/withNoSSR";
+import { AVATAR_KEY } from "@/lib/utils/profileFields";
 import { Button, Card, Checkbox, Select } from "@dgshahr/ui-kit";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -48,6 +49,8 @@ function ProfileFieldRow({
       // by the account column behind it
       keyLocked
       typeLocked={field.builtin}
+      // the avatar is always optional: the drawer offers it but never requires it
+      requiredLocked={field.key === AVATAR_KEY}
       onPatch={(payload) => update({ id: field.id, payload }, { onError })}
       // builtins are backed by account columns: they can be hidden, never deleted
       onDelete={field.builtin ? undefined : () => remove(field.id, { onError })}

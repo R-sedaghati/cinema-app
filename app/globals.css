@@ -91,17 +91,17 @@
 
 /* Swiper pagination dots — amber brand color */
 .application-banner .swiper-pagination-bullet-active {
-  background: #d89a2b;
+  background: rgb(var(--dgs-color-primary-500));
 }
 .application-banner .swiper-pagination-bullet {
-  background: rgba(216, 154, 43, 0.4);
+  background: rgb(var(--dgs-color-primary-500) / 0.4);
   opacity: 1;
 }
 
 @utility bg-radial-primary {
   background-image: radial-gradient(
     circle,
-    rgba(216, 154, 43, 0.18) 0%,
+    rgb(var(--dgs-color-primary-500) / 0.18) 0%,
     transparent 70%
   );
 }

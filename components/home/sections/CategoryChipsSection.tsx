@@ -50,7 +50,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
   }
 
   return (
-    <div className="overflow-x-auto md:overflow-visible scrollbar-hidden pb-1">
+    <div data-el="root" className="overflow-x-auto md:overflow-visible scrollbar-hidden pb-1">
       <div data-el="items" className="flex gap-2 w-max md:w-auto md:flex-wrap">
         <button
           onClick={() => router.push("/artists")}

@@ -24,6 +24,8 @@ export interface ISectionConfig {
   background?: string;
   /** Section border (1px solid), `#rrggbb`; absent = no border. */
   borderColor?: string;
+  /** Section text color, `#rrggbb`; absent = the section's own. */
+  color?: string;
   /** Full URL on read, bare storage path on write (see `toStoragePath`). */
   backgroundImage?: string;
   /** 0–90, % black over the image; absent = 50. */
@@ -47,6 +49,7 @@ export interface IResolvedSection<K extends string> {
   paddingX?: number;
   background?: string;
   borderColor?: string;
+  color?: string;
   backgroundImage?: string;
   backgroundOverlay?: number;
   styles?: Record<string, string>;
@@ -93,13 +96,15 @@ const toOverlay = (value: unknown): number | undefined =>
   typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 90 ? value : undefined;
 
 const backgroundOf = (entry: ISectionConfig) => {
-  const out: Pick<ISectionConfig, "background" | "borderColor" | "backgroundImage" | "backgroundOverlay"> = {};
+  const out: Pick<ISectionConfig, "background" | "borderColor" | "color" | "backgroundImage" | "backgroundOverlay"> = {};
   const color = toHex(entry.background);
   const image = toImage(entry.backgroundImage);
   const overlay = toOverlay(entry.backgroundOverlay);
   const border = toHex(entry.borderColor);
+  const text = toHex(entry.color);
   if (color) out.background = color;
   if (border) out.borderColor = border;
+  if (text) out.color = text;
   if (image) out.backgroundImage = image;
   if (image && overlay !== undefined) out.backgroundOverlay = overlay;
   return out;
@@ -112,7 +117,7 @@ const backgroundOf = (entry: ISectionConfig) => {
  */
 export function sectionBoxProps(
   section: Partial<Record<SizeKey | SpacingKey, number>> &
-    Pick<ISectionConfig, "background" | "borderColor" | "backgroundImage" | "backgroundOverlay">,
+    Pick<ISectionConfig, "background" | "borderColor" | "color" | "backgroundImage" | "backgroundOverlay">,
 ) {
   const style: Record<string, string | number> = {};
   // Fixed width still yields to a narrower screen instead of scrolling sideways.
@@ -127,6 +132,12 @@ export function sectionBoxProps(
   if (section.background) style.backgroundColor = section.background;
   // ponytail: fixed 1px solid; add width/style controls if admins ask.
   if (section.borderColor) style.border = `1px solid ${section.borderColor}`;
+  // Components hard-code their text shades (`text-zinc-100`…), so the section color
+  // re-points the light text vars inside the band; per-element styles still win.
+  if (section.color) {
+    style.color = section.color;
+    for (const shade of [100, 200, 300]) style[`--color-zinc-${shade}`] = section.color;
+  }
   if (section.backgroundImage) {
     // Overlay as a flat gradient layer on top of the image — no extra element needed.
     const shade = `rgba(0,0,0,${(section.backgroundOverlay ?? 50) / 100})`;
