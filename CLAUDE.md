@@ -20,7 +20,7 @@ Test files import with explicit `.ts` extensions and relative paths (node resolv
 
 ## Architecture
 
-**Next.js 16 App Router** project for ArchiveHonar — a cinema artists registry. Persian/RTL UI (`lang="fa" dir="rtl"`). Capacitor configured for mobile (`ir.archive.honar`).
+**Next.js 16 App Router** project for ArchiveHonar — a cinema artists registry. Persian/RTL UI (`lang="fa" dir="rtl"`). Capacitor configured for mobile (`archive.honar`).
 
 ### Route structure
 

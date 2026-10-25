@@ -1,4 +1,4 @@
-package ir.archive.honar;
+package archive.honar;
 
 import com.getcapacitor.BridgeActivity;
 

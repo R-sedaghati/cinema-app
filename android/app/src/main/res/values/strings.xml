@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <resources>
-    <string name="app_name">ArchiveHonar</string>
-    <string name="title_activity_main">ArchiveHonar</string>
-    <string name="package_name">ir.archive.honar</string>
-    <string name="custom_url_scheme">ir.archive.honar</string>
+    <string name="app_name">آرشیوهنر</string>
+    <string name="title_activity_main">آرشیوهنر</string>
+    <string name="package_name">archive.honar</string>
+    <string name="custom_url_scheme">archive.honar</string>
 </resources>
