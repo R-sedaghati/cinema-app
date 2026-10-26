@@ -84,12 +84,14 @@ export function ProfileClient() {
               >
                 <ArrowRight size={22} />
               </button>
-              <span data-el="title" className="text-base font-semibold text-zinc-100">
+              <span
+                data-el="title"
+                className="text-base font-semibold text-zinc-100"
+              >
                 {active ? sectionLabels(active) : ""}
               </span>
             </div>
           )}
-          <BackLinkSection copy={fromCopy} />
           <div className="overflow-x-auto">
             <ProfileContent active={active} />
           </div>
