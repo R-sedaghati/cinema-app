@@ -140,6 +140,8 @@ export default function ArtistRegistrationPageContent({
     categoryId,
   } = useArtistRegistrationStore();
 
+  console.log("answers", answers);
+
   // Typing writes the URL, and Safari throws once history.replaceState is called more
   // than 100 times in 10s — so answers reach the URL debounced.
   const debouncedAnswers = useDebounce(answers);
@@ -187,6 +189,9 @@ export default function ArtistRegistrationPageContent({
     // Portfolio rows are the authoritative record of what was uploaded, so they win over
     // saved answers: a stale or empty file key would otherwise blank the hydrated images.
     // Unsaved edits carried in the URL are newer than either, so they win over both.
+    console.log("portfolioAnswers", portfolioAnswers);
+    console.log("urlAnswers", urlAnswers);
+
     setField("answers", {
       ...(r.answers ?? {}),
       ...portfolioAnswers,
@@ -222,8 +227,9 @@ export default function ArtistRegistrationPageContent({
 
     const cat = topLevelCategories.find((c) => c.id === urlCategoryId);
     if (cat) {
+      console.log("rererae", urlAnswers);
+
       setField("categoryId", urlIds.length ? urlIds : [cat.id]);
-      setField("answers", urlAnswers);
       setSelectedCategory(cat.id, cat.title);
       // The flow clamps the step to what the schema actually has; keep the obvious
       // nonsense out of the store in the first place.
@@ -248,8 +254,6 @@ export default function ArtistRegistrationPageContent({
       if (!editId) params.set("category", String(selectedCategoryId));
       if (step > 0) params.set("step", String(step));
       if (categoryId.length) params.set("ids", categoryId.join(","));
-      if (Object.keys(answers).length)
-        params.set("answers", JSON.stringify(answers));
     }
 
     const query = params.toString();
