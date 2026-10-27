@@ -26,6 +26,8 @@ export function useArtistSearchParams() {
 
   const categoryId = Number(searchParams.get("category")) || null;
   const search = searchParams.get("search") ?? "";
+  // `?all=1` lists every resume instead of the category tiles; setCategory drops it.
+  const showAll = searchParams.has("all");
 
   const { selections, ranges } = useMemo(() => {
     const selections: Record<string, string[]> = {};
@@ -130,6 +132,7 @@ export function useArtistSearchParams() {
   return {
     categoryId,
     search,
+    showAll,
     selections,
     ranges,
     activeFilterCount,

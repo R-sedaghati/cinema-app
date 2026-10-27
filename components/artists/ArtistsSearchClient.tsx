@@ -22,25 +22,16 @@ import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useArtistSearchParams } from "@/lib/hooks/useArtistSearchParams";
 import { useEffect, useState } from "react";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
+import { normalizeFa } from "@/lib/utils/normalizeFa";
 
 const PAGE_SIZE = 12;
-
-/**
- * Category names carry ZWNJ ("تهیه\u200cکنندگی") and admins type both the Arabic and the
- * Persian forms of ی/ک, so a raw `includes` misses tiles the user clearly meant.
- */
-const normalizeFa = (value: string) =>
-  value
-    .replace(/\u200c/g, "")
-    .replace(/\u064a/g, "\u06cc")
-    .replace(/\u0643/g, "\u06a9")
-    .trim();
 
 export function ArtistsSearchClient() {
   const copy = useLandingCopy();
   const {
     categoryId,
     search,
+    showAll,
     selections,
     ranges,
     activeFilterCount,
@@ -113,7 +104,9 @@ export function ArtistsSearchClient() {
         onClick={() =>
           // setCategory(null) also drops every filter; search text is kept. With nothing
           // to clear, back leaves for home — history may point off-site or nowhere.
-          categoryId || activeFilterCount ? setCategory(null) : router.push("/")
+          categoryId || activeFilterCount || showAll
+            ? setCategory(null)
+            : router.push("/")
         }
         data-el="link"
         className="flex cursor-pointer items-center gap-2 py-2 text-base text-zinc-300 sm:py-0 sm:text-sm transition-colors hover:text-zinc-50"
@@ -170,7 +163,7 @@ export function ArtistsSearchClient() {
         )}
       </div>
 
-      {!categoryId && (
+      {!categoryId && !showAll && (
         <div className="flex flex-wrap flex-col gap-4">
           {rows.map((row, rowIndex) => (
             <div key={rowIndex} className="flex flex-wrap justify-center gap-4">
@@ -198,7 +191,7 @@ export function ArtistsSearchClient() {
         </div>
       )}
 
-      {(categoryId || search) && (
+      {(categoryId || search || showAll) && (
         <div className="space-y-6">
           {!isPending && artists.length > 0 && (
             <p data-el="body" className="text-sm text-zinc-500">

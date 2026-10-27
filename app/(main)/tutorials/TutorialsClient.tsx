@@ -5,6 +5,7 @@ import { useUserTutorialList } from "@/lib/services/landing/hook";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import BackLinkSection from "@/components/artist-registration/sections/BackLinkSection";
 import { useFormCopy } from "@/lib/hooks/useFormCopy";
+import { useEffect } from "react";
 
 export function TutorialsClient() {
   const fromCopy = useFormCopy();
@@ -12,6 +13,14 @@ export function TutorialsClient() {
   const { data } = useUserTutorialList();
   const tutorials = data?.result ?? [];
   const copy = useLandingCopy();
+
+  // Search results link to `#tutorial-<id>`; the browser's own hash scroll runs before
+  // the list has loaded, so redo it once the cards exist.
+  useEffect(() => {
+    if (tutorials.length && window.location.hash) {
+      document.querySelector(window.location.hash)?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [tutorials.length]);
 
   return (
     <>
@@ -36,7 +45,8 @@ export function TutorialsClient() {
           {tutorials.map((tutorial) => (
             <div
               key={tutorial.id}
-              className="flex flex-col gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 md:p-6"
+              id={`tutorial-${tutorial.id}`}
+              className="scroll-mt-24 flex flex-col gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 md:p-6"
             >
               {tutorial.thumbnail && (
                 <div className="relative w-full h-48 md:h-72 rounded-xl overflow-hidden bg-gray-100">

@@ -17,7 +17,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
     return (
       <div data-card-grid data-el="items" data-grid className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
         <button
-          onClick={() => router.push("/artists")}
+          onClick={() => router.push("/artists?all=1")}
           data-card
           data-el="item"
           data-all
@@ -53,7 +53,7 @@ export function CategoryChipsSection({ variant = "chips" }: { variant?: string }
     <div data-el="root" className="overflow-x-auto md:overflow-visible scrollbar-hidden pb-1">
       <div data-el="items" className="flex gap-2 w-max md:w-auto md:flex-wrap">
         <button
-          onClick={() => router.push("/artists")}
+          onClick={() => router.push("/artists?all=1")}
           data-el="item"
           data-all
           data-pad

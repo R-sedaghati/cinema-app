@@ -8,13 +8,13 @@ import Link from "next/link";
 import type { CopyResolver } from "@/lib/utils/copy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 
-const statusClasses: Record<IContactRequestItem["status"], string> = {
+export const statusClasses: Record<IContactRequestItem["status"], string> = {
   PENDING: "bg-amber-900/40 text-amber-400",
   APPROVED: "bg-emerald-900/40 text-emerald-400",
   REJECTED: "bg-red-900/40 text-red-400",
 };
 
-const statusKeys: Record<IContactRequestItem["status"], LandingCopyKey> = {
+export const statusKeys: Record<IContactRequestItem["status"], LandingCopyKey> = {
   PENDING: "requestPending",
   APPROVED: "requestApproved",
   REJECTED: "requestRejected",

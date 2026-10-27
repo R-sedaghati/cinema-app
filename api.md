@@ -287,7 +287,7 @@ List approved artist requests (public). Sensitive user fields excluded.
 | Param | Type | Description |
 |-------|------|-------------|
 | category | number | Filter by category ID |
-| search | string | Search by category name |
+| search | string | Search category names, `user.code` and public answers (Persian-normalized: ي/ك→ی/ک, ZWNJ ignored) |
 | sort | string | Sort field |
 | page | number | Page number |
 
@@ -332,6 +332,19 @@ Search cities by name.
 Get city by ID.
 
 **Response:** `ApiResponse<{ id: number; name: string }>`
+
+---
+
+### `GET /search/`
+Site-wide search for the home search box. Artists are **not** included — use `GET /artists-requests/?search=` for those (it owns the privacy rules). Same Persian normalization as artist search.
+
+**Query params:**
+| Param | Type | Description |
+|-------|------|-------------|
+| q | string | Search term; under 2 chars returns empty groups |
+| limit | number | Max rows per group (default 5, max 20) |
+
+**Response:** `ApiResponse<{ categories: { id; faName; enName; image; parent: { id; faName } \| null }[]; tutorials: { id; title; thumbnail }[]; faqs: { id; question }[] }>`
 
 ---
 
