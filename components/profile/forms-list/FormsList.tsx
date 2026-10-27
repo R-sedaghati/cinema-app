@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ContentCard from "../ContentCard";
-import { Table } from "@dgshahr/ui-kit";
+import { Pagination, Table } from "@dgshahr/ui-kit";
 import { formName, generateColumns, viewKey } from "./Columns";
 import { useUserAtristRequests } from "@/lib/services/landing/hook";
 import TableEmptyState from "@/components/common/TableEmptyState";
@@ -159,6 +159,18 @@ export default function FormsList() {
               </div>
             </div>
           ))}
+
+        {!!data?.count && (
+          <Pagination
+            pageSize={pagination.count}
+            defaultCurrent={pagination.page}
+            totalCount={data.count}
+            onPageChange={(p) =>
+              setPagination((state) => ({ ...state, page: p }))
+            }
+            hideOnSinglePage
+          />
+        )}
       </div>
 
       {/* Desktop table */}

@@ -328,6 +328,7 @@ export const LANDING_COPY = {
   profileMessagesTitle: { group: "پروفایل کاربر", admin: "عنوان صندوق پیام", value: "پیام‌ها" },
   profileMessagesEmpty: { group: "پروفایل کاربر", admin: "متن نبودن پیام", value: "هنوز پیامی برای شما ثبت نشده است." },
   profileRequestsTitle: { group: "پروفایل کاربر", admin: "عنوان درخواست‌های ارتباط", value: "درخواست‌های ارتباط با هنرمندان" },
+  profileRequestsEmpty: { group: "پروفایل کاربر", admin: "متن نبودن درخواست", value: "هیچ درخواستی ثبت نشده است." },
   profileRequestsTabTitle: { group: "پروفایل کاربر", admin: "عنوان تب درخواست‌ها", value: "درخواست‌های ارتباط" },
   profileRequestsColArtist: { group: "پروفایل کاربر", admin: "ستون هنرمند", value: "هنرمند" },
   profileRequestsColTracking: { group: "پروفایل کاربر", admin: "ستون شماره پیگیری", value: "شماره پیگیری" },
@@ -402,6 +403,15 @@ export const LANDING_COPY = {
 
   // --- عناصر مشترک ---
   searchEmptyTitle: { group: "عناصر مشترک", admin: "متن نتیجه‌نداشتن جستجو", value: "نتیجه‌ای یافت نشد!" },
+  searchGroupArtists: { group: "جستجو", admin: "عنوان گروه هنرمندان", value: "هنرمندان" },
+  searchGroupCategories: { group: "جستجو", admin: "عنوان گروه دسته‌بندی‌ها و فرم‌ها", value: "دسته‌بندی‌ها و فرم‌ها" },
+  searchGroupTutorials: { group: "جستجو", admin: "عنوان گروه آموزش‌ها", value: "آموزش‌ها" },
+  searchGroupFaqs: { group: "جستجو", admin: "عنوان گروه سوالات متداول", value: "سوالات متداول" },
+  searchGroupPages: { group: "جستجو", admin: "عنوان گروه صفحات", value: "صفحات" },
+  searchSeeAll: { group: "جستجو", admin: "پیوند مشاهده همه نتایج", value: "مشاهده همه نتایج" },
+  searchMoreArtists: { group: "جستجو", admin: "پیوند هنرمندان بیشتر ({count} = تعداد)", value: "مشاهده هر {count} هنرمند" },
+  searchPageTitle: { group: "جستجو", admin: "عنوان صفحه نتایج ({q} = عبارت)", value: "نتایج جستجو برای «{q}»" },
+  searchTypeMore: { group: "جستجو", admin: "راهنمای حداقل طول عبارت", value: "دست‌کم دو حرف بنویسید." },
   searchEmptyAlt: { group: "عناصر مشترک", admin: "متن جایگزین تصویر نتیجه‌نداشتن", value: "یافت نشد" },
   successIconAlt: { group: "عناصر مشترک", admin: "متن جایگزین تصویر موفقیت", value: "موفق" },
   listSeparator: { group: "عناصر مشترک", admin: "جداکننده فهرست‌ها", value: "، " },

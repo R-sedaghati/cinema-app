@@ -276,3 +276,21 @@ export type IUserBadgeCountsResponse = IRetriveResponse<{
   messages: number;
   forms: number;
 }>;
+
+/** `GET /search/` — site-wide search groups; artists come from the artist list instead. */
+export type IGlobalSearchResponse = IRetriveResponse<{
+  categories: {
+    id: number;
+    faName: string;
+    enName: string;
+    image: string | null;
+    parent: { id: number; faName: string } | null;
+  }[];
+  tutorials: { id: number; title: string; thumbnail: string | null }[];
+  faqs: { id: number; question: string }[];
+}>;
+
+export type GlobalSearchResult = IGlobalSearchResponse["result"] & {
+  artists: IArtistItem[];
+  artistCount: number;
+};

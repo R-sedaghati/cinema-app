@@ -5,20 +5,31 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLandingCopy } from "@/lib/hooks/useLandingCopy";
 import { toEnglishDigits } from "@/lib/utils/toEnglishDigits";
+import useDebounce from "@/lib/hooks/useDebounce";
+import { useGlobalSearch } from "@/lib/services/landing/hook";
+import { SearchResults } from "@/components/search/SearchResults";
 
 export function SearchHeaderSection({ variant = "stacked" }: { variant?: string }) {
   const router = useRouter();
   const copy = useLandingCopy();
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const query = useDebounce(search, 300);
+  const { data, isPending } = useGlobalSearch(query);
 
   const submit = () => {
     if (search.trim()) {
-      router.push(`/artists?search=${encodeURIComponent(search.trim())}`);
+      setOpen(false);
+      router.push(`/search?q=${encodeURIComponent(search.trim())}`);
     }
   };
 
   const input = (
-    <div className="relative">
+    <div
+      className="relative"
+      // Focus moving onto a result link stays inside, so only a real leave closes it.
+      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}
+    >
       <Search
         data-el="icon"
         className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500"
@@ -27,12 +38,33 @@ export function SearchHeaderSection({ variant = "stacked" }: { variant?: string 
       <input
         type="text"
         value={search}
-        onChange={(e) => setSearch(toEnglishDigits(e.target.value))}
-        onKeyDown={(e) => e.key === "Enter" && submit()}
+        onChange={(e) => {
+          setSearch(toEnglishDigits(e.target.value));
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit();
+          if (e.key === "Escape") setOpen(false);
+        }}
         placeholder={copy("homeSearchPlaceholder")}
         data-el="input"
         className="w-full rounded-2xl py-3.5 md:py-4 pr-10 pl-4 text-sm md:text-base outline-none focus:ring-1 focus:ring-error-500/60 border border-zinc-700/40 bg-zinc-900/60"
       />
+      {open && query.trim().length >= 2 && (
+        <div
+          data-el="dropdown"
+          className="absolute inset-x-0 top-full z-30 mt-2 max-h-[70vh] overflow-y-auto rounded-2xl border border-zinc-700/60 bg-zinc-900 text-right shadow-xl"
+        >
+          <SearchResults
+            compact
+            query={query}
+            data={data}
+            isPending={isPending}
+            onNavigate={() => setOpen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 

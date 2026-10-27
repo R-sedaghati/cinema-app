@@ -32,7 +32,7 @@ export function ArtistGridSection({ variant = "grid" }: { variant?: string }) {
             {copy("homeArtistsTitle")}
           </span>
         </h2>
-        <Link href="/artists" data-el="link" className="text-xs text-error-500 md:text-sm">
+        <Link href="/artists?all=1" data-el="link" className="text-xs text-error-500 md:text-sm">
           <span style={copy.style("homeArtistsCta")}>
             {copy("homeArtistsCta")}
           </span>
@@ -265,7 +265,7 @@ function Empty({ message }: { message: React.ReactNode }) {
   );
 }
 
-function ArtistCard({ artist }: { artist: IArtistItem }) {
+export function ArtistCard({ artist }: { artist: IArtistItem }) {
   const copy = useLandingCopy();
 
   return (
@@ -292,8 +292,14 @@ function ArtistCard({ artist }: { artist: IArtistItem }) {
       </div>
 
       <p data-el="card-title" className="truncate text-sm font-semibold leading-tight text-zinc-100 transition-colors group-hover:text-error-400 md:text-base">
-        {artist.user.firstName} {artist.user.lastName}
+        {[artist.user.firstName, artist.user.lastName].filter(Boolean).join(" ") ||
+          artist.user.code}
       </p>
+      {artist.user.code && (artist.user.firstName || artist.user.lastName) && (
+        <p data-el="card-meta" dir="ltr" className="mt-0.5 text-right text-xs text-zinc-500 md:text-sm">
+          #{artist.user.code}
+        </p>
+      )}
 
       <div className="mt-1.5 flex flex-col gap-1 md:mt-2">
         {artist.categories?.[0] && (

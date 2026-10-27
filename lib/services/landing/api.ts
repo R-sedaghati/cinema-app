@@ -28,6 +28,8 @@ import {
   ICreateGuestContactRequestResponse,
   IGuestContactRequestStatusResponse,
   IFormSchemaResponse,
+  IGlobalSearchResponse,
+  GlobalSearchResult,
   IPagination,
   IPurchaseResponse,
   ParamsPublicArtistList,
@@ -451,4 +453,24 @@ export const userMessageRead = async (id: number, accessToken: string) => {
   );
 
   return data;
+};
+
+/**
+ * Home search: the site-wide groups plus the public artist list, which already owns the
+ * approval and privacy rules for artists.
+ */
+export const globalSearch = async (
+  q: string,
+  limit = 5,
+): Promise<GlobalSearchResult> => {
+  const [groups, artists] = await Promise.all([
+    landingApi.get<IGlobalSearchResponse>("/search", { params: { q, limit } }),
+    userArtsitList({ search: q, count: limit }),
+  ]);
+
+  return {
+    ...groups.data.result,
+    artists: artists.result,
+    artistCount: artists.count,
+  };
 };

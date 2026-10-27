@@ -30,6 +30,7 @@ import {
   ICreateGuestContactRequestResponse,
   IGuestContactRequestStatusResponse,
   IFormSchemaResponse,
+  GlobalSearchResult,
   IPagination,
   ParamsPublicArtistList,
   IUserArtistListResponse,
@@ -53,6 +54,7 @@ import {
   userAboutUs,
   userArtistRequests,
   userArtsitList,
+  globalSearch,
   userBannerList,
   userCategoryList,
   userCityList,
@@ -549,3 +551,13 @@ export const useUserBadgeCounts = () => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useGlobalSearch = (q: string, limit = 5) =>
+  useQuery<GlobalSearchResult>({
+    enabled: q.trim().length >= 2,
+    queryKey: ["globalSearch", q, limit],
+    queryFn: () => globalSearch(q, limit),
+    // Typing shouldn't blank the dropdown between keystrokes.
+    placeholderData: (previous) => previous,
+    refetchOnWindowFocus: false,
+  });

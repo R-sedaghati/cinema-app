@@ -216,6 +216,9 @@ export default function ArtistRegistrationPageContent({
     // Titles come from the category list, so hydrating a deep-linked step has to wait
     // for it — without a title the form header renders blank.
     if (!urlStep || !urlCategoryId) {
+      // No deep link means the grid of all forms: the last form opened would otherwise
+      // still be in the store and reopen in its place.
+      reset();
       setIsUrlHydrated(true);
       return;
     }
