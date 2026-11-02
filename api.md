@@ -1072,7 +1072,12 @@ The caller's own ledger, paginated. **Auth required.**
 `SPEND_CONTACT` (or its failed-payment refund) paid for; null otherwise.
 
 `type` is one of `REFUND_REJECTED`, `REFUND_REVISION`, `REFUND_FAILED_PAYMENT`,
-`ADMIN_ADJUST`, `SPEND_REGISTRATION`, `SPEND_CONTACT`.
+`ADMIN_ADJUST`, `SPEND_REGISTRATION`, `SPEND_CONTACT`, `GATEWAY_PAYMENT`.
+
+`GATEWAY_PAYMENT` rows are the gateway leg of the caller's completed registration /
+subscription `Payment`s (negative `amount`, `description` carries the SEP RefNum). They
+are not wallet movements and do not count toward the balance. `id` is the payment's id,
+so it can collide with a ledger row's id — key on `type` + `id`.
 
 ---
 
