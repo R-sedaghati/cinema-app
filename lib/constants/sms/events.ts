@@ -1,4 +1,9 @@
-import type { SmsMode, SmsRecipient, SmsSource } from "@/lib/services/admin/type";
+import {
+  ESmsEvent,
+  type SmsMode,
+  type SmsRecipient,
+  type SmsSource,
+} from "@/lib/services/admin/type";
 
 /** The record each group of pickable fields belongs to, in the order the picker lists them. */
 export const SMS_SOURCE_LABEL: Record<SmsSource, string> = {
