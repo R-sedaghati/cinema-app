@@ -1782,6 +1782,12 @@ Get all artist requests for a specific user (admin view).
 
 ---
 
+### `POST /admin/users/:id/impersonate/`
+"Login as user". **SUPER_ADMIN only** (`ADMIN` → `403`; unknown user → `404`). No body.
+Returns `{ accessToken }`: a regular user token (works with every `/user/*` route) with a
+**1-hour** expiry and an extra `impersonatedBy: <adminId>` claim. Does not update the user's
+`lastLogin`. The admin panel stores it in the site's user session and opens `/` in a new tab.
+
 ### `DELETE /admin/users/:id/`
 Delete a user and everything they own. **SUPER_ADMIN only** — an ordinary `ADMIN` token
 gets `403`. Irreversible.

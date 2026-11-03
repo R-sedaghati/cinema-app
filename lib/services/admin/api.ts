@@ -686,6 +686,17 @@ export const adminUserDelete = async (id: number, accessToken: string) => {
   return data;
 };
 
+// Short-lived user token for "login as user" (SUPER_ADMIN only).
+export const adminImpersonateUser = async (id: number, accessToken: string) => {
+  const { data } = await api.post<IRetriveResponse<{ accessToken: string }>>(
+    `/admin/users/${id}/impersonate/`,
+    null,
+    { headers: { Authorization: accessToken } },
+  );
+
+  return data;
+};
+
 export const adminUsersList = async (
   params: Partial<ParamsUsersList> | undefined,
   accessToken: string,

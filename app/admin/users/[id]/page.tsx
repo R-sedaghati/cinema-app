@@ -2,7 +2,8 @@
 
 import ArtistStatus from "@/components/admin/artist-registration/ArtistStatus";
 import UserWallet from "@/components/admin/users/UserWallet";
-import { useAdminUserDetail, useAdminUserRequest } from "@/lib/services/admin/hook";
+import { useAdminImpersonateUser, useAdminUserDetail, useAdminUserRequest } from "@/lib/services/admin/hook";
+import useAuthStore from "@/lib/stores/useAuthStore";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import withNoSSR from "@/lib/utils/withNoSSR";
 import { toResumeName } from "@/lib/utils/resumeName";
@@ -21,10 +22,23 @@ function ArtistDetail() {
   const { data: userDetail } = useAdminUserRequest(id);
   const data = userDetail?.result?.at(0);
   const user = useAdminUserDetail(id).data?.result;
+  const impersonate = useAdminImpersonateUser();
+
+  const loginAsUser = () =>
+    impersonate.mutate(id, {
+      onSuccess: ({ result }) => {
+        // Same origin, separate store from the admin session: swap the site's user
+        // session for this one (logout also drops the previous user's profile cache).
+        const auth = useAuthStore.getState();
+        auth.logout();
+        auth.login(result.accessToken, "", true);
+        window.open("/", "_blank");
+      },
+    });
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex justify-start">
+      <div className="flex justify-between">
         <Button
           onClick={() => router.push("/admin/users")}
           variant="text"
@@ -32,6 +46,9 @@ function ArtistDetail() {
           color="gray"
         >
           بازگشت به کاربران
+        </Button>
+        <Button onClick={loginAsUser} isLoading={impersonate.isPending} variant="outline">
+          ورود به عنوان کاربر
         </Button>
       </div>
       <div className="p-4 flex flex-col gap-6 bg-gray-100">

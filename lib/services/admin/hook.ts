@@ -153,6 +153,7 @@ import {
   adminUserDetail,
   adminUsersList,
   adminUserDelete,
+  adminImpersonateUser,
   adminUserUpdate,
   adminProfile,
   adminProfileUpdate,
@@ -724,6 +725,14 @@ export const useAdminUserDelete = () => {
     // user on screen.
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["adminUsersList"] }),
+  });
+};
+
+export const useAdminImpersonateUser = () => {
+  const { accessToken } = useAdminAuthStore();
+
+  return useMutation({
+    mutationFn: (id: number) => adminImpersonateUser(id, accessToken),
   });
 };
 
