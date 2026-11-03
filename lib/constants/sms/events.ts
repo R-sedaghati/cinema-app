@@ -49,7 +49,12 @@ export const SMS_EVENT: Record<
   [ESmsEvent.SUBSCRIPTION_EXPIRED]: {
     label: "پایان اشتراک",
     description:
-      "روز پایان اشتراک سالانه و یک هفته بعد از آن (اگر تمدید نشده باشد) برای هنرمند ارسال می‌شود (بین ساعت ۱۰ تا ۲۰). {expiresAt} تاریخ پایان است.",
+      "روز پایان اشتراک سالانه برای هنرمند ارسال می‌شود (بین ساعت ۱۰ تا ۲۰). {expiresAt} تاریخ پایان است.",
+  },
+  [ESmsEvent.SUBSCRIPTION_EXPIRED_FOLLOWUP]: {
+    label: "پیگیری پایان اشتراک",
+    description:
+      "یک هفته بعد از پایان اشتراک، اگر هنرمند تمدید نکرده باشد، ارسال می‌شود (بین ساعت ۱۰ تا ۲۰). {expiresAt} تاریخ پایان است.",
   },
   [ESmsEvent.ADMIN_REGISTRATION]: {
     label: "اعلان ادمین: ثبت‌نام جدید",
@@ -95,6 +100,7 @@ export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.RESUME_REQUEST_APPROVED,
   ESmsEvent.SUBSCRIPTION_REMINDER,
   ESmsEvent.SUBSCRIPTION_EXPIRED,
+  ESmsEvent.SUBSCRIPTION_EXPIRED_FOLLOWUP,
   ESmsEvent.ADMIN_FORM_SUBMITTED,
   ESmsEvent.ADMIN_REGISTRATION,
   ESmsEvent.ADMIN_TRANSACTION,
