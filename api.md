@@ -61,6 +61,8 @@ enum SmsEvent {
   PAYMENT_SUCCESS = "PAYMENT_SUCCESS",
   PAYMENT_FAILED  = "PAYMENT_FAILED",
   SUPPORT_REPLY   = "SUPPORT_REPLY",    // admin replied to a support ticket (vars: subject, ticketId)
+  SUBSCRIPTION_REMINDER = "SUBSCRIPTION_REMINDER", // 30/7/3 days before expiry, 10:00–20:00 Tehran (vars: daysLeft, expiresAt)
+  SUBSCRIPTION_EXPIRED  = "SUBSCRIPTION_EXPIRED",  // on expiry day + 7 days after if not renewed (vars: expiresAt)
 }
 
 // Named validations an admin picks in the form-builder; enforced on submit by the API

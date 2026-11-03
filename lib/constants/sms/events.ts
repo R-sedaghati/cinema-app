@@ -41,6 +41,16 @@ export const SMS_EVENT: Record<
     label: "تایید درخواست مشاهده رزومه",
     description: "زمانی که ادمین درخواست مشاهده رزومه یک هنرمند را تایید می‌کند، برای درخواست‌دهنده ارسال می‌شود.",
   },
+  [ESmsEvent.SUBSCRIPTION_REMINDER]: {
+    label: "یادآوری تمدید اشتراک",
+    description:
+      "۳۰، ۷ و ۳ روز پیش از پایان اشتراک سالانه برای هنرمند ارسال می‌شود (بین ساعت ۱۰ تا ۲۰). {daysLeft} تعداد روزهای باقی‌مانده و {expiresAt} تاریخ پایان است.",
+  },
+  [ESmsEvent.SUBSCRIPTION_EXPIRED]: {
+    label: "پایان اشتراک",
+    description:
+      "روز پایان اشتراک سالانه و یک هفته بعد از آن (اگر تمدید نشده باشد) برای هنرمند ارسال می‌شود (بین ساعت ۱۰ تا ۲۰). {expiresAt} تاریخ پایان است.",
+  },
   [ESmsEvent.ADMIN_REGISTRATION]: {
     label: "اعلان ادمین: ثبت‌نام جدید",
     description:
@@ -83,6 +93,8 @@ export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.REJECTED,
   ESmsEvent.SUPPORT_REPLY,
   ESmsEvent.RESUME_REQUEST_APPROVED,
+  ESmsEvent.SUBSCRIPTION_REMINDER,
+  ESmsEvent.SUBSCRIPTION_EXPIRED,
   ESmsEvent.ADMIN_FORM_SUBMITTED,
   ESmsEvent.ADMIN_REGISTRATION,
   ESmsEvent.ADMIN_TRANSACTION,
@@ -109,4 +121,6 @@ export const SMS_VARIABLE_SAMPLE: Record<string, string> = {
   artistId: "123",
   message: "ثبت‌نام هنرمند (#۱۲۳) پرداخت شد و در انتظار بررسی است.",
   link: "/admin/artist-registration/123",
+  daysLeft: "۷",
+  expiresAt: "۱۴۰۶/۰۸/۱۱",
 };
