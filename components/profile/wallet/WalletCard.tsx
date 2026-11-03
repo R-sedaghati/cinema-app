@@ -96,7 +96,7 @@ export default function WalletCard() {
         ) : (
           transactions.map((transaction) => (
             <Row
-              key={transaction.id}
+              key={`${transaction.type}-${transaction.id}`}
               transaction={transaction}
               currency={copy("labelCurrency")}
             />

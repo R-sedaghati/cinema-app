@@ -236,7 +236,9 @@ export type WalletTransactionType =
   | "REFUND_FAILED_PAYMENT"
   | "ADMIN_ADJUST"
   | "SPEND_REGISTRATION"
-  | "SPEND_CONTACT";
+  | "SPEND_CONTACT"
+  /** A completed gateway payment; not a wallet movement, does not affect the balance. */
+  | "GATEWAY_PAYMENT";
 
 export interface IWalletTransactionItem {
   id: number;
