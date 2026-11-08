@@ -3,7 +3,7 @@ import Button from "@/components/common/Button";
 import { EArtistRequestStatus, IArtistItem } from "@/lib/services/admin/type";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
-import { ChevronLeft } from "lucide-react";
+import { Pencil, Eye, CreditCard, ExternalLink } from "lucide-react";
 import type { CopyResolver } from "@/lib/utils/copy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
 import { toResumeName } from "@/lib/utils/resumeName";
@@ -66,40 +66,44 @@ export const generateColumns = (
     title: copy("profileColActions"),
     className: "align-middle",
     render: (data) => (
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-1">
         <Button
           variant="text"
-          leftIcon={<ChevronLeft />}
+          title={copy("profileFormEdit")}
+          aria-label={copy("profileFormEdit")}
           onClick={() => onEdit(data)}
         >
-          <span style={copy.style("profileFormEdit")}>{copy("profileFormEdit")}</span>
+          <Pencil size={18} />
         </Button>
 
         <Button
           variant="text"
-          leftIcon={<ChevronLeft />}
+          title={copy(viewKey(data))}
+          aria-label={copy(viewKey(data))}
           onClick={() => onView(data)}
         >
-          <span style={copy.style(viewKey(data))}>{copy(viewKey(data))}</span>
+          <Eye size={18} />
         </Button>
 
         {data.status === EArtistRequestStatus.PENDING_PAYMENT && (
           <Button
             variant="text"
-            leftIcon={<ChevronLeft />}
+            title={copy("profileFormPay")}
+            aria-label={copy("profileFormPay")}
             onClick={() => onPay(data)}
           >
-            <span style={copy.style("profileFormPay")}>{copy("profileFormPay")}</span>
+            <CreditCard size={18} />
           </Button>
         )}
 
         {data.status === EArtistRequestStatus.APPROVED && (
           <Button
             variant="text"
-            leftIcon={<ChevronLeft />}
+            title={copy("profileFormPublicPage")}
+            aria-label={copy("profileFormPublicPage")}
             onClick={() => onOpenPublic(data)}
           >
-            <span style={copy.style("profileFormPublicPage")}>{copy("profileFormPublicPage")}</span>
+            <ExternalLink size={18} />
           </Button>
         )}
       </div>

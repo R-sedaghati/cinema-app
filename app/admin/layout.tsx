@@ -16,7 +16,19 @@ export default function RootLayout({ children }: PropsWithChildren) {
   const excludedPaths = ["/admin/login"];
   const isLoginPage = excludedPaths.includes(pathname);
 
-  const queryClient = useMemo(() => new QueryClient(), []);
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchInterval: 10000,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: true,
+          },
+        },
+      }),
+    [],
+  );
 
   useEffect(() => {
     if (hasHydrated && !isLoggedIn && !isLoginPage) {

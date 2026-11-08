@@ -26,7 +26,19 @@ function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const queryClient = useMemo(() => new QueryClient(), []);
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchInterval: 10000,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: true,
+          },
+        },
+      }),
+    [],
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

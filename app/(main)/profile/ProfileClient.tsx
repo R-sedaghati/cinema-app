@@ -74,7 +74,7 @@ export function ProfileClient() {
         <ProfileSidebar active={active} setActive={handleSelect} />
       )}
       {isMobile !== null && (!isMobile || !showSidebar) && (
-        <div className="relative z-10 flex-4">
+        <div className="relative z-10 flex-4 min-w-0">
           {isMobile && (
             <div className="flex items-center gap-3 mb-5 pb-4 border-b border-zinc-800/60">
               <button

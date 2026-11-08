@@ -3,7 +3,7 @@ import { toResumeName } from "@/lib/utils/resumeName";
 import { IContactRequestItem } from "@/lib/services/landing/type";
 import convertGregorianTimeToShamsiTime from "@/lib/utils/convertGregorianTimeToShamsiTime";
 import { ColumnsType } from "@dgshahr/ui-kit/Table";
-import { ChevronLeft } from "lucide-react";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import type { CopyResolver } from "@/lib/utils/copy";
 import type { LandingCopyKey } from "@/lib/constants/landingCopy";
@@ -77,9 +77,13 @@ export const generateColumns = (
     title: copy("profileColActions"),
     className: "align-middle max-w-52",
     render: (data) => (
-      <Link href={`/artists/${data.artist?.id}`}>
-        <Button variant="text" leftIcon={<ChevronLeft />}>
-          <span style={copy.style("profileRequestsViewArtist")}>{copy("profileRequestsViewArtist")}</span>
+      <Link
+        href={`/artists/${data.artist?.id}`}
+        title={copy("profileRequestsViewArtist")}
+        aria-label={copy("profileRequestsViewArtist")}
+      >
+        <Button variant="text">
+          <Eye size={18} />
         </Button>
       </Link>
     ),

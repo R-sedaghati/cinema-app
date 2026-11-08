@@ -17,7 +17,19 @@ interface IDraft {
 
 /** Iframe target of the admin page-builder: renders whatever draft the parent posts. */
 export default function PageBuilderPreview() {
-  const queryClient = useMemo(() => new QueryClient(), []);
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchInterval: 10000,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: true,
+          },
+        },
+      }),
+    [],
+  );
   const [draft, setDraft] = useState<IDraft | null>(null);
 
   useEffect(() => {

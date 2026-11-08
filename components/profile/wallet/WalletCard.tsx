@@ -88,6 +88,8 @@ export default function WalletCard() {
         </p>
       </div>
 
+      <h3 className="text-zinc-50 text-lg font-semibold mt-2">تراکنش‌ها</h3>
+
       <div className="flex flex-col rounded-xl bg-gray-100/60 border-2 border-zinc-700/60 backdrop-blur-sm">
         {isPending ? (
           <p data-el="body" className="p-4 text-zinc-400"><span style={copy.style("labelLoading")}>{copy("labelLoading")}</span></p>
