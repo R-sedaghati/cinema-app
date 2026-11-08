@@ -23,7 +23,8 @@ export const LANDING_COPY = {
   heroSubtitle: {
     group: "صفحه معرفی — سربرگ",
     admin: "زیرعنوان",
-    value: "از ثبت رزومه تا دیده شدن و دریافت درخواست همکاری٬ همه در سینما آرشیو",
+    value:
+      "از ثبت رزومه تا دیده شدن و دریافت درخواست همکاری٬ همه در سینما آرشیو",
   },
   heroPrimaryCta: {
     group: "صفحه معرفی — سربرگ",
@@ -48,15 +49,39 @@ export const LANDING_COPY = {
     value:
       "پروفایل‌های استاندارد، جستجوی دقیق و مسیر ارتباط کنترل‌شده؛ همه‌چیز برای انتخاب بهتر و سریع‌تر آماده است.",
   },
-  statsCta: { group: "صفحه معرفی — آمار", admin: "دکمه بخش آمار", value: "مشاهده هنرمندان" },
+  statsCta: {
+    group: "صفحه معرفی — آمار",
+    admin: "دکمه بخش آمار",
+    value: "مشاهده هنرمندان",
+  },
   stat1Value: { group: "صفحه معرفی — آمار", admin: "عدد آمار ۱", value: "۹۰٪" },
-  stat1Label: { group: "صفحه معرفی — آمار", admin: "عنوان آمار ۱", value: "رضایت هنرمندها" },
-  stat2Value: { group: "صفحه معرفی — آمار", admin: "عدد آمار ۲", value: "۲۰۰۰+" },
-  stat2Label: { group: "صفحه معرفی — آمار", admin: "عنوان آمار ۲", value: "پروفایل کاربری فعال" },
+  stat1Label: {
+    group: "صفحه معرفی — آمار",
+    admin: "عنوان آمار ۱",
+    value: "رضایت هنرمندها",
+  },
+  stat2Value: {
+    group: "صفحه معرفی — آمار",
+    admin: "عدد آمار ۲",
+    value: "۲۰۰۰+",
+  },
+  stat2Label: {
+    group: "صفحه معرفی — آمار",
+    admin: "عنوان آمار ۲",
+    value: "پروفایل کاربری فعال",
+  },
   stat3Value: { group: "صفحه معرفی — آمار", admin: "عدد آمار ۳", value: "۳۵٪" },
-  stat3Label: { group: "صفحه معرفی — آمار", admin: "عنوان آمار ۳", value: "کاریابی هنرمندها" },
+  stat3Label: {
+    group: "صفحه معرفی — آمار",
+    admin: "عنوان آمار ۳",
+    value: "کاریابی هنرمندها",
+  },
   stat4Value: { group: "صفحه معرفی — آمار", admin: "عدد آمار ۴", value: "۵+" },
-  stat4Label: { group: "صفحه معرفی — آمار", admin: "عنوان آمار ۴", value: "سال تجربه کاری" },
+  stat4Label: {
+    group: "صفحه معرفی — آمار",
+    admin: "عنوان آمار ۴",
+    value: "سال تجربه کاری",
+  },
 
   // --- صفحه معرفی: باکس ثبت‌نام ---
   promoTitle: {
@@ -69,7 +94,11 @@ export const LANDING_COPY = {
     admin: "زیرعنوان باکس",
     value: "فرم رو پر کن و شانست رو برای ورود به دنیای حرفه‌ای هنر امتحان کن.",
   },
-  promoCta: { group: "صفحه معرفی — باکس ثبت‌نام", admin: "دکمه باکس", value: "ثبت‌ نام هنرمند" },
+  promoCta: {
+    group: "صفحه معرفی — باکس ثبت‌نام",
+    admin: "دکمه باکس",
+    value: "ثبت‌ نام هنرمند",
+  },
 
   // --- صفحه معرفی: چرا سینما آرشیو ---
   reasonsTitle: {
@@ -117,36 +146,76 @@ export const LANDING_COPY = {
     admin: "متن راهنمای کادر جستجو",
     value: "جستجوی هنرمندان، دسته‌بندی‌ها...",
   },
-  homeExploreKicker: { group: "صفحه اول", admin: "برچسب بالای عنوان", value: "کاوش" },
+  homeExploreKicker: {
+    group: "صفحه اول",
+    admin: "برچسب بالای عنوان",
+    value: "کاوش",
+  },
   homeExploreTitle: {
     group: "صفحه اول",
     admin: "عنوان صفحه اول",
     value: "هنرمندان سینما را کشف کنید",
   },
-  homeAllLabel: { group: "صفحه اول", admin: "برچسب «همه» در فیلترها", value: "همه" },
-  homeRegistrationTitle: { group: "صفحه اول", admin: "عنوان بخش ثبت‌نام", value: "ثبت‌نام هنرمند" },
-  homeRegistrationCta: { group: "صفحه اول", admin: "لینک بخش ثبت‌نام", value: "شروع" },
-  homeArtistsTitle: { group: "صفحه اول", admin: "عنوان بخش هنرمندان", value: "هنرمندان" },
-  homeArtistsCta: { group: "صفحه اول", admin: "لینک بخش هنرمندان", value: "همه" },
-  homeSupportTitle: { group: "صفحه اول", admin: "عنوان بخش پشتیبانی", value: "پشتیبانی" },
+  homeAllLabel: {
+    group: "صفحه اول",
+    admin: "برچسب «همه» در فیلترها",
+    value: "همه",
+  },
+  homeRegistrationTitle: {
+    group: "صفحه اول",
+    admin: "عنوان بخش ثبت‌نام",
+    value: "ثبت‌نام هنرمند",
+  },
+  homeRegistrationCta: {
+    group: "صفحه اول",
+    admin: "لینک بخش ثبت‌نام",
+    value: "شروع",
+  },
+  homeArtistsTitle: {
+    group: "صفحه اول",
+    admin: "عنوان بخش هنرمندان",
+    value: "هنرمندان",
+  },
+  homeArtistsCta: {
+    group: "صفحه اول",
+    admin: "لینک بخش هنرمندان",
+    value: "همه",
+  },
+  homeSupportTitle: {
+    group: "صفحه اول",
+    admin: "عنوان بخش پشتیبانی",
+    value: "پشتیبانی",
+  },
   homeSupportSubtitle: {
     group: "صفحه اول",
     admin: "توضیح بخش پشتیبانی",
     value: "با تیم ما در ارتباط باشید",
   },
-  homeTutorialsTitle: { group: "صفحه اول", admin: "عنوان بخش آموزش", value: "راهنمای ویدیویی" },
+  homeTutorialsTitle: {
+    group: "صفحه اول",
+    admin: "عنوان بخش آموزش",
+    value: "راهنمای ویدیویی",
+  },
   homeTutorialsSubtitle: {
     group: "صفحه اول",
     admin: "توضیح بخش آموزش",
     value: "آموزش استفاده از اپلیکیشن",
   },
-  homeFaqTitle: { group: "صفحه اول", admin: "عنوان بخش سوالات", value: "سوالات متداول" },
+  homeFaqTitle: {
+    group: "صفحه اول",
+    admin: "عنوان بخش سوالات",
+    value: "سوالات متداول",
+  },
   homeFaqSubtitle: {
     group: "صفحه اول",
     admin: "توضیح بخش سوالات",
     value: "پاسخ سوالات خود را پیدا کنید",
   },
-  homeEmptyArtists: { group: "صفحه اول", admin: "متن نبودن هنرمند", value: "هنرمندی یافت نشد" },
+  homeEmptyArtists: {
+    group: "صفحه اول",
+    admin: "متن نبودن هنرمند",
+    value: "هنرمندی یافت نشد",
+  },
 
   // --- صفحه جستجوی هنرمندان ---
   artistsTitle: {
@@ -164,280 +233,990 @@ export const LANDING_COPY = {
     admin: "متن راهنمای کادر جستجو",
     value: "مثلاً: کارگردان، تهران...",
   },
-  artistsLoadMore: { group: "صفحه جستجوی هنرمندان", admin: "دکمه نمایش بیشتر", value: "نمایش بیشتر" },
-  artistsLoading: { group: "صفحه جستجوی هنرمندان", admin: "متن در حال بارگذاری", value: "در حال بارگذاری..." },
+  artistsLoadMore: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "دکمه نمایش بیشتر",
+    value: "نمایش بیشتر",
+  },
+  artistsLoading: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "متن در حال بارگذاری",
+    value: "در حال بارگذاری...",
+  },
 
   // --- عنوان صفحات ---
-  aboutPageTitle: { group: "عنوان صفحات", admin: "عنوان صفحه درباره ما", value: "درباره آرشیو هنر" },
-  faqPageTitle: { group: "عنوان صفحات", admin: "عنوان صفحه سوالات متداول", value: "سوالات متداول" },
+  aboutPageTitle: {
+    group: "عنوان صفحات",
+    admin: "عنوان صفحه درباره ما",
+    value: "درباره آرشیو هنر",
+  },
+  faqPageTitle: {
+    group: "عنوان صفحات",
+    admin: "عنوان صفحه سوالات متداول",
+    value: "سوالات متداول",
+  },
 
   // --- سربرگ و منو ---
   brandName: { group: "سربرگ و منو", admin: "نام سایت", value: "آرشیو هنر" },
   navHome: { group: "سربرگ و منو", admin: "منو: خانه", value: "خانه" },
-  navArtists: { group: "سربرگ و منو", admin: "منو: جستجوی هنرمندان", value: "جستجوی هنرمندان" },
-  navForms: { group: "سربرگ و منو", admin: "منو: فرم‌های درخواست", value: "فرم‌های درخواست" },
-  navSupport: { group: "سربرگ و منو", admin: "منو: پشتیبانی", value: "پشتیبانی" },
-  navFaq: { group: "سربرگ و منو", admin: "منو: سوالات متداول", value: "سوالات متداول" },
-  navAbout: { group: "سربرگ و منو", admin: "منو: درباره ما", value: "درباره ما" },
+  navArtists: {
+    group: "سربرگ و منو",
+    admin: "منو: جستجوی هنرمندان",
+    value: "جستجوی هنرمندان",
+  },
+  navForms: {
+    group: "سربرگ و منو",
+    admin: "منو: فرم‌های درخواست",
+    value: "فرم‌های درخواست",
+  },
+  navSupport: {
+    group: "سربرگ و منو",
+    admin: "منو: پشتیبانی",
+    value: "پشتیبانی",
+  },
+  navFaq: {
+    group: "سربرگ و منو",
+    admin: "منو: سوالات متداول",
+    value: "سوالات متداول",
+  },
+  navAbout: {
+    group: "سربرگ و منو",
+    admin: "منو: درباره ما",
+    value: "درباره ما",
+  },
   navProfile: { group: "سربرگ و منو", admin: "دکمه پروفایل", value: "پروفایل" },
-  navLogin: { group: "سربرگ و منو", admin: "دکمه ورود/ثبت‌نام", value: "ورود / ثبت‌نام کاربر" },
-  navMobileSearch: { group: "سربرگ و منو", admin: "منوی پایین موبایل: جستجو", value: "جستجو" },
-  navMobileForms: { group: "سربرگ و منو", admin: "منوی پایین موبایل: فرم‌ها", value: "فرم‌ها" },
-  navMobileLogin: { group: "سربرگ و منو", admin: "منوی پایین موبایل: ورود", value: "ورود" },
+  navLogin: {
+    group: "سربرگ و منو",
+    admin: "دکمه ورود/ثبت‌نام",
+    value: "ورود / ثبت‌نام کاربر",
+  },
+  navMobileSearch: {
+    group: "سربرگ و منو",
+    admin: "منوی پایین موبایل: جستجو",
+    value: "جستجو",
+  },
+  navMobileForms: {
+    group: "سربرگ و منو",
+    admin: "منوی پایین موبایل: فرم‌ها",
+    value: "فرم‌ها",
+  },
+  navMobileLogin: {
+    group: "سربرگ و منو",
+    admin: "منوی پایین موبایل: ورود",
+    value: "ورود",
+  },
 
   // --- پابرگ سایت ---
-  footerPhoneLabel: { group: "پابرگ سایت", admin: "برچسب تلفن پشتیبانی", value: "تلفن پشتیبانی" },
-  footerArtists: { group: "پابرگ سایت", admin: "لینک جستجوی هنرمندان", value: "جستجوی هنرمندان" },
-  footerAbout: { group: "پابرگ سایت", admin: "لینک درباره ما", value: "درباره ما" },
-  footerContact: { group: "پابرگ سایت", admin: "لینک تماس با ما", value: "تماس با ما" },
-  footerFaq: { group: "پابرگ سایت", admin: "لینک سوالات متداول", value: "سوالات متداول" },
-  footerSupport: { group: "پابرگ سایت", admin: "لینک پشتیبانی", value: "پشتیبانی" },
-  footerTerms: { group: "پابرگ سایت", admin: "لینک قوانین و حریم خصوصی", value: "قوانین و حریم خصوصی" },
-  footerAppDownload: { group: "پابرگ سایت", admin: "عنوان دریافت اپلیکیشن", value: "دریافت اپلیکیشن" },
+  footerPhoneLabel: {
+    group: "پابرگ سایت",
+    admin: "برچسب تلفن پشتیبانی",
+    value: "تلفن پشتیبانی",
+  },
+  footerArtists: {
+    group: "پابرگ سایت",
+    admin: "لینک جستجوی هنرمندان",
+    value: "جستجوی هنرمندان",
+  },
+  footerAbout: {
+    group: "پابرگ سایت",
+    admin: "لینک درباره ما",
+    value: "درباره ما",
+  },
+  footerContact: {
+    group: "پابرگ سایت",
+    admin: "لینک تماس با ما",
+    value: "تماس با ما",
+  },
+  footerFaq: {
+    group: "پابرگ سایت",
+    admin: "لینک سوالات متداول",
+    value: "سوالات متداول",
+  },
+  footerSupport: {
+    group: "پابرگ سایت",
+    admin: "لینک پشتیبانی",
+    value: "پشتیبانی",
+  },
+  footerTerms: {
+    group: "پابرگ سایت",
+    admin: "لینک قوانین و حریم خصوصی",
+    value: "قوانین و حریم خصوصی",
+  },
+  footerAppDownload: {
+    group: "پابرگ سایت",
+    admin: "عنوان دریافت اپلیکیشن",
+    value: "دریافت اپلیکیشن",
+  },
 
   // --- ورود و ثبت‌نام کاربر ---
-  loginTitle: { group: "ورود و ثبت‌نام", admin: "عنوان کشوی ورود", value: "ورود یا ثبت‌نام" },
-  loginPhoneLabel: { group: "ورود و ثبت‌نام", admin: "برچسب شماره موبایل", value: "شماره موبایل را وارد کنید" },
-  loginPhonePlaceholder: { group: "ورود و ثبت‌نام", admin: "راهنمای کادر شماره موبایل", value: "۰۹**  ***  ****" },
-  loginPhoneError: { group: "ورود و ثبت‌نام", admin: "خطای شماره موبایل", value: "شماره موبایل اشتباه است." },
-  loginPhoneCta: { group: "ورود و ثبت‌نام", admin: "دکمه دریافت کد", value: "دریافت کد" },
-  loginOtpSent: { group: "ورود و ثبت‌نام", admin: "پیام ارسال کد", value: "کد ورود ارسال شد" },
-  loginOtpPrefix: { group: "ورود و ثبت‌نام", admin: "متن قبل از شماره در مرحله کد", value: "کد پیامک شده به شماره" },
-  loginOtpSuffix: { group: "ورود و ثبت‌نام", admin: "متن بعد از شماره در مرحله کد", value: "را وارد کنید." },
-  loginOtpChangeNumber: { group: "ورود و ثبت‌نام", admin: "دکمه تغییر شماره", value: "تغییر شماره موبایل" },
-  loginOtpResend: { group: "ورود و ثبت‌نام", admin: "دکمه ارسال مجدد کد", value: "ارسال مجدد کد" },
-  loginOtpCountdown: { group: "ورود و ثبت‌نام", admin: "متن شمارش معکوس", value: "تا ارسال مجدد کد" },
-  loginOtpSubmit: { group: "ورود و ثبت‌نام", admin: "دکمه ورود", value: "ورود" },
-  loginOtpWrong: { group: "ورود و ثبت‌نام", admin: "خطای کد اشتباه", value: "کد وارد شده اشتباه است." },
-  loginSuccess: { group: "ورود و ثبت‌نام", admin: "پیام ورود موفق", value: "با موفقیت وارد شدید" },
-  loginTermsPrefix: { group: "ورود و ثبت‌نام", admin: "متن قوانین ـ بخش اول", value: "ورود شما به منزله پذیرش" },
-  loginTermsLink: { group: "ورود و ثبت‌نام", admin: "متن لینک قوانین", value: "قوانین و مقررات" },
-  loginTermsSuffix: { group: "ورود و ثبت‌نام", admin: "متن قوانین ـ بخش دوم", value: "می‌باشد" },
-  completeProfileTitle: { group: "ورود و ثبت‌نام", admin: "عنوان تکمیل پروفایل", value: "تکمیل پروفایل" },
+  loginTitle: {
+    group: "ورود و ثبت‌نام",
+    admin: "عنوان کشوی ورود",
+    value: "ورود یا ثبت‌نام",
+  },
+  loginPhoneLabel: {
+    group: "ورود و ثبت‌نام",
+    admin: "برچسب شماره موبایل",
+    value: "شماره موبایل را وارد کنید",
+  },
+  loginPhonePlaceholder: {
+    group: "ورود و ثبت‌نام",
+    admin: "راهنمای کادر شماره موبایل",
+    value: "۰۹**  ***  ****",
+  },
+  loginPhoneError: {
+    group: "ورود و ثبت‌نام",
+    admin: "خطای شماره موبایل",
+    value: "شماره موبایل اشتباه است.",
+  },
+  loginPhoneCta: {
+    group: "ورود و ثبت‌نام",
+    admin: "دکمه دریافت کد",
+    value: "دریافت کد",
+  },
+  loginOtpSent: {
+    group: "ورود و ثبت‌نام",
+    admin: "پیام ارسال کد",
+    value: "کد ورود ارسال شد",
+  },
+  loginOtpPrefix: {
+    group: "ورود و ثبت‌نام",
+    admin: "متن قبل از شماره در مرحله کد",
+    value: "کد پیامک شده به شماره",
+  },
+  loginOtpSuffix: {
+    group: "ورود و ثبت‌نام",
+    admin: "متن بعد از شماره در مرحله کد",
+    value: "را وارد کنید.",
+  },
+  loginOtpChangeNumber: {
+    group: "ورود و ثبت‌نام",
+    admin: "دکمه تغییر شماره",
+    value: "تغییر شماره موبایل",
+  },
+  loginOtpResend: {
+    group: "ورود و ثبت‌نام",
+    admin: "دکمه ارسال مجدد کد",
+    value: "ارسال مجدد کد",
+  },
+  loginOtpCountdown: {
+    group: "ورود و ثبت‌نام",
+    admin: "متن شمارش معکوس",
+    value: "تا ارسال مجدد کد",
+  },
+  loginOtpSubmit: {
+    group: "ورود و ثبت‌نام",
+    admin: "دکمه ورود",
+    value: "ورود",
+  },
+  loginOtpWrong: {
+    group: "ورود و ثبت‌نام",
+    admin: "خطای کد اشتباه",
+    value: "کد وارد شده اشتباه است.",
+  },
+  loginSuccess: {
+    group: "ورود و ثبت‌نام",
+    admin: "پیام ورود موفق",
+    value: "با موفقیت وارد شدید",
+  },
+  loginTermsPrefix: {
+    group: "ورود و ثبت‌نام",
+    admin: "متن قوانین ـ بخش اول",
+    value: "ورود شما به منزله پذیرش",
+  },
+  loginTermsLink: {
+    group: "ورود و ثبت‌نام",
+    admin: "متن لینک قوانین",
+    value: "قوانین و مقررات",
+  },
+  loginTermsSuffix: {
+    group: "ورود و ثبت‌نام",
+    admin: "متن قوانین ـ بخش دوم",
+    value: "می‌باشد",
+  },
+  completeProfileTitle: {
+    group: "ورود و ثبت‌نام",
+    admin: "عنوان تکمیل پروفایل",
+    value: "تکمیل پروفایل",
+  },
   completeProfileDesc: {
     group: "ورود و ثبت‌نام",
     admin: "توضیح تکمیل پروفایل",
     value: "برای استفاده کامل از سایت، لطفاً اطلاعات زیر را تکمیل کنید.",
   },
-  completeProfileAvatarOptional: { group: "ورود و ثبت‌نام", admin: "برچسب اختیاری بودن تصویر", value: "اختیاری" },
-  completeProfileSuccess: { group: "ورود و ثبت‌نام", admin: "پیام تکمیل پروفایل", value: "پروفایل با موفقیت تکمیل شد" },
+  completeProfileAvatarOptional: {
+    group: "ورود و ثبت‌نام",
+    admin: "برچسب اختیاری بودن تصویر",
+    value: "اختیاری",
+  },
+  completeProfileSuccess: {
+    group: "ورود و ثبت‌نام",
+    admin: "پیام تکمیل پروفایل",
+    value: "پروفایل با موفقیت تکمیل شد",
+  },
 
   // --- فیلدهای مشترک ---
   fieldFirstName: { group: "فیلدهای مشترک", admin: "برچسب نام", value: "نام" },
-  fieldFirstNamePlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای نام", value: "نام خود را وارد کنید" },
-  fieldLastName: { group: "فیلدهای مشترک", admin: "برچسب نام خانوادگی", value: "نام خانوادگی" },
-  fieldLastNamePlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای نام خانوادگی", value: "نام خانوادگی خود را وارد کنید" },
+  fieldFirstNamePlaceholder: {
+    group: "فیلدهای مشترک",
+    admin: "راهنمای نام",
+    value: "نام خود را وارد کنید",
+  },
+  fieldLastName: {
+    group: "فیلدهای مشترک",
+    admin: "برچسب نام خانوادگی",
+    value: "نام خانوادگی",
+  },
+  fieldLastNamePlaceholder: {
+    group: "فیلدهای مشترک",
+    admin: "راهنمای نام خانوادگی",
+    value: "نام خانوادگی خود را وارد کنید",
+  },
   fieldEmail: { group: "فیلدهای مشترک", admin: "برچسب ایمیل", value: "ایمیل" },
-  fieldEmailPlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای ایمیل", value: "ایمیل خود را وارد کنید." },
-  fieldNationalCode: { group: "فیلدهای مشترک", admin: "برچسب کد ملی", value: "کد ملی" },
-  fieldNationalCodePlaceholder: { group: "فیلدهای مشترک", admin: "راهنمای کد ملی", value: "کد ملی ۱۰ رقمی خود را وارد کنید" },
-  fieldPhone: { group: "فیلدهای مشترک", admin: "برچسب شماره موبایل", value: "شماره موبایل" },
+  fieldEmailPlaceholder: {
+    group: "فیلدهای مشترک",
+    admin: "راهنمای ایمیل",
+    value: "ایمیل خود را وارد کنید.",
+  },
+  fieldNationalCode: {
+    group: "فیلدهای مشترک",
+    admin: "برچسب کد ملی",
+    value: "کد ملی",
+  },
+  fieldNationalCodePlaceholder: {
+    group: "فیلدهای مشترک",
+    admin: "راهنمای کد ملی",
+    value: "کد ملی ۱۰ رقمی خود را وارد کنید",
+  },
+  fieldPhone: {
+    group: "فیلدهای مشترک",
+    admin: "برچسب شماره موبایل",
+    value: "شماره موبایل",
+  },
   actionSave: { group: "فیلدهای مشترک", admin: "دکمه ذخیره", value: "ذخیره" },
-  actionCancel: { group: "فیلدهای مشترک", admin: "دکمه انصراف", value: "انصراف" },
+  actionCancel: {
+    group: "فیلدهای مشترک",
+    admin: "دکمه انصراف",
+    value: "انصراف",
+  },
   actionBack: { group: "فیلدهای مشترک", admin: "دکمه بازگشت", value: "بازگشت" },
   actionEdit: { group: "فیلدهای مشترک", admin: "دکمه ویرایش", value: "ویرایش" },
-  actionMore: { group: "فیلدهای مشترک", admin: "دکمه نمایش بیشتر", value: "نمایش بیشتر" },
-  labelLoading: { group: "فیلدهای مشترک", admin: "متن در حال بارگذاری", value: "در حال بارگذاری..." },
+  actionMore: {
+    group: "فیلدهای مشترک",
+    admin: "دکمه نمایش بیشتر",
+    value: "نمایش بیشتر",
+  },
+  labelLoading: {
+    group: "فیلدهای مشترک",
+    admin: "متن در حال بارگذاری",
+    value: "در حال بارگذاری...",
+  },
   labelFree: { group: "فیلدهای مشترک", admin: "متن رایگان", value: "رایگان" },
   labelCurrency: { group: "فیلدهای مشترک", admin: "واحد پول", value: "تومان" },
   labelGenderMan: { group: "فیلدهای مشترک", admin: "جنسیت آقا", value: "آقا" },
-  labelGenderWoman: { group: "فیلدهای مشترک", admin: "جنسیت خانم", value: "خانم" },
-  saveSuccess: { group: "فیلدهای مشترک", admin: "پیام ذخیره موفق", value: "با موفقیت تغییر کرد" },
+  labelGenderWoman: {
+    group: "فیلدهای مشترک",
+    admin: "جنسیت خانم",
+    value: "خانم",
+  },
+  saveSuccess: {
+    group: "فیلدهای مشترک",
+    admin: "پیام ذخیره موفق",
+    value: "با موفقیت تغییر کرد",
+  },
 
   // --- جستجوی هنرمندان (فیلترها) ---
-  artistsCount: { group: "صفحه جستجوی هنرمندان", admin: "متن تعداد نتایج ({count} = عدد)", value: "{count} هنرمند یافت شد" },
+  artistsCount: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "متن تعداد نتایج ({count} = عدد)",
+    value: "{count} هنرمند یافت شد",
+  },
   artistsNoFilters: {
     group: "صفحه جستجوی هنرمندان",
     admin: "متن نبودن فیلتر برای دسته‌بندی",
     value: "برای این دسته‌بندی فیلتری تعریف نشده است.",
   },
-  artistsClearFilters: { group: "صفحه جستجوی هنرمندان", admin: "دکمه حذف فیلترها", value: "حذف فیلترها" },
-  artistsCategoryLabel: { group: "صفحه جستجوی هنرمندان", admin: "برچسب پیش‌فرض دسته‌بندی", value: "دسته‌بندی" },
-  artistsRangeTo: { group: "صفحه جستجوی هنرمندان", admin: "واژه «تا» در بازه‌ها", value: "تا" },
-  artistsCardCta: { group: "صفحه جستجوی هنرمندان", admin: "دکمه کارت هنرمند", value: "مشاهده پروفایل" },
+  artistsClearFilters: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "دکمه حذف فیلترها",
+    value: "حذف فیلترها",
+  },
+  artistsCategoryLabel: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "برچسب پیش‌فرض دسته‌بندی",
+    value: "دسته‌بندی",
+  },
+  artistsRangeTo: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "واژه «تا» در بازه‌ها",
+    value: "تا",
+  },
+  artistsCardCta: {
+    group: "صفحه جستجوی هنرمندان",
+    admin: "دکمه کارت هنرمند",
+    value: "مشاهده پروفایل",
+  },
 
   // --- صفحه هنرمند ---
-  artistAboutTitle: { group: "صفحه هنرمند", admin: "عنوان بخش درباره", value: "درباره من" },
-  artistPhotosTitle: { group: "صفحه هنرمند", admin: "عنوان نمونه‌کار تصویری", value: "نمونه کارهای تصویری" },
-  artistVideosTitle: { group: "صفحه هنرمند", admin: "عنوان نمونه‌کار ویدیویی", value: "نمونه کارهای ویدیویی" },
-  artistProvince: { group: "صفحه هنرمند", admin: "برچسب استان", value: "استان" },
-  artistCategory: { group: "صفحه هنرمند", admin: "برچسب دسته‌بندی", value: "دسته‌بندی" },
+  artistAboutTitle: {
+    group: "صفحه هنرمند",
+    admin: "عنوان بخش درباره",
+    value: "درباره من",
+  },
+  artistPhotosTitle: {
+    group: "صفحه هنرمند",
+    admin: "عنوان نمونه‌کار تصویری",
+    value: "نمونه کارهای تصویری",
+  },
+  artistVideosTitle: {
+    group: "صفحه هنرمند",
+    admin: "عنوان نمونه‌کار ویدیویی",
+    value: "نمونه کارهای ویدیویی",
+  },
+  artistProvince: {
+    group: "صفحه هنرمند",
+    admin: "برچسب استان",
+    value: "استان",
+  },
+  artistCategory: {
+    group: "صفحه هنرمند",
+    admin: "برچسب دسته‌بندی",
+    value: "دسته‌بندی",
+  },
   artistGender: { group: "صفحه هنرمند", admin: "برچسب جنسیت", value: "جنسیت" },
-  artistBirthDate: { group: "صفحه هنرمند", admin: "برچسب تاریخ تولد", value: "تاریخ تولد" },
+  artistBirthDate: {
+    group: "صفحه هنرمند",
+    admin: "برچسب تاریخ تولد",
+    value: "تاریخ تولد",
+  },
   artistAccent: { group: "صفحه هنرمند", admin: "برچسب لهجه", value: "لهجه" },
-  artistContactTitle: { group: "صفحه هنرمند", admin: "عنوان اطلاعات تماس", value: "اطلاعات تماس" },
-  artistContactPhone: { group: "صفحه هنرمند", admin: "برچسب شماره تماس", value: "شماره تماس" },
-  artistContactEmail: { group: "صفحه هنرمند", admin: "برچسب ایمیل", value: "ایمیل" },
-  artistContactAddress: { group: "صفحه هنرمند", admin: "برچسب آدرس", value: "آدرس" },
-  artistContactPostalCode: { group: "صفحه هنرمند", admin: "برچسب کد پستی", value: "کد پستی" },
-  artistContactYes: { group: "صفحه هنرمند", admin: "مقدار «بله» در اطلاعات خصوصی", value: "بله" },
-  artistContactNo: { group: "صفحه هنرمند", admin: "مقدار «خیر» در اطلاعات خصوصی", value: "خیر" },
-  artistContactCta: { group: "صفحه هنرمند", admin: "دکمه مشاهده اطلاعات تماس", value: "مشاهده اطلاعات تماس" },
-  artistShareCta: { group: "صفحه هنرمند", admin: "دکمه اشتراک گذاری", value: "اشتراک گذاری" },
+  artistContactTitle: {
+    group: "صفحه هنرمند",
+    admin: "عنوان اطلاعات تماس",
+    value: "اطلاعات تماس",
+  },
+  artistContactPhone: {
+    group: "صفحه هنرمند",
+    admin: "برچسب شماره تماس",
+    value: "شماره تماس",
+  },
+  artistContactEmail: {
+    group: "صفحه هنرمند",
+    admin: "برچسب ایمیل",
+    value: "ایمیل",
+  },
+  artistContactAddress: {
+    group: "صفحه هنرمند",
+    admin: "برچسب آدرس",
+    value: "آدرس",
+  },
+  artistContactPostalCode: {
+    group: "صفحه هنرمند",
+    admin: "برچسب کد پستی",
+    value: "کد پستی",
+  },
+  artistContactYes: {
+    group: "صفحه هنرمند",
+    admin: "مقدار «بله» در اطلاعات خصوصی",
+    value: "بله",
+  },
+  artistContactNo: {
+    group: "صفحه هنرمند",
+    admin: "مقدار «خیر» در اطلاعات خصوصی",
+    value: "خیر",
+  },
+  artistContactCta: {
+    group: "صفحه هنرمند",
+    admin: "دکمه مشاهده اطلاعات تماس",
+    value: "مشاهده اطلاعات تماس",
+  },
+  artistShareCta: {
+    group: "صفحه هنرمند",
+    admin: "دکمه اشتراک گذاری",
+    value: "اشتراک گذاری",
+  },
   artistLoginFirst: {
     group: "صفحه هنرمند",
     admin: "پیام نیاز به ورود",
     value: "برای مشاهده اطلاعات تماس ابتدا وارد شوید.",
   },
-  artistWorkPhoto: { group: "صفحه هنرمند", admin: "برچسب نمونه تصویری", value: "نمونه تصویری" },
-  artistWorkVideo: { group: "صفحه هنرمند", admin: "برچسب نمونه ویدیویی", value: "نمونه ویدیویی" },
-  artistWorkYear: { group: "صفحه هنرمند", admin: "برچسب سال نمونه‌کار ({year} = سال)", value: "سال {year}" },
+  artistWorkPhoto: {
+    group: "صفحه هنرمند",
+    admin: "برچسب نمونه تصویری",
+    value: "نمونه تصویری",
+  },
+  artistWorkVideo: {
+    group: "صفحه هنرمند",
+    admin: "برچسب نمونه ویدیویی",
+    value: "نمونه ویدیویی",
+  },
+  artistWorkYear: {
+    group: "صفحه هنرمند",
+    admin: "برچسب سال نمونه‌کار ({year} = سال)",
+    value: "سال {year}",
+  },
 
   // --- درخواست مشاهده اطلاعات تماس ---
   callFormDesc: {
     group: "درخواست اطلاعات تماس",
     admin: "توضیح فرم",
-    value: "برای مشاهده رزومه و اطلاعات تماس هنرمند، فرم زیر را پر کنید. پس از تأیید درخواست توسط پشتیبانی، پیامک دریافت می‌کنید.",
+    value:
+      "برای مشاهده رزومه و اطلاعات تماس هنرمند، فرم زیر را پر کنید. پس از تأیید درخواست توسط پشتیبانی، پیامک دریافت می‌کنید.",
   },
-  callSubmitting: { group: "درخواست اطلاعات تماس", admin: "متن در حال ثبت", value: "در حال ثبت درخواست..." },
-  callPendingCta: { group: "درخواست اطلاعات تماس", admin: "دکمه درخواست در انتظار تأیید", value: "درخواست شما در انتظار تأیید است" },
-  callSuccessTitle: { group: "درخواست اطلاعات تماس", admin: "عنوان موفقیت", value: "درخواست شما با موفقیت ثبت شد" },
+  callSubmitting: {
+    group: "درخواست اطلاعات تماس",
+    admin: "متن در حال ثبت",
+    value: "در حال ثبت درخواست...",
+  },
+  callPendingCta: {
+    group: "درخواست اطلاعات تماس",
+    admin: "دکمه درخواست در انتظار تأیید",
+    value: "درخواست شما در انتظار تأیید است",
+  },
+  callSuccessTitle: {
+    group: "درخواست اطلاعات تماس",
+    admin: "عنوان موفقیت",
+    value: "درخواست شما با موفقیت ثبت شد",
+  },
   callSuccessDesc: {
     group: "درخواست اطلاعات تماس",
     admin: "توضیح موفقیت",
-    value: "پس از بررسی و تأیید درخواست، پیامک دریافت می‌کنید. وضعیت درخواست در پروفایل شما، بخش «درخواست‌های ارتباط با هنرمندان» قابل پیگیری است.",
+    value:
+      "پس از بررسی و تأیید درخواست، پیامک دریافت می‌کنید. وضعیت درخواست در پروفایل شما، بخش «درخواست‌های ارتباط با هنرمندان» قابل پیگیری است.",
   },
   callSuccessGuestDesc: {
     group: "درخواست اطلاعات تماس",
     admin: "توضیح موفقیت (بدون ورود)",
-    value: "پس از تأیید درخواست، پیامک دریافت می‌کنید و اطلاعات تماس در همین مرورگر، روی صفحه هنرمند نمایش داده می‌شود.",
+    value:
+      "پس از تأیید درخواست، پیامک دریافت می‌کنید و اطلاعات تماس در همین مرورگر، روی صفحه هنرمند نمایش داده می‌شود.",
   },
-  callSuccessTracking: { group: "درخواست اطلاعات تماس", admin: "برچسب شماره پیگیری", value: "شماره پیگیری:" },
-  callSuccessCta: { group: "درخواست اطلاعات تماس", admin: "دکمه رفتن به پروفایل", value: "رفتن به پروفایل" },
+  callSuccessTracking: {
+    group: "درخواست اطلاعات تماس",
+    admin: "برچسب شماره پیگیری",
+    value: "شماره پیگیری:",
+  },
+  callSuccessCta: {
+    group: "درخواست اطلاعات تماس",
+    admin: "دکمه رفتن به پروفایل",
+    value: "رفتن به پروفایل",
+  },
 
   // --- پروفایل کاربر ---
-  profileOverviewTitle: { group: "پروفایل کاربر", admin: "عنوان ویرایش پروفایل", value: "ویرایش پروفایل" },
-  profileOverviewCta: { group: "پروفایل کاربر", admin: "دکمه به‌روزرسانی پروفایل", value: "به‌روزرسانی پروفایل" },
-  profileAvatarCta: { group: "پروفایل کاربر", admin: "دکمه تغییر تصویر پروفایل", value: "تغییر تصویر پروفایل" },
-  profileAvatarHint: { group: "پروفایل کاربر", admin: "توضیح تصویر پروفایل", value: "این تصویر در رزومه شما نمایش داده می‌شود." },
-  profileAvatarError: { group: "پروفایل کاربر", admin: "خطای بارگذاری تصویر پروفایل", value: "خطا در بارگذاری تصویر" },
-  profileFormsTitle: { group: "پروفایل کاربر", admin: "عنوان لیست فرم‌ها", value: "لیست فرم‌ها" },
-  profileFormsEmpty: { group: "پروفایل کاربر", admin: "متن نبودن فرم", value: "هیچ فرمی ثبت نشده است." },
-  profileFormsTracking: { group: "پروفایل کاربر", admin: "برچسب کد پیگیری فرم", value: "کد پیگیری:" },
-  profileFormEdit: { group: "پروفایل کاربر", admin: "دکمه ویرایش فرم", value: "ویرایش فرم" },
-  profileFormPay: { group: "پروفایل کاربر", admin: "دکمه پرداخت فرم (پرداخت ناموفق)", value: "پرداخت" },
-  profileFormView: { group: "پروفایل کاربر", admin: "دکمه مشاهده فرم", value: "مشاهده فرم" },
-  profileFormPublicPage: { group: "پروفایل کاربر", admin: "دکمه صفحه عمومی هنرمند", value: "صفحه عمومی" },
-  profileFormViewTitle: { group: "پروفایل کاربر", admin: "عنوان صفحه مشاهده فرم", value: "مشاهده فرم ثبت‌شده" },
-  profileResumeView: { group: "پروفایل کاربر", admin: "دکمه مشاهده رزومه (درخواست تاییدشده)", value: "مشاهده رزومه" },
-  profileResumeViewTitle: { group: "پروفایل کاربر", admin: "عنوان صفحه مشاهده رزومه (درخواست تاییدشده)", value: "مشاهده رزومه" },
-  profileFormsColName: { group: "پروفایل کاربر", admin: "ستون نام فرم", value: "نام فرم" },
-  profileFormsColDate: { group: "پروفایل کاربر", admin: "ستون تاریخ ارسال", value: "تاریخ ارسال" },
-  profileColStatus: { group: "پروفایل کاربر", admin: "ستون وضعیت", value: "وضعیت" },
-  profileColActions: { group: "پروفایل کاربر", admin: "ستون عملیات", value: "عملیات" },
-  profileMessagesTitle: { group: "پروفایل کاربر", admin: "عنوان صندوق پیام", value: "پیام‌ها" },
-  profileMessagesEmpty: { group: "پروفایل کاربر", admin: "متن نبودن پیام", value: "هنوز پیامی برای شما ثبت نشده است." },
-  profileRequestsTitle: { group: "پروفایل کاربر", admin: "عنوان درخواست‌های ارتباط", value: "درخواست‌های ارتباط با هنرمندان" },
-  profileRequestsEmpty: { group: "پروفایل کاربر", admin: "متن نبودن درخواست", value: "هیچ درخواستی ثبت نشده است." },
-  profileRequestsTabTitle: { group: "پروفایل کاربر", admin: "عنوان تب درخواست‌ها", value: "درخواست‌های ارتباط" },
-  profileRequestsColArtist: { group: "پروفایل کاربر", admin: "ستون هنرمند", value: "هنرمند" },
-  profileRequestsColTracking: { group: "پروفایل کاربر", admin: "ستون شماره پیگیری", value: "شماره پیگیری" },
-  profileRequestsColDate: { group: "پروفایل کاربر", admin: "ستون تاریخ", value: "تاریخ ثبت" },
-  requestPending: { group: "پروفایل کاربر", admin: "وضعیت درخواست: در انتظار تأیید", value: "در انتظار تأیید" },
-  requestApproved: { group: "پروفایل کاربر", admin: "وضعیت درخواست: تأیید شده", value: "تأیید شده" },
-  requestRejected: { group: "پروفایل کاربر", admin: "وضعیت درخواست: رد شده", value: "رد شده" },
-  profileRequestsViewArtist: { group: "پروفایل کاربر", admin: "دکمه مشاهده پروفایل هنرمند", value: "مشاهده پروفایل هنرمند" },
-  profileWalletTitle: { group: "پروفایل کاربر", admin: "عنوان کیف پول", value: "کیف پول" },
-  profileWalletBalance: { group: "پروفایل کاربر", admin: "برچسب موجودی", value: "موجودی کیف پول" },
+  profileOverviewTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان ویرایش پروفایل",
+    value: "ویرایش پروفایل",
+  },
+  profileOverviewCta: {
+    group: "پروفایل کاربر",
+    admin: "دکمه به‌روزرسانی پروفایل",
+    value: "به‌روزرسانی پروفایل",
+  },
+  profileAvatarCta: {
+    group: "پروفایل کاربر",
+    admin: "دکمه تغییر تصویر پروفایل",
+    value: "تغییر تصویر پروفایل",
+  },
+  profileAvatarHint: {
+    group: "پروفایل کاربر",
+    admin: "توضیح تصویر پروفایل",
+    value: "این تصویر در رزومه شما نمایش داده می‌شود.",
+  },
+  profileAvatarError: {
+    group: "پروفایل کاربر",
+    admin: "خطای بارگذاری تصویر پروفایل",
+    value: "خطا در بارگذاری تصویر",
+  },
+  profileFormsTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان لیست فرم‌ها",
+    value: "لیست فرم‌ها",
+  },
+  profileFormsEmpty: {
+    group: "پروفایل کاربر",
+    admin: "متن نبودن فرم",
+    value: "هیچ فرمی ثبت نشده است.",
+  },
+  profileFormsTracking: {
+    group: "پروفایل کاربر",
+    admin: "برچسب کد پیگیری فرم",
+    value: "کد پیگیری:",
+  },
+  profileFormEdit: {
+    group: "پروفایل کاربر",
+    admin: "دکمه ویرایش فرم",
+    value: "ویرایش فرم",
+  },
+  profileFormPay: {
+    group: "پروفایل کاربر",
+    admin: "دکمه پرداخت فرم (پرداخت ناموفق)",
+    value: "پرداخت",
+  },
+  profileFormView: {
+    group: "پروفایل کاربر",
+    admin: "دکمه مشاهده فرم",
+    value: "مشاهده فرم",
+  },
+  profileFormPublicPage: {
+    group: "پروفایل کاربر",
+    admin: "دکمه صفحه عمومی هنرمند",
+    value: "صفحه عمومی",
+  },
+  profileFormViewTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان صفحه مشاهده فرم",
+    value: "مشاهده فرم ثبت‌شده",
+  },
+  profileResumeView: {
+    group: "پروفایل کاربر",
+    admin: "دکمه مشاهده رزومه (درخواست تاییدشده)",
+    value: "مشاهده رزومه",
+  },
+  profileResumeViewTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان صفحه مشاهده رزومه (درخواست تاییدشده)",
+    value: "مشاهده رزومه",
+  },
+  profileFormsColName: {
+    group: "پروفایل کاربر",
+    admin: "ستون نام فرم",
+    value: "نام فرم",
+  },
+  profileFormsColDate: {
+    group: "پروفایل کاربر",
+    admin: "ستون تاریخ ارسال",
+    value: "تاریخ ارسال",
+  },
+  profileColStatus: {
+    group: "پروفایل کاربر",
+    admin: "ستون وضعیت",
+    value: "وضعیت",
+  },
+  profileColActions: {
+    group: "پروفایل کاربر",
+    admin: "ستون عملیات",
+    value: "عملیات",
+  },
+  profileMessagesTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان صندوق پیام",
+    value: "پیام‌ها",
+  },
+  profileMessagesEmpty: {
+    group: "پروفایل کاربر",
+    admin: "متن نبودن پیام",
+    value: "هنوز پیامی برای شما ثبت نشده است.",
+  },
+  profileRequestsTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان درخواست‌های ارتباط",
+    value: "درخواست‌های ارتباط با هنرمندان",
+  },
+  profileRequestsEmpty: {
+    group: "پروفایل کاربر",
+    admin: "متن نبودن درخواست",
+    value: "هیچ درخواستی ثبت نشده است.",
+  },
+  profileRequestsTabTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان تب درخواست‌ها",
+    value: "درخواست‌های ارتباط",
+  },
+  profileRequestsColArtist: {
+    group: "پروفایل کاربر",
+    admin: "ستون هنرمند",
+    value: "هنرمند",
+  },
+  profileRequestsColTracking: {
+    group: "پروفایل کاربر",
+    admin: "ستون شماره پیگیری",
+    value: "شماره پیگیری",
+  },
+  profileRequestsColDate: {
+    group: "پروفایل کاربر",
+    admin: "ستون تاریخ",
+    value: "تاریخ ثبت",
+  },
+  requestPending: {
+    group: "پروفایل کاربر",
+    admin: "وضعیت درخواست: در انتظار تأیید",
+    value: "در انتظار تأیید",
+  },
+  requestApproved: {
+    group: "پروفایل کاربر",
+    admin: "وضعیت درخواست: تأیید شده",
+    value: "تأیید شده",
+  },
+  requestRejected: {
+    group: "پروفایل کاربر",
+    admin: "وضعیت درخواست: رد شده",
+    value: "رد شده",
+  },
+  profileRequestsViewArtist: {
+    group: "پروفایل کاربر",
+    admin: "دکمه مشاهده پروفایل هنرمند",
+    value: "مشاهده پروفایل هنرمند",
+  },
+  profileWalletTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان کیف پول",
+    value: "تراکنش ها",
+  },
+  profileWalletBalance: {
+    group: "پروفایل کاربر",
+    admin: "برچسب موجودی",
+    value: "موجودی کیف پول",
+  },
   profileWalletNote: {
     group: "پروفایل کاربر",
     admin: "توضیح کیف پول",
-    value: "اگر درخواست ثبت‌نام شما رد شود یا نیاز به اصلاح داشته باشد، هزینه پرداختی به کیف پول شما برمی‌گردد و در پرداخت بعدی به‌صورت خودکار کسر می‌شود.",
+    value:
+      "اگر درخواست ثبت‌نام شما رد شود یا نیاز به اصلاح داشته باشد، هزینه پرداختی به کیف پول شما برمی‌گردد و در پرداخت بعدی به‌صورت خودکار کسر می‌شود.",
   },
-  profileWalletEmpty: { group: "پروفایل کاربر", admin: "متن نبودن تراکنش", value: "هنوز تراکنشی ثبت نشده است." },
-  profileSupportTitle: { group: "پروفایل کاربر", admin: "عنوان پشتیبانی", value: "پشتیبانی" },
+  profileWalletEmpty: {
+    group: "پروفایل کاربر",
+    admin: "متن نبودن تراکنش",
+    value: "هنوز تراکنشی ثبت نشده است.",
+  },
+  profileSupportTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان پشتیبانی",
+    value: "پشتیبانی",
+  },
   profileSupportDesc: {
     group: "پروفایل کاربر",
     admin: "توضیح بخش پشتیبانی پروفایل",
-    value: "سوال یا مشکلی دارید؟ تیکت ثبت کنید تا تیم پشتیبانی پاسخ دهد. پاسخ‌ها همین‌جا و با پیامک به شما اطلاع داده می‌شوند.",
+    value:
+      "سوال یا مشکلی دارید؟ تیکت ثبت کنید تا تیم پشتیبانی پاسخ دهد. پاسخ‌ها همین‌جا و با پیامک به شما اطلاع داده می‌شوند.",
   },
-  profileSupportNew: { group: "پروفایل کاربر", admin: "دکمه تیکت جدید", value: "تیکت جدید" },
-  profileSupportEmpty: { group: "پروفایل کاربر", admin: "متن نبودن تیکت", value: "هنوز تیکتی ثبت نکرده‌اید." },
-  profileSupportSubject: { group: "پروفایل کاربر", admin: "برچسب موضوع تیکت", value: "موضوع" },
-  profileSupportMessage: { group: "پروفایل کاربر", admin: "برچسب متن تیکت", value: "متن پیام" },
-  profileSupportSubmit: { group: "پروفایل کاربر", admin: "دکمه ارسال تیکت", value: "ارسال تیکت" },
-  profileSupportCancel: { group: "پروفایل کاربر", admin: "دکمه انصراف تیکت", value: "انصراف" },
-  profileSupportRequired: { group: "پروفایل کاربر", admin: "خطای خالی بودن تیکت", value: "موضوع و متن پیام الزامی است." },
-  profileSupportCreated: { group: "پروفایل کاربر", admin: "پیام ثبت تیکت", value: "تیکت شما ثبت شد." },
-  profileSupportError: { group: "پروفایل کاربر", admin: "خطای ارسال تیکت یا پاسخ", value: "ارسال ناموفق بود. دوباره تلاش کنید." },
-  profileSupportBack: { group: "پروفایل کاربر", admin: "دکمه بازگشت به تیکت‌ها", value: "بازگشت به تیکت‌ها" },
-  profileSupportReplyPlaceholder: { group: "پروفایل کاربر", admin: "راهنمای کادر پاسخ", value: "پاسخ خود را بنویسید..." },
-  profileSupportSend: { group: "پروفایل کاربر", admin: "دکمه ارسال پاسخ", value: "ارسال پاسخ" },
-  profileSupportClosed: { group: "پروفایل کاربر", admin: "متن تیکت بسته", value: "این تیکت بسته شده است. برای موضوع جدید تیکت جدید ثبت کنید." },
-  profileSupportYou: { group: "پروفایل کاربر", admin: "برچسب پیام کاربر", value: "شما" },
-  profileSupportStaff: { group: "پروفایل کاربر", admin: "برچسب پیام پشتیبانی", value: "پشتیبانی" },
-  profileSupportStatusOpen: { group: "پروفایل کاربر", admin: "وضعیت تیکت: در انتظار پاسخ", value: "در انتظار پاسخ" },
-  profileSupportStatusAnswered: { group: "پروفایل کاربر", admin: "وضعیت تیکت: پاسخ داده شد", value: "پاسخ داده شد" },
-  profileSupportStatusClosed: { group: "پروفایل کاربر", admin: "وضعیت تیکت: بسته", value: "بسته شده" },
-  profileLogoutTitle: { group: "پروفایل کاربر", admin: "عنوان خروج از حساب", value: "خروج از حساب" },
-  profileLogoutSuccess: { group: "پروفایل کاربر", admin: "پیام خروج موفق", value: "با موفقیت خارج شدید" },
+  profileSupportNew: {
+    group: "پروفایل کاربر",
+    admin: "دکمه تیکت جدید",
+    value: "تیکت جدید",
+  },
+  profileSupportEmpty: {
+    group: "پروفایل کاربر",
+    admin: "متن نبودن تیکت",
+    value: "هنوز تیکتی ثبت نکرده‌اید.",
+  },
+  profileSupportSubject: {
+    group: "پروفایل کاربر",
+    admin: "برچسب موضوع تیکت",
+    value: "موضوع",
+  },
+  profileSupportMessage: {
+    group: "پروفایل کاربر",
+    admin: "برچسب متن تیکت",
+    value: "متن پیام",
+  },
+  profileSupportSubmit: {
+    group: "پروفایل کاربر",
+    admin: "دکمه ارسال تیکت",
+    value: "ارسال تیکت",
+  },
+  profileSupportCancel: {
+    group: "پروفایل کاربر",
+    admin: "دکمه انصراف تیکت",
+    value: "انصراف",
+  },
+  profileSupportRequired: {
+    group: "پروفایل کاربر",
+    admin: "خطای خالی بودن تیکت",
+    value: "موضوع و متن پیام الزامی است.",
+  },
+  profileSupportCreated: {
+    group: "پروفایل کاربر",
+    admin: "پیام ثبت تیکت",
+    value: "تیکت شما ثبت شد.",
+  },
+  profileSupportError: {
+    group: "پروفایل کاربر",
+    admin: "خطای ارسال تیکت یا پاسخ",
+    value: "ارسال ناموفق بود. دوباره تلاش کنید.",
+  },
+  profileSupportBack: {
+    group: "پروفایل کاربر",
+    admin: "دکمه بازگشت به تیکت‌ها",
+    value: "بازگشت به تیکت‌ها",
+  },
+  profileSupportReplyPlaceholder: {
+    group: "پروفایل کاربر",
+    admin: "راهنمای کادر پاسخ",
+    value: "پاسخ خود را بنویسید...",
+  },
+  profileSupportSend: {
+    group: "پروفایل کاربر",
+    admin: "دکمه ارسال پاسخ",
+    value: "ارسال پاسخ",
+  },
+  profileSupportClosed: {
+    group: "پروفایل کاربر",
+    admin: "متن تیکت بسته",
+    value: "این تیکت بسته شده است. برای موضوع جدید تیکت جدید ثبت کنید.",
+  },
+  profileSupportYou: {
+    group: "پروفایل کاربر",
+    admin: "برچسب پیام کاربر",
+    value: "شما",
+  },
+  profileSupportStaff: {
+    group: "پروفایل کاربر",
+    admin: "برچسب پیام پشتیبانی",
+    value: "پشتیبانی",
+  },
+  profileSupportStatusOpen: {
+    group: "پروفایل کاربر",
+    admin: "وضعیت تیکت: در انتظار پاسخ",
+    value: "در انتظار پاسخ",
+  },
+  profileSupportStatusAnswered: {
+    group: "پروفایل کاربر",
+    admin: "وضعیت تیکت: پاسخ داده شد",
+    value: "پاسخ داده شد",
+  },
+  profileSupportStatusClosed: {
+    group: "پروفایل کاربر",
+    admin: "وضعیت تیکت: بسته",
+    value: "بسته شده",
+  },
+  profileLogoutTitle: {
+    group: "پروفایل کاربر",
+    admin: "عنوان خروج از حساب",
+    value: "خروج از حساب",
+  },
+  profileLogoutSuccess: {
+    group: "پروفایل کاربر",
+    admin: "پیام خروج موفق",
+    value: "با موفقیت خارج شدید",
+  },
 
   // --- ثبت‌نام: خطاها ---
-  regEditUnavailable: { group: "ثبت‌نام هنرمند", admin: "پیام نبودن دسته‌بندی فرم", value: "این درخواست دسته‌بندی معتبری ندارد و قابل ویرایش نیست." },
-  regEditUnavailableCta: { group: "ثبت‌نام هنرمند", admin: "دکمه بازگشت به فهرست فرم‌ها", value: "بازگشت به فهرست فرم‌ها" },
-  deepLinkCategoryMissing: { group: "ثبت‌نام هنرمند", admin: "پیام پیدا نشدن دسته‌بندی لینک", value: "این دسته‌بندی پیدا نشد. از فهرست زیر انتخاب کنید." },
+  regEditUnavailable: {
+    group: "ثبت‌نام هنرمند",
+    admin: "پیام نبودن دسته‌بندی فرم",
+    value: "این درخواست دسته‌بندی معتبری ندارد و قابل ویرایش نیست.",
+  },
+  regEditUnavailableCta: {
+    group: "ثبت‌نام هنرمند",
+    admin: "دکمه بازگشت به فهرست فرم‌ها",
+    value: "بازگشت به فهرست فرم‌ها",
+  },
+  deepLinkCategoryMissing: {
+    group: "ثبت‌نام هنرمند",
+    admin: "پیام پیدا نشدن دسته‌بندی لینک",
+    value: "این دسته‌بندی پیدا نشد. از فهرست زیر انتخاب کنید.",
+  },
 
   // --- بارگذاری فایل ---
-  imageUploadFailed: { group: "بارگذاری فایل", admin: "خطای بارگذاری تصویر", value: "بارگذاری تصویر ناموفق بود. دوباره تلاش کنید." },
-  videoUploadFailed: { group: "بارگذاری فایل", admin: "خطای بارگذاری ویدیو", value: "بارگذاری ویدیو ناموفق بود. دوباره تلاش کنید." },
+  imageUploadFailed: {
+    group: "بارگذاری فایل",
+    admin: "خطای بارگذاری تصویر",
+    value: "بارگذاری تصویر ناموفق بود. دوباره تلاش کنید.",
+  },
+  videoUploadFailed: {
+    group: "بارگذاری فایل",
+    admin: "خطای بارگذاری ویدیو",
+    value: "بارگذاری ویدیو ناموفق بود. دوباره تلاش کنید.",
+  },
 
   // --- آموزش‌ها ---
-  tutorialsTitle: { group: "آموزش‌ها", admin: "عنوان صفحه آموزش‌ها", value: "آموزش‌ها" },
-  tutorialsEmpty: { group: "آموزش‌ها", admin: "متن نبودن آموزش", value: "تا این لحظه آموزشی ثبت نشده است." },
-  tutorialsSectionTitle: { group: "آموزش‌ها", admin: "عنوان بخش آموزش‌ها در صفحه اول", value: "آموزش‌ها" },
-  tutorialsSectionCta: { group: "آموزش‌ها", admin: "لینک «همه» بخش آموزش‌ها", value: "همه" },
+  tutorialsTitle: {
+    group: "آموزش‌ها",
+    admin: "عنوان صفحه آموزش‌ها",
+    value: "آموزش‌ها",
+  },
+  tutorialsEmpty: {
+    group: "آموزش‌ها",
+    admin: "متن نبودن آموزش",
+    value: "تا این لحظه آموزشی ثبت نشده است.",
+  },
+  tutorialsSectionTitle: {
+    group: "آموزش‌ها",
+    admin: "عنوان بخش آموزش‌ها در صفحه اول",
+    value: "آموزش‌ها",
+  },
+  tutorialsSectionCta: {
+    group: "آموزش‌ها",
+    admin: "لینک «همه» بخش آموزش‌ها",
+    value: "همه",
+  },
 
   // --- ورود اجباری پیش از فرم ثبت‌نام ---
-  regAuthGateTitle: { group: "نتیجه ثبت‌نام", admin: "عنوان نیاز به ورود", value: "برای ثبت‌نام ابتدا وارد شوید" },
+  regAuthGateTitle: {
+    group: "نتیجه ثبت‌نام",
+    admin: "عنوان نیاز به ورود",
+    value: "برای ثبت‌نام ابتدا وارد شوید",
+  },
   regAuthGateDesc: {
     group: "نتیجه ثبت‌نام",
     admin: "توضیح نیاز به ورود",
-    value: "فرم ثبت‌نام و پرداخت به حساب کاربری شما گره خورده است. پس از ورود، فرم را تکمیل کنید.",
+    value:
+      "فرم ثبت‌نام و پرداخت به حساب کاربری شما گره خورده است. پس از ورود، فرم را تکمیل کنید.",
   },
-  regAuthGateCta: { group: "نتیجه ثبت‌نام", admin: "دکمه ورود", value: "ورود / ثبت‌نام" },
+  regAuthGateCta: {
+    group: "نتیجه ثبت‌نام",
+    admin: "دکمه ورود",
+    value: "ورود / ثبت‌نام",
+  },
 
   // --- فرم تماس با ما ---
-  contactRequiredError: { group: "فرم تماس با ما", admin: "خطای فیلد الزامی ({field} = نام فیلد)", value: "{field} الزامی است" },
-  contactSubmitSuccess: { group: "فرم تماس با ما", admin: "پیام ارسال موفق", value: "درخواست شما با موفقیت ارسال شد." },
-  contactSubmitError: { group: "فرم تماس با ما", admin: "پیام ارسال ناموفق", value: "ارسال درخواست با خطا مواجه شد." },
+  contactRequiredError: {
+    group: "فرم تماس با ما",
+    admin: "خطای فیلد الزامی ({field} = نام فیلد)",
+    value: "{field} الزامی است",
+  },
+  contactSubmitSuccess: {
+    group: "فرم تماس با ما",
+    admin: "پیام ارسال موفق",
+    value: "درخواست شما با موفقیت ارسال شد.",
+  },
+  contactSubmitError: {
+    group: "فرم تماس با ما",
+    admin: "پیام ارسال ناموفق",
+    value: "ارسال درخواست با خطا مواجه شد.",
+  },
 
   // --- عناصر مشترک ---
-  searchEmptyTitle: { group: "عناصر مشترک", admin: "متن نتیجه‌نداشتن جستجو", value: "نتیجه‌ای یافت نشد!" },
-  searchGroupArtists: { group: "جستجو", admin: "عنوان گروه هنرمندان", value: "هنرمندان" },
-  searchGroupCategories: { group: "جستجو", admin: "عنوان گروه دسته‌بندی‌ها و فرم‌ها", value: "دسته‌بندی‌ها و فرم‌ها" },
-  searchGroupTutorials: { group: "جستجو", admin: "عنوان گروه آموزش‌ها", value: "آموزش‌ها" },
-  searchGroupFaqs: { group: "جستجو", admin: "عنوان گروه سوالات متداول", value: "سوالات متداول" },
-  searchGroupPages: { group: "جستجو", admin: "عنوان گروه صفحات", value: "صفحات" },
-  searchSeeAll: { group: "جستجو", admin: "پیوند مشاهده همه نتایج", value: "مشاهده همه نتایج" },
-  searchMoreArtists: { group: "جستجو", admin: "پیوند هنرمندان بیشتر ({count} = تعداد)", value: "مشاهده هر {count} هنرمند" },
-  searchPageTitle: { group: "جستجو", admin: "عنوان صفحه نتایج ({q} = عبارت)", value: "نتایج جستجو برای «{q}»" },
-  searchTypeMore: { group: "جستجو", admin: "راهنمای حداقل طول عبارت", value: "دست‌کم دو حرف بنویسید." },
-  searchEmptyAlt: { group: "عناصر مشترک", admin: "متن جایگزین تصویر نتیجه‌نداشتن", value: "یافت نشد" },
-  successIconAlt: { group: "عناصر مشترک", admin: "متن جایگزین تصویر موفقیت", value: "موفق" },
-  listSeparator: { group: "عناصر مشترک", admin: "جداکننده فهرست‌ها", value: "، " },
-  avatarFallback: { group: "عناصر مشترک", admin: "حرف جایگزین عکس پروفایل", value: "؟" },
-  supportDefaultTitle: { group: "عنوان صفحات", admin: "عنوان پیش‌فرض صفحه پشتیبانی", value: "مرکز پشتیبانی" },
-  termsDefaultTitle: { group: "عنوان صفحات", admin: "عنوان پیش‌فرض صفحه قوانین", value: "قوانین و حریم خصوصی" },
+  searchEmptyTitle: {
+    group: "عناصر مشترک",
+    admin: "متن نتیجه‌نداشتن جستجو",
+    value: "نتیجه‌ای یافت نشد!",
+  },
+  searchGroupArtists: {
+    group: "جستجو",
+    admin: "عنوان گروه هنرمندان",
+    value: "هنرمندان",
+  },
+  searchGroupCategories: {
+    group: "جستجو",
+    admin: "عنوان گروه دسته‌بندی‌ها و فرم‌ها",
+    value: "دسته‌بندی‌ها و فرم‌ها",
+  },
+  searchGroupTutorials: {
+    group: "جستجو",
+    admin: "عنوان گروه آموزش‌ها",
+    value: "آموزش‌ها",
+  },
+  searchGroupFaqs: {
+    group: "جستجو",
+    admin: "عنوان گروه سوالات متداول",
+    value: "سوالات متداول",
+  },
+  searchGroupPages: {
+    group: "جستجو",
+    admin: "عنوان گروه صفحات",
+    value: "صفحات",
+  },
+  searchSeeAll: {
+    group: "جستجو",
+    admin: "پیوند مشاهده همه نتایج",
+    value: "مشاهده همه نتایج",
+  },
+  searchMoreArtists: {
+    group: "جستجو",
+    admin: "پیوند هنرمندان بیشتر ({count} = تعداد)",
+    value: "مشاهده هر {count} هنرمند",
+  },
+  searchPageTitle: {
+    group: "جستجو",
+    admin: "عنوان صفحه نتایج ({q} = عبارت)",
+    value: "نتایج جستجو برای «{q}»",
+  },
+  searchTypeMore: {
+    group: "جستجو",
+    admin: "راهنمای حداقل طول عبارت",
+    value: "دست‌کم دو حرف بنویسید.",
+  },
+  searchEmptyAlt: {
+    group: "عناصر مشترک",
+    admin: "متن جایگزین تصویر نتیجه‌نداشتن",
+    value: "یافت نشد",
+  },
+  successIconAlt: {
+    group: "عناصر مشترک",
+    admin: "متن جایگزین تصویر موفقیت",
+    value: "موفق",
+  },
+  listSeparator: {
+    group: "عناصر مشترک",
+    admin: "جداکننده فهرست‌ها",
+    value: "، ",
+  },
+  avatarFallback: {
+    group: "عناصر مشترک",
+    admin: "حرف جایگزین عکس پروفایل",
+    value: "؟",
+  },
+  supportDefaultTitle: {
+    group: "عنوان صفحات",
+    admin: "عنوان پیش‌فرض صفحه پشتیبانی",
+    value: "مرکز پشتیبانی",
+  },
+  termsDefaultTitle: {
+    group: "عنوان صفحات",
+    admin: "عنوان پیش‌فرض صفحه قوانین",
+    value: "قوانین و حریم خصوصی",
+  },
 
   // --- دسترس‌پذیری (متن‌های صفحه‌خوان) ---
-  ariaMenuOpen: { group: "دسترس‌پذیری", admin: "دکمه باز کردن منو", value: "منو" },
-  ariaMenuClose: { group: "دسترس‌پذیری", admin: "بستن منو (پس‌زمینه)", value: "بستن منو" },
-  ariaMenuDialog: { group: "دسترس‌پذیری", admin: "کشوی منوی اصلی", value: "منوی اصلی" },
+  ariaMenuOpen: {
+    group: "دسترس‌پذیری",
+    admin: "دکمه باز کردن منو",
+    value: "منو",
+  },
+  ariaMenuClose: {
+    group: "دسترس‌پذیری",
+    admin: "بستن منو (پس‌زمینه)",
+    value: "بستن منو",
+  },
+  ariaMenuDialog: {
+    group: "دسترس‌پذیری",
+    admin: "کشوی منوی اصلی",
+    value: "منوی اصلی",
+  },
   ariaClose: { group: "دسترس‌پذیری", admin: "دکمه بستن", value: "بستن" },
-  ariaBottomNav: { group: "دسترس‌پذیری", admin: "نوار ناوبری موبایل", value: "ناوبری اصلی" },
-  ariaInstagram: { group: "دسترس‌پذیری", admin: "لینک اینستاگرام", value: "اینستاگرام" },
-  ariaSupportCall: { group: "دسترس‌پذیری", admin: "لینک تماس با پشتیبانی", value: "تماس با پشتیبانی" },
-  ariaRangeFrom: { group: "دسترس‌پذیری", admin: "ورودی «از» فیلتر بازه ({label})", value: "{label} از" },
-  ariaRangeTo: { group: "دسترس‌پذیری", admin: "ورودی «تا» فیلتر بازه ({label})", value: "{label} تا" },
+  ariaBottomNav: {
+    group: "دسترس‌پذیری",
+    admin: "نوار ناوبری موبایل",
+    value: "ناوبری اصلی",
+  },
+  ariaInstagram: {
+    group: "دسترس‌پذیری",
+    admin: "لینک اینستاگرام",
+    value: "اینستاگرام",
+  },
+  ariaSupportCall: {
+    group: "دسترس‌پذیری",
+    admin: "لینک تماس با پشتیبانی",
+    value: "تماس با پشتیبانی",
+  },
+  ariaRangeFrom: {
+    group: "دسترس‌پذیری",
+    admin: "ورودی «از» فیلتر بازه ({label})",
+    value: "{label} از",
+  },
+  ariaRangeTo: {
+    group: "دسترس‌پذیری",
+    admin: "ورودی «تا» فیلتر بازه ({label})",
+    value: "{label} تا",
+  },
 
   // --- آپلود فایل ---
-  uploadImageTypeError: { group: "آپلود فایل", admin: "خطای فرمت تصویر", value: "فرمت تصویر باید JPG، PNG یا WebP باشد." },
+  uploadImageTypeError: {
+    group: "آپلود فایل",
+    admin: "خطای فرمت تصویر",
+    value: "فرمت تصویر باید JPG، PNG یا WebP باشد.",
+  },
   uploadImageSizeError: {
     group: "آپلود فایل",
     admin: "خطای حجم تصویر ({mb} = مگابایت مجاز)",
     value: "حجم تصویر نباید بیشتر از {mb} مگابایت باشد.",
   },
-  uploadVideoTypeError: { group: "آپلود فایل", admin: "خطای فرمت ویدیو", value: "فرمت ویدیو باید MP4، WebM یا MOV باشد." },
+  uploadVideoTypeError: {
+    group: "آپلود فایل",
+    admin: "خطای فرمت ویدیو",
+    value: "فرمت ویدیو باید MP4، WebM یا MOV باشد.",
+  },
   uploadVideoSizeError: {
     group: "آپلود فایل",
     admin: "خطای حجم ویدیو ({mb} = مگابایت مجاز)",
@@ -445,19 +1224,71 @@ export const LANDING_COPY = {
   },
 
   // --- خطاهای سرور ---
-  errorGeneric: { group: "خطاهای سرور", admin: "خطای عمومی", value: "خطایی در ارتباط با سرور رخ داده است." },
-  errorUnauthorized: { group: "خطاهای سرور", admin: "خطای انقضای دسترسی", value: "دسترسی شما منقضی شده است. دوباره وارد شوید." },
-  errorForbidden: { group: "خطاهای سرور", admin: "خطای نداشتن دسترسی", value: "اجازه دسترسی به این بخش را ندارید." },
-  errorNotFound: { group: "خطاهای سرور", admin: "خطای پیدا نشدن مورد", value: "موردی با این مشخصات پیدا نشد." },
-  errorServer: { group: "خطاهای سرور", admin: "خطای داخلی سرور", value: "خطای داخلی سرور. کمی بعد دوباره تلاش کنید." },
-  errorNetwork: { group: "خطاهای سرور", admin: "خطای شبکه", value: "ارتباط با سرور برقرار نشد. اینترنت خود را بررسی کنید." },
-  errorCredentials: { group: "خطاهای سرور", admin: "خطای نام کاربری یا رمز", value: "نام کاربری یا رمز عبور اشتباه است." },
-  errorRequiredFields: { group: "خطاهای سرور", admin: "خطای فیلدهای الزامی", value: "پر کردن همه فیلدهای الزامی ضروری است." },
-  errorNumber: { group: "خطاهای سرور", admin: "خطای مقدار عددی", value: "مقدار عددی نامعتبر است." },
-  errorInvalidValue: { group: "خطاهای سرور", admin: "خطای مقدار نامعتبر", value: "مقدار وارد شده معتبر نیست." },
-  errorDuplicate: { group: "خطاهای سرور", admin: "خطای مورد تکراری", value: "این مورد از قبل ثبت شده است." },
-  errorFileTooLarge: { group: "خطاهای سرور", admin: "خطای حجم فایل", value: "حجم فایل بیش از حد مجاز است." },
-  errorTimeout: { group: "خطاهای سرور", admin: "خطای عدم پاسخ سرور", value: "پاسخی از سرور دریافت نشد. دوباره تلاش کنید." },
+  errorGeneric: {
+    group: "خطاهای سرور",
+    admin: "خطای عمومی",
+    value: "خطایی در ارتباط با سرور رخ داده است.",
+  },
+  errorUnauthorized: {
+    group: "خطاهای سرور",
+    admin: "خطای انقضای دسترسی",
+    value: "دسترسی شما منقضی شده است. دوباره وارد شوید.",
+  },
+  errorForbidden: {
+    group: "خطاهای سرور",
+    admin: "خطای نداشتن دسترسی",
+    value: "اجازه دسترسی به این بخش را ندارید.",
+  },
+  errorNotFound: {
+    group: "خطاهای سرور",
+    admin: "خطای پیدا نشدن مورد",
+    value: "موردی با این مشخصات پیدا نشد.",
+  },
+  errorServer: {
+    group: "خطاهای سرور",
+    admin: "خطای داخلی سرور",
+    value: "خطای داخلی سرور. کمی بعد دوباره تلاش کنید.",
+  },
+  errorNetwork: {
+    group: "خطاهای سرور",
+    admin: "خطای شبکه",
+    value: "ارتباط با سرور برقرار نشد. اینترنت خود را بررسی کنید.",
+  },
+  errorCredentials: {
+    group: "خطاهای سرور",
+    admin: "خطای نام کاربری یا رمز",
+    value: "نام کاربری یا رمز عبور اشتباه است.",
+  },
+  errorRequiredFields: {
+    group: "خطاهای سرور",
+    admin: "خطای فیلدهای الزامی",
+    value: "پر کردن همه فیلدهای الزامی ضروری است.",
+  },
+  errorNumber: {
+    group: "خطاهای سرور",
+    admin: "خطای مقدار عددی",
+    value: "مقدار عددی نامعتبر است.",
+  },
+  errorInvalidValue: {
+    group: "خطاهای سرور",
+    admin: "خطای مقدار نامعتبر",
+    value: "مقدار وارد شده معتبر نیست.",
+  },
+  errorDuplicate: {
+    group: "خطاهای سرور",
+    admin: "خطای مورد تکراری",
+    value: "این مورد از قبل ثبت شده است.",
+  },
+  errorFileTooLarge: {
+    group: "خطاهای سرور",
+    admin: "خطای حجم فایل",
+    value: "حجم فایل بیش از حد مجاز است.",
+  },
+  errorTimeout: {
+    group: "خطاهای سرور",
+    admin: "خطای عدم پاسخ سرور",
+    value: "پاسخی از سرور دریافت نشد. دوباره تلاش کنید.",
+  },
 } as const;
 
 export type LandingCopyKey = keyof typeof LANDING_COPY;
