@@ -34,7 +34,8 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
   // Only the required fields still empty. The avatar drops out by itself once uploaded,
   // since the upload refreshes the profile; the others stay until the save.
   const missing = useMemo(
-    () => (profile && allFields ? missingProfileFields(profile, allFields) : []),
+    () =>
+      profile && allFields ? missingProfileFields(profile, allFields) : [],
     [profile, allFields],
   );
   // Optional: offered whenever the admin enabled the field, never required.
@@ -63,10 +64,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
 
     if (!fields.length) return done();
 
-    mutate(
-      Object.fromEntries(fields.map((f) => [f.key, answers[f.key]])),
-      { onSuccess: done },
-    );
+    mutate(Object.fromEntries(fields.map((f) => [f.key, answers[f.key]])), {
+      onSuccess: done,
+    });
   };
 
   return (
@@ -84,7 +84,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-4">
         <p data-el="body" className="text-sm text-zinc-400">
-          <span style={copy.style("completeProfileDesc")}>{copy("completeProfileDesc")}</span>
+          <span style={copy.style("completeProfileDesc")}>
+            {copy("completeProfileDesc")}
+          </span>
         </p>
 
         {showAvatar && (
@@ -101,11 +103,14 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
               </div>
             )}
             <div className="flex min-w-0 flex-col items-start gap-2">
-              <span className="text-xs text-zinc-400">
-                <span style={copy.style("completeProfileAvatarOptional")}>
-                  {copy("completeProfileAvatarOptional")}
+              {!allFields?.at(0)?.required && (
+                <span className="text-xs text-zinc-400">
+                  <span style={copy.style("completeProfileAvatarOptional")}>
+                    {copy("completeProfileAvatarOptional")}
+                  </span>
                 </span>
-              </span>
+              )}
+
               <label
                 className={`inline-flex cursor-pointer items-center gap-2 rounded-full border border-error-500 px-4 py-2 text-sm text-error-500 transition hover:bg-error-500/10 ${
                   uploadAvatar.isPending ? "pointer-events-none opacity-60" : ""
@@ -113,7 +118,13 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
               >
                 <Camera className="h-4 w-4" />
                 <span style={copy.style("profileAvatarCta")}>
-                  {uploadAvatar.isPending ? "..." : <span style={copy.style("profileAvatarCta")}>{copy("profileAvatarCta")}</span>}
+                  {uploadAvatar.isPending ? (
+                    "..."
+                  ) : (
+                    <span style={copy.style("profileAvatarCta")}>
+                      {copy("profileAvatarCta")}
+                    </span>
+                  )}
                 </span>
                 <input
                   type="file"
@@ -131,7 +142,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
                 />
               </label>
               <span className="text-xs text-zinc-400">
-                <span style={copy.style("profileAvatarHint")}>{copy("profileAvatarHint")}</span>
+                <span style={copy.style("profileAvatarHint")}>
+                  {copy("profileAvatarHint")}
+                </span>
               </span>
             </div>
           </div>
@@ -142,7 +155,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
             key={field.key}
             field={field}
             value={answers[field.key] ?? ""}
-            onChange={(value) => setAnswers((prev) => ({ ...prev, [field.key]: value }))}
+            onChange={(value) =>
+              setAnswers((prev) => ({ ...prev, [field.key]: value }))
+            }
           />
         ))}
 
@@ -154,7 +169,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
             className="w-full rounded-full!"
             isFullWidth
           >
-            <span data-el="button" style={copy.style("actionSave")}>{copy("actionSave")}</span>
+            <span data-el="button" style={copy.style("actionSave")}>
+              {copy("actionSave")}
+            </span>
           </Button>
           <Button
             type="button"
@@ -164,7 +181,9 @@ const CompleteProfileDrawer = ({ open, onClose }: Props) => {
             className="w-full rounded-full!"
             isFullWidth
           >
-            <span data-el="button" style={copy.style("actionCancel")}>{copy("actionCancel")}</span>
+            <span data-el="button" style={copy.style("actionCancel")}>
+              {copy("actionCancel")}
+            </span>
           </Button>
         </div>
       </form>
