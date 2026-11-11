@@ -46,6 +46,10 @@ export const SMS_EVENT: Record<
     label: "ثبت فرم",
     description: "پس از تکمیل و ارسال فرم ثبت‌نام توسط هنرمند ارسال می‌شود.",
   },
+  [ESmsEvent.FORM_EDITED]: {
+    label: "ویرایش فرم",
+    description: "وقتی هنرمند فرم درخواست قبلاً ثبت‌شده‌اش را ویرایش و دوباره ارسال می‌کند.",
+  },
   [ESmsEvent.NEED_REVISION]: {
     label: "نیاز به اصلاح",
     description:
@@ -125,6 +129,7 @@ export const SMS_EVENT: Record<
 /** Pipeline order — the list reads top to bottom as the applicant's journey. */
 export const SMS_EVENT_ORDER: ESmsEvent[] = [
   ESmsEvent.FORM_SUBMITTED,
+  ESmsEvent.FORM_EDITED,
   ESmsEvent.PAYMENT_SUCCESS,
   ESmsEvent.PAYMENT_FAILED,
   ESmsEvent.NEED_REVISION,

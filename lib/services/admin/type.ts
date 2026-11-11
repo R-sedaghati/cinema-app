@@ -1047,6 +1047,7 @@ export interface IAdjustWalletRequest {
 /** The events a profile-inbox message can carry (the message's own `event`). */
 export enum ESmsEvent {
   FORM_SUBMITTED = "FORM_SUBMITTED",
+  FORM_EDITED = "FORM_EDITED",
   NEED_REVISION = "NEED_REVISION",
   APPROVED = "APPROVED",
   REJECTED = "REJECTED",
