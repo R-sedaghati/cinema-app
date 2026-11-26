@@ -56,15 +56,15 @@ export default function CheckAppUpdate() {
         </p>
       </div>
       <div className="flex flex-col items-center md:hidden gap-4 w-full">
-        <button onClick={() => router.push("/download")}>
+        <a href="/apk/app-Archivehonar.apk" download="app-Archivehonar.apk">
           <img
             src="/download-android.svg"
-            alt="App Store"
+            alt="Download Android App"
             className="h-18.75 w-64"
             width={256}
             height={75}
           />
-        </button>
+        </a>
         <button
           onClick={() => router.push("https://cafebazaar.ir/app/archive.honar")}
         >
