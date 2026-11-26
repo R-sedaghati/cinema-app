@@ -11,7 +11,7 @@ export default function ApplicationPage() {
   const sections = resolveHomeSections(data?.result?.homeSections);
 
   return (
-    <div className="min-h-screen pb-safe-32">
+    <div className="min-h-screen pb-safe-24">
       <HomeSections sections={sections} />
     </div>
   );

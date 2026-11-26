@@ -147,13 +147,19 @@ export function SiteFooter() {
                   height={75}
                 />
               </button>
-              <img
-                src="/download-bazar.svg"
-                alt="App Store"
-                className="h-18.75 w-64"
-                width={256}
-                height={75}
-              />
+              <button
+                onClick={() =>
+                  router.push("https://cafebazaar.ir/app/archive.honar")
+                }
+              >
+                <img
+                  src="/download-bazar.svg"
+                  alt="App Store"
+                  className="h-18.75 w-64"
+                  width={256}
+                  height={75}
+                />
+              </button>
             </div>
           </div>
           {enamadQuery && (
